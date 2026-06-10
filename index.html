@@ -8,218 +8,248 @@ $ cat /home/user/soundmachine/index.html
 <title>VIRUS TI SNOW // EDITOR</title>
 <style>
   :root{
-    --bg: #0c0c0e;
-    --panel: #1c1c20;
-    --panel-light: #2a2a30;
-    --accent: #ff8c1a;
-    --accent2: #ff3b3b;
-    --led: #ffb347;
-    --green: #3dff7a;
-    --red: #ff4040;
-    --border: #050505;
-    --text: #d8d8d8;
+    --black: #000000;
+    --white: #ffffff;
+    --grey: #333333;
   }
-  *{ box-sizing: border-box; }
+  *{
+    box-sizing: border-box;
+    border-radius: 0 !important;
+    text-shadow: none !important;
+    box-shadow: none !important;
+  }
   body{
-    margin:0;
-    background: linear-gradient(135deg,#1a1a1d,#08080a);
-    color: var(--text);
+    margin: 0;
+    background: var(--black);
+    color: var(--white);
     font-family: "Courier New", Courier, monospace;
-    padding: 16px;
+    padding: 8px;
+    image-rendering: pixelated;
   }
-  h1{
-    text-align:center;
-    letter-spacing: 6px;
-    font-size: 1.8em;
-    color: var(--accent);
-    text-shadow: 0 0 8px rgba(255,140,26,0.6);
-    margin: 0 0 12px 0;
+  /* header bar */
+  .header{
+    border: 1px solid var(--white);
+    padding: 6px 8px;
+    margin-bottom: 8px;
+    text-align: center;
+    font-weight: bold;
+    letter-spacing: 4px;
+    font-size: 0.95em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
   }
   .topbar{
-    display:flex;
+    display: flex;
     flex-wrap: wrap;
-    gap: 12px;
-    align-items:center;
-    justify-content:center;
-    background: var(--panel);
-    border: 2px solid var(--border);
-    border-radius: 10px;
-    padding: 12px;
-    margin-bottom: 16px;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 4px 10px rgba(0,0,0,0.6);
+    gap: 8px;
+    align-items: center;
+    justify-content: center;
+    border: 1px solid var(--white);
+    padding: 6px 8px;
+    margin-bottom: 8px;
   }
   .topbar label{
-    font-size: 0.75em;
-    color: #999;
-    display:block;
-    margin-bottom:4px;
-    letter-spacing:1px;
-  }
-  .topbar select, .topbar input[type="number"], .topbar input[type="text"]{
-    background: #0a0a0c;
-    color: var(--led);
-    border: 1px solid #444;
-    border-radius:4px;
-    padding: 6px 8px;
-    font-family: inherit;
-    font-size: 0.85em;
-  }
-  .conn{
-    display:flex;
-    align-items:center;
-    gap:6px;
-    font-size:0.8em;
-  }
-  .dot{
-    width:14px; height:14px; border-radius:50%;
-    background: var(--red);
-    box-shadow: 0 0 8px var(--red);
-    transition: all 0.2s;
-  }
-  .dot.on{
-    background: var(--green);
-    box-shadow: 0 0 10px var(--green);
-  }
-  .actions{
-    display:flex;
-    flex-wrap:wrap;
-    gap:8px;
-    justify-content:center;
-    margin-bottom: 16px;
-  }
-  button{
-    background: linear-gradient(180deg,#3a3a40,#1c1c20);
-    color: var(--text);
-    border: 1px solid #000;
-    border-radius: 6px;
-    padding: 10px 16px;
-    font-family: inherit;
-    font-weight:bold;
-    letter-spacing:1px;
-    cursor:pointer;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.1), 0 2px 4px rgba(0,0,0,0.5);
-  }
-  button:active{
-    transform: translateY(1px);
-    box-shadow: inset 0 1px 4px rgba(0,0,0,0.6);
-  }
-  button.randomize{ border-color: var(--accent2); color: var(--accent2); }
-  button.init{ border-color: var(--accent); color: var(--accent); }
-  button.primary{ border-color: var(--green); color: var(--green); }
-
-  .grid{
-    display:grid;
-    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
-    gap: 16px;
-  }
-  .section{
-    background: var(--panel);
-    border: 2px solid var(--border);
-    border-radius: 10px;
-    padding: 12px;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 4px 10px rgba(0,0,0,0.6);
-  }
-  .section h2{
-    margin: 0 0 12px 0;
-    font-size: 1em;
-    letter-spacing: 3px;
-    color: var(--accent);
-    border-bottom: 1px solid #333;
-    padding-bottom: 6px;
+    font-size: 0.6em;
+    color: var(--white);
+    display: block;
+    margin-bottom: 2px;
+    letter-spacing: 1px;
+    font-weight: bold;
     text-transform: uppercase;
   }
-  .knobs{
-    display:flex;
+  .topbar select, .topbar input[type="number"], .topbar input[type="text"]{
+    background: var(--black);
+    color: var(--white);
+    border: 1px solid var(--white);
+    padding: 3px 6px;
+    font-family: inherit;
+    font-size: 0.8em;
+    outline: none;
+  }
+  .conn{
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 0.7em;
+    font-weight: bold;
+    letter-spacing: 1px;
+  }
+  /* square pixel LED */
+  .dot{
+    width: 10px; height: 10px;
+    background: var(--grey);
+    border: 1px solid var(--white);
+    transition: none;
+  }
+  .dot.on{
+    background: var(--white);
+  }
+  .actions{
+    display: flex;
     flex-wrap: wrap;
-    gap: 14px;
+    gap: 6px;
+    justify-content: center;
+    margin-bottom: 8px;
+  }
+  button{
+    background: var(--black);
+    color: var(--white);
+    border: 1px solid var(--white);
+    padding: 6px 14px;
+    font-family: inherit;
+    font-weight: bold;
+    font-size: 0.75em;
+    letter-spacing: 2px;
+    cursor: pointer;
+    text-transform: uppercase;
+  }
+  button:hover{
+    background: var(--white);
+    color: var(--black);
+  }
+  button:active{
+    background: var(--white);
+    color: var(--black);
+  }
+  button.randomize, button.init, button.primary{
+    border-color: var(--white);
+    color: var(--white);
+  }
+  button.randomize:hover, button.init:hover, button.primary:hover{
+    background: var(--white);
+    color: var(--black);
+  }
+
+  .grid{
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 8px;
+  }
+  .section{
+    background: var(--black);
+    border: 1px solid var(--white);
+    padding: 6px 8px;
+  }
+  .section h2{
+    margin: 0 0 8px 0;
+    font-size: 0.7em;
+    letter-spacing: 2px;
+    color: var(--white);
+    border-bottom: 1px solid var(--white);
+    padding-bottom: 4px;
+    text-transform: uppercase;
+    font-weight: bold;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .section h2 svg{
+    flex: 0 0 auto;
+    shape-rendering: crispEdges;
+  }
+  .knobs{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
     justify-content: flex-start;
   }
   .knob-container{
-    display:flex;
-    flex-direction:column;
-    align-items:center;
-    width: 80px;
-    user-select:none;
-    -webkit-user-select:none;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 72px;
+    user-select: none;
+    -webkit-user-select: none;
     touch-action: none;
   }
   .knob-svg{
     cursor: ns-resize;
+    shape-rendering: crispEdges;
   }
   .knob-label{
-    font-size: 0.65em;
-    text-align:center;
-    margin-top: 4px;
-    color: #bbb;
+    font-size: 0.55em;
+    text-align: center;
+    margin-top: 2px;
+    color: var(--white);
     letter-spacing: 0.5px;
-    height: 28px;
-    display:flex;
-    align-items:center;
-    justify-content:center;
+    height: 24px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-transform: uppercase;
+    font-weight: bold;
   }
   .knob-value{
-    background:#0a0a0c;
-    color: var(--led);
-    border: 1px solid #444;
-    border-radius:3px;
-    padding: 2px 6px;
-    font-size: 0.75em;
-    margin-top: 3px;
+    background: var(--black);
+    color: var(--white);
+    border: 1px solid var(--white);
+    padding: 1px 5px;
+    font-size: 0.85em;
+    font-weight: bold;
+    margin-top: 2px;
     min-width: 34px;
-    text-align:center;
+    text-align: center;
     cursor: text;
   }
   .library{
-    margin-top: 16px;
-    background: var(--panel);
-    border: 2px solid var(--border);
-    border-radius: 10px;
-    padding: 12px;
-    box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 4px 10px rgba(0,0,0,0.6);
+    margin-top: 8px;
+    background: var(--black);
+    border: 1px solid var(--white);
+    padding: 6px 8px;
   }
   .library h2{
-    margin: 0 0 12px 0;
-    font-size: 1em;
-    letter-spacing: 3px;
-    color: var(--accent);
-    border-bottom: 1px solid #333;
-    padding-bottom: 6px;
+    margin: 0 0 8px 0;
+    font-size: 0.7em;
+    letter-spacing: 2px;
+    color: var(--white);
+    border-bottom: 1px solid var(--white);
+    padding-bottom: 4px;
     text-transform: uppercase;
+    font-weight: bold;
   }
   .lib-row{
-    display:flex;
-    flex-wrap:wrap;
-    gap:8px;
-    align-items:center;
-    margin-bottom: 10px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 6px;
+    align-items: center;
+    margin-bottom: 8px;
   }
   .lib-list{
-    display:flex;
-    flex-direction:column;
-    gap:6px;
-    max-height: 220px;
-    overflow-y:auto;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    max-height: 200px;
+    overflow-y: auto;
   }
   .lib-item{
-    display:flex;
-    justify-content:space-between;
-    align-items:center;
-    background:#0a0a0c;
-    border:1px solid #333;
-    border-radius:4px;
-    padding:6px 10px;
-    font-size:0.85em;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    background: var(--black);
+    border: 1px solid var(--grey);
+    padding: 4px 8px;
+    font-size: 0.75em;
   }
-  .lib-item .name{ color: var(--led); }
-  .lib-item .btns{ display:flex; gap:6px; }
-  .lib-item button{ padding: 4px 8px; font-size: 0.75em; }
-  input[type="file"]{ display:none; }
-  .small{ font-size:0.75em; color:#888; }
+  .lib-item .name{
+    color: var(--white);
+    font-weight: bold;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+  }
+  .lib-item .btns{ display: flex; gap: 4px; }
+  .lib-item button{ padding: 2px 8px; font-size: 0.7em; }
+  input[type="file"]{ display: none; }
+  .small{ font-size: 0.65em; color: var(--grey); text-transform: uppercase; letter-spacing: 1px; }
+
+  /* scrollbar — keep it monochrome */
+  ::-webkit-scrollbar{ width: 8px; background: var(--black); }
+  ::-webkit-scrollbar-thumb{ background: var(--grey); border: 1px solid var(--white); }
 </style>
 </head>
 <body>
 
-<h1>VIRUS TI SNOW :: PATCH EDITOR</h1>
+<div class="header">VIRUS TI SNOW :: PATCH EDITOR</div>
 
 <div class="topbar">
   <div>
@@ -249,7 +279,7 @@ $ cat /home/user/soundmachine/index.html
 <div class="library">
   <h2>Patch Library</h2>
   <div class="lib-row">
-    <input type="text" id="patchName" placeholder="Nome patch..." style="flex:1; min-width:160px; background:#0a0a0c; color:var(--led); border:1px solid #444; border-radius:4px; padding:8px;">
+    <input type="text" id="patchName" placeholder="NOME PATCH..." style="flex:1; min-width:160px; background:#000; color:#fff; border:1px solid #fff; padding:6px; font-family:inherit; font-size:0.8em; outline:none;">
     <button class="primary" id="btnSavePatch">SALVA</button>
   </div>
   <div class="lib-list" id="libList"></div>
@@ -262,11 +292,11 @@ $ cat /home/user/soundmachine/index.html
   // SysEx format: F0 00 20 33 01 [DeviceID] 01 [param] [value] F7
   // ---------------------------------------------------------------------
   const SECTIONS = [
-    { key: 'osc',    title: 'Oscillators' },
-    { key: 'filter', title: 'Filter 1' },
-    { key: 'amp',    title: 'Amplifier' },
-    { key: 'lfo',    title: 'LFO 1' },
-    { key: 'fx',     title: 'Effects' },
+    { key: 'osc',    title: 'Oscillators', icon: 'osc' },
+    { key: 'filter', title: 'Filter 1',    icon: 'filter' },
+    { key: 'amp',    title: 'Amplifier',   icon: 'amp' },
+    { key: 'lfo',    title: 'LFO 1',       icon: 'lfo' },
+    { key: 'fx',     title: 'Effects',     icon: 'fx' },
   ];
 
   const PARAMS = [
@@ -416,16 +446,96 @@ $ cat /home/user/soundmachine/index.html
   }
 
   // ---------------------------------------------------------------------
-  // Knob UI
+  // Pixel section icons (8x8 grid drawn as crisp rects)
   // ---------------------------------------------------------------------
-  const ARC_RADIUS = 40;
-  const CIRCUMFERENCE = 2 * Math.PI * ARC_RADIUS;
-  const ARC_FRACTION = 270 / 360;
-  const ARC_LENGTH = CIRCUMFERENCE * ARC_FRACTION;
+  const svgNS = 'http://www.w3.org/2000/svg';
 
-  function valueToAngle(value){
-    // -135deg (value=0) to +135deg (value=127)
-    return -135 + (value / 127) * 270;
+  const ICONS = {
+    // square waveform symbol
+    osc: [
+      [0,5],[0,6],[0,7],
+      [1,1],[1,2],[1,3],[1,4],[1,5],
+      [2,1],
+      [3,1],
+      [4,1],[4,2],[4,3],[4,4],[4,5],[4,6],[4,7],
+      [5,7],
+      [6,7],
+      [7,3],[7,4],[7,5],[7,6],[7,7],
+    ],
+    // triangle (low-pass slope)
+    filter: [
+      [0,1],[1,1],[2,1],[3,1],[4,1],
+      [4,2],[5,3],[5,4],[6,5],[6,6],[7,7],
+      [0,2],[0,3],[0,4],[0,5],[0,6],[0,7],
+      [1,7],[2,7],[3,7],[4,7],[5,7],[6,7],
+    ],
+    // vertical bar (level)
+    amp: [
+      [3,1],[4,1],
+      [3,2],[4,2],
+      [3,3],[4,3],
+      [3,4],[4,4],
+      [3,5],[4,5],
+      [3,6],[4,6],
+      [1,7],[2,7],[3,7],[4,7],[5,7],[6,7],
+    ],
+    // pixel sine
+    lfo: [
+      [0,4],[0,3],[1,2],[2,1],[3,2],[3,3],[4,4],[4,5],[5,6],[6,7],[6,6],[7,5],[7,4],
+    ],
+    // star/sparkle
+    fx: [
+      [3,0],[4,0],
+      [3,1],[4,1],
+      [0,3],[1,3],[2,3],[3,3],[4,3],[5,3],[6,3],[7,3],
+      [0,4],[1,4],[2,4],[3,4],[4,4],[5,4],[6,4],[7,4],
+      [3,6],[4,6],
+      [3,7],[4,7],
+      [1,1],[6,1],[1,6],[6,6],
+    ],
+  };
+
+  function createIcon(name){
+    const svg = document.createElementNS(svgNS, 'svg');
+    svg.setAttribute('viewBox', '0 0 8 8');
+    svg.setAttribute('width', '12');
+    svg.setAttribute('height', '12');
+    (ICONS[name] || []).forEach(([x, y]) => {
+      const r = document.createElementNS(svgNS, 'rect');
+      r.setAttribute('x', x);
+      r.setAttribute('y', y);
+      r.setAttribute('width', 1);
+      r.setAttribute('height', 1);
+      r.setAttribute('fill', '#ffffff');
+      svg.appendChild(r);
+    });
+    return svg;
+  }
+
+  // ---------------------------------------------------------------------
+  // Knob UI — square pixel-art encoder
+  // 12-segment indicator frame around a square body, plus a tick line
+  // ---------------------------------------------------------------------
+  // Segment positions clockwise around the square (grid units, 16x16 viewBox).
+  // Starts bottom-left (value 0) and ends bottom-right (value 127),
+  // mimicking a 270-degree rotary sweep.
+  const SEGMENTS = [
+    [2, 13], [0, 11], [0, 8], [0, 5], [2, 2],   // left side going up
+    [5, 0],  [8, 0],                            // top
+    [11, 0],                                    // top right
+    [13, 2], [15, 5], [15, 8], [15, 11], [13, 13], // right side going down
+  ];
+
+  // tick directions for the pointer inside the body (dx,dy from center, in pixels)
+  const TICKS = [
+    [-3, 3], [-4, 1], [-4, 0], [-4, -1], [-3, -3],
+    [-1, -4], [0, -4],
+    [1, -4],
+    [3, -3], [4, -1], [4, 0], [4, 1], [3, 3],
+  ];
+
+  function valueToSegment(value){
+    return Math.round((value / 127) * (SEGMENTS.length - 1));
   }
 
   function displayValue(param, value){
@@ -440,78 +550,44 @@ $ cat /home/user/soundmachine/index.html
     const container = document.createElement('div');
     container.className = 'knob-container';
 
-    const svgNS = 'http://www.w3.org/2000/svg';
     const svg = document.createElementNS(svgNS, 'svg');
-    svg.setAttribute('viewBox', '0 0 100 100');
-    svg.setAttribute('width', '64');
-    svg.setAttribute('height', '64');
+    svg.setAttribute('viewBox', '0 0 16 16');
+    svg.setAttribute('width', '56');
+    svg.setAttribute('height', '56');
     svg.classList.add('knob-svg');
 
-    // background arc (track)
-    const trackPath = document.createElementNS(svgNS, 'circle');
-    trackPath.setAttribute('cx', '50');
-    trackPath.setAttribute('cy', '50');
-    trackPath.setAttribute('r', String(ARC_RADIUS));
-    trackPath.setAttribute('fill', 'none');
-    trackPath.setAttribute('stroke', '#3a3a40');
-    trackPath.setAttribute('stroke-width', '6');
-    trackPath.setAttribute('stroke-linecap', 'round');
-    trackPath.setAttribute('stroke-dasharray', `${ARC_LENGTH} ${CIRCUMFERENCE}`);
-    trackPath.setAttribute('transform', 'rotate(135 50 50)');
-    svg.appendChild(trackPath);
+    // surrounding segment dots
+    const segRects = SEGMENTS.map(([x, y]) => {
+      const r = document.createElementNS(svgNS, 'rect');
+      r.setAttribute('x', x);
+      r.setAttribute('y', y);
+      r.setAttribute('width', 1);
+      r.setAttribute('height', 1);
+      r.setAttribute('fill', '#333333');
+      svg.appendChild(r);
+      return r;
+    });
 
-    // value arc
-    const valuePath = document.createElementNS(svgNS, 'circle');
-    valuePath.setAttribute('cx', '50');
-    valuePath.setAttribute('cy', '50');
-    valuePath.setAttribute('r', String(ARC_RADIUS));
-    valuePath.setAttribute('fill', 'none');
-    valuePath.setAttribute('stroke', 'var(--accent)');
-    valuePath.setAttribute('stroke-width', '6');
-    valuePath.setAttribute('stroke-linecap', 'round');
-    valuePath.setAttribute('stroke-dasharray', `${ARC_LENGTH} ${CIRCUMFERENCE}`);
-    valuePath.setAttribute('transform', 'rotate(135 50 50)');
-    svg.appendChild(valuePath);
-
-    // knob body
-    const body = document.createElementNS(svgNS, 'circle');
-    body.setAttribute('cx', '50');
-    body.setAttribute('cy', '50');
-    body.setAttribute('r', '26');
-    body.setAttribute('fill', 'url(#knobGrad)');
-    body.setAttribute('stroke', '#000');
-    body.setAttribute('stroke-width', '2');
+    // square encoder body — white outline, black fill
+    const body = document.createElementNS(svgNS, 'rect');
+    body.setAttribute('x', '3.5');
+    body.setAttribute('y', '3.5');
+    body.setAttribute('width', '9');
+    body.setAttribute('height', '9');
+    body.setAttribute('fill', '#000000');
+    body.setAttribute('stroke', '#ffffff');
+    body.setAttribute('stroke-width', '1');
     svg.appendChild(body);
 
-    // pointer
+    // pointer line from center toward active segment
     const pointer = document.createElementNS(svgNS, 'line');
-    pointer.setAttribute('x1', '50');
-    pointer.setAttribute('y1', '50');
-    pointer.setAttribute('x2', '50');
-    pointer.setAttribute('y2', '26');
-    pointer.setAttribute('stroke', 'var(--accent2)');
-    pointer.setAttribute('stroke-width', '4');
-    pointer.setAttribute('stroke-linecap', 'round');
+    pointer.setAttribute('x1', '8');
+    pointer.setAttribute('y1', '8');
+    pointer.setAttribute('x2', '8');
+    pointer.setAttribute('y2', '4');
+    pointer.setAttribute('stroke', '#ffffff');
+    pointer.setAttribute('stroke-width', '1');
     svg.appendChild(pointer);
-
-    // gradient def (only add once globally)
-    if (!document.getElementById('knobGrad')){
-      const defs = document.createElementNS(svgNS, 'defs');
-      const grad = document.createElementNS(svgNS, 'radialGradient');
-      grad.setAttribute('id', 'knobGrad');
-      grad.setAttribute('cx', '40%');
-      grad.setAttribute('cy', '35%');
-      const stop1 = document.createElementNS(svgNS, 'stop');
-      stop1.setAttribute('offset', '0%');
-      stop1.setAttribute('stop-color', '#4a4a52');
-      const stop2 = document.createElementNS(svgNS, 'stop');
-      stop2.setAttribute('offset', '100%');
-      stop2.setAttribute('stop-color', '#16161a');
-      grad.appendChild(stop1);
-      grad.appendChild(stop2);
-      defs.appendChild(grad);
-      svg.insertBefore(defs, svg.firstChild);
-    }
 
     const label = document.createElement('div');
     label.className = 'knob-label';
@@ -526,10 +602,13 @@ $ cat /home/user/soundmachine/index.html
 
     function render(){
       const value = patch[param.id];
-      const angle = valueToAngle(value);
-      pointer.setAttribute('transform', `rotate(${angle} 50 50)`);
-      const offset = ARC_LENGTH * (1 - value / 127);
-      valuePath.setAttribute('stroke-dashoffset', String(offset));
+      const active = valueToSegment(value);
+      segRects.forEach((r, i) => {
+        r.setAttribute('fill', i <= active ? '#ffffff' : '#333333');
+      });
+      const [dx, dy] = TICKS[active];
+      pointer.setAttribute('x2', String(8 + dx));
+      pointer.setAttribute('y2', String(8 + dy));
       valueLabel.textContent = displayValue(param, value);
     }
 
@@ -593,7 +672,8 @@ $ cat /home/user/soundmachine/index.html
       const div = document.createElement('div');
       div.className = 'section';
       const h2 = document.createElement('h2');
-      h2.textContent = sec.title;
+      h2.appendChild(createIcon(sec.icon));
+      h2.appendChild(document.createTextNode(sec.title));
       div.appendChild(h2);
 
       const knobs = document.createElement('div');
