@@ -26,16 +26,48 @@
   }
   /* header bar */
   .header{
+    display: flex;
+    align-items: center;
+    gap: 8px;
     border: 1px solid var(--white);
-    padding: 6px 8px;
+    padding: 4px 8px;
     margin-bottom: 8px;
-    text-align: center;
     font-weight: bold;
-    letter-spacing: 4px;
-    font-size: 0.95em;
+    letter-spacing: 2px;
+    font-size: 0.85em;
     text-transform: uppercase;
     white-space: nowrap;
     overflow: hidden;
+  }
+  .header .badge{
+    flex: 0 0 auto;
+    background: var(--white);
+    color: var(--black);
+    padding: 1px 6px;
+    font-weight: bold;
+  }
+  .header .title{
+    flex: 0 0 auto;
+    letter-spacing: 4px;
+  }
+  .header .dots{
+    flex: 1 1 auto;
+    height: 10px;
+    min-width: 20px;
+    border: 1px dotted var(--white);
+  }
+  .header .readout{
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    border: 1px solid var(--white);
+    padding: 1px 6px;
+    font-size: 0.9em;
+  }
+  .header .readout svg{
+    flex: 0 0 auto;
+    shape-rendering: crispEdges;
   }
   .topbar{
     display: flex;
@@ -247,7 +279,14 @@
 </head>
 <body>
 
-<div class="header">VIRUS TI SNOW :: PATCH EDITOR</div>
+<div class="header">
+  <span class="badge" id="headerBadge">A01</span>
+  <span class="title">VIRUS TI SNOW</span>
+  <span class="dots"></span>
+  <span class="readout" id="headerReadout">
+    <span id="headerChannelLabel">CH 01</span>
+  </span>
+</div>
 
 <div class="topbar">
   <div>
@@ -364,6 +403,13 @@
   }
   chanSelect.value = 1;
 
+  function updateHeaderChannel(){
+    const ch = parseInt(chanSelect.value, 10);
+    document.getElementById('headerChannelLabel').textContent =
+      'CH ' + String(ch).padStart(2, '0');
+  }
+  chanSelect.addEventListener('change', updateHeaderChannel);
+
   function updateConnectionIndicator(){
     if (selectedOutput && selectedOutput.state === 'connected'){
       connDot.classList.add('on');
@@ -444,115 +490,131 @@
   }
 
   // ---------------------------------------------------------------------
-  // Pixel section icons (8x8 grid drawn as crisp rects)
+  // Dithered pixel rendering helpers (Bayer 4x4 ordered dithering)
   // ---------------------------------------------------------------------
   const svgNS = 'http://www.w3.org/2000/svg';
 
-  const ICONS = {
-    // square waveform symbol
-    osc: [
-      [0,5],[0,6],[0,7],
-      [1,1],[1,2],[1,3],[1,4],[1,5],
-      [2,1],
-      [3,1],
-      [4,1],[4,2],[4,3],[4,4],[4,5],[4,6],[4,7],
-      [5,7],
-      [6,7],
-      [7,3],[7,4],[7,5],[7,6],[7,7],
-    ],
-    // triangle (low-pass slope)
-    filter: [
-      [0,1],[1,1],[2,1],[3,1],[4,1],
-      [4,2],[5,3],[5,4],[6,5],[6,6],[7,7],
-      [0,2],[0,3],[0,4],[0,5],[0,6],[0,7],
-      [1,7],[2,7],[3,7],[4,7],[5,7],[6,7],
-    ],
-    // vertical bar (level)
-    amp: [
-      [3,1],[4,1],
-      [3,2],[4,2],
-      [3,3],[4,3],
-      [3,4],[4,4],
-      [3,5],[4,5],
-      [3,6],[4,6],
-      [1,7],[2,7],[3,7],[4,7],[5,7],[6,7],
-    ],
-    // pixel sine
-    lfo: [
-      [0,4],[0,3],[1,2],[2,1],[3,2],[3,3],[4,4],[4,5],[5,6],[6,7],[6,6],[7,5],[7,4],
-    ],
-    // star/sparkle
-    fx: [
-      [3,0],[4,0],
-      [3,1],[4,1],
-      [0,3],[1,3],[2,3],[3,3],[4,3],[5,3],[6,3],[7,3],
-      [0,4],[1,4],[2,4],[3,4],[4,4],[5,4],[6,4],[7,4],
-      [3,6],[4,6],
-      [3,7],[4,7],
-      [1,1],[6,1],[1,6],[6,6],
-    ],
-  };
+  const BAYER4 = [
+    [ 0, 8, 2,10],
+    [12, 4,14, 6],
+    [ 3,11, 1, 9],
+    [15, 7,13, 5]
+  ];
 
-  function createIcon(name){
+  function ditherDot(x, y, density){
+    return BAYER4[((y % 4) + 4) % 4][((x % 4) + 4) % 4] < density;
+  }
+
+  function addPixel(svg, x, y, w, h, fill){
+    const r = document.createElementNS(svgNS, 'rect');
+    r.setAttribute('x', x);
+    r.setAttribute('y', y);
+    r.setAttribute('width', w);
+    r.setAttribute('height', h);
+    r.setAttribute('fill', fill || '#ffffff');
+    svg.appendChild(r);
+    return r;
+  }
+
+  function drawDitherRing(svg, cx, cy, radius, gridSize){
+    for (let y = 0; y < gridSize; y++){
+      for (let x = 0; x < gridSize; x++){
+        const dist = Math.sqrt((x + 0.5 - cx) ** 2 + (y + 0.5 - cy) ** 2);
+        const density = Math.max(0, 16 - Math.abs(dist - radius) * 10);
+        if (density > 0 && ditherDot(x, y, density)){
+          addPixel(svg, x, y, 1, 1, '#ffffff');
+        }
+      }
+    }
+  }
+
+  function drawDitherDiamond(svg, cx, cy, radius, gridSize){
+    for (let y = 0; y < gridSize; y++){
+      for (let x = 0; x < gridSize; x++){
+        const dist = Math.abs(x + 0.5 - cx) + Math.abs(y + 0.5 - cy);
+        const density = Math.max(0, 16 - Math.abs(dist - radius) * 8);
+        if (density > 0 && ditherDot(x, y, density)){
+          addPixel(svg, x, y, 1, 1, '#ffffff');
+        }
+      }
+    }
+  }
+
+  function drawDitherBar(svg, gridSize){
+    for (let y = 0; y < gridSize; y++){
+      const density = Math.round((y / (gridSize - 1)) * 16);
+      for (let x = 0; x < gridSize; x++){
+        if (ditherDot(x, y, density)){
+          addPixel(svg, x, y, 1, 1, '#ffffff');
+        }
+      }
+    }
+  }
+
+  function drawCross(svg, cx, cy){
+    addPixel(svg, cx - 1, cy, 3, 1, '#ffffff');
+    addPixel(svg, cx, cy - 1, 1, 3, '#ffffff');
+  }
+
+  // ---------------------------------------------------------------------
+  // Section icons — Digitakt-style dithered/stippled pixel icons
+  // ---------------------------------------------------------------------
+  function createIcon(type, gridSize){
+    gridSize = gridSize || 12;
     const svg = document.createElementNS(svgNS, 'svg');
-    svg.setAttribute('viewBox', '0 0 8 8');
-    svg.setAttribute('width', '12');
-    svg.setAttribute('height', '12');
-    (ICONS[name] || []).forEach(([x, y]) => {
-      const r = document.createElementNS(svgNS, 'rect');
-      r.setAttribute('x', x);
-      r.setAttribute('y', y);
-      r.setAttribute('width', 1);
-      r.setAttribute('height', 1);
-      r.setAttribute('fill', '#ffffff');
-      svg.appendChild(r);
-    });
+    svg.setAttribute('viewBox', `0 0 ${gridSize} ${gridSize}`);
+    const px = gridSize <= 8 ? 10 : 14;
+    svg.setAttribute('width', px);
+    svg.setAttribute('height', px);
+    const cx = gridSize / 2;
+    const cy = gridSize / 2;
+    switch(type){
+      case 'osc':
+        drawDitherRing(svg, cx, cy, gridSize * 0.4, gridSize);
+        break;
+      case 'filter':
+        drawDitherDiamond(svg, cx, cy, gridSize * 0.42, gridSize);
+        break;
+      case 'amp':
+        drawDitherBar(svg, gridSize);
+        break;
+      case 'lfo':
+        drawDitherRing(svg, cx, cy, gridSize * 0.4, gridSize);
+        drawCross(svg, Math.round(cx), Math.round(cy));
+        break;
+      case 'fx':
+        drawDitherDiamond(svg, cx, cy, gridSize * 0.42, gridSize);
+        drawDitherRing(svg, cx, cy, gridSize * 0.18, gridSize);
+        break;
+    }
     return svg;
   }
 
   // ---------------------------------------------------------------------
-  // Knob UI — circular 8-bit pixel-art encoder
-  // Circle outline drawn as individual pixel dots (Bresenham circle),
-  // with a single larger pixel indicator moving around the ring.
+  // Knob UI — Digitakt-style dithered/stippled circular encoder with a
+  // solid radial indicator line showing the current value (-135deg to
+  // +135deg sweep, 0deg = up).
   // ---------------------------------------------------------------------
-  function buildCircleRing(radius, gapDegrees){
-    const pts = [];
-    let x = 0, y = radius, d = 3 - 2 * radius;
-    while (x <= y){
-      [[x,y],[y,x],[-x,y],[-y,x],[x,-y],[y,-x],[-x,-y],[-y,-x]].forEach(([dx,dy]) => {
-        pts.push({ dx, dy });
-      });
-      if (d < 0){ d += 4 * x + 6; }
-      else { d += 4 * (x - y) + 10; y--; }
-      x++;
-    }
-    const seen = new Set();
-    const unique = [];
-    pts.forEach(p => {
-      const key = p.dx + ',' + p.dy;
-      if (!seen.has(key)){ seen.add(key); unique.push(p); }
-    });
-    // clock angle: 0deg = top (12 o'clock), increasing clockwise
-    unique.forEach(p => {
-      let a = Math.atan2(p.dx, -p.dy) * 180 / Math.PI;
-      if (a < 0) a += 360;
-      p.angle = a;
-    });
-    // remove a gap centered at the bottom (6 o'clock) for a 270deg sweep
-    const half = gapDegrees / 2;
-    const lo = 180 - half, hi = 180 + half;
-    const ring = unique.filter(p => !(p.angle > lo && p.angle < hi));
-    ring.forEach(p => { p.sortKey = (p.angle - hi + 360) % 360; });
-    ring.sort((a, b) => a.sortKey - b.sortKey);
-    return ring;
+  const KNOB_GRID = 16;
+  const KNOB_CENTER = KNOB_GRID / 2;
+  const KNOB_RADIUS = 6;
+
+  function angleForValue(value){
+    return (-135 + (value / 127) * 270) * Math.PI / 180;
   }
 
-  const RING_RADIUS = 5;
-  const RING_CENTER = 6;
-  const RING_POINTS = buildCircleRing(RING_RADIUS, 90);
-
-  function valueToSegment(value){
-    return Math.round((value / 127) * (RING_POINTS.length - 1));
+  function computeLinePixels(value){
+    const angle = angleForValue(value);
+    const dx = Math.sin(angle);
+    const dy = -Math.cos(angle);
+    const pixels = [];
+    for (let r = 2; r <= KNOB_RADIUS; r++){
+      pixels.push({
+        x: Math.floor(KNOB_CENTER + dx * r),
+        y: Math.floor(KNOB_CENTER + dy * r)
+      });
+    }
+    return pixels;
   }
 
   function displayValue(param, value){
@@ -568,28 +630,24 @@
     container.className = 'knob-container';
 
     const svg = document.createElementNS(svgNS, 'svg');
-    svg.setAttribute('viewBox', '0 0 13 13');
+    svg.setAttribute('viewBox', `0 0 ${KNOB_GRID} ${KNOB_GRID}`);
     svg.setAttribute('width', '48');
     svg.setAttribute('height', '48');
     svg.classList.add('knob-svg');
 
-    // circle outline made of individual pixel dots (Bresenham circle)
-    RING_POINTS.forEach(p => {
+    // dithered/stippled ring background texture
+    drawDitherRing(svg, KNOB_CENTER, KNOB_CENTER, KNOB_RADIUS, KNOB_GRID);
+
+    // solid radial indicator line showing the current value
+    const indicatorPixels = [];
+    for (let i = 0; i < KNOB_RADIUS - 1; i++){
       const r = document.createElementNS(svgNS, 'rect');
-      r.setAttribute('x', p.dx + RING_CENTER);
-      r.setAttribute('y', p.dy + RING_CENTER);
       r.setAttribute('width', 1);
       r.setAttribute('height', 1);
       r.setAttribute('fill', '#ffffff');
       svg.appendChild(r);
-    });
-
-    // single larger pixel indicator that moves around the ring
-    const indicator = document.createElementNS(svgNS, 'rect');
-    indicator.setAttribute('width', 1.6);
-    indicator.setAttribute('height', 1.6);
-    indicator.setAttribute('fill', '#ffffff');
-    svg.appendChild(indicator);
+      indicatorPixels.push(r);
+    }
 
     const label = document.createElement('div');
     label.className = 'knob-label';
@@ -604,10 +662,11 @@
 
     function render(){
       const value = patch[param.id];
-      const active = valueToSegment(value);
-      const p = RING_POINTS[active];
-      indicator.setAttribute('x', (p.dx + RING_CENTER) - 0.3);
-      indicator.setAttribute('y', (p.dy + RING_CENTER) - 0.3);
+      const pixels = computeLinePixels(value);
+      pixels.forEach((p, i) => {
+        indicatorPixels[i].setAttribute('x', p.x);
+        indicatorPixels[i].setAttribute('y', p.y);
+      });
       valueLabel.textContent = displayValue(param, value);
     }
 
@@ -854,6 +913,10 @@
   // ---------------------------------------------------------------------
   buildSections();
   renderLibrary();
+
+  // header readout: small dithered icon + MIDI channel
+  document.getElementById('headerReadout').prepend(createIcon('osc', 8));
+  updateHeaderChannel();
 })();
 </script>
 </body>
