@@ -28,13 +28,13 @@
   .header{
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     border: 1px solid var(--white);
-    padding: 4px 8px;
-    margin-bottom: 8px;
+    padding: 3px 6px;
+    margin-bottom: 6px;
     font-weight: bold;
-    letter-spacing: 2px;
-    font-size: 0.85em;
+    letter-spacing: 1px;
+    font-size: 1em;
     text-transform: uppercase;
     white-space: nowrap;
     overflow: hidden;
@@ -43,17 +43,21 @@
     flex: 0 0 auto;
     background: var(--white);
     color: var(--black);
-    padding: 1px 6px;
+    padding: 1px 5px;
     font-weight: bold;
+    font-size: 1.05em;
+    letter-spacing: 1px;
   }
   .header .title{
     flex: 0 0 auto;
-    letter-spacing: 4px;
+    letter-spacing: 3px;
+    font-size: 1.05em;
+    font-weight: bold;
   }
   .header .dots{
     flex: 1 1 auto;
-    height: 10px;
-    min-width: 20px;
+    height: 8px;
+    min-width: 12px;
     border: 1px dotted var(--white);
   }
   .header .readout{
@@ -61,9 +65,10 @@
     display: flex;
     align-items: center;
     gap: 4px;
-    border: 1px solid var(--white);
-    padding: 1px 6px;
-    font-size: 0.9em;
+    border: 1px dotted var(--white);
+    padding: 1px 5px;
+    font-size: 0.75em;
+    letter-spacing: 1px;
   }
   .header .readout svg{
     flex: 0 0 auto;
@@ -72,12 +77,12 @@
   .topbar{
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 6px;
     align-items: center;
     justify-content: center;
-    border: 1px solid var(--white);
-    padding: 6px 8px;
-    margin-bottom: 8px;
+    border: 1px dotted var(--white);
+    padding: 4px 6px;
+    margin-bottom: 6px;
   }
   .topbar label{
     font-size: 0.6em;
@@ -153,26 +158,26 @@
 
   .grid{
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 8px;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 4px;
   }
   .section{
     background: var(--black);
-    border: 1px solid var(--white);
-    padding: 6px 8px;
+    border: 1px dotted var(--white);
+    padding: 4px 5px;
   }
   .section h2{
-    margin: 0 0 8px 0;
-    font-size: 0.7em;
-    letter-spacing: 2px;
+    margin: 0 0 4px 0;
+    font-size: 0.65em;
+    letter-spacing: 1px;
     color: var(--white);
-    border-bottom: 1px solid var(--white);
-    padding-bottom: 4px;
+    border-bottom: 1px dotted var(--white);
+    padding-bottom: 3px;
     text-transform: uppercase;
     font-weight: bold;
     display: flex;
     align-items: center;
-    gap: 6px;
+    gap: 5px;
   }
   .section h2 svg{
     flex: 0 0 auto;
@@ -181,14 +186,14 @@
   .knobs{
     display: flex;
     flex-wrap: wrap;
-    gap: 8px;
+    gap: 4px;
     justify-content: flex-start;
   }
   .knob-container{
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 64px;
+    width: 46px;
     user-select: none;
     -webkit-user-select: none;
     touch-action: none;
@@ -200,33 +205,34 @@
   .knob-label{
     font-size: 0.55em;
     text-align: center;
-    margin-top: 2px;
+    margin-top: 1px;
     color: var(--white);
-    letter-spacing: 0.5px;
-    height: 24px;
+    letter-spacing: 1px;
+    height: 12px;
     display: flex;
     align-items: center;
     justify-content: center;
     text-transform: uppercase;
     font-weight: bold;
+    white-space: nowrap;
   }
   .knob-value{
     background: var(--black);
     color: var(--white);
-    border: 1px solid var(--white);
-    padding: 1px 5px;
-    font-size: 0.85em;
+    border: 1px dotted var(--white);
+    padding: 0 3px;
+    font-size: 0.7em;
     font-weight: bold;
-    margin-top: 2px;
-    min-width: 34px;
+    margin-top: 1px;
+    min-width: 22px;
     text-align: center;
     cursor: text;
   }
   .library{
-    margin-top: 8px;
+    margin-top: 6px;
     background: var(--black);
-    border: 1px solid var(--white);
-    padding: 6px 8px;
+    border: 1px dotted var(--white);
+    padding: 5px 6px;
   }
   .library h2{
     margin: 0 0 8px 0;
@@ -338,39 +344,39 @@
 
   const PARAMS = [
     // Oscillator 1
-    { id:'osc1_wave',       name:'Osc1 Waveform',     section:'osc', cc:17, default:0 },
-    { id:'osc1_pw',         name:'Osc1 Pulsewidth',   section:'osc', cc:18, default:64 },
-    { id:'osc1_waveselect', name:'Osc1 Wave Select',  section:'osc', cc:19, default:0 },
-    { id:'osc1_semitone',   name:'Osc1 Semitone',     section:'osc', cc:20, default:64, bipolar:true },
+    { id:'osc1_wave',       name:'Osc1 Waveform',     short:'O1WV', section:'osc', cc:17, default:0 },
+    { id:'osc1_pw',         name:'Osc1 Pulsewidth',   short:'O1PW', section:'osc', cc:18, default:64 },
+    { id:'osc1_waveselect', name:'Osc1 Wave Select',  short:'O1WS', section:'osc', cc:19, default:0 },
+    { id:'osc1_semitone',   name:'Osc1 Semitone',     short:'O1ST', section:'osc', cc:20, default:64, bipolar:true },
     // Oscillator 2
-    { id:'osc2_wave',       name:'Osc2 Waveform',     section:'osc', cc:22, default:0 },
-    { id:'osc2_pw',         name:'Osc2 Pulsewidth',   section:'osc', cc:23, default:64 },
-    { id:'osc2_waveselect', name:'Osc2 Wave Select',  section:'osc', cc:24, default:0 },
-    { id:'osc2_semitone',   name:'Osc2 Semitone',     section:'osc', cc:25, default:64, bipolar:true },
+    { id:'osc2_wave',       name:'Osc2 Waveform',     short:'O2WV', section:'osc', cc:22, default:0 },
+    { id:'osc2_pw',         name:'Osc2 Pulsewidth',   short:'O2PW', section:'osc', cc:23, default:64 },
+    { id:'osc2_waveselect', name:'Osc2 Wave Select',  short:'O2WS', section:'osc', cc:24, default:0 },
+    { id:'osc2_semitone',   name:'Osc2 Semitone',     short:'O2ST', section:'osc', cc:25, default:64, bipolar:true },
     // Shared detune (Osc1/Osc2)
-    { id:'osc_detune',      name:'Osc Detune',        section:'osc', cc:26, default:0 },
+    { id:'osc_detune',      name:'Osc Detune',        short:'DET',  section:'osc', cc:26, default:0 },
 
     // Filter 1
-    { id:'f1_cutoff',    name:'Cutoff',            section:'filter', cc:40, default:127 },
-    { id:'f1_resonance', name:'Resonance',         section:'filter', cc:42, default:0 },
-    { id:'f1_envamount', name:'Env Amount',        section:'filter', cc:44, default:64, bipolar:true },
-    { id:'f1_keytrack',  name:'Keyboard Track',    section:'filter', cc:46, default:0 },
+    { id:'f1_cutoff',    name:'Cutoff',            short:'CUTT', section:'filter', cc:40, default:127 },
+    { id:'f1_resonance', name:'Resonance',         short:'RES',  section:'filter', cc:42, default:0 },
+    { id:'f1_envamount', name:'Env Amount',        short:'ENV',  section:'filter', cc:44, default:64, bipolar:true },
+    { id:'f1_keytrack',  name:'Keyboard Track',    short:'KEY',  section:'filter', cc:46, default:0 },
 
     // Amplifier
-    { id:'amp_attack',  name:'Attack',  section:'amp', cc:59, default:0 },
-    { id:'amp_decay',   name:'Decay',   section:'amp', cc:60, default:0 },
-    { id:'amp_sustain', name:'Sustain', section:'amp', cc:61, default:127 },
-    { id:'amp_release', name:'Release', section:'amp', cc:63, default:0 },
+    { id:'amp_attack',  name:'Attack',  short:'ATK', section:'amp', cc:59, default:0 },
+    { id:'amp_decay',   name:'Decay',   short:'DCY', section:'amp', cc:60, default:0 },
+    { id:'amp_sustain', name:'Sustain', short:'SUS', section:'amp', cc:61, default:127 },
+    { id:'amp_release', name:'Release', short:'REL', section:'amp', cc:63, default:0 },
 
     // LFO 1
-    { id:'lfo1_rate',  name:'Rate',  section:'lfo', cc:67, default:64 },
-    { id:'lfo1_shape', name:'Shape', section:'lfo', cc:68, default:0 },
+    { id:'lfo1_rate',  name:'Rate',  short:'RATE', section:'lfo', cc:67, default:64 },
+    { id:'lfo1_shape', name:'Shape', short:'SHP',  section:'lfo', cc:68, default:0 },
 
     // Effects
-    { id:'fx_chorus_mix',      name:'Chorus Mix',      section:'fx', cc:105, default:0 },
-    { id:'fx_chorus_rate',     name:'Chorus Rate',     section:'fx', cc:106, default:64 },
-    { id:'fx_delay_time',      name:'Delay Time',      section:'fx', cc:114, default:0 },
-    { id:'fx_delay_feedback',  name:'Delay Feedback',  section:'fx', cc:115, default:0 },
+    { id:'fx_chorus_mix',      name:'Chorus Mix',      short:'CHMX', section:'fx', cc:105, default:0 },
+    { id:'fx_chorus_rate',     name:'Chorus Rate',     short:'CHRT', section:'fx', cc:106, default:64 },
+    { id:'fx_delay_time',      name:'Delay Time',      short:'DLTM', section:'fx', cc:114, default:0 },
+    { id:'fx_delay_feedback',  name:'Delay Feedback',  short:'DLFB', section:'fx', cc:115, default:0 },
   ];
 
   const SYSEX_PREFIX = [0xF0, 0x00, 0x20, 0x33, 0x01];
@@ -540,20 +546,59 @@
     }
   }
 
-  function drawDitherBar(svg, gridSize){
-    for (let y = 0; y < gridSize; y++){
-      const density = Math.round((y / (gridSize - 1)) * 16);
-      for (let x = 0; x < gridSize; x++){
-        if (ditherDot(x, y, density)){
+  // dithered wave (sine) spanning the grid width
+  function drawDitherWave(svg, gridSize, amplitude, cycles){
+    for (let x = 0; x < gridSize; x++){
+      const yCenter = gridSize / 2 + amplitude * Math.sin((x / gridSize) * Math.PI * 2 * cycles);
+      for (let y = 0; y < gridSize; y++){
+        const dist = Math.abs(y + 0.5 - yCenter);
+        const density = Math.max(0, 16 - dist * 12);
+        if (density > 0 && ditherDot(x, y, density)){
           addPixel(svg, x, y, 1, 1, '#ffffff');
         }
       }
     }
   }
 
-  function drawCross(svg, cx, cy){
-    addPixel(svg, cx - 1, cy, 3, 1, '#ffffff');
-    addPixel(svg, cx, cy - 1, 1, 3, '#ffffff');
+  // dithered funnel/triangle (filter slope), denser toward bottom-left
+  function drawDitherFunnel(svg, gridSize){
+    for (let y = 0; y < gridSize; y++){
+      for (let x = 0; x < gridSize; x++){
+        const edgeY = (gridSize - 1) - x;
+        const dist = y - edgeY;
+        const density = Math.max(0, 16 - Math.abs(dist) * 6);
+        if (dist >= -1 && density > 0 && ditherDot(x, y, density)){
+          addPixel(svg, x, y, 1, 1, '#ffffff');
+        }
+      }
+    }
+  }
+
+  // dithered vertical bar chart
+  function drawDitherBars(svg, gridSize){
+    const heights = [0.4, 0.7, 1.0, 0.55];
+    const barWidth = Math.max(1, Math.floor(gridSize / (heights.length * 2)));
+    heights.forEach((h, i) => {
+      const x0 = i * 2 * barWidth + 1;
+      const barH = Math.round(h * (gridSize - 2));
+      for (let y = gridSize - 1; y > gridSize - 1 - barH; y--){
+        const density = Math.round(((gridSize - y) / gridSize) * 16);
+        for (let x = x0; x < x0 + barWidth; x++){
+          if (ditherDot(x, y, density)){
+            addPixel(svg, x, y, 1, 1, '#ffffff');
+          }
+        }
+      }
+    });
+  }
+
+  // dithered sparkle: diamond outline plus corner sparkle dots
+  function drawDitherSparkle(svg, cx, cy, gridSize){
+    drawDitherDiamond(svg, cx, cy, gridSize * 0.42, gridSize);
+    addPixel(svg, 0, 0, 1, 1, '#ffffff');
+    addPixel(svg, gridSize - 1, 0, 1, 1, '#ffffff');
+    addPixel(svg, 0, gridSize - 1, 1, 1, '#ffffff');
+    addPixel(svg, gridSize - 1, gridSize - 1, 1, 1, '#ffffff');
   }
 
   // ---------------------------------------------------------------------
@@ -570,21 +615,24 @@
     const cy = gridSize / 2;
     switch(type){
       case 'osc':
-        drawDitherRing(svg, cx, cy, gridSize * 0.4, gridSize);
+        // pixel waveform ~
+        drawDitherWave(svg, gridSize, gridSize * 0.3, 1.5);
         break;
       case 'filter':
-        drawDitherDiamond(svg, cx, cy, gridSize * 0.42, gridSize);
+        // pixel triangle / funnel
+        drawDitherFunnel(svg, gridSize);
         break;
       case 'amp':
-        drawDitherBar(svg, gridSize);
+        // pixel bar chart
+        drawDitherBars(svg, gridSize);
         break;
       case 'lfo':
-        drawDitherRing(svg, cx, cy, gridSize * 0.4, gridSize);
-        drawCross(svg, Math.round(cx), Math.round(cy));
+        // pixel sine wave
+        drawDitherWave(svg, gridSize, gridSize * 0.35, 2);
         break;
       case 'fx':
-        drawDitherDiamond(svg, cx, cy, gridSize * 0.42, gridSize);
-        drawDitherRing(svg, cx, cy, gridSize * 0.18, gridSize);
+        // pixel sparkle diamond
+        drawDitherSparkle(svg, cx, cy, gridSize);
         break;
     }
     return svg;
@@ -595,9 +643,21 @@
   // solid radial indicator line showing the current value (-135deg to
   // +135deg sweep, 0deg = up).
   // ---------------------------------------------------------------------
-  const KNOB_GRID = 16;
+  const KNOB_GRID = 14;
   const KNOB_CENTER = KNOB_GRID / 2;
   const KNOB_RADIUS = 6;
+
+  // sparse dithered fill inside the knob circle
+  function drawDitherFill(svg, cx, cy, radius, gridSize, density){
+    for (let y = 0; y < gridSize; y++){
+      for (let x = 0; x < gridSize; x++){
+        const dist = Math.sqrt((x + 0.5 - cx) ** 2 + (y + 0.5 - cy) ** 2);
+        if (dist < radius && ditherDot(x, y, density)){
+          addPixel(svg, x, y, 1, 1, '#ffffff');
+        }
+      }
+    }
+  }
 
   function angleForValue(value){
     return (-135 + (value / 127) * 270) * Math.PI / 180;
@@ -631,14 +691,17 @@
 
     const svg = document.createElementNS(svgNS, 'svg');
     svg.setAttribute('viewBox', `0 0 ${KNOB_GRID} ${KNOB_GRID}`);
-    svg.setAttribute('width', '48');
-    svg.setAttribute('height', '48');
+    svg.setAttribute('width', '40');
+    svg.setAttribute('height', '40');
     svg.classList.add('knob-svg');
 
-    // dithered/stippled ring background texture
+    // sparse dithered fill inside the circle
+    drawDitherFill(svg, KNOB_CENTER, KNOB_CENTER, KNOB_RADIUS - 1, KNOB_GRID, 3);
+
+    // dithered/stippled ring outline (sparse dots)
     drawDitherRing(svg, KNOB_CENTER, KNOB_CENTER, KNOB_RADIUS, KNOB_GRID);
 
-    // solid radial indicator line showing the current value
+    // single bright pixel line from center outward showing the value
     const indicatorPixels = [];
     for (let i = 0; i < KNOB_RADIUS - 1; i++){
       const r = document.createElementNS(svgNS, 'rect');
@@ -651,7 +714,7 @@
 
     const label = document.createElement('div');
     label.className = 'knob-label';
-    label.textContent = param.name;
+    label.textContent = param.short || param.name;
 
     const valueLabel = document.createElement('div');
     valueLabel.className = 'knob-value';
