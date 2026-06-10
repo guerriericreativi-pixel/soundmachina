@@ -158,7 +158,7 @@ $ cat /home/user/soundmachine/index.html
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 72px;
+    width: 64px;
     user-select: none;
     -webkit-user-select: none;
     touch-action: none;
@@ -513,29 +513,48 @@ $ cat /home/user/soundmachine/index.html
   }
 
   // ---------------------------------------------------------------------
-  // Knob UI — square pixel-art encoder
-  // 12-segment indicator frame around a square body, plus a tick line
+  // Knob UI — circular 8-bit pixel-art encoder
+  // Circle outline drawn as individual pixel dots (Bresenham circle),
+  // with a single larger pixel indicator moving around the ring.
   // ---------------------------------------------------------------------
-  // Segment positions clockwise around the square (grid units, 16x16 viewBox).
-  // Starts bottom-left (value 0) and ends bottom-right (value 127),
-  // mimicking a 270-degree rotary sweep.
-  const SEGMENTS = [
-    [2, 13], [0, 11], [0, 8], [0, 5], [2, 2],   // left side going up
-    [5, 0],  [8, 0],                            // top
-    [11, 0],                                    // top right
-    [13, 2], [15, 5], [15, 8], [15, 11], [13, 13], // right side going down
-  ];
+  function buildCircleRing(radius, gapDegrees){
+    const pts = [];
+    let x = 0, y = radius, d = 3 - 2 * radius;
+    while (x <= y){
+      [[x,y],[y,x],[-x,y],[-y,x],[x,-y],[y,-x],[-x,-y],[-y,-x]].forEach(([dx,dy]) => {
+        pts.push({ dx, dy });
+      });
+      if (d < 0){ d += 4 * x + 6; }
+      else { d += 4 * (x - y) + 10; y--; }
+      x++;
+    }
+    const seen = new Set();
+    const unique = [];
+    pts.forEach(p => {
+      const key = p.dx + ',' + p.dy;
+      if (!seen.has(key)){ seen.add(key); unique.push(p); }
+    });
+    // clock angle: 0deg = top (12 o'clock), increasing clockwise
+    unique.forEach(p => {
+      let a = Math.atan2(p.dx, -p.dy) * 180 / Math.PI;
+      if (a < 0) a += 360;
+      p.angle = a;
+    });
+    // remove a gap centered at the bottom (6 o'clock) for a 270deg sweep
+    const half = gapDegrees / 2;
+    const lo = 180 - half, hi = 180 + half;
+    const ring = unique.filter(p => !(p.angle > lo && p.angle < hi));
+    ring.forEach(p => { p.sortKey = (p.angle - hi + 360) % 360; });
+    ring.sort((a, b) => a.sortKey - b.sortKey);
+    return ring;
+  }
 
-  // tick directions for the pointer inside the body (dx,dy from center, in pixels)
-  const TICKS = [
-    [-3, 3], [-4, 1], [-4, 0], [-4, -1], [-3, -3],
-    [-1, -4], [0, -4],
-    [1, -4],
-    [3, -3], [4, -1], [4, 0], [4, 1], [3, 3],
-  ];
+  const RING_RADIUS = 5;
+  const RING_CENTER = 6;
+  const RING_POINTS = buildCircleRing(RING_RADIUS, 90);
 
   function valueToSegment(value){
-    return Math.round((value / 127) * (SEGMENTS.length - 1));
+    return Math.round((value / 127) * (RING_POINTS.length - 1));
   }
 
   function displayValue(param, value){
@@ -551,43 +570,28 @@ $ cat /home/user/soundmachine/index.html
     container.className = 'knob-container';
 
     const svg = document.createElementNS(svgNS, 'svg');
-    svg.setAttribute('viewBox', '0 0 16 16');
-    svg.setAttribute('width', '56');
-    svg.setAttribute('height', '56');
+    svg.setAttribute('viewBox', '0 0 13 13');
+    svg.setAttribute('width', '48');
+    svg.setAttribute('height', '48');
     svg.classList.add('knob-svg');
 
-    // surrounding segment dots
-    const segRects = SEGMENTS.map(([x, y]) => {
+    // circle outline made of individual pixel dots (Bresenham circle)
+    RING_POINTS.forEach(p => {
       const r = document.createElementNS(svgNS, 'rect');
-      r.setAttribute('x', x);
-      r.setAttribute('y', y);
+      r.setAttribute('x', p.dx + RING_CENTER);
+      r.setAttribute('y', p.dy + RING_CENTER);
       r.setAttribute('width', 1);
       r.setAttribute('height', 1);
-      r.setAttribute('fill', '#333333');
+      r.setAttribute('fill', '#ffffff');
       svg.appendChild(r);
-      return r;
     });
 
-    // square encoder body — white outline, black fill
-    const body = document.createElementNS(svgNS, 'rect');
-    body.setAttribute('x', '3.5');
-    body.setAttribute('y', '3.5');
-    body.setAttribute('width', '9');
-    body.setAttribute('height', '9');
-    body.setAttribute('fill', '#000000');
-    body.setAttribute('stroke', '#ffffff');
-    body.setAttribute('stroke-width', '1');
-    svg.appendChild(body);
-
-    // pointer line from center toward active segment
-    const pointer = document.createElementNS(svgNS, 'line');
-    pointer.setAttribute('x1', '8');
-    pointer.setAttribute('y1', '8');
-    pointer.setAttribute('x2', '8');
-    pointer.setAttribute('y2', '4');
-    pointer.setAttribute('stroke', '#ffffff');
-    pointer.setAttribute('stroke-width', '1');
-    svg.appendChild(pointer);
+    // single larger pixel indicator that moves around the ring
+    const indicator = document.createElementNS(svgNS, 'rect');
+    indicator.setAttribute('width', 1.6);
+    indicator.setAttribute('height', 1.6);
+    indicator.setAttribute('fill', '#ffffff');
+    svg.appendChild(indicator);
 
     const label = document.createElement('div');
     label.className = 'knob-label';
@@ -603,12 +607,9 @@ $ cat /home/user/soundmachine/index.html
     function render(){
       const value = patch[param.id];
       const active = valueToSegment(value);
-      segRects.forEach((r, i) => {
-        r.setAttribute('fill', i <= active ? '#ffffff' : '#333333');
-      });
-      const [dx, dy] = TICKS[active];
-      pointer.setAttribute('x2', String(8 + dx));
-      pointer.setAttribute('y2', String(8 + dy));
+      const p = RING_POINTS[active];
+      indicator.setAttribute('x', (p.dx + RING_CENTER) - 0.3);
+      indicator.setAttribute('y', (p.dy + RING_CENTER) - 0.3);
       valueLabel.textContent = displayValue(param, value);
     }
 
