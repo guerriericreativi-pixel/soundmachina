@@ -1,0 +1,779 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>VIRUS TI SNOW // EDITOR</title>
+<style>
+  :root{
+    --bg: #0c0c0e;
+    --panel: #1c1c20;
+    --panel-light: #2a2a30;
+    --accent: #ff8c1a;
+    --accent2: #ff3b3b;
+    --led: #ffb347;
+    --green: #3dff7a;
+    --red: #ff4040;
+    --border: #050505;
+    --text: #d8d8d8;
+  }
+  *{ box-sizing: border-box; }
+  body{
+    margin:0;
+    background: linear-gradient(135deg,#1a1a1d,#08080a);
+    color: var(--text);
+    font-family: "Courier New", Courier, monospace;
+    padding: 16px;
+  }
+  h1{
+    text-align:center;
+    letter-spacing: 6px;
+    font-size: 1.8em;
+    color: var(--accent);
+    text-shadow: 0 0 8px rgba(255,140,26,0.6);
+    margin: 0 0 12px 0;
+  }
+  .topbar{
+    display:flex;
+    flex-wrap: wrap;
+    gap: 12px;
+    align-items:center;
+    justify-content:center;
+    background: var(--panel);
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    margin-bottom: 16px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 4px 10px rgba(0,0,0,0.6);
+  }
+  .topbar label{
+    font-size: 0.75em;
+    color: #999;
+    display:block;
+    margin-bottom:4px;
+    letter-spacing:1px;
+  }
+  .topbar select, .topbar input[type="number"], .topbar input[type="text"]{
+    background: #0a0a0c;
+    color: var(--led);
+    border: 1px solid #444;
+    border-radius:4px;
+    padding: 6px 8px;
+    font-family: inherit;
+    font-size: 0.85em;
+  }
+  .conn{
+    display:flex;
+    align-items:center;
+    gap:6px;
+    font-size:0.8em;
+  }
+  .dot{
+    width:14px; height:14px; border-radius:50%;
+    background: var(--red);
+    box-shadow: 0 0 8px var(--red);
+    transition: all 0.2s;
+  }
+  .dot.on{
+    background: var(--green);
+    box-shadow: 0 0 10px var(--green);
+  }
+  .actions{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    justify-content:center;
+    margin-bottom: 16px;
+  }
+  button{
+    background: linear-gradient(180deg,#3a3a40,#1c1c20);
+    color: var(--text);
+    border: 1px solid #000;
+    border-radius: 6px;
+    padding: 10px 16px;
+    font-family: inherit;
+    font-weight:bold;
+    letter-spacing:1px;
+    cursor:pointer;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.1), 0 2px 4px rgba(0,0,0,0.5);
+  }
+  button:active{
+    transform: translateY(1px);
+    box-shadow: inset 0 1px 4px rgba(0,0,0,0.6);
+  }
+  button.randomize{ border-color: var(--accent2); color: var(--accent2); }
+  button.init{ border-color: var(--accent); color: var(--accent); }
+  button.primary{ border-color: var(--green); color: var(--green); }
+
+  .grid{
+    display:grid;
+    grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+    gap: 16px;
+  }
+  .section{
+    background: var(--panel);
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 4px 10px rgba(0,0,0,0.6);
+  }
+  .section h2{
+    margin: 0 0 12px 0;
+    font-size: 1em;
+    letter-spacing: 3px;
+    color: var(--accent);
+    border-bottom: 1px solid #333;
+    padding-bottom: 6px;
+    text-transform: uppercase;
+  }
+  .knobs{
+    display:flex;
+    flex-wrap: wrap;
+    gap: 14px;
+    justify-content: flex-start;
+  }
+  .knob-container{
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    width: 80px;
+    user-select:none;
+    -webkit-user-select:none;
+    touch-action: none;
+  }
+  .knob-svg{
+    cursor: ns-resize;
+  }
+  .knob-label{
+    font-size: 0.65em;
+    text-align:center;
+    margin-top: 4px;
+    color: #bbb;
+    letter-spacing: 0.5px;
+    height: 28px;
+    display:flex;
+    align-items:center;
+    justify-content:center;
+  }
+  .knob-value{
+    background:#0a0a0c;
+    color: var(--led);
+    border: 1px solid #444;
+    border-radius:3px;
+    padding: 2px 6px;
+    font-size: 0.75em;
+    margin-top: 3px;
+    min-width: 34px;
+    text-align:center;
+    cursor: text;
+  }
+  .library{
+    margin-top: 16px;
+    background: var(--panel);
+    border: 2px solid var(--border);
+    border-radius: 10px;
+    padding: 12px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.05), 0 4px 10px rgba(0,0,0,0.6);
+  }
+  .library h2{
+    margin: 0 0 12px 0;
+    font-size: 1em;
+    letter-spacing: 3px;
+    color: var(--accent);
+    border-bottom: 1px solid #333;
+    padding-bottom: 6px;
+    text-transform: uppercase;
+  }
+  .lib-row{
+    display:flex;
+    flex-wrap:wrap;
+    gap:8px;
+    align-items:center;
+    margin-bottom: 10px;
+  }
+  .lib-list{
+    display:flex;
+    flex-direction:column;
+    gap:6px;
+    max-height: 220px;
+    overflow-y:auto;
+  }
+  .lib-item{
+    display:flex;
+    justify-content:space-between;
+    align-items:center;
+    background:#0a0a0c;
+    border:1px solid #333;
+    border-radius:4px;
+    padding:6px 10px;
+    font-size:0.85em;
+  }
+  .lib-item .name{ color: var(--led); }
+  .lib-item .btns{ display:flex; gap:6px; }
+  .lib-item button{ padding: 4px 8px; font-size: 0.75em; }
+  input[type="file"]{ display:none; }
+  .small{ font-size:0.75em; color:#888; }
+</style>
+</head>
+<body>
+
+<h1>VIRUS TI SNOW :: PATCH EDITOR</h1>
+
+<div class="topbar">
+  <div>
+    <label>MIDI OUTPUT</label>
+    <select id="midiOutSelect"><option value="">-- nessuna porta --</option></select>
+  </div>
+  <div>
+    <label>MIDI CHANNEL</label>
+    <select id="midiChannel"></select>
+  </div>
+  <div class="conn">
+    <span class="dot" id="connDot"></span>
+    <span id="connLabel">DISCONNESSO</span>
+  </div>
+</div>
+
+<div class="actions">
+  <button class="randomize" id="btnRandomize">RANDOMIZE</button>
+  <button class="init" id="btnInit">INIT</button>
+  <button class="primary" id="btnExport">EXPORT .SYX</button>
+  <button class="primary" id="btnImport">IMPORT .SYX</button>
+  <input type="file" id="fileInput" accept=".syx">
+</div>
+
+<div class="grid" id="sectionsContainer"></div>
+
+<div class="library">
+  <h2>Patch Library</h2>
+  <div class="lib-row">
+    <input type="text" id="patchName" placeholder="Nome patch..." style="flex:1; min-width:160px; background:#0a0a0c; color:var(--led); border:1px solid #444; border-radius:4px; padding:8px;">
+    <button class="primary" id="btnSavePatch">SALVA</button>
+  </div>
+  <div class="lib-list" id="libList"></div>
+</div>
+
+<script>
+(function(){
+  // ---------------------------------------------------------------------
+  // Parameter definitions: Virus TI parameter numbers per spec
+  // SysEx format: F0 00 20 33 01 [DeviceID] 01 [param] [value] F7
+  // ---------------------------------------------------------------------
+  const SECTIONS = [
+    { key: 'osc',    title: 'Oscillators' },
+    { key: 'filter', title: 'Filter 1' },
+    { key: 'amp',    title: 'Amplifier' },
+    { key: 'lfo',    title: 'LFO 1' },
+    { key: 'fx',     title: 'Effects' },
+  ];
+
+  const PARAMS = [
+    // Oscillator 1
+    { id:'osc1_wave',       name:'Osc1 Waveform',     section:'osc', cc:17, default:0 },
+    { id:'osc1_pw',         name:'Osc1 Pulsewidth',   section:'osc', cc:18, default:64 },
+    { id:'osc1_waveselect', name:'Osc1 Wave Select',  section:'osc', cc:19, default:0 },
+    { id:'osc1_semitone',   name:'Osc1 Semitone',     section:'osc', cc:20, default:64, bipolar:true },
+    // Oscillator 2
+    { id:'osc2_wave',       name:'Osc2 Waveform',     section:'osc', cc:22, default:0 },
+    { id:'osc2_pw',         name:'Osc2 Pulsewidth',   section:'osc', cc:23, default:64 },
+    { id:'osc2_waveselect', name:'Osc2 Wave Select',  section:'osc', cc:24, default:0 },
+    { id:'osc2_semitone',   name:'Osc2 Semitone',     section:'osc', cc:25, default:64, bipolar:true },
+    // Shared detune (Osc1/Osc2)
+    { id:'osc_detune',      name:'Osc Detune',        section:'osc', cc:26, default:0 },
+
+    // Filter 1
+    { id:'f1_cutoff',    name:'Cutoff',            section:'filter', cc:40, default:127 },
+    { id:'f1_resonance', name:'Resonance',         section:'filter', cc:42, default:0 },
+    { id:'f1_envamount', name:'Env Amount',        section:'filter', cc:44, default:64, bipolar:true },
+    { id:'f1_keytrack',  name:'Keyboard Track',    section:'filter', cc:46, default:0 },
+
+    // Amplifier
+    { id:'amp_attack',  name:'Attack',  section:'amp', cc:59, default:0 },
+    { id:'amp_decay',   name:'Decay',   section:'amp', cc:60, default:0 },
+    { id:'amp_sustain', name:'Sustain', section:'amp', cc:61, default:127 },
+    { id:'amp_release', name:'Release', section:'amp', cc:63, default:0 },
+
+    // LFO 1
+    { id:'lfo1_rate',  name:'Rate',  section:'lfo', cc:67, default:64 },
+    { id:'lfo1_shape', name:'Shape', section:'lfo', cc:68, default:0 },
+
+    // Effects
+    { id:'fx_chorus_mix',      name:'Chorus Mix',      section:'fx', cc:105, default:0 },
+    { id:'fx_chorus_rate',     name:'Chorus Rate',     section:'fx', cc:106, default:64 },
+    { id:'fx_delay_time',      name:'Delay Time',      section:'fx', cc:114, default:0 },
+    { id:'fx_delay_feedback',  name:'Delay Feedback',  section:'fx', cc:115, default:0 },
+  ];
+
+  const SYSEX_PREFIX = [0xF0, 0x00, 0x20, 0x33, 0x01];
+  const SYSEX_CMD_PARAM = 0x01; // single parameter change
+
+  // ---------------------------------------------------------------------
+  // State
+  // ---------------------------------------------------------------------
+  const patch = {};
+  PARAMS.forEach(p => { patch[p.id] = p.default; });
+
+  let midiAccess = null;
+  let selectedOutput = null;
+
+  const LIB_KEY = 'virusTiSnow_patchLibrary';
+
+  // ---------------------------------------------------------------------
+  // MIDI setup
+  // ---------------------------------------------------------------------
+  const outSelect = document.getElementById('midiOutSelect');
+  const chanSelect = document.getElementById('midiChannel');
+  const connDot = document.getElementById('connDot');
+  const connLabel = document.getElementById('connLabel');
+
+  for (let i = 1; i <= 16; i++){
+    const opt = document.createElement('option');
+    opt.value = i;
+    opt.textContent = 'Channel ' + i;
+    chanSelect.appendChild(opt);
+  }
+  chanSelect.value = 1;
+
+  function updateConnectionIndicator(){
+    if (selectedOutput && selectedOutput.state === 'connected'){
+      connDot.classList.add('on');
+      connLabel.textContent = 'CONNESSO: ' + selectedOutput.name;
+    } else {
+      connDot.classList.remove('on');
+      connLabel.textContent = 'DISCONNESSO';
+    }
+  }
+
+  function refreshOutputs(){
+    const prev = outSelect.value;
+    outSelect.innerHTML = '<option value="">-- nessuna porta --</option>';
+    if (!midiAccess) return;
+    midiAccess.outputs.forEach(output => {
+      const opt = document.createElement('option');
+      opt.value = output.id;
+      opt.textContent = output.name;
+      outSelect.appendChild(opt);
+    });
+    if (prev && [...outSelect.options].some(o => o.value === prev)){
+      outSelect.value = prev;
+    }
+    onOutputChange();
+  }
+
+  function onOutputChange(){
+    const id = outSelect.value;
+    selectedOutput = (midiAccess && id) ? midiAccess.outputs.get(id) : null;
+    updateConnectionIndicator();
+  }
+
+  outSelect.addEventListener('change', onOutputChange);
+
+  if (navigator.requestMIDIAccess){
+    navigator.requestMIDIAccess({ sysex: true }).then(access => {
+      midiAccess = access;
+      refreshOutputs();
+      midiAccess.onstatechange = refreshOutputs;
+    }).catch(err => {
+      connLabel.textContent = 'MIDI NON DISPONIBILE';
+      console.error(err);
+    });
+  } else {
+    connLabel.textContent = 'WEB MIDI NON SUPPORTATO';
+  }
+
+  // ---------------------------------------------------------------------
+  // SysEx send
+  // ---------------------------------------------------------------------
+  function deviceId(){
+    return parseInt(chanSelect.value, 10) - 1; // 0-15
+  }
+
+  function buildSysEx(cc, value){
+    return new Uint8Array([
+      ...SYSEX_PREFIX,
+      deviceId(),
+      SYSEX_CMD_PARAM,
+      cc & 0x7F,
+      value & 0x7F,
+      0xF7
+    ]);
+  }
+
+  function sendParam(param, value){
+    if (selectedOutput){
+      try{
+        selectedOutput.send(buildSysEx(param.cc, value));
+      } catch(e){ console.error('MIDI send error', e); }
+    }
+  }
+
+  function sendFullPatch(p){
+    PARAMS.forEach((param, i) => {
+      setTimeout(() => sendParam(param, p[param.id]), i * 15);
+    });
+  }
+
+  // ---------------------------------------------------------------------
+  // Knob UI
+  // ---------------------------------------------------------------------
+  const ARC_RADIUS = 40;
+  const CIRCUMFERENCE = 2 * Math.PI * ARC_RADIUS;
+  const ARC_FRACTION = 270 / 360;
+  const ARC_LENGTH = CIRCUMFERENCE * ARC_FRACTION;
+
+  function valueToAngle(value){
+    // -135deg (value=0) to +135deg (value=127)
+    return -135 + (value / 127) * 270;
+  }
+
+  function displayValue(param, value){
+    if (param.bipolar) {
+      const v = value - 64;
+      return (v > 0 ? '+' : '') + v;
+    }
+    return String(value);
+  }
+
+  function createKnob(param){
+    const container = document.createElement('div');
+    container.className = 'knob-container';
+
+    const svgNS = 'http://www.w3.org/2000/svg';
+    const svg = document.createElementNS(svgNS, 'svg');
+    svg.setAttribute('viewBox', '0 0 100 100');
+    svg.setAttribute('width', '64');
+    svg.setAttribute('height', '64');
+    svg.classList.add('knob-svg');
+
+    // background arc (track)
+    const trackPath = document.createElementNS(svgNS, 'circle');
+    trackPath.setAttribute('cx', '50');
+    trackPath.setAttribute('cy', '50');
+    trackPath.setAttribute('r', String(ARC_RADIUS));
+    trackPath.setAttribute('fill', 'none');
+    trackPath.setAttribute('stroke', '#3a3a40');
+    trackPath.setAttribute('stroke-width', '6');
+    trackPath.setAttribute('stroke-linecap', 'round');
+    trackPath.setAttribute('stroke-dasharray', `${ARC_LENGTH} ${CIRCUMFERENCE}`);
+    trackPath.setAttribute('transform', 'rotate(135 50 50)');
+    svg.appendChild(trackPath);
+
+    // value arc
+    const valuePath = document.createElementNS(svgNS, 'circle');
+    valuePath.setAttribute('cx', '50');
+    valuePath.setAttribute('cy', '50');
+    valuePath.setAttribute('r', String(ARC_RADIUS));
+    valuePath.setAttribute('fill', 'none');
+    valuePath.setAttribute('stroke', 'var(--accent)');
+    valuePath.setAttribute('stroke-width', '6');
+    valuePath.setAttribute('stroke-linecap', 'round');
+    valuePath.setAttribute('stroke-dasharray', `${ARC_LENGTH} ${CIRCUMFERENCE}`);
+    valuePath.setAttribute('transform', 'rotate(135 50 50)');
+    svg.appendChild(valuePath);
+
+    // knob body
+    const body = document.createElementNS(svgNS, 'circle');
+    body.setAttribute('cx', '50');
+    body.setAttribute('cy', '50');
+    body.setAttribute('r', '26');
+    body.setAttribute('fill', 'url(#knobGrad)');
+    body.setAttribute('stroke', '#000');
+    body.setAttribute('stroke-width', '2');
+    svg.appendChild(body);
+
+    // pointer
+    const pointer = document.createElementNS(svgNS, 'line');
+    pointer.setAttribute('x1', '50');
+    pointer.setAttribute('y1', '50');
+    pointer.setAttribute('x2', '50');
+    pointer.setAttribute('y2', '26');
+    pointer.setAttribute('stroke', 'var(--accent2)');
+    pointer.setAttribute('stroke-width', '4');
+    pointer.setAttribute('stroke-linecap', 'round');
+    svg.appendChild(pointer);
+
+    // gradient def (only add once globally)
+    if (!document.getElementById('knobGrad')){
+      const defs = document.createElementNS(svgNS, 'defs');
+      const grad = document.createElementNS(svgNS, 'radialGradient');
+      grad.setAttribute('id', 'knobGrad');
+      grad.setAttribute('cx', '40%');
+      grad.setAttribute('cy', '35%');
+      const stop1 = document.createElementNS(svgNS, 'stop');
+      stop1.setAttribute('offset', '0%');
+      stop1.setAttribute('stop-color', '#4a4a52');
+      const stop2 = document.createElementNS(svgNS, 'stop');
+      stop2.setAttribute('offset', '100%');
+      stop2.setAttribute('stop-color', '#16161a');
+      grad.appendChild(stop1);
+      grad.appendChild(stop2);
+      defs.appendChild(grad);
+      svg.insertBefore(defs, svg.firstChild);
+    }
+
+    const label = document.createElement('div');
+    label.className = 'knob-label';
+    label.textContent = param.name;
+
+    const valueLabel = document.createElement('div');
+    valueLabel.className = 'knob-value';
+
+    container.appendChild(svg);
+    container.appendChild(label);
+    container.appendChild(valueLabel);
+
+    function render(){
+      const value = patch[param.id];
+      const angle = valueToAngle(value);
+      pointer.setAttribute('transform', `rotate(${angle} 50 50)`);
+      const offset = ARC_LENGTH * (1 - value / 127);
+      valuePath.setAttribute('stroke-dashoffset', String(offset));
+      valueLabel.textContent = displayValue(param, value);
+    }
+
+    function setValue(value, send){
+      value = Math.max(0, Math.min(127, Math.round(value)));
+      patch[param.id] = value;
+      render();
+      if (send) sendParam(param, value);
+    }
+
+    // drag interaction
+    let dragging = false;
+    let startY = 0;
+    let startVal = 0;
+
+    svg.addEventListener('pointerdown', (e) => {
+      dragging = true;
+      startY = e.clientY;
+      startVal = patch[param.id];
+      svg.setPointerCapture(e.pointerId);
+      e.preventDefault();
+    });
+
+    svg.addEventListener('pointermove', (e) => {
+      if (!dragging) return;
+      const dy = startY - e.clientY;
+      setValue(startVal + dy * 0.7, true);
+    });
+
+    function endDrag(e){
+      dragging = false;
+    }
+    svg.addEventListener('pointerup', endDrag);
+    svg.addEventListener('pointercancel', endDrag);
+
+    // double-click to type exact value
+    valueLabel.addEventListener('dblclick', () => {
+      const current = patch[param.id];
+      const input = prompt('Valore (0-127):', current);
+      if (input === null) return;
+      const num = parseInt(input, 10);
+      if (!isNaN(num)) setValue(num, true);
+    });
+
+    container._render = render;
+    container._setValue = setValue;
+    render();
+
+    return container;
+  }
+
+  // ---------------------------------------------------------------------
+  // Build sections
+  // ---------------------------------------------------------------------
+  const knobRefs = {}; // id -> container element
+
+  function buildSections(){
+    const root = document.getElementById('sectionsContainer');
+    root.innerHTML = '';
+    SECTIONS.forEach(sec => {
+      const div = document.createElement('div');
+      div.className = 'section';
+      const h2 = document.createElement('h2');
+      h2.textContent = sec.title;
+      div.appendChild(h2);
+
+      const knobs = document.createElement('div');
+      knobs.className = 'knobs';
+
+      PARAMS.filter(p => p.section === sec.key).forEach(param => {
+        const knob = createKnob(param);
+        knobRefs[param.id] = knob;
+        knobs.appendChild(knob);
+      });
+
+      div.appendChild(knobs);
+      root.appendChild(div);
+    });
+  }
+
+  function refreshAllKnobs(){
+    PARAMS.forEach(p => knobRefs[p.id]._render());
+  }
+
+  function applyPatchObject(p, send){
+    PARAMS.forEach(param => {
+      const value = (p[param.id] !== undefined) ? p[param.id] : param.default;
+      patch[param.id] = Math.max(0, Math.min(127, value));
+    });
+    refreshAllKnobs();
+    if (send) sendFullPatch(patch);
+  }
+
+  // ---------------------------------------------------------------------
+  // Buttons: Randomize / Init
+  // ---------------------------------------------------------------------
+  document.getElementById('btnRandomize').addEventListener('click', () => {
+    const newPatch = {};
+    PARAMS.forEach(p => { newPatch[p.id] = Math.floor(Math.random() * 128); });
+    applyPatchObject(newPatch, true);
+  });
+
+  document.getElementById('btnInit').addEventListener('click', () => {
+    const newPatch = {};
+    PARAMS.forEach(p => { newPatch[p.id] = p.default; });
+    applyPatchObject(newPatch, true);
+  });
+
+  // ---------------------------------------------------------------------
+  // Export / Import .syx
+  // ---------------------------------------------------------------------
+  document.getElementById('btnExport').addEventListener('click', () => {
+    const bytes = [];
+    PARAMS.forEach(param => {
+      bytes.push(...buildSysEx(param.cc, patch[param.id]));
+    });
+    const blob = new Blob([new Uint8Array(bytes)], { type: 'application/octet-stream' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = 'virus_ti_patch.syx';
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  });
+
+  const fileInput = document.getElementById('fileInput');
+  document.getElementById('btnImport').addEventListener('click', () => fileInput.click());
+
+  fileInput.addEventListener('change', (e) => {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = () => {
+      const bytes = new Uint8Array(reader.result);
+      const newPatch = {};
+      let i = 0;
+      while (i < bytes.length){
+        if (bytes[i] === 0xF0){
+          // find matching F7
+          let j = i + 1;
+          while (j < bytes.length && bytes[j] !== 0xF7) j++;
+          if (j < bytes.length){
+            const msg = bytes.slice(i, j + 1);
+            // Expect: F0 00 20 33 01 [DeviceID] 01 [param] [value] F7
+            if (msg.length === 10 &&
+                msg[1] === 0x00 && msg[2] === 0x20 && msg[3] === 0x33 &&
+                msg[4] === 0x01 && msg[6] === 0x01){
+              const cc = msg[7];
+              const value = msg[8];
+              const param = PARAMS.find(p => p.cc === cc);
+              if (param) newPatch[param.id] = value;
+            }
+            i = j + 1;
+            continue;
+          }
+        }
+        i++;
+      }
+      applyPatchObject(newPatch, true);
+    };
+    reader.readAsArrayBuffer(file);
+    fileInput.value = '';
+  });
+
+  // ---------------------------------------------------------------------
+  // Patch library (localStorage)
+  // ---------------------------------------------------------------------
+  function loadLibrary(){
+    try{
+      return JSON.parse(localStorage.getItem(LIB_KEY)) || {};
+    } catch(e){ return {}; }
+  }
+
+  function saveLibrary(lib){
+    localStorage.setItem(LIB_KEY, JSON.stringify(lib));
+  }
+
+  function renderLibrary(){
+    const lib = loadLibrary();
+    const list = document.getElementById('libList');
+    list.innerHTML = '';
+    const names = Object.keys(lib).sort();
+    if (names.length === 0){
+      const empty = document.createElement('div');
+      empty.className = 'small';
+      empty.textContent = 'Nessuna patch salvata.';
+      list.appendChild(empty);
+      return;
+    }
+    names.forEach(name => {
+      const item = document.createElement('div');
+      item.className = 'lib-item';
+
+      const nameEl = document.createElement('span');
+      nameEl.className = 'name';
+      nameEl.textContent = name;
+
+      const btns = document.createElement('div');
+      btns.className = 'btns';
+
+      const loadBtn = document.createElement('button');
+      loadBtn.textContent = 'CARICA';
+      loadBtn.addEventListener('click', () => {
+        applyPatchObject(lib[name], true);
+      });
+
+      const delBtn = document.createElement('button');
+      delBtn.textContent = 'CANCELLA';
+      delBtn.addEventListener('click', () => {
+        if (confirm(`Cancellare la patch "${name}"?`)){
+          delete lib[name];
+          saveLibrary(lib);
+          renderLibrary();
+        }
+      });
+
+      btns.appendChild(loadBtn);
+      btns.appendChild(delBtn);
+      item.appendChild(nameEl);
+      item.appendChild(btns);
+      list.appendChild(item);
+    });
+  }
+
+  document.getElementById('btnSavePatch').addEventListener('click', () => {
+    const input = document.getElementById('patchName');
+    const name = input.value.trim();
+    if (!name){
+      alert('Inserisci un nome per la patch.');
+      return;
+    }
+    const lib = loadLibrary();
+    lib[name] = { ...patch };
+    saveLibrary(lib);
+    input.value = '';
+    renderLibrary();
+  });
+
+  // ---------------------------------------------------------------------
+  // Init
+  // ---------------------------------------------------------------------
+  buildSections();
+  renderLibrary();
+})();
+</script>
+</body>
+</html>
