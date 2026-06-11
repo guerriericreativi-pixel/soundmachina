@@ -299,6 +299,22 @@
   .part-main .field input[type="number"]{
     min-width: 56px;
   }
+  .part-display{
+    flex: 1 1 auto;
+    min-width: 120px;
+    align-self: stretch;
+    display: flex;
+    align-items: stretch;
+    background: #050505;
+    border: 1px solid #222222;
+    padding: 8px 12px;
+    cursor: pointer;
+  }
+  .part-display canvas{
+    display: block;
+    width: 100%;
+    height: 100%;
+  }
   input[type="number"]{
     background: transparent;
     color: var(--fg);
@@ -751,6 +767,58 @@
   }
 
   // ---------------------------------------------------------------------
+  // 5x7 dot-matrix font for the part name displays.
+  // Each glyph is 7 rows of 5 bits (bit4 = leftmost column).
+  // ---------------------------------------------------------------------
+  const FONT5X7 = {
+    ' ': [0x00,0x00,0x00,0x00,0x00,0x00,0x00],
+    '-': [0x00,0x00,0x00,0x1F,0x00,0x00,0x00],
+    '.': [0x00,0x00,0x00,0x00,0x00,0x18,0x18],
+    '0': [0x0E,0x11,0x13,0x15,0x19,0x11,0x0E],
+    '1': [0x04,0x0C,0x04,0x04,0x04,0x04,0x0E],
+    '2': [0x0E,0x11,0x01,0x02,0x04,0x08,0x1F],
+    '3': [0x1F,0x02,0x04,0x02,0x01,0x11,0x0E],
+    '4': [0x02,0x06,0x0A,0x12,0x1F,0x02,0x02],
+    '5': [0x1F,0x10,0x1E,0x01,0x01,0x11,0x0E],
+    '6': [0x06,0x08,0x10,0x1E,0x11,0x11,0x0E],
+    '7': [0x1F,0x01,0x02,0x04,0x08,0x08,0x08],
+    '8': [0x0E,0x11,0x11,0x0E,0x11,0x11,0x0E],
+    '9': [0x0E,0x11,0x11,0x0F,0x01,0x02,0x0C],
+    'A': [0x0E,0x11,0x11,0x1F,0x11,0x11,0x11],
+    'B': [0x1E,0x11,0x11,0x1E,0x11,0x11,0x1E],
+    'C': [0x0E,0x11,0x10,0x10,0x10,0x11,0x0E],
+    'D': [0x1E,0x11,0x11,0x11,0x11,0x11,0x1E],
+    'E': [0x1F,0x10,0x10,0x1E,0x10,0x10,0x1F],
+    'F': [0x1F,0x10,0x10,0x1E,0x10,0x10,0x10],
+    'G': [0x0E,0x11,0x10,0x17,0x11,0x11,0x0F],
+    'H': [0x11,0x11,0x11,0x1F,0x11,0x11,0x11],
+    'I': [0x0E,0x04,0x04,0x04,0x04,0x04,0x0E],
+    'J': [0x01,0x01,0x01,0x01,0x01,0x11,0x0E],
+    'K': [0x11,0x12,0x14,0x18,0x14,0x12,0x11],
+    'L': [0x10,0x10,0x10,0x10,0x10,0x10,0x1F],
+    'M': [0x11,0x1B,0x15,0x15,0x11,0x11,0x11],
+    'N': [0x11,0x19,0x15,0x13,0x11,0x11,0x11],
+    'O': [0x0E,0x11,0x11,0x11,0x11,0x11,0x0E],
+    'P': [0x1E,0x11,0x11,0x1E,0x10,0x10,0x10],
+    'Q': [0x0E,0x11,0x11,0x11,0x15,0x12,0x0D],
+    'R': [0x1E,0x11,0x11,0x1E,0x14,0x12,0x11],
+    'S': [0x0F,0x10,0x10,0x0E,0x01,0x01,0x1E],
+    'T': [0x1F,0x04,0x04,0x04,0x04,0x04,0x04],
+    'U': [0x11,0x11,0x11,0x11,0x11,0x11,0x0E],
+    'V': [0x11,0x11,0x11,0x11,0x11,0x0A,0x04],
+    'W': [0x11,0x11,0x11,0x15,0x15,0x15,0x0A],
+    'X': [0x11,0x11,0x0A,0x04,0x0A,0x11,0x11],
+    'Y': [0x11,0x11,0x0A,0x04,0x04,0x04,0x04],
+    'Z': [0x1F,0x01,0x02,0x04,0x08,0x10,0x1F],
+  };
+  const FONT_COLS = 5;
+  const FONT_ROWS = 7;
+
+  function glyphFor(ch){
+    return FONT5X7[ch] || FONT5X7[' '];
+  }
+
+  // ---------------------------------------------------------------------
   // State
   // ---------------------------------------------------------------------
   const patch = {};
@@ -763,8 +831,11 @@
     PART_PARAMS.forEach(pp => { values[pp.id] = pp.default; });
     const sound = {};
     PARAMS.forEach(p => { sound[p.id] = p.default; });
-    multiParts.push({ enabled: true, values, sound });
+    multiParts.push({ enabled: true, name: 'init', values, sound });
   }
+
+  // partDisplays[i] = { _render, _startReveal } for the per-part dot-matrix name display
+  let partDisplays = [];
 
   let midiAccess = null;
   let selectedOutput = null;
@@ -809,6 +880,7 @@
     accentDots.forEach(dot => {
       dot.classList.toggle('selected', dot.getAttribute('data-accent') === color);
     });
+    partDisplays.forEach(d => d._render());
   }
 
   let currentAccent = localStorage.getItem(ACCENT_KEY) || '#00ffff';
@@ -1574,6 +1646,158 @@
     return field;
   }
 
+  function createPartDisplay(index){
+    const wrap = document.createElement('div');
+    wrap.className = 'part-display';
+    wrap.title = 'Click to rename patch';
+
+    const canvas = document.createElement('canvas');
+    wrap.appendChild(canvas);
+    const ctx = canvas.getContext('2d');
+
+    const DOT = 4, GAP = 1, CELL = DOT + GAP;
+    const PRG_DOT = 2, PRG_GAP = 1, PRG_CELL = PRG_DOT + PRG_GAP;
+
+    let w = 0, h = 0, dpr = 1;
+    let revealCols = 0;
+    let revealTimer = null;
+    let flickerDots = [];
+
+    function now(){
+      return (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
+    }
+
+    function getName(){
+      return (multiParts[index].name || 'init').toUpperCase();
+    }
+
+    function totalCols(text){
+      return Math.max(0, text.length * (FONT_COLS + 1) - 1);
+    }
+
+    function render(){
+      if (w <= 0 || h <= 0) return;
+      ctx.clearRect(0, 0, w, h);
+      const colors = dotColors();
+
+      // background dot grid
+      const cols = Math.floor((w + GAP) / CELL);
+      const rows = Math.floor((h + GAP) / CELL);
+      ctx.fillStyle = '#1a1a1a';
+      for (let r = 0; r < rows; r++){
+        for (let c = 0; c < cols; c++){
+          ctx.fillRect(c * CELL, r * CELL, DOT, DOT);
+        }
+      }
+
+      // tiny "PRG nnn" label, top-left
+      const prgText = 'PRG ' + String(multiParts[index].values.program).padStart(3, '0');
+      ctx.fillStyle = colors.inactive;
+      let px = 2, py = 2;
+      for (const ch of prgText){
+        const glyph = glyphFor(ch);
+        for (let row = 0; row < FONT_ROWS; row++){
+          for (let col = 0; col < FONT_COLS; col++){
+            if (glyph[row] & (1 << (FONT_COLS - 1 - col))){
+              ctx.fillRect(px + col * PRG_CELL, py + row * PRG_CELL, PRG_DOT, PRG_DOT);
+            }
+          }
+        }
+        px += (FONT_COLS + 1) * PRG_CELL;
+      }
+
+      // main patch name, centered, revealed column by column
+      const text = getName();
+      const tCols = totalCols(text);
+      const textW = Math.max(0, tCols * CELL - GAP);
+      const textH = FONT_ROWS * CELL - GAP;
+      const ox = Math.max(0, Math.floor((w - textW) / 2));
+      const oy = Math.max(0, Math.floor((h - textH) / 2));
+
+      ctx.fillStyle = colors.active;
+      let gcol = 0;
+      for (const ch of text){
+        const glyph = glyphFor(ch);
+        for (let col = 0; col < FONT_COLS; col++){
+          if (gcol < revealCols){
+            for (let row = 0; row < FONT_ROWS; row++){
+              if (glyph[row] & (1 << (FONT_COLS - 1 - col))){
+                ctx.fillRect(ox + gcol * CELL, oy + row * CELL, DOT, DOT);
+              }
+            }
+          }
+          gcol++;
+        }
+        gcol++; // gap column between characters
+      }
+
+      // idle flicker dots
+      const t = now();
+      flickerDots = flickerDots.filter(d => d.until > t);
+      ctx.fillStyle = colors.active;
+      flickerDots.forEach(d => {
+        ctx.fillRect(d.x * CELL, d.y * CELL, DOT, DOT);
+      });
+    }
+
+    function startReveal(){
+      revealCols = 0;
+      const target = totalCols(getName());
+      if (revealTimer) clearInterval(revealTimer);
+      revealTimer = setInterval(() => {
+        revealCols++;
+        render();
+        if (revealCols >= target){
+          clearInterval(revealTimer);
+          revealTimer = null;
+        }
+      }, 60);
+    }
+
+    function resize(){
+      const rect = wrap.getBoundingClientRect();
+      dpr = window.devicePixelRatio || 1;
+      w = Math.max(1, Math.floor(rect.width));
+      h = Math.max(1, Math.floor(rect.height));
+      canvas.width = w * dpr;
+      canvas.height = h * dpr;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      render();
+    }
+
+    setInterval(() => {
+      const cols = Math.floor((w + GAP) / CELL);
+      const rows = Math.floor((h + GAP) / CELL);
+      if (cols <= 0 || rows <= 0) return;
+      const count = 1 + Math.floor(Math.random() * 2);
+      for (let i = 0; i < count; i++){
+        flickerDots.push({
+          x: Math.floor(Math.random() * cols),
+          y: Math.floor(Math.random() * rows),
+          until: now() + 250
+        });
+      }
+      render();
+      setTimeout(render, 260);
+    }, 3000);
+
+    wrap.addEventListener('click', () => {
+      const name = prompt('Part name', multiParts[index].name || 'init');
+      if (name !== null && name.trim() !== ''){
+        multiParts[index].name = name.trim().slice(0, 16);
+        startReveal();
+      }
+    });
+
+    window.addEventListener('resize', resize);
+    resize();
+    startReveal();
+
+    wrap._render = render;
+    wrap._startReveal = startReveal;
+    return wrap;
+  }
+
   function createPartRow(index){
     const part = multiParts[index];
 
@@ -1680,6 +1904,10 @@
     });
     main.appendChild(editBtn);
 
+    const display = createPartDisplay(index);
+    main.appendChild(display);
+    partDisplays.push(display);
+
     row.appendChild(main);
     row.appendChild(editor);
     return row;
@@ -1688,6 +1916,7 @@
   function buildMultiView(){
     const partList = document.getElementById('partList');
     partList.innerHTML = '';
+    partDisplays = [];
     for (let i = 0; i < NUM_PARTS; i++){
       partList.appendChild(createPartRow(i));
     }
