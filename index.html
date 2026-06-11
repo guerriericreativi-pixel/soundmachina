@@ -284,7 +284,8 @@
     height: 80px;
     min-height: 80px;
     box-sizing: border-box;
-    overflow: hidden;
+    overflow-x: auto;
+    overflow-y: hidden;
   }
   .part-main .field{
     gap: 0;
@@ -296,7 +297,8 @@
   }
   .part-main .knob-container{
     width: 56px;
-    flex: 0 0 56px;
+    flex: 0 1 56px;
+    min-width: 36px;
   }
   .part-main .knob-svg{
     width: 40px;
@@ -323,8 +325,9 @@
     font-weight: 700;
     letter-spacing: 0.05em;
     text-transform: lowercase;
-    flex: 0 0 30px;
+    flex: 0 1 30px;
     width: 30px;
+    min-width: 22px;
     align-self: center;
     overflow: hidden;
   }
@@ -353,38 +356,45 @@
     box-sizing: border-box;
   }
   .part-main .field-ch{
-    flex: 0 0 55px;
+    flex: 0 1 55px;
     width: 55px;
+    min-width: 40px;
   }
   .part-main .field-bank{
-    flex: 0 0 55px;
+    flex: 0 1 55px;
     width: 55px;
+    min-width: 40px;
   }
   .part-main .field-prg{
-    flex: 0 0 45px;
+    flex: 0 1 45px;
     width: 45px;
+    min-width: 34px;
   }
   .part-main .field-out{
-    flex: 0 0 85px;
+    flex: 0 1 85px;
     width: 85px;
+    min-width: 50px;
   }
   .part-main .field-lowkey,
   .part-main .field-highkey{
-    flex: 0 0 40px;
+    flex: 0 1 40px;
     width: 40px;
+    min-width: 32px;
   }
   .part-main .field-lowkey label,
   .part-main .field-highkey label{
     font-size: 12px;
   }
   .part-main .vol-knob{
-    flex: 0 0 70px;
+    flex: 0 1 70px;
     width: 70px;
+    min-width: 40px;
   }
   .part-main .trsp-knob,
   .part-main .dtun-knob{
-    flex: 0 0 60px;
+    flex: 0 1 60px;
     width: 60px;
+    min-width: 40px;
   }
   .part-main .edit-btn{
     flex: 0 0 70px;
@@ -395,8 +405,8 @@
     box-sizing: border-box;
   }
   .part-display{
-    flex: 1 1 auto;
-    min-width: 0;
+    flex: 1 1 120px;
+    min-width: 80px;
     height: 60px;
     align-self: center;
     display: flex;
