@@ -2,48 +2,102 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>virus ti snow // editor</title>
 <style>
   :root{
-    --black: #000000;
-    --white: #ffffff;
+    --bg: #ffffff;
+    --fg: #000000;
+    --section-bg: #f5f5f5;
+    --border: #000000;
+    --dot-color: #e8e8e8;
+  }
+  html[data-theme="dark"]{
+    --bg: #111111;
+    --fg: #eeeeee;
+    --section-bg: #1a1a1a;
+    --border: #333333;
+    --dot-color: #222222;
   }
   *{
     box-sizing: border-box;
   }
+  html, body{
+    height: 100%;
+  }
   body{
     margin: 0;
-    background: var(--white);
-    color: var(--black);
+    background-color: var(--bg);
+    background-image: radial-gradient(circle, var(--dot-color) 1px, transparent 1.5px);
+    background-size: 8px 8px;
+    color: var(--fg);
     font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
     font-weight: 300;
     font-size: 12px;
     letter-spacing: 0.05em;
-    padding: 32px 40px;
+    padding: 16px;
+    transition: background-color 200ms ease, color 200ms ease;
   }
 
+  /* ------------------------------------------------------------------ */
+  /* header                                                              */
+  /* ------------------------------------------------------------------ */
   .header{
     display: flex;
+    flex-direction: column;
     justify-content: space-between;
-    align-items: center;
-    flex-wrap: wrap;
-    gap: 16px;
-    border-bottom: 1px solid var(--black);
-    padding-bottom: 16px;
-    margin-bottom: 32px;
-    text-transform: lowercase;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+    padding-bottom: 8px;
+    min-height: 48px;
   }
-  .header .title{
+  .header-top{
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    width: 100%;
+  }
+  .visualizer{
+    flex: 1 1 auto;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 3px;
+    height: 20px;
+    overflow: hidden;
+    transition: opacity 300ms ease;
+  }
+  .visualizer.flash .vdot{
+    background: var(--fg);
+    animation-duration: 0.4s, 3.5s;
+  }
+  .vdot{
+    width: 4px;
+    height: 4px;
+    min-width: 4px;
+    border-radius: 50%;
+    background: var(--border);
+    opacity: 0.6;
+    animation: wave 3.5s ease-in-out infinite;
+  }
+  @keyframes wave{
+    0%, 100%{ transform: translateY(0); }
+    50%{ transform: translateY(-6px); }
+  }
+  .header-controls{
+    flex: 0 0 auto;
+    display: flex;
+    align-items: center;
+    gap: 16px;
+    flex-wrap: wrap;
+  }
+  .header-title{
     font-size: 13px;
     font-weight: 300;
     letter-spacing: 0.05em;
-  }
-  .midi{
-    display: flex;
-    align-items: center;
-    gap: 24px;
-    flex-wrap: wrap;
+    text-transform: lowercase;
+    align-self: flex-start;
+    margin-top: 8px;
   }
   .field{
     display: flex;
@@ -53,13 +107,14 @@
   .field label{
     font-size: 10px;
     letter-spacing: 0.05em;
-    color: var(--black);
+    color: var(--fg);
+    text-transform: lowercase;
   }
   select{
     background: transparent;
-    color: var(--black);
+    color: var(--fg);
     border: none;
-    border-bottom: 1px solid var(--black);
+    border-bottom: 1px solid var(--border);
     font-family: inherit;
     font-size: 11px;
     font-weight: 300;
@@ -75,117 +130,193 @@
     font-size: 11px;
   }
   .dot{
-    width: 6px;
-    height: 6px;
-    border: 1px solid var(--black);
+    width: 8px;
+    height: 8px;
+    border: 1px solid var(--border);
     border-radius: 50%;
     background: transparent;
+    transition: transform 100ms ease;
   }
   .dot.on{
-    background: var(--black);
+    background: var(--fg);
+  }
+  .dot.pulse{
+    animation: ledBounce 400ms ease-out;
+  }
+  @keyframes ledBounce{
+    0%{ transform: scale(1); }
+    50%{ transform: scale(1.8); }
+    100%{ transform: scale(1); }
+  }
+  .theme-toggle{
+    font-size: 14px;
+    line-height: 1;
+    padding: 4px 8px;
   }
 
+  /* ------------------------------------------------------------------ */
+  /* buttons                                                             */
+  /* ------------------------------------------------------------------ */
   .actions{
     display: flex;
     flex-wrap: wrap;
-    gap: 24px;
-    margin-bottom: 40px;
+    gap: 8px;
+    margin-bottom: 16px;
   }
   button{
     background: none;
-    border: none;
-    color: var(--black);
+    border: 1px solid var(--border);
+    color: var(--fg);
     font-family: inherit;
     font-size: 11px;
     font-weight: 300;
     letter-spacing: 0.05em;
     text-transform: lowercase;
     cursor: pointer;
-    padding: 0 0 2px 0;
-    border-bottom: 1px solid transparent;
+    border-radius: 0;
+    padding: 6px 12px;
+    transition: background-color 100ms ease, color 100ms ease;
   }
   button:hover{
-    border-bottom: 1px solid var(--black);
+    background: var(--fg);
+    color: var(--bg);
   }
 
+  /* ------------------------------------------------------------------ */
+  /* section grid                                                        */
+  /* ------------------------------------------------------------------ */
   .grid{
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-    gap: 48px;
-    margin-bottom: 48px;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 12px;
+  }
+  @media (orientation: landscape) and (min-width: 900px){
+    .grid{
+      grid-template-columns: repeat(3, 1fr);
+    }
+  }
+  .section{
+    position: relative;
+    overflow: hidden;
+    border: 1px solid var(--border);
+    background: var(--section-bg);
+    padding: 16px;
+    border-radius: 0;
+    transition: background-color 200ms ease, border-color 200ms ease;
+  }
+  .section::after{
+    content: '';
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: -2px;
+    height: 2px;
+    background: var(--fg);
+    opacity: 0;
+    pointer-events: none;
+  }
+  .section:hover::after{
+    animation: scan 600ms linear;
+  }
+  @keyframes scan{
+    0%{ top: 0; opacity: 0.6; }
+    100%{ top: 100%; opacity: 0; }
   }
   .section h2{
-    margin: 0 0 24px 0;
+    margin: 0 0 16px 0;
     font-size: 11px;
     font-weight: 300;
     letter-spacing: 0.05em;
     text-transform: lowercase;
-    color: var(--black);
+    color: var(--fg);
   }
+
+  /* ------------------------------------------------------------------ */
+  /* knobs                                                               */
+  /* ------------------------------------------------------------------ */
   .knobs{
     display: flex;
     flex-wrap: wrap;
-    gap: 24px;
+    gap: 16px;
   }
   .knob-container{
+    position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 48px;
+    width: 56px;
     user-select: none;
     -webkit-user-select: none;
     touch-action: none;
   }
   .knob-svg{
     cursor: ns-resize;
+    width: 40px;
+    height: 40px;
+  }
+  .knob-indicator{
+    transform-origin: 50% 50%;
   }
   .knob-label{
     font-size: 11px;
     font-weight: 300;
     letter-spacing: 0.05em;
     text-transform: lowercase;
-    margin-top: 8px;
-    color: var(--black);
+    margin-top: 4px;
+    color: var(--fg);
+    white-space: nowrap;
   }
   .knob-value{
     font-family: "SF Mono", Menlo, Monaco, monospace;
     font-size: 13px;
-    font-weight: 300;
+    font-weight: 700;
     margin-top: 2px;
-    color: var(--black);
-    cursor: text;
+    color: var(--fg);
+    cursor: pointer;
+    min-height: 18px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .ripple-dot{
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 4px;
+    height: 4px;
+    margin: -2px 0 0 -2px;
+    border-radius: 50%;
+    background: var(--fg);
+    pointer-events: none;
+    animation: rippleOut 400ms ease-out forwards;
+  }
+  @keyframes rippleOut{
+    from{ transform: translate(0, 0) scale(1); opacity: 0.8; }
+    to{ transform: translate(var(--dx), var(--dy)) scale(0.2); opacity: 0; }
   }
 
-  .library{
-    border-top: 1px solid var(--black);
-    padding-top: 24px;
-  }
-  .library-title{
-    font-size: 11px;
-    font-weight: 300;
-    letter-spacing: 0.05em;
-    text-transform: lowercase;
-    margin-bottom: 16px;
-  }
+  /* ------------------------------------------------------------------ */
+  /* patch library                                                       */
+  /* ------------------------------------------------------------------ */
   .lib-row{
     display: flex;
     flex-wrap: wrap;
-    gap: 16px;
+    gap: 12px;
     align-items: center;
-    margin-bottom: 24px;
+    margin-bottom: 16px;
   }
   input[type="text"]{
     flex: 1;
-    min-width: 160px;
+    min-width: 140px;
     background: transparent;
-    color: var(--black);
+    color: var(--fg);
     border: none;
-    border-bottom: 1px solid var(--black);
+    border-bottom: 1px solid var(--border);
     font-family: inherit;
     font-size: 11px;
     font-weight: 300;
     letter-spacing: 0.05em;
-    padding: 2px 0;
+    padding: 4px 0;
     outline: none;
     text-transform: lowercase;
   }
@@ -193,39 +324,101 @@
     display: flex;
     flex-direction: column;
     gap: 8px;
+    max-height: 200px;
+    overflow-y: auto;
   }
   .lib-item{
     display: flex;
     justify-content: space-between;
     align-items: center;
     font-size: 11px;
+    gap: 8px;
   }
   .lib-item .name{
     letter-spacing: 0.05em;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
-  .lib-item .btns{ display: flex; gap: 16px; }
+  .lib-item .btns{ display: flex; gap: 8px; flex: 0 0 auto; }
+  .lib-item button{ padding: 4px 10px; }
   input[type="file"]{ display: none; }
-  .small{ font-size: 10px; color: var(--black); opacity: 0.5; letter-spacing: 0.05em; }
+  .small{ font-size: 10px; color: var(--fg); opacity: 0.5; letter-spacing: 0.05em; }
+
+  /* ------------------------------------------------------------------ */
+  /* iPad 11" (1194x834 landscape / 834x1194 portrait)                   */
+  /* ------------------------------------------------------------------ */
+  @media (min-width: 768px){
+    body{
+      font-size: 14px;
+      background-size: 10px 10px;
+      padding: 16px 24px;
+    }
+    .header{
+      min-height: 60px;
+    }
+    .header-title{
+      font-size: 14px;
+    }
+    .grid{
+      gap: 16px;
+    }
+    .section{
+      padding: 24px;
+    }
+    .knob-label{
+      font-size: 13px;
+    }
+    .knob-svg{
+      width: 56px;
+      height: 56px;
+    }
+    .knob-container{
+      width: 72px;
+    }
+    .knob-value{
+      min-width: 44px;
+      min-height: 44px;
+      font-size: 15px;
+    }
+    button{
+      min-height: 44px;
+      padding: 12px 24px;
+      font-size: 13px;
+    }
+    select{
+      min-height: 44px;
+      font-size: 13px;
+    }
+    .lib-item button{
+      min-height: 44px;
+      min-width: 44px;
+    }
+  }
 </style>
 </head>
 <body>
 
 <div class="header">
-  <div class="title">virus ti snow</div>
-  <div class="midi">
-    <div class="field">
-      <label>output</label>
-      <select id="midiOutSelect"><option value="">none</option></select>
-    </div>
-    <div class="field">
-      <label>channel</label>
-      <select id="midiChannel"></select>
-    </div>
-    <div class="conn">
-      <span class="dot" id="connDot"></span>
-      <span id="connLabel">disconnected</span>
+  <div class="header-top">
+    <div class="visualizer" id="visualizer"></div>
+    <div class="header-controls">
+      <div class="field">
+        <label>output</label>
+        <select id="midiOutSelect"><option value="">none</option></select>
+      </div>
+      <div class="field">
+        <label>channel</label>
+        <select id="midiChannel"></select>
+      </div>
+      <div class="conn">
+        <span class="dot" id="connDot"></span>
+        <span id="connLabel">disconnected</span>
+      </div>
+      <button class="theme-toggle" id="themeToggle">○</button>
     </div>
   </div>
+  <div class="header-title">virus ti snow</div>
 </div>
 
 <div class="actions">
@@ -237,15 +430,6 @@
 </div>
 
 <div class="grid" id="sectionsContainer"></div>
-
-<div class="library">
-  <div class="library-title">patch library</div>
-  <div class="lib-row">
-    <input type="text" id="patchName" placeholder="patch name">
-    <button id="btnSavePatch">save</button>
-  </div>
-  <div class="lib-list" id="libList"></div>
-</div>
 
 <script>
 (function(){
@@ -276,10 +460,10 @@
     { id:'osc_detune',      name:'Osc Detune',        short:'det',  section:'osc', cc:26, default:0 },
 
     // Filter 1
-    { id:'f1_cutoff',    name:'Cutoff',            short:'cutoff', section:'filter', cc:40, default:127 },
-    { id:'f1_resonance', name:'Resonance',         short:'res',    section:'filter', cc:42, default:0 },
-    { id:'f1_envamount', name:'Env Amount',        short:'env',    section:'filter', cc:44, default:64, bipolar:true },
-    { id:'f1_keytrack',  name:'Keyboard Track',    short:'key',    section:'filter', cc:46, default:0 },
+    { id:'f1_cutoff',    name:'Cutoff',            short:'cutt', section:'filter', cc:40, default:127 },
+    { id:'f1_resonance', name:'Resonance',         short:'res',  section:'filter', cc:42, default:0 },
+    { id:'f1_envamount', name:'Env Amount',        short:'env',  section:'filter', cc:44, default:64, bipolar:true },
+    { id:'f1_keytrack',  name:'Keyboard Track',    short:'key',  section:'filter', cc:46, default:0 },
 
     // Amplifier
     { id:'amp_attack',  name:'Attack',  short:'atk', section:'amp', cc:59, default:0 },
@@ -289,13 +473,13 @@
 
     // LFO 1
     { id:'lfo1_rate',  name:'Rate',  short:'rate', section:'lfo', cc:67, default:64 },
-    { id:'lfo1_shape', name:'Shape', short:'shape', section:'lfo', cc:68, default:0 },
+    { id:'lfo1_shape', name:'Shape', short:'shp',  section:'lfo', cc:68, default:0 },
 
     // Effects
-    { id:'fx_chorus_mix',      name:'Chorus Mix',      short:'chorus mix',  section:'fx', cc:105, default:0 },
-    { id:'fx_chorus_rate',     name:'Chorus Rate',     short:'chorus rate', section:'fx', cc:106, default:64 },
-    { id:'fx_delay_time',      name:'Delay Time',      short:'delay time',  section:'fx', cc:114, default:0 },
-    { id:'fx_delay_feedback',  name:'Delay Feedback',  short:'delay fb',    section:'fx', cc:115, default:0 },
+    { id:'fx_chorus_mix',      name:'Chorus Mix',      short:'chmx', section:'fx', cc:105, default:0 },
+    { id:'fx_chorus_rate',     name:'Chorus Rate',     short:'chrt', section:'fx', cc:106, default:64 },
+    { id:'fx_delay_time',      name:'Delay Time',      short:'dlt',  section:'fx', cc:114, default:0 },
+    { id:'fx_delay_feedback',  name:'Delay Feedback',  short:'dlfb', section:'fx', cc:115, default:0 },
   ];
 
   const SYSEX_PREFIX = [0xF0, 0x00, 0x20, 0x33, 0x01];
@@ -309,8 +493,48 @@
 
   let midiAccess = null;
   let selectedOutput = null;
+  let wasConnected = false;
 
   const LIB_KEY = 'virusTiSnow_patchLibrary';
+  const THEME_KEY = 'virusTiSnow_theme';
+
+  // ---------------------------------------------------------------------
+  // Theme toggle (persisted in localStorage)
+  // ---------------------------------------------------------------------
+  const themeToggle = document.getElementById('themeToggle');
+
+  function applyTheme(theme){
+    if (theme === 'dark'){
+      document.documentElement.setAttribute('data-theme', 'dark');
+      themeToggle.textContent = '●'; // ●
+    } else {
+      document.documentElement.removeAttribute('data-theme');
+      themeToggle.textContent = '○'; // ○
+    }
+  }
+
+  let currentTheme = localStorage.getItem(THEME_KEY) || 'light';
+  applyTheme(currentTheme);
+
+  themeToggle.addEventListener('click', () => {
+    currentTheme = (currentTheme === 'light') ? 'dark' : 'light';
+    localStorage.setItem(THEME_KEY, currentTheme);
+    applyTheme(currentTheme);
+  });
+
+  // ---------------------------------------------------------------------
+  // Header sine-wave visualizer (idle animation)
+  // ---------------------------------------------------------------------
+  const visualizer = document.getElementById('visualizer');
+  const DOT_COUNT = window.innerWidth >= 768 ? 48 : 32;
+  const WAVE_DURATION = 3.5; // seconds, matches CSS animation-duration
+
+  for (let i = 0; i < DOT_COUNT; i++){
+    const dot = document.createElement('div');
+    dot.className = 'vdot';
+    dot.style.animationDelay = (-(i / DOT_COUNT) * WAVE_DURATION) + 's';
+    visualizer.appendChild(dot);
+  }
 
   // ---------------------------------------------------------------------
   // MIDI setup
@@ -328,14 +552,29 @@
   }
   chanSelect.value = 1;
 
+  function flashConnected(){
+    connDot.classList.remove('pulse');
+    // force reflow so the animation can restart
+    void connDot.offsetWidth;
+    connDot.classList.add('pulse');
+
+    visualizer.classList.remove('flash');
+    void visualizer.offsetWidth;
+    visualizer.classList.add('flash');
+    setTimeout(() => visualizer.classList.remove('flash'), 500);
+  }
+
   function updateConnectionIndicator(){
-    if (selectedOutput && selectedOutput.state === 'connected'){
+    const isConnected = !!(selectedOutput && selectedOutput.state === 'connected');
+    if (isConnected){
       connDot.classList.add('on');
       connLabel.textContent = 'connected: ' + selectedOutput.name;
+      if (!wasConnected) flashConnected();
     } else {
       connDot.classList.remove('on');
       connLabel.textContent = 'disconnected';
     }
+    wasConnected = isConnected;
   }
 
   function refreshOutputs(){
@@ -408,16 +647,16 @@
   }
 
   // ---------------------------------------------------------------------
-  // Knob UI — minimal thin-stroke circle with a single radial indicator
-  // line showing the current value (-135deg to +135deg sweep, 0deg = up).
+  // Knob UI — thin-stroke circle with a single radial indicator line
+  // showing the current value (-135deg to +135deg sweep, 0deg = up).
   // ---------------------------------------------------------------------
   const svgNS = 'http://www.w3.org/2000/svg';
-  const KNOB_SIZE = 36;
+  const KNOB_SIZE = 40;
   const KNOB_CENTER = KNOB_SIZE / 2;
   const KNOB_RADIUS = 16;
 
   function angleForValue(value){
-    return (-135 + (value / 127) * 270) * Math.PI / 180;
+    return -135 + (value / 127) * 270;
   }
 
   function displayValue(param, value){
@@ -428,14 +667,26 @@
     return String(value);
   }
 
+  // spawn a brief ripple of dots radiating outward from a knob
+  function spawnRipple(container){
+    const RIPPLE_COUNT = 8;
+    for (let i = 0; i < RIPPLE_COUNT; i++){
+      const angle = (i / RIPPLE_COUNT) * Math.PI * 2;
+      const dot = document.createElement('div');
+      dot.className = 'ripple-dot';
+      dot.style.setProperty('--dx', (Math.cos(angle) * 28) + 'px');
+      dot.style.setProperty('--dy', (Math.sin(angle) * 28) + 'px');
+      container.appendChild(dot);
+      setTimeout(() => dot.remove(), 450);
+    }
+  }
+
   function createKnob(param){
     const container = document.createElement('div');
     container.className = 'knob-container';
 
     const svg = document.createElementNS(svgNS, 'svg');
     svg.setAttribute('viewBox', `0 0 ${KNOB_SIZE} ${KNOB_SIZE}`);
-    svg.setAttribute('width', KNOB_SIZE);
-    svg.setAttribute('height', KNOB_SIZE);
     svg.classList.add('knob-svg');
 
     // thin stroke circle, no fill
@@ -444,17 +695,24 @@
     circle.setAttribute('cy', KNOB_CENTER);
     circle.setAttribute('r', KNOB_RADIUS);
     circle.setAttribute('fill', 'none');
-    circle.setAttribute('stroke', '#000000');
+    circle.setAttribute('stroke', 'currentColor');
     circle.setAttribute('stroke-width', '0.5');
     svg.appendChild(circle);
 
-    // single thin line from center to edge showing the value
-    const indicator = document.createElementNS(svgNS, 'line');
-    indicator.setAttribute('x1', KNOB_CENTER);
-    indicator.setAttribute('y1', KNOB_CENTER);
-    indicator.setAttribute('stroke', '#000000');
-    indicator.setAttribute('stroke-width', '1');
+    // single thin line from center to edge, rotated to show the value
+    const indicator = document.createElementNS(svgNS, 'g');
+    indicator.classList.add('knob-indicator');
+    const line = document.createElementNS(svgNS, 'line');
+    line.setAttribute('x1', KNOB_CENTER);
+    line.setAttribute('y1', KNOB_CENTER);
+    line.setAttribute('x2', KNOB_CENTER);
+    line.setAttribute('y2', KNOB_CENTER - KNOB_RADIUS);
+    line.setAttribute('stroke', 'currentColor');
+    line.setAttribute('stroke-width', '1');
+    indicator.appendChild(line);
     svg.appendChild(indicator);
+
+    svg.style.color = 'var(--fg)';
 
     const label = document.createElement('div');
     label.className = 'knob-label';
@@ -469,16 +727,16 @@
 
     function render(){
       const value = patch[param.id];
-      const angle = angleForValue(value);
-      indicator.setAttribute('x2', KNOB_CENTER + Math.sin(angle) * KNOB_RADIUS);
-      indicator.setAttribute('y2', KNOB_CENTER - Math.cos(angle) * KNOB_RADIUS);
+      indicator.style.transform = `rotate(${angleForValue(value)}deg)`;
       valueLabel.textContent = displayValue(param, value);
     }
 
-    function setValue(value, send){
+    function setValue(value, send, opts){
       value = Math.max(0, Math.min(127, Math.round(value)));
+      const changed = patch[param.id] !== value;
       patch[param.id] = value;
       render();
+      if (changed && !(opts && opts.silent)) spawnRipple(container);
       if (send) sendParam(param, value);
     }
 
@@ -507,8 +765,13 @@
     svg.addEventListener('pointerup', endDrag);
     svg.addEventListener('pointercancel', endDrag);
 
-    // double-click to type exact value
-    valueLabel.addEventListener('dblclick', () => {
+    // double-click resets to default
+    svg.addEventListener('dblclick', () => {
+      setValue(param.default, true);
+    });
+
+    // tap/click the value box to type an exact value
+    valueLabel.addEventListener('click', () => {
       const current = patch[param.id];
       const input = prompt('value (0-127):', current);
       if (input === null) return;
@@ -527,6 +790,7 @@
   // Build sections
   // ---------------------------------------------------------------------
   const knobRefs = {}; // id -> container element
+  const allKnobsInOrder = [];
 
   function buildSections(){
     const root = document.getElementById('sectionsContainer');
@@ -544,11 +808,52 @@
       PARAMS.filter(p => p.section === sec.key).forEach(param => {
         const knob = createKnob(param);
         knobRefs[param.id] = knob;
+        allKnobsInOrder.push(knob);
         knobs.appendChild(knob);
       });
 
       div.appendChild(knobs);
       root.appendChild(div);
+    });
+
+    // patch library section
+    const libSection = document.createElement('div');
+    libSection.className = 'section';
+    const libTitle = document.createElement('h2');
+    libTitle.textContent = 'patch library';
+    libSection.appendChild(libTitle);
+
+    const libRow = document.createElement('div');
+    libRow.className = 'lib-row';
+    const nameInput = document.createElement('input');
+    nameInput.type = 'text';
+    nameInput.id = 'patchName';
+    nameInput.placeholder = 'patch name';
+    const saveBtn = document.createElement('button');
+    saveBtn.id = 'btnSavePatch';
+    saveBtn.textContent = 'save';
+    libRow.appendChild(nameInput);
+    libRow.appendChild(saveBtn);
+    libSection.appendChild(libRow);
+
+    const libList = document.createElement('div');
+    libList.className = 'lib-list';
+    libList.id = 'libList';
+    libSection.appendChild(libList);
+
+    root.appendChild(libSection);
+
+    saveBtn.addEventListener('click', () => {
+      const name = nameInput.value.trim();
+      if (!name){
+        alert('enter a patch name');
+        return;
+      }
+      const lib = loadLibrary();
+      lib[name] = { ...patch };
+      saveLibrary(lib);
+      nameInput.value = '';
+      renderLibrary();
     });
   }
 
@@ -565,16 +870,48 @@
     if (send) sendFullPatch(patch);
   }
 
+  // smoothly animate every knob's indicator with the same transition
+  function animateAllKnobs(duration){
+    allKnobsInOrder.forEach(knob => {
+      const indicator = knob.querySelector('.knob-indicator');
+      indicator.style.transition = `transform ${duration}ms ease-in-out`;
+    });
+    setTimeout(() => {
+      allKnobsInOrder.forEach(knob => {
+        knob.querySelector('.knob-indicator').style.transition = '';
+      });
+    }, duration + 50);
+  }
+
+  // animate knobs in a left-to-right cascade (used by randomize)
+  function animateCascade(stepDuration, stagger){
+    allKnobsInOrder.forEach((knob, i) => {
+      const indicator = knob.querySelector('.knob-indicator');
+      indicator.style.transition = `transform ${stepDuration}ms ease-out`;
+      indicator.style.transitionDelay = (i * stagger) + 'ms';
+    });
+    const total = stepDuration + allKnobsInOrder.length * stagger + 50;
+    setTimeout(() => {
+      allKnobsInOrder.forEach(knob => {
+        const indicator = knob.querySelector('.knob-indicator');
+        indicator.style.transition = '';
+        indicator.style.transitionDelay = '';
+      });
+    }, total);
+  }
+
   // ---------------------------------------------------------------------
   // Buttons: Randomize / Init
   // ---------------------------------------------------------------------
   document.getElementById('btnRandomize').addEventListener('click', () => {
+    animateCascade(150, 30);
     const newPatch = {};
     PARAMS.forEach(p => { newPatch[p.id] = Math.floor(Math.random() * 128); });
     applyPatchObject(newPatch, true);
   });
 
   document.getElementById('btnInit').addEventListener('click', () => {
+    animateAllKnobs(300);
     const newPatch = {};
     PARAMS.forEach(p => { newPatch[p.id] = p.default; });
     applyPatchObject(newPatch, true);
@@ -632,6 +969,7 @@
         }
         i++;
       }
+      animateAllKnobs(300);
       applyPatchObject(newPatch, true);
     };
     reader.readAsArrayBuffer(file);
@@ -677,6 +1015,7 @@
       const loadBtn = document.createElement('button');
       loadBtn.textContent = 'load';
       loadBtn.addEventListener('click', () => {
+        animateAllKnobs(300);
         applyPatchObject(lib[name], true);
       });
 
@@ -697,20 +1036,6 @@
       list.appendChild(item);
     });
   }
-
-  document.getElementById('btnSavePatch').addEventListener('click', () => {
-    const input = document.getElementById('patchName');
-    const name = input.value.trim();
-    if (!name){
-      alert('enter a patch name');
-      return;
-    }
-    const lib = loadLibrary();
-    lib[name] = { ...patch };
-    saveLibrary(lib);
-    input.value = '';
-    renderLibrary();
-  });
 
   // ---------------------------------------------------------------------
   // Init
