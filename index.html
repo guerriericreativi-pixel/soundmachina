@@ -136,6 +136,10 @@
     font-size: 14px;
     line-height: 1;
     padding: 4px 8px;
+    min-height: 0;
+    min-width: 0;
+    width: auto;
+    height: auto;
   }
 
   /* ------------------------------------------------------------------ */
@@ -165,6 +169,153 @@
   button:hover{
     background: var(--fg);
     color: var(--bg);
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* mode tabs / single-multi views                                      */
+  /* ------------------------------------------------------------------ */
+  .hidden{ display: none !important; }
+  .mode-tabs{
+    display: flex;
+    gap: 8px;
+    margin-bottom: 8px;
+    flex: 0 0 auto;
+  }
+  .mode-tab{
+    background: none;
+    border: 1px solid var(--border);
+    color: var(--fg);
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 300;
+    letter-spacing: 0.05em;
+    text-transform: lowercase;
+    cursor: pointer;
+    border-radius: 0;
+    padding: 6px 12px;
+    transition: background-color 100ms ease, color 100ms ease;
+  }
+  .mode-tab.active{
+    background: var(--fg);
+    color: var(--bg);
+  }
+  #singleView,
+  #multiView{
+    display: flex;
+    flex-direction: column;
+    flex: 1 1 auto;
+    min-height: 0;
+    gap: 8px;
+  }
+
+  /* ------------------------------------------------------------------ */
+  /* multi mode                                                          */
+  /* ------------------------------------------------------------------ */
+  .multi-global{
+    display: flex;
+    align-items: flex-end;
+    gap: 16px;
+    flex-wrap: wrap;
+    flex: 0 0 auto;
+    border: 1px solid var(--border);
+    background: var(--section-bg);
+    padding: 12px 16px;
+  }
+  .part-list{
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    flex: 1 1 auto;
+    min-height: 0;
+    overflow-y: auto;
+  }
+  .part-row{
+    border: 1px solid var(--border);
+    background: var(--section-bg);
+    border-left-width: 3px;
+    border-left-style: solid;
+    transition: opacity 200ms ease, background-color 200ms ease, border-color 200ms ease;
+  }
+  .part-row.disabled{
+    opacity: 0.4;
+  }
+  .part-0{ border-left-color: #ffffff; }
+  .part-1{ border-left-color: #aaaaaa; }
+  .part-2{ border-left-color: #555555; }
+  .part-3{ border-left-color: #dddddd; }
+  html[data-theme="dark"] .part-0{ border-left-color: #ffffff; }
+  html[data-theme="dark"] .part-1{ border-left-color: #999999; }
+  html[data-theme="dark"] .part-2{ border-left-color: #555555; }
+  html[data-theme="dark"] .part-3{ border-left-color: #cccccc; }
+  .part-main{
+    display: flex;
+    align-items: flex-end;
+    gap: 16px;
+    flex-wrap: wrap;
+    padding: 12px 16px;
+  }
+  .part-badge{
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    text-transform: lowercase;
+    min-width: 22px;
+    align-self: center;
+  }
+  .part-enable{
+    padding: 4px 10px;
+    font-size: 10px;
+    align-self: center;
+  }
+  .part-main .field select,
+  .part-main .field input[type="number"]{
+    min-width: 56px;
+  }
+  input[type="number"]{
+    background: transparent;
+    color: var(--fg);
+    border: none;
+    border-bottom: 1px solid var(--border);
+    font-family: inherit;
+    font-size: 11px;
+    font-weight: 300;
+    letter-spacing: 0.05em;
+    padding: 2px 0;
+    outline: none;
+    width: 56px;
+  }
+  .key-display{
+    font-family: "SF Mono", Menlo, Monaco, monospace;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+    border-bottom: 1px solid var(--border);
+    padding: 2px 4px;
+    cursor: pointer;
+    text-align: center;
+    min-width: 40px;
+    text-transform: lowercase;
+  }
+  .part-editor{
+    display: flex;
+    flex-wrap: wrap;
+    gap: 8px;
+    padding: 0 16px 16px 16px;
+    border-top: 1px solid var(--border);
+  }
+  .subsection{
+    flex: 1 1 180px;
+    min-width: 180px;
+    border: 1px solid var(--border);
+    padding: 12px;
+  }
+  .subsection h3{
+    margin: 0 0 8px 0;
+    font-size: 10px;
+    font-weight: 300;
+    letter-spacing: 0.05em;
+    text-transform: lowercase;
+    color: var(--fg);
   }
 
   /* ------------------------------------------------------------------ */
@@ -437,15 +588,42 @@
   </div>
 </div>
 
-<div class="actions">
-  <button id="btnRandomize">randomize</button>
-  <button id="btnInit">init</button>
-  <button id="btnExport">export .syx</button>
-  <button id="btnImport">import .syx</button>
-  <input type="file" id="fileInput" accept=".syx">
+<div class="mode-tabs">
+  <button class="mode-tab active" id="tabSingle" data-mode="single">single</button>
+  <button class="mode-tab" id="tabMulti" data-mode="multi">multi</button>
 </div>
 
-<div class="grid" id="sectionsContainer"></div>
+<div id="singleView">
+  <div class="actions">
+    <button id="btnRandomize">randomize</button>
+    <button id="btnInit">init</button>
+    <button id="btnExport">export .syx</button>
+    <button id="btnImport">import .syx</button>
+    <input type="file" id="fileInput" accept=".syx">
+  </div>
+
+  <div class="grid" id="sectionsContainer"></div>
+</div>
+
+<div id="multiView" class="hidden">
+  <div class="multi-global">
+    <div class="field">
+      <label>play mode</label>
+      <select id="playModeSelect">
+        <option value="0">single</option>
+        <option value="1">multi</option>
+      </select>
+    </div>
+    <div class="field">
+      <label>multi program</label>
+      <input type="number" id="multiProgramInput" min="0" max="127" value="0">
+    </div>
+    <button id="btnMultiLoad">load</button>
+    <button id="btnMultiSave">save</button>
+  </div>
+
+  <div class="part-list" id="partList"></div>
+</div>
 
 <script>
 (function(){
@@ -502,10 +680,51 @@
   const SYSEX_CMD_PARAM = 0x01; // single parameter change
 
   // ---------------------------------------------------------------------
+  // Multi mode: 4 parts, each with its own mixer/MIDI settings (page C)
+  // and its own full sound (oscillator/filter/amp/lfo/fx).
+  // Per-part param SysEx: F0 00 20 33 01 [DeviceID] 72 [part 00-03] [param] [value] F7
+  // ---------------------------------------------------------------------
+  const NUM_PARTS = 4;
+  const SYSEX_CMD_MULTI = 0x72;  // page C: per-part mixer params
+  const SYSEX_CMD_STORE = 0x70;  // store/write request
+  const PART_ENABLE_PARAM = 0xC0;
+
+  const PART_PARAMS = [
+    { id:'channel',   name:'MIDI Channel', short:'ch',   cc:34,  kind:'channel', default:0 },
+    { id:'volume',    name:'Volume',       short:'vol',  cc:39,  kind:'knob',    default:127 },
+    { id:'bank',      name:'Bank',         short:'bank', cc:31,  kind:'bank',    default:0 },
+    { id:'program',   name:'Program',      short:'prg',  cc:33,  kind:'program', default:0 },
+    { id:'lowkey',    name:'Low Key',      short:'low',  cc:35,  kind:'key',     default:0 },
+    { id:'highkey',   name:'High Key',     short:'high', cc:36,  kind:'key',     default:127 },
+    { id:'transpose', name:'Transpose',    short:'trsp', cc:37,  kind:'knob',    default:64, bipolar:true },
+    { id:'detune',    name:'Detune',       short:'dtun', cc:38,  kind:'knob',    default:64, bipolar:true },
+    { id:'output',    name:'Output',       short:'out',  cc:41,  kind:'output',  default:0 },
+  ];
+
+  const BANK_NAMES = ['a', 'b', 'c', 'd'];
+  const OUTPUT_NAMES = ['out1 l', 'out1 l+r', 'out1 r', 'out2 l', 'out2 l+r', 'out2 r'];
+  const NOTE_NAMES = ['c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'a#', 'b'];
+
+  function noteName(value){
+    const octave = Math.floor(value / 12) - 1; // MIDI 0 -> c-1
+    return NOTE_NAMES[value % 12] + octave;
+  }
+
+  // ---------------------------------------------------------------------
   // State
   // ---------------------------------------------------------------------
   const patch = {};
   PARAMS.forEach(p => { patch[p.id] = p.default; });
+
+  // multiParts[i] = { enabled, values: {per-part mixer params}, sound: {per-part PARAMS} }
+  const multiParts = [];
+  for (let i = 0; i < NUM_PARTS; i++){
+    const values = {};
+    PART_PARAMS.forEach(pp => { values[pp.id] = pp.default; });
+    const sound = {};
+    PARAMS.forEach(p => { sound[p.id] = p.default; });
+    multiParts.push({ enabled: true, values, sound });
+  }
 
   let midiAccess = null;
   let selectedOutput = null;
@@ -785,6 +1004,30 @@
   }
 
   // ---------------------------------------------------------------------
+  // Multi mode SysEx send
+  // ---------------------------------------------------------------------
+  function sendMultiPartParam(partIndex, cc, value){
+    if (selectedOutput){
+      try{
+        selectedOutput.send(new Uint8Array([
+          ...SYSEX_PREFIX, deviceId(), SYSEX_CMD_MULTI, partIndex & 0x7F, cc & 0x7F, value & 0x7F, 0xF7
+        ]));
+      } catch(e){ console.error('MIDI send error', e); }
+    }
+  }
+
+  // per-part full sound editor: addresses the part via the device-id byte
+  function sendPartSoundParam(partIndex, cc, value){
+    if (selectedOutput){
+      try{
+        selectedOutput.send(new Uint8Array([
+          ...SYSEX_PREFIX, partIndex & 0x7F, SYSEX_CMD_PARAM, cc & 0x7F, value & 0x7F, 0xF7
+        ]));
+      } catch(e){ console.error('MIDI send error', e); }
+    }
+  }
+
+  // ---------------------------------------------------------------------
   // Knob UI — thin-stroke circle with a single radial indicator line
   // showing the current value (-135deg to +135deg sweep, 0deg = up).
   // ---------------------------------------------------------------------
@@ -797,8 +1040,8 @@
     return -135 + (value / 127) * 270;
   }
 
-  function displayValue(param, value){
-    if (param.bipolar) {
+  function displayValue(value, bipolar){
+    if (bipolar) {
       const v = value - 64;
       return (v > 0 ? '+' : '') + v;
     }
@@ -819,7 +1062,9 @@
     }
   }
 
-  function createKnob(param){
+  // generic knob: caller supplies getValue/setValue so the same widget can
+  // back the single-mode patch, or any per-part value in multi mode.
+  function createKnobGeneric(opts){
     const container = document.createElement('div');
     container.className = 'knob-container';
 
@@ -854,7 +1099,7 @@
 
     const label = document.createElement('div');
     label.className = 'knob-label';
-    label.textContent = param.short || param.name;
+    label.textContent = opts.label;
 
     const valueLabel = document.createElement('div');
     valueLabel.className = 'knob-value';
@@ -864,18 +1109,17 @@
     container.appendChild(valueLabel);
 
     function render(){
-      const value = patch[param.id];
+      const value = opts.getValue();
       indicator.style.transform = `rotate(${angleForValue(value)}deg)`;
-      valueLabel.textContent = displayValue(param, value);
+      valueLabel.textContent = displayValue(value, opts.bipolar);
     }
 
-    function setValue(value, send, opts){
+    function setValue(value, send, setOpts){
       value = Math.max(0, Math.min(127, Math.round(value)));
-      const changed = patch[param.id] !== value;
-      patch[param.id] = value;
+      const changed = opts.getValue() !== value;
+      opts.setValue(value, send);
       render();
-      if (changed && !(opts && opts.silent)) spawnRipple(container);
-      if (send) sendParam(param, value);
+      if (changed && !(setOpts && setOpts.silent)) spawnRipple(container);
     }
 
     // drag interaction
@@ -886,7 +1130,7 @@
     svg.addEventListener('pointerdown', (e) => {
       dragging = true;
       startY = e.clientY;
-      startVal = patch[param.id];
+      startVal = opts.getValue();
       svg.setPointerCapture(e.pointerId);
       e.preventDefault();
     });
@@ -905,12 +1149,12 @@
 
     // double-click resets to default
     svg.addEventListener('dblclick', () => {
-      setValue(param.default, true);
+      setValue(opts.default, true);
     });
 
     // tap/click the value box to type an exact value
     valueLabel.addEventListener('click', () => {
-      const current = patch[param.id];
+      const current = opts.getValue();
       const input = prompt('value (0-127):', current);
       if (input === null) return;
       const num = parseInt(input, 10);
@@ -922,6 +1166,19 @@
     render();
 
     return container;
+  }
+
+  function createKnob(param){
+    return createKnobGeneric({
+      label: param.short || param.name,
+      default: param.default,
+      bipolar: param.bipolar,
+      getValue: () => patch[param.id],
+      setValue: (value, send) => {
+        patch[param.id] = value;
+        if (send) sendParam(param, value);
+      }
+    });
   }
 
   // ---------------------------------------------------------------------
@@ -1176,10 +1433,248 @@
   }
 
   // ---------------------------------------------------------------------
+  // Multi mode UI — single | multi tabs, 4 part strips
+  // ---------------------------------------------------------------------
+  function clamp7(value){
+    return Math.max(0, Math.min(127, Math.round(value)));
+  }
+
+  function createPartKnob(partIndex, pp){
+    return createKnobGeneric({
+      label: pp.short || pp.name,
+      default: pp.default,
+      bipolar: pp.bipolar,
+      getValue: () => multiParts[partIndex].values[pp.id],
+      setValue: (value, send) => {
+        multiParts[partIndex].values[pp.id] = value;
+        if (send) sendMultiPartParam(partIndex, pp.cc, value);
+      }
+    });
+  }
+
+  function createPartSoundKnob(partIndex, param){
+    return createKnobGeneric({
+      label: param.short || param.name,
+      default: param.default,
+      bipolar: param.bipolar,
+      getValue: () => multiParts[partIndex].sound[param.id],
+      setValue: (value, send) => {
+        multiParts[partIndex].sound[param.id] = value;
+        if (send) sendPartSoundParam(partIndex, param.cc, value);
+      }
+    });
+  }
+
+  function createKeyField(partIndex, pp){
+    const field = document.createElement('div');
+    field.className = 'field';
+    const label = document.createElement('label');
+    label.textContent = pp.short || pp.name;
+    const display = document.createElement('div');
+    display.className = 'key-display';
+    display.textContent = noteName(multiParts[partIndex].values[pp.id]);
+    display.addEventListener('click', () => {
+      const current = multiParts[partIndex].values[pp.id];
+      const input = prompt('value (0-127):', current);
+      if (input === null) return;
+      const num = parseInt(input, 10);
+      if (isNaN(num)) return;
+      const value = clamp7(num);
+      multiParts[partIndex].values[pp.id] = value;
+      display.textContent = noteName(value);
+      sendMultiPartParam(partIndex, pp.cc, value);
+    });
+    field.appendChild(label);
+    field.appendChild(display);
+    return field;
+  }
+
+  function createSelectField(labelText, options, value, onChange){
+    const field = document.createElement('div');
+    field.className = 'field';
+    const label = document.createElement('label');
+    label.textContent = labelText;
+    const select = document.createElement('select');
+    options.forEach((opt, i) => {
+      const o = document.createElement('option');
+      o.value = i;
+      o.textContent = opt;
+      select.appendChild(o);
+    });
+    select.value = value;
+    select.addEventListener('change', () => onChange(parseInt(select.value, 10)));
+    field.appendChild(label);
+    field.appendChild(select);
+    return field;
+  }
+
+  function createPartRow(index){
+    const part = multiParts[index];
+
+    const row = document.createElement('div');
+    row.className = 'part-row part-' + index;
+    if (!part.enabled) row.classList.add('disabled');
+
+    const main = document.createElement('div');
+    main.className = 'part-main';
+
+    const badge = document.createElement('div');
+    badge.className = 'part-badge';
+    badge.textContent = 'p' + (index + 1);
+    main.appendChild(badge);
+
+    const enableBtn = document.createElement('button');
+    enableBtn.className = 'part-enable';
+    enableBtn.textContent = part.enabled ? 'on' : 'off';
+    enableBtn.addEventListener('click', () => {
+      part.enabled = !part.enabled;
+      enableBtn.textContent = part.enabled ? 'on' : 'off';
+      row.classList.toggle('disabled', !part.enabled);
+      sendMultiPartParam(index, PART_ENABLE_PARAM, part.enabled ? 1 : 0);
+    });
+    main.appendChild(enableBtn);
+
+    // MIDI channel
+    const channels = [];
+    for (let c = 1; c <= 16; c++) channels.push(String(c));
+    main.appendChild(createSelectField('ch', channels, part.values.channel, (v) => {
+      part.values.channel = v;
+      sendMultiPartParam(index, 34, v);
+    }));
+
+    // volume knob
+    main.appendChild(createPartKnob(index, PART_PARAMS.find(p => p.id === 'volume')));
+
+    // bank select
+    main.appendChild(createSelectField('bank', BANK_NAMES, part.values.bank, (v) => {
+      part.values.bank = v;
+      sendMultiPartParam(index, 31, v);
+    }));
+
+    // program change number input
+    const progField = document.createElement('div');
+    progField.className = 'field';
+    const progLabel = document.createElement('label');
+    progLabel.textContent = 'prg';
+    const progInput = document.createElement('input');
+    progInput.type = 'number';
+    progInput.min = '0';
+    progInput.max = '127';
+    progInput.value = String(part.values.program);
+    progInput.addEventListener('change', () => {
+      const v = clamp7(parseInt(progInput.value, 10) || 0);
+      progInput.value = String(v);
+      part.values.program = v;
+      sendMultiPartParam(index, 33, v);
+    });
+    progField.appendChild(progLabel);
+    progField.appendChild(progInput);
+    main.appendChild(progField);
+
+    // low / high key
+    main.appendChild(createKeyField(index, PART_PARAMS.find(p => p.id === 'lowkey')));
+    main.appendChild(createKeyField(index, PART_PARAMS.find(p => p.id === 'highkey')));
+
+    // transpose / detune knobs
+    main.appendChild(createPartKnob(index, PART_PARAMS.find(p => p.id === 'transpose')));
+    main.appendChild(createPartKnob(index, PART_PARAMS.find(p => p.id === 'detune')));
+
+    // output select
+    main.appendChild(createSelectField('out', OUTPUT_NAMES, part.values.output, (v) => {
+      part.values.output = v;
+      sendMultiPartParam(index, 41, v);
+    }));
+
+    // expanded per-part sound editor
+    const editor = document.createElement('div');
+    editor.className = 'part-editor hidden';
+    SECTIONS.forEach(sec => {
+      const sub = document.createElement('div');
+      sub.className = 'subsection section-' + sec.key;
+      const h3 = document.createElement('h3');
+      h3.textContent = sec.title;
+      sub.appendChild(h3);
+
+      const knobs = document.createElement('div');
+      knobs.className = 'knobs';
+      PARAMS.filter(p => p.section === sec.key).forEach(param => {
+        knobs.appendChild(createPartSoundKnob(index, param));
+      });
+      sub.appendChild(knobs);
+      editor.appendChild(sub);
+    });
+
+    const editBtn = document.createElement('button');
+    editBtn.textContent = 'edit';
+    editBtn.addEventListener('click', () => {
+      const collapsed = editor.classList.toggle('hidden');
+      editBtn.textContent = collapsed ? 'edit' : 'close';
+    });
+    main.appendChild(editBtn);
+
+    row.appendChild(main);
+    row.appendChild(editor);
+    return row;
+  }
+
+  function buildMultiView(){
+    const partList = document.getElementById('partList');
+    partList.innerHTML = '';
+    for (let i = 0; i < NUM_PARTS; i++){
+      partList.appendChild(createPartRow(i));
+    }
+  }
+
+  // global multi controls
+  const playModeSelect = document.getElementById('playModeSelect');
+  playModeSelect.addEventListener('change', () => {
+    const v = parseInt(playModeSelect.value, 10);
+    if (selectedOutput){
+      try{ selectedOutput.send(buildSysEx(122, v)); } catch(e){ console.error('MIDI send error', e); }
+    }
+  });
+
+  const multiProgramInput = document.getElementById('multiProgramInput');
+  document.getElementById('btnMultiLoad').addEventListener('click', () => {
+    const v = clamp7(parseInt(multiProgramInput.value, 10) || 0);
+    multiProgramInput.value = String(v);
+    if (selectedOutput){
+      try{ selectedOutput.send(buildSysEx(105, v)); } catch(e){ console.error('MIDI send error', e); }
+    }
+  });
+  document.getElementById('btnMultiSave').addEventListener('click', () => {
+    const v = clamp7(parseInt(multiProgramInput.value, 10) || 0);
+    multiProgramInput.value = String(v);
+    if (selectedOutput){
+      try{
+        selectedOutput.send(new Uint8Array([...SYSEX_PREFIX, deviceId(), SYSEX_CMD_STORE, v & 0x7F, 0xF7]));
+      } catch(e){ console.error('MIDI send error', e); }
+    }
+  });
+
+  // single | multi tab switching
+  const tabSingle = document.getElementById('tabSingle');
+  const tabMulti = document.getElementById('tabMulti');
+  const singleView = document.getElementById('singleView');
+  const multiView = document.getElementById('multiView');
+
+  function setMode(mode){
+    const isMulti = mode === 'multi';
+    tabMulti.classList.toggle('active', isMulti);
+    tabSingle.classList.toggle('active', !isMulti);
+    multiView.classList.toggle('hidden', !isMulti);
+    singleView.classList.toggle('hidden', isMulti);
+  }
+
+  tabSingle.addEventListener('click', () => setMode('single'));
+  tabMulti.addEventListener('click', () => setMode('multi'));
+
+  // ---------------------------------------------------------------------
   // Init
   // ---------------------------------------------------------------------
   buildSections();
   renderLibrary();
+  buildMultiView();
 })();
 </script>
 </body>
