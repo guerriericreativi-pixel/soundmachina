@@ -11,6 +11,7 @@
     --section-bg: #f5f5f5;
     --border: #000000;
     --dot-color: #e8e8e8;
+    --accent: #00ffff;
   }
   html[data-theme="dark"]{
     --bg: #111111;
@@ -122,7 +123,7 @@
     transition: transform 100ms ease;
   }
   .dot.on{
-    background: var(--fg);
+    background: var(--accent);
   }
   .dot.pulse{
     animation: ledBounce 400ms ease-out;
@@ -140,6 +141,26 @@
     min-width: 0;
     width: auto;
     height: auto;
+  }
+  .accent-picker{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .accent-dot{
+    width: 16px;
+    height: 16px;
+    min-width: 0;
+    min-height: 0;
+    padding: 0;
+    border: 1px solid var(--border);
+    border-radius: 50%;
+    cursor: pointer;
+    box-shadow: none;
+    transition: box-shadow 100ms ease;
+  }
+  .accent-dot.selected{
+    box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--fg);
   }
 
   /* ------------------------------------------------------------------ */
@@ -169,6 +190,7 @@
   button:hover{
     background: var(--fg);
     color: var(--bg);
+    border-color: var(--accent);
   }
 
   /* ------------------------------------------------------------------ */
@@ -196,8 +218,9 @@
     transition: background-color 100ms ease, color 100ms ease;
   }
   .mode-tab.active{
-    background: var(--fg);
-    color: var(--bg);
+    background: var(--accent);
+    color: #000000;
+    border-color: var(--accent);
   }
   #singleView,
   #multiView{
@@ -266,6 +289,11 @@
     padding: 4px 10px;
     font-size: 10px;
     align-self: center;
+  }
+  .part-enable.active{
+    background: var(--accent);
+    color: #000000;
+    border-color: var(--accent);
   }
   .part-main .field select,
   .part-main .field input[type="number"]{
@@ -378,9 +406,12 @@
     right: 0;
     top: -2px;
     height: 2px;
-    background: var(--fg);
+    background: var(--accent);
     opacity: 0;
     pointer-events: none;
+  }
+  .section:hover{
+    border-color: var(--accent);
   }
   .section:hover::after{
     animation: scan 600ms linear;
@@ -435,6 +466,9 @@
   }
   .knob-indicator{
     transform-origin: 50% 50%;
+  }
+  .knob-indicator line{
+    stroke: var(--accent);
   }
   .knob-label{
     font-size: 11px;
@@ -582,6 +616,12 @@
       <div class="conn">
         <span class="dot" id="connDot"></span>
         <span id="connLabel">disconnected</span>
+      </div>
+      <div class="accent-picker" id="accentPicker">
+        <button class="accent-dot" data-accent="#888888" style="background:#888888" title="grey"></button>
+        <button class="accent-dot" data-accent="#aaff00" style="background:#aaff00" title="lime"></button>
+        <button class="accent-dot" data-accent="#00ffff" style="background:#00ffff" title="cyan"></button>
+        <button class="accent-dot" data-accent="#ff00ff" style="background:#ff00ff" title="fuchsia"></button>
       </div>
       <button class="theme-toggle" id="themeToggle">○</button>
     </div>
@@ -758,6 +798,31 @@
   });
 
   // ---------------------------------------------------------------------
+  // Accent color picker (persisted in localStorage)
+  // ---------------------------------------------------------------------
+  const ACCENT_KEY = 'virusTiSnow_accent';
+  const accentPicker = document.getElementById('accentPicker');
+  const accentDots = Array.from(accentPicker.children);
+
+  function applyAccent(color){
+    document.documentElement.style.setProperty('--accent', color);
+    accentDots.forEach(dot => {
+      dot.classList.toggle('selected', dot.getAttribute('data-accent') === color);
+    });
+  }
+
+  let currentAccent = localStorage.getItem(ACCENT_KEY) || '#00ffff';
+  applyAccent(currentAccent);
+
+  accentDots.forEach(dot => {
+    dot.addEventListener('click', () => {
+      currentAccent = dot.getAttribute('data-accent');
+      localStorage.setItem(ACCENT_KEY, currentAccent);
+      applyAccent(currentAccent);
+    });
+  });
+
+  // ---------------------------------------------------------------------
   // Header visualizer — OP-XY style scrolling piano-roll dot matrix.
   // 40x8 grid of dots scrolling right-to-left. New columns are generated
   // as a musical sequence (pentatonic rows). Speed/density react to the
@@ -839,9 +904,10 @@
 
   function dotColors(){
     const dark = document.documentElement.getAttribute('data-theme') === 'dark';
-    return dark
-      ? { active: '#ffffff', inactive: '#333333' }
-      : { active: '#000000', inactive: '#dddddd' };
+    return {
+      active: currentAccent,
+      inactive: dark ? '#333333' : '#dddddd'
+    };
   }
 
   let lastStep = 0;
@@ -1525,10 +1591,12 @@
 
     const enableBtn = document.createElement('button');
     enableBtn.className = 'part-enable';
+    enableBtn.classList.toggle('active', part.enabled);
     enableBtn.textContent = part.enabled ? 'on' : 'off';
     enableBtn.addEventListener('click', () => {
       part.enabled = !part.enabled;
       enableBtn.textContent = part.enabled ? 'on' : 'off';
+      enableBtn.classList.toggle('active', part.enabled);
       row.classList.toggle('disabled', !part.enabled);
       sendMultiPartParam(index, PART_ENABLE_PARAM, part.enabled ? 1 : 0);
     });
