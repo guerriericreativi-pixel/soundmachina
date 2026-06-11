@@ -425,12 +425,18 @@
   .part-editor-row{
     display: grid;
     grid-template-columns: repeat(3, 1fr);
-    gap: 16px;
+    gap: 8px;
     padding: 16px;
   }
   .subsection{
     border: 1px solid var(--border);
     padding: 12px;
+  }
+  .part-editor-row .section-osc{
+    grid-column: 1 / -1;
+  }
+  .part-editor-row .section-fx{
+    grid-column: 1 / 2;
   }
   .subsection h3{
     margin: 0 0 8px 0;
@@ -444,6 +450,10 @@
     display: grid;
     grid-template-columns: repeat(4, 1fr);
     gap: 16px;
+  }
+  .section-osc .knobs{
+    grid-template-columns: repeat(5, 1fr);
+    gap: 20px 16px;
   }
   .subsection .knob-container{
     width: auto;
