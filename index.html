@@ -278,26 +278,29 @@
   .part-main{
     display: flex;
     align-items: center;
-    gap: 8px;
+    gap: 6px;
     flex-wrap: nowrap;
     padding: 4px 8px;
-    height: 90px;
-    min-height: 90px;
+    height: 80px;
+    min-height: 80px;
     box-sizing: border-box;
     overflow: hidden;
   }
   .part-main .field{
     gap: 0;
+    overflow: hidden;
   }
   .part-main .field label{
     font-size: 11px;
+    white-space: nowrap;
   }
   .part-main .knob-container{
     width: 56px;
+    flex: 0 0 56px;
   }
   .part-main .knob-svg{
-    width: 48px;
-    height: 48px;
+    width: 40px;
+    height: 40px;
   }
   .part-main .knob-label{
     font-size: 11px;
@@ -309,7 +312,7 @@
   }
   .part-main .key-display{
     font-size: 12px;
-    min-width: 32px;
+    min-width: 0;
     padding: 1px 2px;
   }
   .part-main button{
@@ -320,16 +323,19 @@
     font-weight: 700;
     letter-spacing: 0.05em;
     text-transform: lowercase;
-    min-width: 28px;
+    flex: 0 0 30px;
+    width: 30px;
     align-self: center;
+    overflow: hidden;
   }
   .part-enable{
-    min-width: 44px;
+    flex: 0 0 44px;
+    width: 44px;
     min-height: 44px;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 4px 10px;
+    padding: 4px 0;
     font-size: 11px;
     align-self: center;
     box-sizing: border-box;
@@ -341,38 +347,56 @@
   }
   .part-main .field select,
   .part-main .field input[type="number"]{
-    min-width: 36px;
-    width: 36px;
+    min-width: 0;
+    width: 100%;
     font-size: 13px;
+    box-sizing: border-box;
   }
-  .part-main .field-ch select{
-    min-width: 60px;
-    width: 60px;
+  .part-main .field-ch{
+    flex: 0 0 55px;
+    width: 55px;
   }
-  .part-main .field-bank select{
-    min-width: 50px;
-    width: 50px;
+  .part-main .field-bank{
+    flex: 0 0 55px;
+    width: 55px;
   }
-  .part-main .field-prg input{
-    min-width: 50px;
-    width: 50px;
+  .part-main .field-prg{
+    flex: 0 0 45px;
+    width: 45px;
   }
-  .part-main .field-out select{
-    min-width: 80px;
-    width: 80px;
+  .part-main .field-out{
+    flex: 0 0 85px;
+    width: 85px;
+  }
+  .part-main .field-lowkey,
+  .part-main .field-highkey{
+    flex: 0 0 40px;
+    width: 40px;
   }
   .part-main .field-lowkey label,
   .part-main .field-highkey label{
     font-size: 12px;
   }
+  .part-main .vol-knob{
+    flex: 0 0 70px;
+    width: 70px;
+  }
+  .part-main .trsp-knob,
+  .part-main .dtun-knob{
+    flex: 0 0 60px;
+    width: 60px;
+  }
   .part-main .edit-btn{
+    flex: 0 0 70px;
+    width: 70px;
     min-height: 44px;
     font-size: 13px;
-    padding: 8px 16px;
+    padding: 8px 4px;
+    box-sizing: border-box;
   }
   .part-display{
-    flex: 1 1 350px;
-    width: 350px;
+    flex: 1 1 auto;
+    min-width: 0;
     height: 60px;
     align-self: center;
     display: flex;
@@ -1943,7 +1967,9 @@
     }));
 
     // volume knob
-    main.appendChild(createPartKnob(index, PART_PARAMS.find(p => p.id === 'volume')));
+    const volKnob = createPartKnob(index, PART_PARAMS.find(p => p.id === 'volume'));
+    volKnob.classList.add('vol-knob');
+    main.appendChild(volKnob);
 
     // bank select
     main.appendChild(createSelectField('bank', BANK_NAMES, part.values.bank, (v) => {
@@ -1976,8 +2002,12 @@
     main.appendChild(createKeyField(index, PART_PARAMS.find(p => p.id === 'highkey')));
 
     // transpose / detune knobs
-    main.appendChild(createPartKnob(index, PART_PARAMS.find(p => p.id === 'transpose')));
-    main.appendChild(createPartKnob(index, PART_PARAMS.find(p => p.id === 'detune')));
+    const trspKnob = createPartKnob(index, PART_PARAMS.find(p => p.id === 'transpose'));
+    trspKnob.classList.add('trsp-knob');
+    main.appendChild(trspKnob);
+    const dtunKnob = createPartKnob(index, PART_PARAMS.find(p => p.id === 'detune'));
+    dtunKnob.classList.add('dtun-knob');
+    main.appendChild(dtunKnob);
 
     // output select
     main.appendChild(createSelectField('out', OUTPUT_NAMES, part.values.output, (v) => {
