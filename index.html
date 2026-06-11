@@ -416,14 +416,31 @@
   }
   .part-editor{
     display: flex;
-    flex-wrap: wrap;
-    gap: 8px;
-    padding: 0 16px 16px 16px;
+    flex-direction: column;
+    width: 100%;
+    background: #111111;
     border-top: 1px solid var(--border);
+    border-bottom: 1px solid var(--border);
+  }
+  .part-editor-header{
+    display: flex;
+    justify-content: flex-end;
+    padding: 8px 16px 0 16px;
+  }
+  .part-editor-close{
+    font-size: 11px;
+    padding: 6px 12px;
+  }
+  .part-editor-row{
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    gap: 16px;
+    padding: 8px 16px 16px 16px;
   }
   .subsection{
-    flex: 1 1 180px;
-    min-width: 180px;
+    flex: 0 0 auto;
+    min-width: 220px;
     border: 1px solid var(--border);
     padding: 12px;
   }
@@ -434,6 +451,27 @@
     letter-spacing: 0.05em;
     text-transform: lowercase;
     color: var(--fg);
+  }
+  .subsection .knobs{
+    flex-wrap: nowrap;
+    gap: 20px;
+  }
+  .subsection .knob-container{
+    width: 60px;
+    flex: 0 0 auto;
+  }
+  .subsection .knob-svg{
+    width: 40px;
+    height: 40px;
+  }
+  .subsection .knob-label{
+    font-size: 10px;
+    margin-top: 2px;
+  }
+  .subsection .knob-value{
+    font-size: 10px;
+    margin-top: 0;
+    min-height: 14px;
   }
 
   /* ------------------------------------------------------------------ */
@@ -1952,6 +1990,17 @@
     // expanded per-part sound editor
     const editor = document.createElement('div');
     editor.className = 'part-editor hidden';
+
+    const editorHeader = document.createElement('div');
+    editorHeader.className = 'part-editor-header';
+    const closeBtn = document.createElement('button');
+    closeBtn.className = 'part-editor-close';
+    closeBtn.textContent = 'close ✕';
+    editorHeader.appendChild(closeBtn);
+    editor.appendChild(editorHeader);
+
+    const editorRow = document.createElement('div');
+    editorRow.className = 'part-editor-row';
     SECTIONS.forEach(sec => {
       const sub = document.createElement('div');
       sub.className = 'subsection section-' + sec.key;
@@ -1965,16 +2014,21 @@
         knobs.appendChild(createPartSoundKnob(index, param));
       });
       sub.appendChild(knobs);
-      editor.appendChild(sub);
+      editorRow.appendChild(sub);
     });
+    editor.appendChild(editorRow);
 
     const editBtn = document.createElement('button');
     editBtn.className = 'edit-btn';
     editBtn.textContent = 'edit';
+    function setEditorOpen(open){
+      editor.classList.toggle('hidden', !open);
+      editBtn.textContent = open ? 'close' : 'edit';
+    }
     editBtn.addEventListener('click', () => {
-      const collapsed = editor.classList.toggle('hidden');
-      editBtn.textContent = collapsed ? 'edit' : 'close';
+      setEditorOpen(editor.classList.contains('hidden'));
     });
+    closeBtn.addEventListener('click', () => setEditorOpen(false));
     main.appendChild(editBtn);
 
     const display = createPartDisplay(index);
