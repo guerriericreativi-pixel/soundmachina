@@ -258,6 +258,8 @@
     background: var(--section-bg);
     border-left-width: 3px;
     border-left-style: solid;
+    padding-left: 16px;
+    overflow: hidden;
     transition: opacity 200ms ease, background-color 200ms ease, border-color 200ms ease;
     flex: 0 0 auto;
   }
@@ -281,9 +283,9 @@
     align-content: center;
     gap: 6px;
     flex-wrap: wrap;
-    padding: 12px 8px;
+    padding: 8px;
     height: auto;
-    min-height: 110px;
+    min-height: 80px;
     box-sizing: border-box;
   }
   .part-main .field{
@@ -298,6 +300,7 @@
     width: 56px;
     flex: 0 1 56px;
     min-width: 36px;
+    gap: 4px;
   }
   .part-main .knob-svg{
     width: 40px;
@@ -310,6 +313,8 @@
   .part-main .knob-value{
     font-size: 11px;
     margin-top: 0;
+    min-height: 0;
+    min-width: 0;
   }
   .part-main .key-display{
     font-size: 12px;
