@@ -59,30 +59,14 @@
   }
   .visualizer{
     flex: 1 1 auto;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 3px;
-    height: 20px;
-    overflow: hidden;
+    display: block;
+    height: 32px;
+    min-width: 0;
     transition: opacity 300ms ease;
   }
-  .visualizer.flash .vdot{
-    background: var(--fg);
-    animation-duration: 0.4s, 3.5s;
-  }
-  .vdot{
-    width: 4px;
-    height: 4px;
-    min-width: 4px;
-    border-radius: 50%;
-    background: var(--border);
-    opacity: 0.6;
-    animation: wave 3.5s ease-in-out infinite;
-  }
-  @keyframes wave{
-    0%, 100%{ transform: translateY(0); }
-    50%{ transform: translateY(-6px); }
+  .visualizer.flash{
+    opacity: 1;
+    filter: brightness(1.6);
   }
   .header-controls{
     flex: 0 0 auto;
@@ -401,7 +385,7 @@
 
 <div class="header">
   <div class="header-top">
-    <div class="visualizer" id="visualizer"></div>
+    <canvas class="visualizer" id="visualizer"></canvas>
     <div class="header-controls">
       <div class="field">
         <label>output</label>
@@ -523,18 +507,79 @@
   });
 
   // ---------------------------------------------------------------------
-  // Header sine-wave visualizer (idle animation)
+  // Header sine-wave visualizer — OP-XY style flowing dot matrix.
+  // Canvas with requestAnimationFrame for smooth 60fps animation.
+  // 48 dots flowing as a continuous sine wave plus a ghost wave overlay.
   // ---------------------------------------------------------------------
   const visualizer = document.getElementById('visualizer');
-  const DOT_COUNT = window.innerWidth >= 768 ? 48 : 32;
-  const WAVE_DURATION = 3.5; // seconds, matches CSS animation-duration
+  const vctx = visualizer.getContext('2d');
 
-  for (let i = 0; i < DOT_COUNT; i++){
-    const dot = document.createElement('div');
-    dot.className = 'vdot';
-    dot.style.animationDelay = (-(i / DOT_COUNT) * WAVE_DURATION) + 's';
-    visualizer.appendChild(dot);
+  const VIS_DOTS = 48;       // number of dots
+  const VIS_DOT_R = 2.5;     // dot radius (5px diameter)
+  const VIS_AMP = 12;        // wave amplitude in px
+  const VIS_SPEED_MAIN = 2;  // seconds per cycle (main wave)
+  const VIS_SPEED_GHOST = 2.7; // seconds per cycle (ghost wave)
+  const VIS_WAVES = 1.5;     // number of full sine cycles across the row
+
+  let visDPR = 1;
+  let visW = 0, visH = 0;
+
+  function resizeVisualizer(){
+    const rect = visualizer.getBoundingClientRect();
+    visDPR = window.devicePixelRatio || 1;
+    visW = Math.max(1, Math.floor(rect.width));
+    visH = Math.max(1, Math.floor(rect.height));
+    visualizer.width = visW * visDPR;
+    visualizer.height = visH * visDPR;
+    vctx.setTransform(visDPR, 0, 0, visDPR, 0, 0);
   }
+
+  function dotColor(){
+    // read the resolved --fg value (black in light, #eee in dark)
+    return getComputedStyle(document.documentElement)
+      .getPropertyValue('--fg').trim() || '#000000';
+  }
+
+  function hexToRgb(hex){
+    let h = hex.replace('#', '');
+    if (h.length === 3) h = h.split('').map(c => c + c).join('');
+    const n = parseInt(h, 16);
+    return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
+  }
+
+  function drawWave(color, t, period, phaseOffset, baseAlpha){
+    const rgb = hexToRgb(color);
+    const midY = visH / 2;
+    const phase = (t / (period * 1000)) * Math.PI * 2;
+    for (let i = 0; i < VIS_DOTS; i++){
+      const frac = VIS_DOTS > 1 ? i / (VIS_DOTS - 1) : 0.5;
+      const x = VIS_DOT_R + frac * (visW - VIS_DOT_R * 2);
+      const angle = frac * Math.PI * 2 * VIS_WAVES - phase + phaseOffset;
+      const s = Math.sin(angle);
+      const y = midY - s * VIS_AMP;
+      // peak (s=1) -> opaque, rest/trough -> 30%
+      const lift = (s + 1) / 2; // 0..1
+      const alpha = baseAlpha * (0.3 + 0.7 * lift);
+      vctx.beginPath();
+      vctx.arc(x, y, VIS_DOT_R, 0, Math.PI * 2);
+      vctx.fillStyle = `rgba(${rgb.r},${rgb.g},${rgb.b},${alpha})`;
+      vctx.fill();
+    }
+  }
+
+  function renderVisualizer(t){
+    vctx.clearRect(0, 0, visW, visH);
+    const color = dotColor();
+    // ghost wave: half-wavelength offset, slightly slower, 50% opacity
+    drawWave(color, t, VIS_SPEED_GHOST, Math.PI, 0.5);
+    // main wave
+    drawWave(color, t, VIS_SPEED_MAIN, 0, 1.0);
+    requestAnimationFrame(renderVisualizer);
+  }
+
+  resizeVisualizer();
+  window.addEventListener('resize', resizeVisualizer);
+  requestAnimationFrame(renderVisualizer);
 
   // ---------------------------------------------------------------------
   // MIDI setup
