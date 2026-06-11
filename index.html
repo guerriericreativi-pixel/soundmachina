@@ -278,14 +278,13 @@
   .part-main{
     display: flex;
     align-items: center;
+    align-content: center;
     gap: 6px;
-    flex-wrap: nowrap;
+    flex-wrap: wrap;
     padding: 4px 8px;
-    height: 80px;
+    height: auto;
     min-height: 80px;
     box-sizing: border-box;
-    overflow-x: auto;
-    overflow-y: hidden;
   }
   .part-main .field{
     gap: 0;
@@ -405,8 +404,8 @@
     box-sizing: border-box;
   }
   .part-display{
-    flex: 1 1 120px;
-    min-width: 80px;
+    flex: 1 1 200px;
+    min-width: 200px;
     height: 60px;
     align-self: center;
     display: flex;
@@ -422,6 +421,13 @@
     display: block;
     width: 100%;
     height: 100%;
+  }
+  @media (max-width: 1023px){
+    .part-display{
+      flex-basis: 100%;
+      min-width: 0;
+      margin-top: 4px;
+    }
   }
   input[type="number"]{
     background: transparent;
@@ -1932,7 +1938,11 @@
     });
 
     window.addEventListener('resize', resize);
-    resize();
+    if (typeof ResizeObserver !== 'undefined'){
+      new ResizeObserver(resize).observe(wrap);
+    } else {
+      resize();
+    }
     startReveal();
 
     wrap._render = render;
