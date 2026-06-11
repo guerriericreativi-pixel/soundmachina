@@ -45,30 +45,29 @@
   .header{
     display: flex;
     flex-direction: column;
-    justify-content: space-between;
-    border-bottom: 1px solid var(--border);
-    margin-bottom: 16px;
-    padding-bottom: 8px;
-    min-height: 48px;
+    flex: 0 0 auto;
+    margin-bottom: 8px;
   }
-  .header-top{
-    display: flex;
-    align-items: center;
-    gap: 16px;
-    width: 100%;
-  }
-  .visualizer{
-    flex: 0 1 auto;
+  .header-display{
     display: block;
-    width: 400px;
-    max-width: 100%;
-    height: 40px;
-    min-width: 0;
+    width: 100%;
+    height: 80px;
     transition: opacity 300ms ease;
   }
-  .visualizer.flash{
+  .header-display.flash{
     opacity: 1;
     filter: brightness(1.6);
+  }
+  .header-bar{
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 12px;
+    border-top: 1px solid var(--border);
+    margin-top: 8px;
+    padding-top: 8px;
+    min-height: 42px;
   }
   .header-controls{
     flex: 0 0 auto;
@@ -82,8 +81,6 @@
     font-weight: 300;
     letter-spacing: 0.05em;
     text-transform: lowercase;
-    align-self: flex-start;
-    margin-top: 8px;
   }
   .field{
     display: flex;
@@ -147,7 +144,8 @@
     display: flex;
     flex-wrap: wrap;
     gap: 8px;
-    margin-bottom: 16px;
+    margin-bottom: 8px;
+    flex: 0 0 auto;
   }
   button{
     background: none;
@@ -174,11 +172,42 @@
   .grid{
     display: grid;
     grid-template-columns: repeat(2, 1fr);
-    gap: 12px;
+    gap: 8px;
+  }
+  .section-osc,
+  .section-lib{
+    grid-column: 1 / -1;
   }
   @media (orientation: landscape) and (min-width: 900px){
+    html, body{
+      height: 100%;
+      overflow: hidden;
+    }
+    body{
+      display: flex;
+      flex-direction: column;
+    }
     .grid{
-      grid-template-columns: repeat(3, 1fr);
+      grid-template-columns: repeat(4, 1fr);
+      flex: 1 1 auto;
+      min-height: 0;
+    }
+    .section{
+      display: flex;
+      flex-direction: column;
+      height: 100%;
+    }
+    .section .knobs{
+      flex: 1 1 auto;
+      align-content: center;
+    }
+    .section-osc .knobs{
+      flex-wrap: nowrap;
+      justify-content: space-between;
+    }
+    .section-lib .lib-list{
+      flex: 1 1 auto;
+      max-height: none;
     }
   }
   .section{
@@ -223,22 +252,22 @@
   .knobs{
     display: flex;
     flex-wrap: wrap;
-    gap: 16px;
+    gap: 24px;
   }
   .knob-container{
     position: relative;
     display: flex;
     flex-direction: column;
     align-items: center;
-    width: 56px;
+    width: 68px;
     user-select: none;
     -webkit-user-select: none;
     touch-action: none;
   }
   .knob-svg{
     cursor: ns-resize;
-    width: 40px;
-    height: 40px;
+    width: 52px;
+    height: 52px;
   }
   .knob-indicator{
     transform-origin: 50% 50%;
@@ -286,10 +315,11 @@
   /* ------------------------------------------------------------------ */
   .lib-row{
     display: flex;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     gap: 12px;
     align-items: center;
-    margin-bottom: 16px;
+    margin-bottom: 8px;
+    flex: 0 0 auto;
   }
   input[type="text"]{
     flex: 1;
@@ -340,27 +370,14 @@
       background-size: 10px 10px;
       padding: 16px 24px;
     }
-    .header{
-      min-height: 60px;
-    }
     .header-title{
       font-size: 14px;
-    }
-    .grid{
-      gap: 16px;
     }
     .section{
       padding: 24px;
     }
     .knob-label{
       font-size: 13px;
-    }
-    .knob-svg{
-      width: 56px;
-      height: 56px;
-    }
-    .knob-container{
-      width: 72px;
     }
     .knob-value{
       min-width: 44px;
@@ -386,8 +403,9 @@
 <body>
 
 <div class="header">
-  <div class="header-top">
-    <canvas class="visualizer" id="visualizer"></canvas>
+  <canvas class="header-display" id="visualizer"></canvas>
+  <div class="header-bar">
+    <div class="header-title">virus ti snow</div>
     <div class="header-controls">
       <div class="field">
         <label>output</label>
@@ -404,7 +422,6 @@
       <button class="theme-toggle" id="themeToggle">○</button>
     </div>
   </div>
-  <div class="header-title">virus ti snow</div>
 </div>
 
 <div class="actions">
@@ -517,31 +534,30 @@
   const visualizer = document.getElementById('visualizer');
   const vctx = visualizer.getContext('2d');
 
-  const VIS_COLS = 40;     // grid columns
-  const VIS_ROWS = 8;      // grid rows
-  const VIS_DOT = 5;       // dot diameter
-  const VIS_GAP = 2;       // gap between dots
-  const VIS_CELL = VIS_DOT + VIS_GAP; // 7px per cell
-  // pentatonic row positions (0 = top .. 7 = bottom) for a musical feel
-  const PENTA_ROWS = [0, 1, 3, 4, 6, 7];
+  const VIS_DOT = 8;       // dot diameter
+  const VIS_GAP = 3;       // gap between dots
+  const VIS_CELL = VIS_DOT + VIS_GAP; // 11px per cell
+
+  let VIS_COLS = 1;        // grid columns (computed from canvas width)
+  let VIS_ROWS = 1;        // grid rows (computed from canvas height)
+  let PENTA_ROWS = [0];    // pentatonic-ish row positions for a musical feel
 
   let visDPR = 1;
   let visW = 0, visH = 0;
-
-  function resizeVisualizer(){
-    const rect = visualizer.getBoundingClientRect();
-    visDPR = window.devicePixelRatio || 1;
-    visW = Math.max(1, Math.floor(rect.width));
-    visH = Math.max(1, Math.floor(rect.height));
-    visualizer.width = visW * visDPR;
-    visualizer.height = visH * visDPR;
-    vctx.setTransform(visDPR, 0, 0, visDPR, 0, 0);
-  }
 
   // grid[col] = array of active row indices for that column
   const grid = [];
   let melodyStep = 0;       // walks up/down the pentatonic scale
   let melodyDir = 1;
+
+  function computePentaRows(rows){
+    const arr = [];
+    for (let i = 0; i < rows; i++){
+      if (i % 7 !== 2 && i % 7 !== 5) arr.push(i);
+    }
+    if (arr.length === 0) arr.push(0);
+    return arr;
+  }
 
   function generateColumn(){
     const connected = wasConnected;
@@ -560,7 +576,7 @@
     const rows = new Set();
     rows.add(PENTA_ROWS[melodyStep]);
     // add harmony notes (thirds/fifths within the pentatonic set)
-    while (rows.size < count){
+    while (rows.size < count && rows.size < PENTA_ROWS.length){
       const offset = 1 + Math.floor(Math.random() * 2); // a third or fifth up
       const idx = (melodyStep + offset) % PENTA_ROWS.length;
       rows.add(PENTA_ROWS[idx]);
@@ -568,8 +584,26 @@
     return [...rows];
   }
 
-  // seed the grid
-  for (let c = 0; c < VIS_COLS; c++){ grid.push(generateColumn()); }
+  function resizeVisualizer(){
+    const rect = visualizer.getBoundingClientRect();
+    visDPR = window.devicePixelRatio || 1;
+    visW = Math.max(1, Math.floor(rect.width));
+    visH = Math.max(1, Math.floor(rect.height));
+    visualizer.width = visW * visDPR;
+    visualizer.height = visH * visDPR;
+    vctx.setTransform(visDPR, 0, 0, visDPR, 0, 0);
+
+    const newCols = Math.max(1, Math.floor((visW + VIS_GAP) / VIS_CELL));
+    const newRows = Math.max(1, Math.floor((visH + VIS_GAP) / VIS_CELL));
+    if (newCols !== VIS_COLS || newRows !== VIS_ROWS){
+      VIS_COLS = newCols;
+      VIS_ROWS = newRows;
+      PENTA_ROWS = computePentaRows(VIS_ROWS);
+      melodyStep = Math.min(melodyStep, PENTA_ROWS.length - 1);
+      grid.length = 0;
+      for (let c = 0; c < VIS_COLS; c++){ grid.push(generateColumn()); }
+    }
+  }
 
   function dotColors(){
     const dark = document.documentElement.getAttribute('data-theme') === 'dark';
@@ -741,9 +775,9 @@
   // showing the current value (-135deg to +135deg sweep, 0deg = up).
   // ---------------------------------------------------------------------
   const svgNS = 'http://www.w3.org/2000/svg';
-  const KNOB_SIZE = 40;
+  const KNOB_SIZE = 52;
   const KNOB_CENTER = KNOB_SIZE / 2;
-  const KNOB_RADIUS = 16;
+  const KNOB_RADIUS = 21;
 
   function angleForValue(value){
     return -135 + (value / 127) * 270;
@@ -887,7 +921,7 @@
     root.innerHTML = '';
     SECTIONS.forEach(sec => {
       const div = document.createElement('div');
-      div.className = 'section';
+      div.className = 'section section-' + sec.key;
       const h2 = document.createElement('h2');
       h2.textContent = sec.title;
       div.appendChild(h2);
@@ -908,7 +942,7 @@
 
     // patch library section
     const libSection = document.createElement('div');
-    libSection.className = 'section';
+    libSection.className = 'section section-lib';
     const libTitle = document.createElement('h2');
     libTitle.textContent = 'patch library';
     libSection.appendChild(libTitle);
