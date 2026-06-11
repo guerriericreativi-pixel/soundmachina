@@ -281,7 +281,8 @@
     gap: 8px;
     flex-wrap: nowrap;
     padding: 4px 8px;
-    height: 80px;
+    height: 90px;
+    min-height: 90px;
     box-sizing: border-box;
     overflow: hidden;
   }
@@ -289,25 +290,25 @@
     gap: 0;
   }
   .part-main .field label{
-    font-size: 8px;
+    font-size: 11px;
   }
   .part-main .knob-container{
-    width: 36px;
+    width: 56px;
   }
   .part-main .knob-svg{
-    width: 32px;
-    height: 32px;
+    width: 48px;
+    height: 48px;
   }
   .part-main .knob-label{
-    font-size: 8px;
+    font-size: 11px;
     margin-top: 0;
   }
   .part-main .knob-value{
-    font-size: 9px;
+    font-size: 11px;
     margin-top: 0;
   }
   .part-main .key-display{
-    font-size: 10px;
+    font-size: 12px;
     min-width: 32px;
     padding: 1px 2px;
   }
@@ -315,17 +316,23 @@
     flex-shrink: 0;
   }
   .part-badge{
-    font-size: 11px;
+    font-size: 16px;
     font-weight: 700;
     letter-spacing: 0.05em;
     text-transform: lowercase;
-    min-width: 22px;
+    min-width: 28px;
     align-self: center;
   }
   .part-enable{
+    min-width: 44px;
+    min-height: 44px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     padding: 4px 10px;
-    font-size: 10px;
+    font-size: 11px;
     align-self: center;
+    box-sizing: border-box;
   }
   .part-enable.active{
     background: var(--accent);
@@ -336,7 +343,32 @@
   .part-main .field input[type="number"]{
     min-width: 36px;
     width: 36px;
-    font-size: 10px;
+    font-size: 13px;
+  }
+  .part-main .field-ch select{
+    min-width: 60px;
+    width: 60px;
+  }
+  .part-main .field-bank select{
+    min-width: 50px;
+    width: 50px;
+  }
+  .part-main .field-prg input{
+    min-width: 50px;
+    width: 50px;
+  }
+  .part-main .field-out select{
+    min-width: 80px;
+    width: 80px;
+  }
+  .part-main .field-lowkey label,
+  .part-main .field-highkey label{
+    font-size: 12px;
+  }
+  .part-main .edit-btn{
+    min-height: 44px;
+    font-size: 13px;
+    padding: 8px 16px;
   }
   .part-display{
     flex: 1 1 350px;
@@ -1647,7 +1679,7 @@
 
   function createKeyField(partIndex, pp){
     const field = document.createElement('div');
-    field.className = 'field';
+    field.className = 'field field-' + pp.id;
     const label = document.createElement('label');
     label.textContent = pp.short || pp.name;
     const display = document.createElement('div');
@@ -1671,7 +1703,7 @@
 
   function createSelectField(labelText, options, value, onChange){
     const field = document.createElement('div');
-    field.className = 'field';
+    field.className = 'field field-' + labelText;
     const label = document.createElement('label');
     label.textContent = labelText;
     const select = document.createElement('select');
@@ -1885,7 +1917,7 @@
 
     // program change number input
     const progField = document.createElement('div');
-    progField.className = 'field';
+    progField.className = 'field field-prg';
     const progLabel = document.createElement('label');
     progLabel.textContent = 'prg';
     const progInput = document.createElement('input');
@@ -1937,6 +1969,7 @@
     });
 
     const editBtn = document.createElement('button');
+    editBtn.className = 'edit-btn';
     editBtn.textContent = 'edit';
     editBtn.addEventListener('click', () => {
       const collapsed = editor.classList.toggle('hidden');
