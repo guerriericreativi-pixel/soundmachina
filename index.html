@@ -247,17 +247,22 @@
   .part-list{
     display: flex;
     flex-direction: column;
-    gap: 8px;
+    gap: 0;
     flex: 1 1 auto;
     min-height: 0;
     overflow-y: auto;
   }
   .part-row{
     border: 1px solid var(--border);
+    border-bottom: none;
     background: var(--section-bg);
     border-left-width: 3px;
     border-left-style: solid;
     transition: opacity 200ms ease, background-color 200ms ease, border-color 200ms ease;
+    flex: 0 0 auto;
+  }
+  .part-list .part-row:last-child{
+    border-bottom: 1px solid var(--border);
   }
   .part-row.disabled{
     opacity: 0.4;
@@ -272,10 +277,42 @@
   html[data-theme="dark"] .part-3{ border-left-color: #cccccc; }
   .part-main{
     display: flex;
-    align-items: flex-end;
-    gap: 16px;
-    flex-wrap: wrap;
-    padding: 12px 16px;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: nowrap;
+    padding: 4px 8px;
+    height: 80px;
+    box-sizing: border-box;
+    overflow: hidden;
+  }
+  .part-main .field{
+    gap: 0;
+  }
+  .part-main .field label{
+    font-size: 8px;
+  }
+  .part-main .knob-container{
+    width: 36px;
+  }
+  .part-main .knob-svg{
+    width: 32px;
+    height: 32px;
+  }
+  .part-main .knob-label{
+    font-size: 8px;
+    margin-top: 0;
+  }
+  .part-main .knob-value{
+    font-size: 9px;
+    margin-top: 0;
+  }
+  .part-main .key-display{
+    font-size: 10px;
+    min-width: 32px;
+    padding: 1px 2px;
+  }
+  .part-main button{
+    flex-shrink: 0;
   }
   .part-badge{
     font-size: 11px;
@@ -297,18 +334,23 @@
   }
   .part-main .field select,
   .part-main .field input[type="number"]{
-    min-width: 56px;
+    min-width: 36px;
+    width: 36px;
+    font-size: 10px;
   }
   .part-display{
-    flex: 1 1 auto;
-    min-width: 120px;
-    align-self: stretch;
+    flex: 1 1 350px;
+    width: 350px;
+    height: 60px;
+    align-self: center;
     display: flex;
     align-items: stretch;
     background: #050505;
-    border: 1px solid #222222;
-    padding: 8px 12px;
+    border: 1px solid color-mix(in srgb, var(--accent) 40%, #222222);
+    padding: 4px 8px;
     cursor: pointer;
+    box-sizing: border-box;
+    overflow: hidden;
   }
   .part-display canvas{
     display: block;
@@ -1708,10 +1750,8 @@
 
       // main patch name, centered, revealed column by column
       const text = getName();
-      const tCols = totalCols(text);
-      const textW = Math.max(0, tCols * CELL - GAP);
       const textH = FONT_ROWS * CELL - GAP;
-      const ox = Math.max(0, Math.floor((w - textW) / 2));
+      const ox = 0;
       const oy = Math.max(0, Math.floor((h - textH) / 2));
 
       ctx.fillStyle = colors.active;
