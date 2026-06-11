@@ -58,9 +58,11 @@
     width: 100%;
   }
   .visualizer{
-    flex: 1 1 auto;
+    flex: 0 1 auto;
     display: block;
-    height: 32px;
+    width: 400px;
+    max-width: 100%;
+    height: 40px;
     min-width: 0;
     transition: opacity 300ms ease;
   }
@@ -507,19 +509,21 @@
   });
 
   // ---------------------------------------------------------------------
-  // Header sine-wave visualizer — OP-XY style flowing dot matrix.
-  // Canvas with requestAnimationFrame for smooth 60fps animation.
-  // 48 dots flowing as a continuous sine wave plus a ghost wave overlay.
+  // Header visualizer — OP-XY style scrolling piano-roll dot matrix.
+  // 40x8 grid of dots scrolling right-to-left. New columns are generated
+  // as a musical sequence (pentatonic rows). Speed/density react to the
+  // MIDI connection state. Canvas + requestAnimationFrame for 60fps.
   // ---------------------------------------------------------------------
   const visualizer = document.getElementById('visualizer');
   const vctx = visualizer.getContext('2d');
 
-  const VIS_DOTS = 48;       // number of dots
-  const VIS_DOT_R = 2.5;     // dot radius (5px diameter)
-  const VIS_AMP = 12;        // wave amplitude in px
-  const VIS_SPEED_MAIN = 2;  // seconds per cycle (main wave)
-  const VIS_SPEED_GHOST = 2.7; // seconds per cycle (ghost wave)
-  const VIS_WAVES = 1.5;     // number of full sine cycles across the row
+  const VIS_COLS = 40;     // grid columns
+  const VIS_ROWS = 8;      // grid rows
+  const VIS_DOT = 5;       // dot diameter
+  const VIS_GAP = 2;       // gap between dots
+  const VIS_CELL = VIS_DOT + VIS_GAP; // 7px per cell
+  // pentatonic row positions (0 = top .. 7 = bottom) for a musical feel
+  const PENTA_ROWS = [0, 1, 3, 4, 6, 7];
 
   let visDPR = 1;
   let visW = 0, visH = 0;
@@ -534,46 +538,87 @@
     vctx.setTransform(visDPR, 0, 0, visDPR, 0, 0);
   }
 
-  function dotColor(){
-    // read the resolved --fg value (black in light, #eee in dark)
-    return getComputedStyle(document.documentElement)
-      .getPropertyValue('--fg').trim() || '#000000';
-  }
+  // grid[col] = array of active row indices for that column
+  const grid = [];
+  let melodyStep = 0;       // walks up/down the pentatonic scale
+  let melodyDir = 1;
 
-  function hexToRgb(hex){
-    let h = hex.replace('#', '');
-    if (h.length === 3) h = h.split('').map(c => c + c).join('');
-    const n = parseInt(h, 16);
-    return { r: (n >> 16) & 255, g: (n >> 8) & 255, b: n & 255 };
-  }
+  function generateColumn(){
+    const connected = wasConnected;
+    // density: 1 dot when disconnected, 2-3 when connected
+    const count = connected ? (2 + (Math.random() < 0.5 ? 0 : 1)) : 1;
 
-  function drawWave(color, t, period, phaseOffset, baseAlpha){
-    const rgb = hexToRgb(color);
-    const midY = visH / 2;
-    const phase = (t / (period * 1000)) * Math.PI * 2;
-    for (let i = 0; i < VIS_DOTS; i++){
-      const frac = VIS_DOTS > 1 ? i / (VIS_DOTS - 1) : 0.5;
-      const x = VIS_DOT_R + frac * (visW - VIS_DOT_R * 2);
-      const angle = frac * Math.PI * 2 * VIS_WAVES - phase + phaseOffset;
-      const s = Math.sin(angle);
-      const y = midY - s * VIS_AMP;
-      // peak (s=1) -> opaque, rest/trough -> 30%
-      const lift = (s + 1) / 2; // 0..1
-      const alpha = baseAlpha * (0.3 + 0.7 * lift);
-      vctx.beginPath();
-      vctx.arc(x, y, VIS_DOT_R, 0, Math.PI * 2);
-      vctx.fillStyle = `rgba(${rgb.r},${rgb.g},${rgb.b},${alpha})`;
-      vctx.fill();
+    // melodic walk: advance the base step up/down the pentatonic scale
+    melodyStep += melodyDir;
+    if (melodyStep >= PENTA_ROWS.length - 1){ melodyStep = PENTA_ROWS.length - 1; melodyDir = -1; }
+    if (melodyStep <= 0){ melodyStep = 0; melodyDir = 1; }
+    // occasionally jump for variety
+    if (Math.random() < 0.15){
+      melodyStep = Math.floor(Math.random() * PENTA_ROWS.length);
     }
+
+    const rows = new Set();
+    rows.add(PENTA_ROWS[melodyStep]);
+    // add harmony notes (thirds/fifths within the pentatonic set)
+    while (rows.size < count){
+      const offset = 1 + Math.floor(Math.random() * 2); // a third or fifth up
+      const idx = (melodyStep + offset) % PENTA_ROWS.length;
+      rows.add(PENTA_ROWS[idx]);
+    }
+    return [...rows];
+  }
+
+  // seed the grid
+  for (let c = 0; c < VIS_COLS; c++){ grid.push(generateColumn()); }
+
+  function dotColors(){
+    const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    return dark
+      ? { active: '#ffffff', inactive: '#333333' }
+      : { active: '#000000', inactive: '#dddddd' };
+  }
+
+  let lastStep = 0;
+  function stepInterval(){
+    return wasConnected ? 80 : 120; // ms per column (faster when connected)
   }
 
   function renderVisualizer(t){
+    // advance the scroll on a musical clock
+    if (t - lastStep >= stepInterval()){
+      lastStep = t;
+      grid.shift();
+      grid.push(generateColumn());
+    }
+
     vctx.clearRect(0, 0, visW, visH);
-    const color = dotColor();
-    // ghost wave: half-wavelength offset, slightly slower, 50% opacity
-    drawWave(color, t, VIS_SPEED_GHOST, Math.PI, 0.5);
-    // main wave
-    drawWave(color, t, VIS_SPEED_MAIN, 0, 1.0);
+    const colors = dotColors();
+    // center the 40x8 grid in the canvas
+    const gridW = VIS_COLS * VIS_CELL - VIS_GAP;
+    const gridH = VIS_ROWS * VIS_CELL - VIS_GAP;
+    const x0 = Math.max(0, (visW - gridW) / 2);
+    const y0 = Math.max(0, (visH - gridH) / 2);
+    const r = VIS_DOT / 2;
+
+    for (let c = 0; c < VIS_COLS; c++){
+      const activeRows = grid[c] || [];
+      const cx = x0 + c * VIS_CELL + r;
+      for (let row = 0; row < VIS_ROWS; row++){
+        const isActive = activeRows.indexOf(row) !== -1;
+        const cy = y0 + row * VIS_CELL + r;
+        vctx.beginPath();
+        vctx.arc(cx, cy, r, 0, Math.PI * 2);
+        if (isActive){
+          vctx.fillStyle = colors.active;
+          vctx.globalAlpha = 1;
+        } else {
+          vctx.fillStyle = colors.inactive;
+          vctx.globalAlpha = 0.3;
+        }
+        vctx.fill();
+      }
+    }
+    vctx.globalAlpha = 1;
     requestAnimationFrame(renderVisualizer);
   }
 
