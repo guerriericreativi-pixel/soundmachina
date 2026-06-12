@@ -51,10 +51,16 @@
   }
   .header-display{
     display: block;
-    width: 100%;
-    height: 80px;
-    background: transparent;
-    transition: opacity 300ms ease;
+    width: 360px;
+    height: 180px;
+    margin: 0 auto 16px auto;
+    background: var(--bg);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    transition: opacity 300ms ease, box-shadow 300ms ease;
+  }
+  html[data-theme="dark"] .header-display{
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4);
   }
   .header-display.flash{
     opacity: 1;
@@ -801,12 +807,164 @@
       min-width: 44px;
     }
   }
+  /* Synth Engine Sub-Navigation */
+  .synth-sub-nav {
+    display: flex;
+    gap: 2px;
+    border-bottom: 1px solid var(--border);
+    margin-bottom: 16px;
+  }
+  .synth-sub-tab {
+    background: transparent;
+    border: 1px solid transparent;
+    color: var(--fg);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    text-transform: uppercase;
+    padding: 6px 12px;
+    cursor: pointer;
+    transition: all 150ms ease;
+  }
+  .synth-sub-tab.active {
+    border: 1px solid var(--border);
+    border-bottom-color: var(--bg);
+    margin-bottom: -1px;
+    color: var(--accent);
+  }
+  .synth-sub-tab:hover:not(.active) {
+    background: #222;
+  }
+  
+  /* Synth OSC Grid Layout */
+  .osc-container {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 16px;
+    width: 100%;
+  }
+  .synth-panel {
+    border: 1px solid var(--border);
+    padding: 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .synth-panel-title {
+    font-size: 11px;
+    text-transform: uppercase;
+    opacity: 0.7;
+    margin: 0;
+    text-align: center;
+    border-bottom: 1px solid var(--border);
+    padding-bottom: 8px;
+    letter-spacing: 1px;
+  }
+  .synth-panel-row {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 16px;
+  }
+  .synth-lcd-select {
+    background: var(--bg);
+    color: var(--accent);
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    border: 1px solid var(--border);
+    padding: 4px;
+    width: 100%;
+    text-align: center;
+    outline: none;
+    cursor: pointer;
+    appearance: none;
+    -webkit-appearance: none;
+  }
+
+  .synth-lcd-select:hover {
+    border-color: var(--accent);
+  }
+
+  /* Range Sliders */
+  input[type=range] {
+    -webkit-appearance: none;
+    width: 100%;
+    background: transparent;
+  }
+  input[type=range]:focus {
+    outline: none;
+  }
+  input[type=range]::-webkit-slider-runnable-track {
+    width: 100%;
+    height: 2px;
+    cursor: pointer;
+    background: var(--border);
+    border-radius: 1px;
+  }
+  input[type=range]::-webkit-slider-thumb {
+    height: 12px;
+    width: 12px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    -webkit-appearance: none;
+    margin-top: -5px;
+    box-shadow: 0 0 6px var(--accent);
+  }
+  input[type=range]:focus::-webkit-slider-thumb {
+    box-shadow: 0 0 10px var(--accent);
+  }
+  input[type=range]::-moz-range-track {
+    width: 100%;
+    height: 2px;
+    cursor: pointer;
+    background: var(--border);
+    border-radius: 1px;
+  }
+  input[type=range]::-moz-range-thumb {
+    height: 12px;
+    width: 12px;
+    border-radius: 50%;
+    background: var(--accent);
+    cursor: pointer;
+    border: none;
+    box-shadow: 0 0 6px var(--accent);
+  }
+  .synth-lcd-display {
+    width: 100%;
+    height: 40px;
+    border: 1px solid var(--border);
+    background: #050505;
+    position: relative;
+    overflow: hidden;
+  }
 </style>
 </head>
 <body>
 
 <div class="header">
-  <canvas class="header-display" id="visualizer"></canvas>
+  <div class="header-top-row" style="display: flex; justify-content: space-between; align-items: stretch; gap: 20px; margin-bottom: 16px;">
+    
+    <!-- LEFT: Logo & Branding -->
+    <div class="header-left-block" style="flex: 1; border: 1px solid var(--border); border-radius: 6px; padding: 20px; display: flex; flex-direction: column; justify-content: flex-start;">
+      <div>
+        <h1 style="margin: 0; font-size: 32px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;">VIRUS-H</h1>
+        <div style="font-size: 11px; opacity: 0.6; margin-top: 4px; letter-spacing: 0.2em;">WEB EDITOR & LIBRARIAN</div>
+      </div>
+    </div>
+
+    <!-- CENTER: DOT Anim -->
+    <div class="header-center-block" style="flex: 2; border: 1px solid var(--border); border-radius: 6px; display: flex; align-items: stretch; padding: 4px; overflow: hidden;">
+      <canvas class="header-display" id="visualizer" style="margin: 0; width: 100%; height: 100%; min-height: 180px; border-radius: 2px;"></canvas>
+    </div>
+
+    <!-- RIGHT: Macro Controls -->
+    <div class="header-right-block" style="flex: 1; border: 1px solid var(--border); border-radius: 6px; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;">
+      <div style="position: absolute; top: 12px; left: 16px; font-size: 10px; font-weight: bold; opacity: 0.5; letter-spacing: 0.2em; text-transform: uppercase;">MACRO CONTROLS</div>
+      <div id="globalMacroKnobs" class="section-main" style="display: flex; gap: 50px; margin-top: 16px; border: none; background: transparent; padding: 0;"></div>
+    </div>
+    
+  </div>
   <div class="header-bar">
     <div class="header-title" id="patchNameDisplay">virus ti snow // [PATCH NAME]</div>
     <div class="header-controls">
@@ -821,6 +979,10 @@
       <div class="field">
         <label>channel</label>
         <select id="midiChannel"></select>
+      </div>
+      <div class="header-control">
+        <label>device id</label>
+        <select id="deviceIdSelect"></select>
       </div>
       <div class="conn">
         <span class="dot" id="connDot"></span>
@@ -840,11 +1002,16 @@
   </div>
 </div>
 
-<div class="mode-tabs" id="partTabs" style="justify-content: flex-end;">
-  <button class="mode-tab" id="btnToggleBrowser" style="background: var(--section-bg); border-color: var(--accent); color: var(--accent);">browser</button>
+<div class="mode-tabs" id="partTabs" style="justify-content: flex-start; border-bottom: 1px solid var(--border); padding-bottom: 0;">
+  <button class="mode-tab" id="btnTabMultipart">MULTIPART</button>
+  <button class="mode-tab" id="btnTabPatchManager">PATCH MANAGER</button>
+  <button class="mode-tab" id="btnTabArp">ARP</button>
+  <button class="mode-tab" id="btnTabSequencer">SEQUENCER</button>
+  <button class="mode-tab active" id="btnTabSynth">SYNTH</button>
 </div>
 
-<div class="section section-lib" style="display: none;">
+<div id="patchManagerContent" style="display: none;">
+<div class="section section-lib">
   <h2>patch library</h2>
   <div class="lib-row">
     <input type="text" id="patchName" placeholder="patch name">
@@ -861,43 +1028,44 @@
 
   <h2 style="margin-top: 32px;">bank tools</h2>
   <div class="lib-row">
-    <select id="bankSelect" style="flex: 1;">
-      <option value="0">RAM A</option>
-      <option value="1">RAM B</option>
-      <option value="2">RAM C</option>
-      <option value="3">RAM D</option>
-      <option value="4">ROM A</option>
-      <option value="5">ROM B</option>
-      <option value="6">ROM C</option>
-      <option value="7">ROM D</option>
-      <option value="8">ROM E</option>
-      <option value="9">ROM F</option>
-      <option value="10">ROM G</option>
-      <option value="11">ROM H</option>
-      <option value="12">ROM I</option>
-      <option value="13">ROM J</option>
-      <option value="14">ROM K</option>
-      <option value="15">ROM L</option>
-      <option value="16">ROM M</option>
-      <option value="17">ROM N</option>
-      <option value="18">ROM O</option>
-      <option value="19">ROM P</option>
-      <option value="20">ROM Q</option>
-      <option value="21">ROM R</option>
-      <option value="22">ROM S</option>
-      <option value="23">ROM T</option>
-      <option value="24">ROM U</option>
-      <option value="25">ROM V</option>
-      <option value="26">ROM W</option>
-      <option value="27">ROM X</option>
-      <option value="28">ROM Y</option>
-      <option value="29">ROM Z</option>
-    </select>
-    <button id="btnFetchBank">fetch full bank</button>
+    <div style="display: flex; gap: 8px; flex: 1;">
+      <select id="bankTypeSelect" style="flex: 1;">
+        <option value="RAM">RAM</option>
+        <option value="ROM">ROM</option>
+      </select>
+      <select id="bankNumSelect" style="flex: 1;">
+        <option value="1">1</option>
+        <option value="2">2</option>
+        <option value="3">3</option>
+        <option value="4">4</option>
+        <option value="5">5</option>
+        <option value="6">6</option>
+        <option value="7">7</option>
+        <option value="8">8</option>
+      </select>
+    </div>
+    <div style="display: flex; gap: 8px;">
+      <button id="btnReadBank">leggi</button>
+      <button id="btnFetchBank">cattura</button>
+    </div>
+  </div>
+  <div class="lib-list" id="synthBankList" style="margin-top: 16px; border: 1px dashed var(--border); background: rgba(0,0,0,0.2);">
+    <div style="color: #666; font-size: 12px; text-align: center; padding: 16px;">nessun banco letto</div>
   </div>
 </div>
+</div>
 
-<div id="multiView">
+<!-- ARP -->
+<div id="arpContent" class="main-content single-view" style="display: none; flex-direction: column; gap: 8px;"></div>
+
+<!-- Placeholder SEQUENCER -->
+<div id="sequencerContent" style="display: none; padding: 40px; text-align: center; border: 1px dashed var(--border); border-radius: 6px; margin-top: 20px;">
+  <h2 style="margin:0; opacity: 0.5;">SEQUENCER / SONG MODE (IN COSTRUZIONE)</h2>
+</div>
+
+<div id="singleView" class="main-content single-view" style="display: flex; flex-direction: column; gap: 8px;"></div>
+
+<div id="multiView" class="main-content multi-view" style="display: none;">
   <div class="multi-global">
     <div class="field">
       <label>play mode</label>
@@ -919,10 +1087,49 @@
 
 <script>
 (function(){
-  // ---------------------------------------------------------------------
-  // Parameter definitions: Virus TI parameter numbers per spec
-  // SysEx format: F0 00 20 33 01 [DeviceID] 01 [param] [value] F7
-  // ---------------------------------------------------------------------
+  // --- UI NAVIGATION TABS ---
+  function hideAllViews() {
+    document.getElementById('singleView').style.display = 'none';
+    document.getElementById('multiView').style.display = 'none';
+    document.getElementById('patchManagerContent').style.display = 'none';
+    document.getElementById('arpContent').style.display = 'none';
+    document.getElementById('sequencerContent').style.display = 'none';
+    
+    document.querySelectorAll('.mode-tab').forEach(btn => btn.classList.remove('active'));
+  }
+
+  document.getElementById('btnTabSynth').addEventListener('click', () => {
+    hideAllViews();
+    document.getElementById('singleView').style.display = 'block';
+    document.getElementById('btnTabSynth').classList.add('active');
+  });
+
+  document.getElementById('btnTabMultipart').addEventListener('click', () => {
+    hideAllViews();
+    document.getElementById('multiView').style.display = 'flex';
+    document.getElementById('btnTabMultipart').classList.add('active');
+  });
+
+  document.getElementById('btnTabPatchManager').addEventListener('click', () => {
+    hideAllViews();
+    document.getElementById('patchManagerContent').style.display = 'block';
+    document.getElementById('btnTabPatchManager').classList.add('active');
+  });
+
+  document.getElementById('btnTabArp').addEventListener('click', () => {
+    hideAllViews();
+    document.getElementById('arpContent').style.display = 'block';
+    document.getElementById('btnTabArp').classList.add('active');
+  });
+
+  document.getElementById('btnTabSequencer').addEventListener('click', () => {
+    hideAllViews();
+    document.getElementById('sequencerContent').style.display = 'block';
+    document.getElementById('btnTabSequencer').classList.add('active');
+  });
+
+
+
   const SECTIONS = [
     { key: 'main',   title: '' },
     { key: 'osc',    title: 'oscillators' },
@@ -936,20 +1143,62 @@
     // Oscillator 1
     { id:'osc1_wave',       name:'Osc1 Waveform',     short:'o1wv', section:'osc', cc:17, default:0 },
     { id:'osc1_pw',         name:'Osc1 Pulsewidth',   short:'o1pw', section:'osc', cc:18, default:64 },
-    { id:'osc1_waveselect', name:'Osc1 Wave Select',  short:'o1ws', section:'osc', cc:19, default:0 },
+    { id:'osc1_shape',      name:'Osc1 Shape',        short:'o1sh', section:'osc', cc:19, default:0 },
     { id:'osc1_semitone',   name:'Osc1 Semitone',     short:'o1st', section:'osc', cc:20, default:64, bipolar:true },
+    { id:'osc1_keyflw',     name:'Osc1 Key Flw',      short:'o1ky', section:'osc', cc:21, default:64 },
+    { id:'osc1_vel',        name:'Vel>Osc1',          short:'v>o1', section:'osc', cc:22, default:64, bipolar:true },
+    { id:'osc1_subshape',   name:'Sub Osc Shape',     short:'sbsh', section:'osc', cc:23, default:0 },
+    
     // Oscillator 2
-    { id:'osc2_wave',       name:'Osc2 Waveform',     short:'o2wv', section:'osc', cc:22, default:0 },
-    { id:'osc2_pw',         name:'Osc2 Pulsewidth',   short:'o2pw', section:'osc', cc:23, default:64 },
-    { id:'osc2_waveselect', name:'Osc2 Wave Select',  short:'o2ws', section:'osc', cc:24, default:0 },
-    { id:'osc2_semitone',   name:'Osc2 Semitone',     short:'o2st', section:'osc', cc:25, default:64, bipolar:true },
-    // Shared detune (Osc1/Osc2)
-    { id:'osc_detune',      name:'Osc Detune',        short:'det',  section:'osc', cc:26, default:0 },
+    { id:'osc2_wave',       name:'Osc2 Waveform',     short:'o2wv', section:'osc', cc:24, default:0 },
+    { id:'osc2_pw',         name:'Osc2 Pulsewidth',   short:'o2pw', section:'osc', cc:25, default:64 },
+    { id:'osc2_shape',      name:'Osc2 Shape',        short:'o2sh', section:'osc', cc:26, default:0 },
+    { id:'osc2_semitone',   name:'Osc2 Semitone',     short:'o2st', section:'osc', cc:27, default:64, bipolar:true },
+    { id:'osc2_keyflw',     name:'Osc2 Key Flw',      short:'o2ky', section:'osc', cc:28, default:64 },
+    { id:'osc2_vel',        name:'Vel>Osc2',          short:'v>o2', section:'osc', cc:29, default:64, bipolar:true },
+    
+    // Shared Detune & Balance
+    { id:'osc_detune',      name:'Osc Detune',        short:'det',  section:'osc', cc:30, default:0 },
+    { id:'osc_balance',     name:'Osc Balance',       short:'bal',  section:'osc', cc:31, default:64, bipolar:true },
+    
+    // Oscillator 3
+    { id:'osc3_semi',       name:'Osc3 Semitone',     short:'o3st', section:'osc', cc:100, default:64, bipolar:true },
+    { id:'osc3_detune',     name:'Osc3 Detune',       short:'o3dt', section:'osc', cc:101, default:64, bipolar:true },
+    
+    // Unison
+    { id:'uni_detune',      name:'Unison Detune',     short:'udt',  section:'osc', cc:102, default:0 },
+    { id:'uni_pan',         name:'Unison Pan',        short:'upn',  section:'osc', cc:103, default:127 },
+    { id:'uni_lfophs',      name:'Unison LFO Phs',    short:'lfoP', section:'osc', cc:115, default:0 },
+    
+    // Common
+    { id:'com_sync',        name:'Osc Sync',          short:'snc',  section:'osc', cc:104, default:0 }, // Sync mode button
+    { id:'com_syncamt',     name:'Sync Amt',          short:'syam', section:'osc', cc:116, default:0 },
+    { id:'com_envosc',      name:'Env>Osc2',          short:'eno',  section:'osc', cc:105, default:64, bipolar:true },
+    { id:'com_phase',       name:'Phase Init',        short:'phi',  section:'osc', cc:106, default:0 },
+    { id:'com_porta',       name:'Portamento',        short:'prt',  section:'osc', cc:5,   default:0 }, // Standard CC 5
+    { id:'com_velpw',       name:'Vel>PW',            short:'v>pw', section:'osc', cc:117, default:64, bipolar:true },
+    { id:'com_velsync',     name:'Vel>Sync',          short:'v>sy', section:'osc', cc:118, default:64, bipolar:true },
+    { id:'com_envsync',     name:'Env>Sync',          short:'e>sy', section:'osc', cc:119, default:64, bipolar:true },
+    { id:'com_fmmode',      name:'FM Mode',           short:'fmmd', section:'osc', cc:120, default:0 },
+    { id:'com_fmamt',       name:'FM Amount',         short:'fmam', section:'osc', cc:121, default:0 },
+    
+    // Noise & Punch
+    { id:'noise_color',     name:'Noise Color',       short:'ncl',  section:'osc', cc:107, default:64, bipolar:true },
+    { id:'punch_int',       name:'Punch Intensity',   short:'pnc',  section:'osc', cc:108, default:0 },
+    
+    // Mixer
+    { id:'mix_osc12',       name:'Osc1/2 Bal',        short:'m12',  section:'osc', cc:109, default:64, bipolar:true },
+    { id:'mix_oscvol',      name:'Osc Vol (Sat)',     short:'mov',  section:'osc', cc:110, default:127 },
+    { id:'mix_osc3',        name:'Osc3 Vol',          short:'mo3',  section:'osc', cc:111, default:0 },
+    { id:'mix_noise',       name:'Noise Vol',         short:'mnv',  section:'osc', cc:112, default:0 },
+    { id:'mix_sub',         name:'Sub Osc Vol',       short:'msb',  section:'osc', cc:113, default:0 },
+    { id:'mix_ring',        name:'Ring Mod Vol',      short:'mrg',  section:'osc', cc:114, default:0 },
 
     // Filter 1
-    { id:'f1_cutoff',    name:'Cutoff',            short:'cutt', section:'main', cc:40, default:127 },
-    { id:'f1_resonance', name:'Resonance',         short:'res',  section:'main', cc:42, default:0 },
-    { id:'f1_envamount', name:'Env Amount',        short:'env',  section:'filter', cc:44, default:64, bipolar:true },
+    { id:'f1_mode',      name:'Filt1 Mode',        short:'f1md', section:'filter', cc:39, default:0 },
+    { id:'f1_cutoff',    name:'Cutoff',            short:'CUTOFF', section:'main', cc:40, default:127 },
+    { id:'f1_resonance', name:'Resonance',         short:'RESONANCE',  section:'main', cc:42, default:0 },
+    { id:'f1_envamt',    name:'Filt1 EnvAmt',      short:'f1ea', section:'filter', cc:43, default:64, bipolar:true },
     { id:'f1_keytrack',  name:'Keyboard Track',    short:'key',  section:'filter', cc:46, default:0 },
 
     // Amplifier
@@ -1153,55 +1402,15 @@
   const visualizer = document.getElementById('visualizer');
   const vctx = visualizer.getContext('2d');
 
-  const VIS_DOT = 8;       // dot diameter
-  const VIS_GAP = 3;       // gap between dots
-  const VIS_CELL = VIS_DOT + VIS_GAP; // 11px per cell
+  const VIS_DOT = 4;       // dot diameter
+  const VIS_GAP = 2;       // gap between dots
+  const VIS_CELL = VIS_DOT + VIS_GAP;
 
-  let VIS_COLS = 1;        // grid columns (computed from canvas width)
-  let VIS_ROWS = 1;        // grid rows (computed from canvas height)
-  let PENTA_ROWS = [0];    // pentatonic-ish row positions for a musical feel
+  let VIS_COLS = 1;
+  let VIS_ROWS = 1;
 
   let visDPR = 1;
   let visW = 0, visH = 0;
-
-  // grid[col] = array of active row indices for that column
-  const grid = [];
-  let melodyStep = 0;       // walks up/down the pentatonic scale
-  let melodyDir = 1;
-
-  function computePentaRows(rows){
-    const arr = [];
-    for (let i = 0; i < rows; i++){
-      if (i % 7 !== 2 && i % 7 !== 5) arr.push(i);
-    }
-    if (arr.length === 0) arr.push(0);
-    return arr;
-  }
-
-  function generateColumn(){
-    const connected = wasConnected;
-    // density: 1 dot when disconnected, 2-3 when connected
-    const count = connected ? (2 + (Math.random() < 0.5 ? 0 : 1)) : 1;
-
-    // melodic walk: advance the base step up/down the pentatonic scale
-    melodyStep += melodyDir;
-    if (melodyStep >= PENTA_ROWS.length - 1){ melodyStep = PENTA_ROWS.length - 1; melodyDir = -1; }
-    if (melodyStep <= 0){ melodyStep = 0; melodyDir = 1; }
-    // occasionally jump for variety
-    if (Math.random() < 0.15){
-      melodyStep = Math.floor(Math.random() * PENTA_ROWS.length);
-    }
-
-    const rows = new Set();
-    rows.add(PENTA_ROWS[melodyStep]);
-    // add harmony notes (thirds/fifths within the pentatonic set)
-    while (rows.size < count && rows.size < PENTA_ROWS.length){
-      const offset = 1 + Math.floor(Math.random() * 2); // a third or fifth up
-      const idx = (melodyStep + offset) % PENTA_ROWS.length;
-      rows.add(PENTA_ROWS[idx]);
-    }
-    return [...rows];
-  }
 
   function resizeVisualizer(){
     const rect = visualizer.getBoundingClientRect();
@@ -1212,67 +1421,75 @@
     visualizer.height = visH * visDPR;
     vctx.setTransform(visDPR, 0, 0, visDPR, 0, 0);
 
-    const newCols = Math.max(1, Math.floor((visW + VIS_GAP) / VIS_CELL));
-    const newRows = Math.max(1, Math.floor((visH + VIS_GAP) / VIS_CELL));
-    if (newCols !== VIS_COLS || newRows !== VIS_ROWS){
-      VIS_COLS = newCols;
-      VIS_ROWS = newRows;
-      PENTA_ROWS = computePentaRows(VIS_ROWS);
-      melodyStep = Math.min(melodyStep, PENTA_ROWS.length - 1);
-      grid.length = 0;
-      for (let c = 0; c < VIS_COLS; c++){ grid.push(generateColumn()); }
-    }
-  }
-
-  function dotColors(){
-    const dark = document.documentElement.getAttribute('data-theme') === 'dark';
-    return {
-      active: currentAccent,
-      inactive: dark ? '#333333' : '#dddddd'
-    };
-  }
-
-  let lastStep = 0;
-  function stepInterval(){
-    return wasConnected ? 80 : 120; // ms per column (faster when connected)
+    VIS_COLS = Math.max(1, Math.floor((visW + VIS_GAP) / VIS_CELL));
+    VIS_ROWS = Math.max(1, Math.floor((visH + VIS_GAP) / VIS_CELL));
   }
 
   function renderVisualizer(t){
-    // advance the scroll on a musical clock
-    if (t - lastStep >= stepInterval()){
-      lastStep = t;
-      grid.shift();
-      grid.push(generateColumn());
-    }
-
     vctx.clearRect(0, 0, visW, visH);
-    const colors = dotColors();
-    // center the 40x8 grid in the canvas
-    const gridW = VIS_COLS * VIS_CELL - VIS_GAP;
-    const gridH = VIS_ROWS * VIS_CELL - VIS_GAP;
-    const x0 = Math.max(0, (visW - gridW) / 2);
-    const y0 = Math.max(0, (visH - gridH) / 2);
+    
+    const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    // Always use the chosen color for the active wave, connected or not
+    const activeColor = currentAccent;
+    const inactiveColor = dark ? '#222222' : '#eeeeee';
+    
+    // Compute waveform row indices
+    const waveRows = [];
+    const timeOff = t * 0.003;
+    const amplitude = wasConnected ? (VIS_ROWS / 2.5) : (VIS_ROWS / 8);
+    const frequency = wasConnected ? 0.3 : 0.1;
+    
+    for (let c = 0; c < VIS_COLS; c++) {
+      let y = VIS_ROWS / 2;
+      if (wasConnected) {
+        y += Math.sin(c * frequency + timeOff) * amplitude;
+        y += Math.sin(c * frequency * 1.5 - timeOff * 2) * (amplitude * 0.4);
+        y += Math.sin(c * frequency * 0.5 + timeOff * 0.8) * (amplitude * 0.2);
+      } else {
+        y += Math.sin(c * frequency + timeOff) * amplitude;
+      }
+      waveRows.push(Math.floor(y));
+    }
+    
+    const x0 = Math.max(0, (visW - (VIS_COLS * VIS_CELL - VIS_GAP)) / 2);
+    const y0 = Math.max(0, (visH - (VIS_ROWS * VIS_CELL - VIS_GAP)) / 2);
     const r = VIS_DOT / 2;
 
     for (let c = 0; c < VIS_COLS; c++){
-      const activeRows = grid[c] || [];
       const cx = x0 + c * VIS_CELL + r;
+      const activeRow = waveRows[c];
+      
       for (let row = 0; row < VIS_ROWS; row++){
-        const isActive = activeRows.indexOf(row) !== -1;
         const cy = y0 + row * VIS_CELL + r;
         vctx.beginPath();
         vctx.arc(cx, cy, r, 0, Math.PI * 2);
+        
+        // line thickness
+        const dist = Math.abs(row - activeRow);
+        const isActive = dist <= (wasConnected ? 1 : 0);
+        
         if (isActive){
-          vctx.fillStyle = colors.active;
-          vctx.globalAlpha = 1;
+          vctx.fillStyle = activeColor;
+          // Dimmer if disconnected, fully bright if connected
+          vctx.globalAlpha = (wasConnected ? 1 : 0.6) - (dist * 0.3);
+          
+          if (wasConnected) {
+            vctx.shadowBlur = 6;
+            vctx.shadowColor = activeColor;
+          } else {
+            vctx.shadowBlur = 2;
+            vctx.shadowColor = activeColor;
+          }
         } else {
-          vctx.fillStyle = colors.inactive;
+          vctx.fillStyle = inactiveColor;
           vctx.globalAlpha = 0.3;
+          vctx.shadowBlur = 0;
         }
         vctx.fill();
+        vctx.shadowBlur = 0;
       }
     }
-    vctx.globalAlpha = 1;
+
     requestAnimationFrame(renderVisualizer);
   }
 
@@ -1287,6 +1504,7 @@
   const inSelect = document.getElementById('midiInSelect');
   const outSelect = document.getElementById('midiOutSelect');
   const chanSelect = document.getElementById('midiChannel');
+  const devIdSelect = document.getElementById('deviceIdSelect');
   const connDot = document.getElementById('connDot');
   const connLabel = document.getElementById('connLabel');
 
@@ -1299,6 +1517,18 @@
     chanSelect.appendChild(opt);
   }
   chanSelect.value = 1;
+
+  for (let i = 1; i <= 16; i++){
+    const opt = document.createElement('option');
+    opt.value = i - 1;
+    opt.textContent = 'ID ' + i;
+    devIdSelect.appendChild(opt);
+  }
+  const optOmni = document.createElement('option');
+  optOmni.value = 16; // 0x10 is Omni in Virus SysEx
+  optOmni.textContent = 'Omni';
+  devIdSelect.appendChild(optOmni);
+  devIdSelect.value = 16; // Default to Omni
 
   function flashConnected(){
     connDot.classList.remove('pulse');
@@ -1373,7 +1603,7 @@
         }
 
         if (window.bankFetchState && window.bankFetchState.active) {
-          // --- RAW DUMP CAPTURE FOR BANK FETCHER ---
+          // --- RAW DUMP CAPTURE FOR BANK FETCHER (READ OR CAPTURE) ---
           let patchName = "";
           for (let i = 249; i <= 258; i++) {
             if (bytes[i] >= 32 && bytes[i] <= 126) patchName += String.fromCharCode(bytes[i]);
@@ -1381,22 +1611,31 @@
           patchName = patchName.trim();
           
           const bState = window.bankFetchState;
-          const bankName = document.getElementById('bankSelect').options[bState.bankIndex].text;
-          const finalName = patchName ? `${bankName}-${bState.currentPatch.toString().padStart(3,'0')} ${patchName}` : `${bankName}-${bState.currentPatch.toString().padStart(3,'0')} Empty`;
+          const bank = bytes[7];
+          const patchNum = bytes[8];
           
-          const lib = loadLibrary(); // Normal patch library
-          lib[finalName] = Array.from(bytes);
-          saveLibrary(lib);
-
-          document.getElementById('midi-debug').textContent = `🔥 BANK FETCH: Salvato ${finalName}... (${bState.currentPatch + 1}/128)`;
+          const finalName = patchName ? `${bState.bankName}-${patchNum.toString().padStart(3,'0')} ${patchName}` : `${bState.bankName}-${patchNum.toString().padStart(3,'0')} Empty`;
           
-          bState.currentPatch++;
-          if (bState.currentPatch < 128) {
-            setTimeout(() => { requestBankPatch(bState.bankIndex, bState.currentPatch); }, 50);
+          if (bState.mode === 'capture') {
+            const lib = loadLibrary(); // Normal patch library
+            lib[finalName] = Array.from(bytes);
+            saveLibrary(lib);
+            document.getElementById('midi-debug').textContent = `🔥 BANK CAPTURE: Salvato ${finalName}... (${bState.readPatches.length + 1}/128)`;
           } else {
-            window.bankFetchState = null;
-            document.getElementById('midi-debug').textContent = `✅ BANK FETCH: ${bankName} Completato!`;
-            renderLibrary();
+            // mode === 'read'
+            bState.readPatches.push(finalName);
+            document.getElementById('midi-debug').textContent = `🔥 BANK READ: Letto ${finalName}... (${bState.readPatches.length}/128)`;
+          }
+          
+          // Reset the global timeout since we are actively receiving patches
+          if (bState.timeoutId) clearTimeout(bState.timeoutId);
+          bState.timeoutId = setTimeout(() => {
+            document.getElementById('midi-debug').textContent = `⚠️ BANK: Timeout di ricezione dopo ${bState.readPatches.length} patches.`;
+            finishBankOperation();
+          }, 3000); // 3 seconds of silence means it's done or failed
+          
+          if (bState.readPatches.length >= 128) {
+             finishBankOperation();
           }
           return;
         }
@@ -1518,7 +1757,7 @@
   // SysEx send
   // ---------------------------------------------------------------------
   function deviceId(){
-    return parseInt(chanSelect.value, 10) - 1; // 0-15
+    return parseInt(devIdSelect.value, 10); // 0-15 or 16 (Omni)
   }
 
   function buildSysEx(cc, value){
@@ -1535,7 +1774,14 @@
   function sendParam(param, value){
     if (selectedOutput){
       try{
-        selectedOutput.send(buildSysEx(param.cc, value));
+        if (param.cc !== undefined && param.cc < 120) {
+          // Send standard MIDI CC
+          const channel = parseInt(document.getElementById('midiChannel').value, 10) - 1;
+          selectedOutput.send(new Uint8Array([0xB0 | channel, param.cc, value & 0x7F]));
+        } else {
+          // Fallback to SysEx if no standard CC exists
+          selectedOutput.send(buildSysEx(param.cc, value));
+        }
       } catch(e){ console.error('MIDI send error', e); }
     }
   }
@@ -1724,6 +1970,231 @@
     });
   }
 
+  const knobRefs = {};
+
+  function buildSingleView(){
+    const root = document.getElementById('singleView');
+    root.innerHTML = '';
+    
+    const container = document.createElement('div');
+    container.className = 'multi-global';
+    container.style.flexDirection = 'column';
+    container.style.alignItems = 'flex-start';
+    container.style.gap = '0px';
+
+    // --- Sub-Navigation ---
+    const nav = document.createElement('div');
+    nav.className = 'synth-sub-nav';
+    const tabs = ['OSC', 'FILTER', 'LFO', 'MATRIX', 'ARP', 'FX 1', 'FX 2', 'COMMON', 'PATCH UTILITY'];
+    
+    tabs.forEach(t => {
+      const btn = document.createElement('button');
+      btn.className = 'synth-sub-tab';
+      if (t === 'OSC') btn.classList.add('active');
+      btn.textContent = t;
+      nav.appendChild(btn);
+    });
+    container.appendChild(nav);
+
+    // --- OSC Grid Content ---
+    const oscContainer = document.createElement('div');
+    oscContainer.className = 'osc-container';
+
+    // Helper: Create Panel
+    function createPanel(title, area) {
+      const p = document.createElement('div');
+      p.className = 'synth-panel';
+      if (area) p.style.gridArea = area;
+      const t = document.createElement('h3');
+      t.className = 'synth-panel-title';
+      t.textContent = title;
+      p.appendChild(t);
+      return p;
+    }
+
+    // Helper: Create Select
+    function createSelect(label, options) {
+      const f = document.createElement('div');
+      f.className = 'field';
+      f.style.flexDirection = 'column';
+      f.style.alignItems = 'center';
+      f.style.gap = '4px';
+      
+      const sel = document.createElement('select');
+      sel.className = 'synth-lcd-select';
+      options.forEach((opt, i) => {
+        const o = document.createElement('option');
+        o.value = i; o.textContent = opt;
+        sel.appendChild(o);
+      });
+      f.appendChild(sel);
+      return f;
+    }
+
+    // -- COLUMN 1: OSC 1, OSC 3, UNISON
+    const col1 = document.createElement('div');
+    col1.style.display = 'flex'; col1.style.flexDirection = 'column'; col1.style.gap = '16px';
+    
+    const pOsc1 = createPanel('OSC 1');
+    const waveRow1 = document.createElement('div');
+    waveRow1.className = 'synth-panel-row';
+    waveRow1.appendChild(createSelect('Wave', ['Classic', 'HyperSaw', 'Wavetable']));
+    waveRow1.appendChild(createSelect('Sub Osc', ['Square', 'Triangle']));
+    pOsc1.appendChild(waveRow1);
+    const lcd1 = document.createElement('canvas');
+    lcd1.className = 'synth-lcd-display';
+    pOsc1.appendChild(lcd1);
+    const rowOsc1_1 = document.createElement('div');
+    rowOsc1_1.className = 'synth-panel-row';
+    rowOsc1_1.appendChild(createKnob(PARAMS.find(x => x.id === 'osc1_semitone')));
+    rowOsc1_1.appendChild(createKnob(PARAMS.find(x => x.id === 'osc1_keyflw')));
+    rowOsc1_1.appendChild(createKnob(PARAMS.find(x => x.id === 'osc1_pw')));
+    const rowOsc1_2 = document.createElement('div');
+    rowOsc1_2.className = 'synth-panel-row';
+    rowOsc1_2.appendChild(createKnob(PARAMS.find(x => x.id === 'osc1_shape')));
+    rowOsc1_2.appendChild(createKnob(PARAMS.find(x => x.id === 'osc1_vel')));
+    pOsc1.appendChild(rowOsc1_1);
+    pOsc1.appendChild(rowOsc1_2);
+    
+    const pOsc3 = createPanel('OSC 3');
+    pOsc3.appendChild(createSelect('Mode', ['Off', 'Saw', 'Pulse', 'Triangle']));
+    const rowOsc3 = document.createElement('div');
+    rowOsc3.className = 'synth-panel-row';
+    rowOsc3.appendChild(createKnob(PARAMS.find(x => x.id === 'osc3_semi')));
+    rowOsc3.appendChild(createKnob(PARAMS.find(x => x.id === 'osc3_detune')));
+    pOsc3.appendChild(rowOsc3);
+
+    const pUnison = createPanel('UNISON');
+    pUnison.appendChild(createSelect('Mode', ['Off', 'Twin', '3 Voices', '4 Voices', '8 Voices']));
+    const rowUni = document.createElement('div');
+    rowUni.className = 'synth-panel-row';
+    rowUni.appendChild(createKnob(PARAMS.find(x => x.id === 'uni_detune')));
+    rowUni.appendChild(createKnob(PARAMS.find(x => x.id === 'uni_pan')));
+    rowUni.appendChild(createKnob(PARAMS.find(x => x.id === 'uni_lfophs')));
+    pUnison.appendChild(rowUni);
+
+    col1.appendChild(pOsc1); col1.appendChild(pOsc3); col1.appendChild(pUnison);
+
+    // -- COLUMN 2: OSC COMMON, NOISE, PUNCH
+    const col2 = document.createElement('div');
+    col2.style.display = 'flex'; col2.style.flexDirection = 'column'; col2.style.gap = '16px';
+    
+    const pCommon = createPanel('OSC COMMON');
+    const fmRow = document.createElement('div');
+    fmRow.className = 'synth-panel-row';
+    fmRow.appendChild(createSelect('FM Mode', ['Off', 'Pos Triangle', 'Triangle', 'Wave', 'Noise', 'In L', 'In R', 'In L+R']));
+    pCommon.appendChild(fmRow);
+
+    const rowCom1 = document.createElement('div');
+    rowCom1.className = 'synth-panel-row';
+    rowCom1.appendChild(createKnob(PARAMS.find(x => x.id === 'com_sync')));
+    rowCom1.appendChild(createKnob(PARAMS.find(x => x.id === 'com_syncamt')));
+    rowCom1.appendChild(createKnob(PARAMS.find(x => x.id === 'com_envosc')));
+    const rowCom2 = document.createElement('div');
+    rowCom2.className = 'synth-panel-row';
+    rowCom2.appendChild(createKnob(PARAMS.find(x => x.id === 'com_phase')));
+    rowCom2.appendChild(createKnob(PARAMS.find(x => x.id === 'com_porta')));
+    rowCom2.appendChild(createKnob(PARAMS.find(x => x.id === 'com_fmamt')));
+    const rowCom3 = document.createElement('div');
+    rowCom3.className = 'synth-panel-row';
+    rowCom3.appendChild(createKnob(PARAMS.find(x => x.id === 'com_velpw')));
+    rowCom3.appendChild(createKnob(PARAMS.find(x => x.id === 'com_velsync')));
+    rowCom3.appendChild(createKnob(PARAMS.find(x => x.id === 'com_envsync')));
+    pCommon.appendChild(rowCom1); pCommon.appendChild(rowCom2); pCommon.appendChild(rowCom3);
+
+    const pNoise = createPanel('NOISE');
+    const rowNoise = document.createElement('div');
+    rowNoise.className = 'synth-panel-row';
+    rowNoise.appendChild(createKnob(PARAMS.find(x => x.id === 'noise_color')));
+    pNoise.appendChild(rowNoise);
+
+    const pPunch = createPanel('PUNCH');
+    const rowPunch = document.createElement('div');
+    rowPunch.className = 'synth-panel-row';
+    rowPunch.appendChild(createKnob(PARAMS.find(x => x.id === 'punch_int')));
+    pPunch.appendChild(rowPunch);
+
+    col2.appendChild(pCommon); col2.appendChild(pNoise); col2.appendChild(pPunch);
+
+    // -- COLUMN 3: OSC 2, MIXER
+    const col3 = document.createElement('div');
+    col3.style.display = 'flex'; col3.style.flexDirection = 'column'; col3.style.gap = '16px';
+
+    const pOsc2 = createPanel('OSC 2');
+    pOsc2.appendChild(createSelect('Wave', ['HyperSaw', 'Classic', 'Wavetable']));
+    const lcd2 = document.createElement('canvas');
+    lcd2.className = 'synth-lcd-display';
+    pOsc2.appendChild(lcd2);
+    const rowOsc2_1 = document.createElement('div');
+    rowOsc2_1.className = 'synth-panel-row';
+    rowOsc2_1.appendChild(createKnob(PARAMS.find(x => x.id === 'osc2_semitone')));
+    rowOsc2_1.appendChild(createKnob(PARAMS.find(x => x.id === 'osc_detune')));
+    rowOsc2_1.appendChild(createKnob(PARAMS.find(x => x.id === 'osc2_keyflw')));
+    
+    const rowOsc2_2 = document.createElement('div');
+    rowOsc2_2.className = 'synth-panel-row';
+    rowOsc2_2.appendChild(createKnob(PARAMS.find(x => x.id === 'osc2_shape')));
+    rowOsc2_2.appendChild(createKnob(PARAMS.find(x => x.id === 'osc2_pw')));
+    rowOsc2_2.appendChild(createKnob(PARAMS.find(x => x.id === 'osc2_vel')));
+    
+    pOsc2.appendChild(rowOsc2_1);
+    pOsc2.appendChild(rowOsc2_2);
+
+    const pMixer = createPanel('MIXER');
+    const rowMix1 = document.createElement('div');
+    rowMix1.className = 'synth-panel-row';
+    rowMix1.appendChild(createKnob(PARAMS.find(x => x.id === 'mix_osc12')));
+    rowMix1.appendChild(createKnob(PARAMS.find(x => x.id === 'mix_oscvol')));
+    const rowMix2 = document.createElement('div');
+    rowMix2.className = 'synth-panel-row';
+    rowMix2.appendChild(createKnob(PARAMS.find(x => x.id === 'mix_osc3')));
+    rowMix2.appendChild(createKnob(PARAMS.find(x => x.id === 'mix_noise')));
+    const rowMix3 = document.createElement('div');
+    rowMix3.className = 'synth-panel-row';
+    rowMix3.appendChild(createKnob(PARAMS.find(x => x.id === 'mix_sub')));
+    rowMix3.appendChild(createKnob(PARAMS.find(x => x.id === 'mix_ring')));
+    pMixer.appendChild(rowMix1); pMixer.appendChild(rowMix2); pMixer.appendChild(rowMix3);
+
+    col3.appendChild(pOsc2); col3.appendChild(pMixer);
+
+    oscContainer.appendChild(col1);
+    oscContainer.appendChild(col2);
+    oscContainer.appendChild(col3);
+
+    container.appendChild(oscContainer);
+    root.appendChild(container);
+
+    // Initialize the big macro knobs (Cutoff & Resonance) and put them in the header
+    const macroKnobs = document.getElementById('globalMacroKnobs');
+    macroKnobs.innerHTML = '';
+    const cutParam = PARAMS.find(p => p.id === 'f1_cutoff');
+    const resParam = PARAMS.find(p => p.id === 'f1_resonance');
+    
+    if (cutParam && resParam) {
+      const cutKnob = createKnob(cutParam);
+      const resKnob = createKnob(resParam);
+      knobRefs[cutParam.id] = cutKnob;
+      knobRefs[resParam.id] = resKnob;
+      macroKnobs.appendChild(cutKnob);
+      macroKnobs.appendChild(resKnob);
+    }
+  }
+
+  function refreshAllKnobs(){
+    PARAMS.forEach(p => {
+      if(knobRefs[p.id]) knobRefs[p.id]._render();
+    });
+  }
+
+  function applyPatchObject(p, send){
+    PARAMS.forEach(param => {
+      const value = (p[param.id] !== undefined) ? p[param.id] : param.default;
+      patch[param.id] = Math.max(0, Math.min(127, value));
+    });
+    refreshAllKnobs();
+    if (send) sendFullPatch(patch);
+  }
+
   // ---------------------------------------------------------------------
   // Raw Dump Library Logic
   // ---------------------------------------------------------------------
@@ -1739,7 +2210,35 @@
   }
 
   window.multiFetchState = null;
-  window.bankFetchState = null;
+  function finishBankOperation() {
+    const bState = window.bankFetchState;
+    if (!bState) return;
+    
+    if (bState.timeoutId) {
+      clearTimeout(bState.timeoutId);
+    }
+    
+    const count = bState.mode === 'read' ? bState.readPatches.length : loadLibraryCount(bState.bankName);
+
+    if (bState.mode === 'capture') {
+      if (count === 0) {
+        document.getElementById('midi-debug').innerHTML = `<span style="color:#f00;">❌ ERRORE: Nessuna patch ricevuta (SysEx bloccato).</span>`;
+      } else {
+        document.getElementById('midi-debug').innerHTML = `<span style="color:#0f0;">✅ BANK CAPTURE: ${bState.bankName} Completato! (${count}/128)</span>`;
+      }
+      updateBrowserView();
+    } else if (bState.mode === 'read') {
+      if (count === 0) {
+        document.getElementById('midi-debug').innerHTML = `<span style="color:#f00;">❌ ERRORE: Nessuna patch ricevuta. SysEx OUT bloccato dal Fantom.</span>`;
+      } else {
+        document.getElementById('midi-debug').innerHTML = `<span style="color:#0f0;">✅ BANK READ: ${bState.bankName} Completato! (${count}/128)</span>`;
+        console.log("Patches lette:", bState.readPatches);
+      }
+    }
+    
+    window.bankFetchState.active = false;
+    window.bankFetchState = null;
+  }
 
   function requestBankPatch(bankIndex, patchIndex) {
     if (!selectedOutput) return;
@@ -1748,6 +2247,16 @@
         ...SYSEX_PREFIX, deviceId(), 0x00, bankIndex & 0x7F, patchIndex & 0x7F, 0xF7
       ]));
     } catch (e) { console.error('Bank dump request error', e); }
+  }
+
+  function requestFullBank(bankIndex) {
+    if (!selectedOutput) return;
+    try {
+      // 0x04 = Bank Print Request
+      selectedOutput.send(new Uint8Array([
+        ...SYSEX_PREFIX, deviceId(), 0x04, bankIndex & 0x7F, 0xF7
+      ]));
+    } catch (e) { console.error('Full Bank dump request error', e); }
   }
 
   function requestDump(partIndex) {
@@ -1981,7 +2490,7 @@
         }
       });
 
-      btns.appendChild(loadBtn);
+      btns.appendChild(loadLabel);
       btns.appendChild(delBtn);
       item.appendChild(nameEl);
       item.appendChild(btns);
@@ -2097,7 +2606,7 @@
     function render(){
       if (w <= 0 || h <= 0) return;
       ctx.clearRect(0, 0, w, h);
-      const colors = dotColors();
+      const colors = { active: currentAccent, inactive: '#666' };
 
       // background dot grid
       const cols = Math.floor((w + GAP) / CELL);
@@ -2358,21 +2867,6 @@
     }
   });
 
-  // Browser toggle logic
-  const btnToggleBrowser = document.getElementById('btnToggleBrowser');
-  const libSection = document.querySelector('.section-lib');
-  let browserVisible = false;
-
-  btnToggleBrowser.addEventListener('click', () => {
-    browserVisible = !browserVisible;
-    if (browserVisible) {
-      libSection.style.display = 'block';
-      libSection.scrollIntoView({ behavior: 'smooth' });
-    } else {
-      libSection.style.display = 'none';
-    }
-  });
-
   // ---------------------------------------------------------------------
   // Init
   // ---------------------------------------------------------------------
@@ -2415,31 +2909,276 @@
     requestDump(0);
   });
 
-  document.getElementById('btnFetchBank').addEventListener('click', () => {
+  function startBankOperation(mode) {
     if (!selectedOutput) {
       alert('MIDI Output non connesso!');
       return;
     }
-    const select = document.getElementById('bankSelect');
-    const bankIndex = parseInt(select.value, 10);
-    const bankName = select.options[select.selectedIndex].text;
+    const type = document.getElementById('bankTypeSelect').value;
+    const num = parseInt(document.getElementById('bankNumSelect').value, 10);
+    const bankIndex = (type === 'RAM' ? 0 : 8) + (num - 1);
+    const bankName = `${type} ${num}`;
     
-    if (confirm(`Vuoi estrarre automaticamente tutte le 128 patch dal banco ${bankName}? Questo processo salverà i suoni nella libreria e richiederà circa 10 secondi.`)) {
-      document.getElementById('midi-debug').textContent = `🔥 BANK FETCH: Richiesta ${bankName} patch 1/128...`;
+    const msg = mode === 'capture' 
+      ? `Vuoi estrarre e SALVARE nella libreria tutte le 128 patch dal banco ${bankName}?`
+      : `Vuoi LEGGERE tutte le 128 patch dal banco ${bankName} senza salvarle?`;
+
+    if (confirm(msg)) {
+      document.getElementById('midi-debug').textContent = `🔥 BANK ${mode.toUpperCase()}: Richiesta ${bankName} patch 1/128...`;
+      if (mode === 'read') {
+         document.getElementById('synthBankList').innerHTML = '<div style="color: #00ffff; font-size: 12px; text-align: center; padding: 16px;">lettura in corso...</div>';
+      }
       window.bankFetchState = {
         active: true,
+        mode: mode,
         bankIndex: bankIndex,
-        currentPatch: 0
+        bankName: bankName,
+        readPatches: [],
+        timeoutId: null
       };
-      requestBankPatch(bankIndex, 0);
+      
+      // Request the FULL bank at once (Command 0x04)
+      requestFullBank(bankIndex);
+      
+      // If we receive absolutely nothing for 3 seconds, we timeout the whole operation
+      window.bankFetchState.timeoutId = setTimeout(() => {
+        const bState = window.bankFetchState;
+        if (bState && bState.active) {
+          document.getElementById('midi-debug').textContent = `⚠️ BANK: Il synth non ha risposto. SysEx bloccato.`;
+          finishBankOperation();
+        }
+      }, 3000);
     }
+  }
+
+  document.getElementById('btnReadBank').addEventListener('click', () => {
+    startBankOperation('read');
   });
+
+  document.getElementById('btnFetchBank').addEventListener('click', () => {
+    startBankOperation('capture');
+  });
+
+  function buildArpView() {
+    const root = document.getElementById('arpContent');
+    root.innerHTML = '';
+    
+    const container = document.createElement('div');
+    container.className = 'multi-global';
+    container.style.flexDirection = 'column';
+    container.style.alignItems = 'flex-start';
+    container.style.gap = '24px';
+    
+    const title = document.createElement('h2');
+    title.textContent = 'arpeggiator settings';
+    title.style.margin = '0';
+    container.appendChild(title);
+    
+    // Create grid for arp controls
+    const grid = document.createElement('div');
+    grid.style.display = 'grid';
+    grid.style.gridTemplateColumns = 'repeat(4, 1fr)';
+    grid.style.gap = '32px';
+    grid.style.width = '100%';
+
+    // Helper for Selects
+    function createArpSelect(label, options, ccIndex) {
+      const field = document.createElement('div');
+      field.className = 'field';
+      field.style.flexDirection = 'column';
+      field.style.alignItems = 'flex-start';
+      field.style.gap = '8px';
+
+      const lbl = document.createElement('label');
+      lbl.textContent = label;
+      field.appendChild(lbl);
+
+      const sel = document.createElement('select');
+      sel.style.width = '100%';
+      options.forEach(opt => {
+        const option = document.createElement('option');
+        option.value = opt.val;
+        option.textContent = opt.name;
+        sel.appendChild(option);
+      });
+
+      sel.addEventListener('change', (e) => {
+        const v = parseInt(e.target.value, 10);
+        sendCC(1, ccIndex, v); // Send CC on Channel 1 for now
+      });
+
+      field.appendChild(sel);
+      return field;
+    }
+
+    // 1. Arp Mode
+    const modeOpts = [
+      {val: 0, name: 'Off'},
+      {val: 1, name: 'Up'},
+      {val: 2, name: 'Down'},
+      {val: 3, name: 'Up & Down'},
+      {val: 4, name: 'As Played'},
+      {val: 5, name: 'Random'},
+      {val: 6, name: 'Chord'}
+    ];
+    grid.appendChild(createArpSelect('mode', modeOpts, 100)); // CC 100 placeholder
+
+    // 2. Pattern
+    const patternOpts = [];
+    for(let i=1; i<=64; i++) {
+      patternOpts.push({val: i-1, name: `Pattern ${i}`});
+    }
+    patternOpts.push({val: 64, name: 'User'});
+    grid.appendChild(createArpSelect('pattern', patternOpts, 101)); // CC 101 placeholder
+
+    // 3. Resolution
+    const resOpts = [
+      {val: 0, name: '1/2'},
+      {val: 1, name: '1/4'},
+      {val: 2, name: '1/8'},
+      {val: 3, name: '1/16'},
+      {val: 4, name: '1/32'},
+      {val: 5, name: '1/64'}
+    ];
+    grid.appendChild(createArpSelect('resolution', resOpts, 102)); // CC 102 placeholder
+
+    // 4. Octaves
+    const octOpts = [
+      {val: 0, name: '1'},
+      {val: 1, name: '2'},
+      {val: 2, name: '3'},
+      {val: 3, name: '4'}
+    ];
+    grid.appendChild(createArpSelect('octaves', octOpts, 103)); // CC 103 placeholder
+
+    // 5. Note Length (Knob)
+    const lengthKnob = document.createElement('div');
+    lengthKnob.className = 'field';
+    lengthKnob.style.flexDirection = 'column';
+    lengthKnob.style.alignItems = 'center';
+    lengthKnob.style.gap = '8px';
+    
+    const lengthLabel = document.createElement('label');
+    lengthLabel.textContent = 'note length';
+    lengthKnob.appendChild(lengthLabel);
+    
+    // create a visual knob placeholder for now (we'll adapt the createGlobalMacroKnob if needed)
+    const lengthInput = document.createElement('input');
+    lengthInput.type = 'range';
+    lengthInput.min = '0';
+    lengthInput.max = '127';
+    lengthInput.value = '64';
+    lengthInput.style.width = '100%';
+    lengthInput.addEventListener('input', (e) => {
+      sendCC(1, 104, e.target.value); // CC 104 placeholder
+    });
+    lengthKnob.appendChild(lengthInput);
+    grid.appendChild(lengthKnob);
+
+    // 6. Swing (Knob)
+    const swingKnob = document.createElement('div');
+    swingKnob.className = 'field';
+    swingKnob.style.flexDirection = 'column';
+    swingKnob.style.alignItems = 'center';
+    swingKnob.style.gap = '8px';
+    
+    const swingLabel = document.createElement('label');
+    swingLabel.textContent = 'swing';
+    swingKnob.appendChild(swingLabel);
+    
+    const swingInput = document.createElement('input');
+    swingInput.type = 'range';
+    swingInput.min = '0';
+    swingInput.max = '127';
+    swingInput.value = '0';
+    swingInput.style.width = '100%';
+    swingInput.addEventListener('input', (e) => {
+      sendCC(1, 105, e.target.value); // CC 105 placeholder
+    });
+    swingKnob.appendChild(swingInput);
+    grid.appendChild(swingKnob);
+
+    // 7. Hold (Checkbox/Toggle)
+    const holdField = document.createElement('div');
+    holdField.className = 'field';
+    holdField.style.flexDirection = 'column';
+    holdField.style.alignItems = 'center';
+    holdField.style.gap = '8px';
+    
+    const holdLabel = document.createElement('label');
+    holdLabel.textContent = 'hold';
+    holdField.appendChild(holdLabel);
+    
+    const holdBtn = document.createElement('button');
+    holdBtn.textContent = 'off';
+    holdBtn.style.width = '100%';
+    let holdState = false;
+    holdBtn.addEventListener('click', () => {
+      holdState = !holdState;
+      holdBtn.textContent = holdState ? 'on' : 'off';
+      holdBtn.style.background = holdState ? 'var(--accent)' : 'none';
+      holdBtn.style.color = holdState ? '#000' : 'var(--fg)';
+      sendCC(1, 106, holdState ? 127 : 0); // CC 106 placeholder
+    });
+    holdField.appendChild(holdBtn);
+    grid.appendChild(holdField);
+
+    container.appendChild(grid);
+
+    // --- 16-STEP SEQUENCER ---
+    const seqTitle = document.createElement('h3');
+    seqTitle.textContent = 'user pattern (16 steps)';
+    seqTitle.style.margin = '16px 0 0 0';
+    seqTitle.style.opacity = '0.6';
+    seqTitle.style.fontSize = '11px';
+    container.appendChild(seqTitle);
+
+    const seqGrid = document.createElement('div');
+    seqGrid.style.display = 'grid';
+    seqGrid.style.gridTemplateColumns = 'repeat(16, 1fr)';
+    seqGrid.style.gap = '4px';
+    seqGrid.style.width = '100%';
+    seqGrid.style.marginTop = '8px';
+
+    for(let i = 0; i < 16; i++) {
+      const step = document.createElement('div');
+      step.style.aspectRatio = '1 / 1';
+      step.style.border = '1px solid var(--border)';
+      step.style.borderRadius = '2px';
+      step.style.cursor = 'pointer';
+      step.style.transition = 'background-color 100ms ease, box-shadow 100ms ease';
+      
+      let stepActive = false;
+      step.addEventListener('click', () => {
+        stepActive = !stepActive;
+        step.style.background = stepActive ? 'var(--accent)' : 'transparent';
+        step.style.borderColor = stepActive ? 'var(--accent)' : 'var(--border)';
+        step.style.boxShadow = stepActive ? '0 0 8px var(--accent)' : 'none';
+        
+        // Simula invio MIDI per lo step N (Placeholder CC 110 + step index)
+        sendCC(1, 110 + i, stepActive ? 127 : 0); 
+      });
+
+      // Hover effect
+      step.addEventListener('mouseenter', () => {
+        if(!stepActive) step.style.background = '#222';
+      });
+      step.addEventListener('mouseleave', () => {
+        if(!stepActive) step.style.background = 'transparent';
+      });
+
+      seqGrid.appendChild(step);
+    }
+    container.appendChild(seqGrid);
+
+    root.appendChild(container);
+  }
 
   renderLibrary();
   renderMultiLibrary();
+  buildSingleView();
   buildMultiView();
-  // Hide library section by default
-  document.querySelector('.section-lib').style.display = 'none';
+  buildArpView();
 })();
 </script>
 </body>

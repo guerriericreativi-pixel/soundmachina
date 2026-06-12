@@ -1,2 +1,6 @@
-# Local Netlify folder
-.netlify
+node_modules/
+.DS_Store
+package.json
+package-lock.json
+test*.js
+old_index.html
