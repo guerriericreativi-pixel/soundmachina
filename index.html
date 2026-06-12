@@ -24,7 +24,7 @@
     box-sizing: border-box;
   }
   html, body{
-    height: 100%;
+    min-height: 100%;
   }
   body{
     margin: 0;
@@ -937,6 +937,30 @@
     background: #050505;
     position: relative;
     overflow: hidden;
+  }
+  @media (max-width: 1200px) {
+    .osc-container {
+      grid-template-columns: 1fr 1fr;
+    }
+    .header-top-row {
+      flex-wrap: wrap;
+    }
+    .header-left-block, .header-center-block, .header-right-block {
+      flex: 1 1 100% !important;
+      min-width: 100%;
+    }
+  }
+
+  @media (max-width: 800px) {
+    .osc-container {
+      grid-template-columns: 1fr;
+    }
+    .header-controls {
+      flex-wrap: wrap;
+    }
+    .synth-panel-row {
+      justify-content: center;
+    }
   }
 </style>
 </head>

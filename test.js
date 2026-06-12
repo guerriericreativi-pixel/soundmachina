@@ -1,9 +1,48 @@
-
+<script>
 (function(){
-  // ---------------------------------------------------------------------
-  // Parameter definitions: Virus TI parameter numbers per spec
-  // SysEx format: F0 00 20 33 01 [DeviceID] 01 [param] [value] F7
-  // ---------------------------------------------------------------------
+  // --- UI NAVIGATION TABS ---
+  function hideAllViews() {
+    document.getElementById('singleView').style.display = 'none';
+    document.getElementById('multiView').style.display = 'none';
+    document.getElementById('patchManagerContent').style.display = 'none';
+    document.getElementById('arpContent').style.display = 'none';
+    document.getElementById('sequencerContent').style.display = 'none';
+    
+    document.querySelectorAll('.mode-tab').forEach(btn => btn.classList.remove('active'));
+  }
+
+  document.getElementById('btnTabSynth').addEventListener('click', () => {
+    hideAllViews();
+    document.getElementById('singleView').style.display = 'block';
+    document.getElementById('btnTabSynth').classList.add('active');
+  });
+
+  document.getElementById('btnTabMultipart').addEventListener('click', () => {
+    hideAllViews();
+    document.getElementById('multiView').style.display = 'flex';
+    document.getElementById('btnTabMultipart').classList.add('active');
+  });
+
+  document.getElementById('btnTabPatchManager').addEventListener('click', () => {
+    hideAllViews();
+    document.getElementById('patchManagerContent').style.display = 'block';
+    document.getElementById('btnTabPatchManager').classList.add('active');
+  });
+
+  document.getElementById('btnTabArp').addEventListener('click', () => {
+    hideAllViews();
+    document.getElementById('arpContent').style.display = 'block';
+    document.getElementById('btnTabArp').classList.add('active');
+  });
+
+  document.getElementById('btnTabSequencer').addEventListener('click', () => {
+    hideAllViews();
+    document.getElementById('sequencerContent').style.display = 'block';
+    document.getElementById('btnTabSequencer').classList.add('active');
+  });
+
+
+
   const SECTIONS = [
     { key: 'main',   title: '' },
     { key: 'osc',    title: 'oscillators' },
@@ -28,9 +67,10 @@
     { id:'osc_detune',      name:'Osc Detune',        short:'det',  section:'osc', cc:26, default:0 },
 
     // Filter 1
-    { id:'f1_cutoff',    name:'Cutoff',            short:'cutt', section:'main', cc:40, default:127 },
-    { id:'f1_resonance', name:'Resonance',         short:'res',  section:'main', cc:42, default:0 },
-    { id:'f1_envamount', name:'Env Amount',        short:'env',  section:'filter', cc:44, default:64, bipolar:true },
+    { id:'f1_mode',      name:'Filt1 Mode',        short:'f1md', section:'filter', cc:39, default:0 },
+    { id:'f1_cutoff',    name:'Cutoff',            short:'CUTOFF', section:'main', cc:40, default:127 },
+    { id:'f1_resonance', name:'Resonance',         short:'RESONANCE',  section:'main', cc:42, default:0 },
+    { id:'f1_envamt',    name:'Filt1 EnvAmt',      short:'f1ea', section:'filter', cc:43, default:64, bipolar:true },
     { id:'f1_keytrack',  name:'Keyboard Track',    short:'key',  section:'filter', cc:46, default:0 },
 
     // Amplifier
@@ -139,18 +179,30 @@
   // ---------------------------------------------------------------------
   // State
   // ---------------------------------------------------------------------
-  const patch = {};
-  PARAMS.forEach(p => { patch[p.id] = p.default; });
+  let currentPartIndex = 0;
 
   // multiParts[i] = { enabled, values: {per-part mixer params}, sound: {per-part PARAMS} }
   const multiParts = [];
   for (let i = 0; i < NUM_PARTS; i++){
     const values = {};
     PART_PARAMS.forEach(pp => { values[pp.id] = pp.default; });
+    values.channel = String(i + 1); // Default MIDI channels 1, 2, 3, 4
     const sound = {};
     PARAMS.forEach(p => { sound[p.id] = p.default; });
     multiParts.push({ enabled: true, name: 'init', values, sound });
   }
+
+  // Define patch as a Proxy so that code modifying `patch.filter1_cutoff` updates the CURRENT part's sound.
+  const patch = new Proxy({}, {
+    get(target, prop) {
+      return multiParts[currentPartIndex].sound[prop];
+    },
+    set(target, prop, value) {
+      multiParts[currentPartIndex].sound[prop] = value;
+      return true;
+    }
+  });
+
 
   // partDisplays[i] = { _render, _startReveal } for the per-part dot-matrix name display
   let partDisplays = [];
@@ -160,6 +212,7 @@
   let wasConnected = false;
 
   const LIB_KEY = 'virusTiSnow_patchLibrary';
+  const MULTI_LIB_KEY = 'virusTiSnow_multiLibrary';
   const THEME_KEY = 'virusTiSnow_theme';
 
   // ---------------------------------------------------------------------
@@ -221,55 +274,15 @@
   const visualizer = document.getElementById('visualizer');
   const vctx = visualizer.getContext('2d');
 
-  const VIS_DOT = 8;       // dot diameter
-  const VIS_GAP = 3;       // gap between dots
-  const VIS_CELL = VIS_DOT + VIS_GAP; // 11px per cell
+  const VIS_DOT = 4;       // dot diameter
+  const VIS_GAP = 2;       // gap between dots
+  const VIS_CELL = VIS_DOT + VIS_GAP;
 
-  let VIS_COLS = 1;        // grid columns (computed from canvas width)
-  let VIS_ROWS = 1;        // grid rows (computed from canvas height)
-  let PENTA_ROWS = [0];    // pentatonic-ish row positions for a musical feel
+  let VIS_COLS = 1;
+  let VIS_ROWS = 1;
 
   let visDPR = 1;
   let visW = 0, visH = 0;
-
-  // grid[col] = array of active row indices for that column
-  const grid = [];
-  let melodyStep = 0;       // walks up/down the pentatonic scale
-  let melodyDir = 1;
-
-  function computePentaRows(rows){
-    const arr = [];
-    for (let i = 0; i < rows; i++){
-      if (i % 7 !== 2 && i % 7 !== 5) arr.push(i);
-    }
-    if (arr.length === 0) arr.push(0);
-    return arr;
-  }
-
-  function generateColumn(){
-    const connected = wasConnected;
-    // density: 1 dot when disconnected, 2-3 when connected
-    const count = connected ? (2 + (Math.random() < 0.5 ? 0 : 1)) : 1;
-
-    // melodic walk: advance the base step up/down the pentatonic scale
-    melodyStep += melodyDir;
-    if (melodyStep >= PENTA_ROWS.length - 1){ melodyStep = PENTA_ROWS.length - 1; melodyDir = -1; }
-    if (melodyStep <= 0){ melodyStep = 0; melodyDir = 1; }
-    // occasionally jump for variety
-    if (Math.random() < 0.15){
-      melodyStep = Math.floor(Math.random() * PENTA_ROWS.length);
-    }
-
-    const rows = new Set();
-    rows.add(PENTA_ROWS[melodyStep]);
-    // add harmony notes (thirds/fifths within the pentatonic set)
-    while (rows.size < count && rows.size < PENTA_ROWS.length){
-      const offset = 1 + Math.floor(Math.random() * 2); // a third or fifth up
-      const idx = (melodyStep + offset) % PENTA_ROWS.length;
-      rows.add(PENTA_ROWS[idx]);
-    }
-    return [...rows];
-  }
 
   function resizeVisualizer(){
     const rect = visualizer.getBoundingClientRect();
@@ -280,67 +293,75 @@
     visualizer.height = visH * visDPR;
     vctx.setTransform(visDPR, 0, 0, visDPR, 0, 0);
 
-    const newCols = Math.max(1, Math.floor((visW + VIS_GAP) / VIS_CELL));
-    const newRows = Math.max(1, Math.floor((visH + VIS_GAP) / VIS_CELL));
-    if (newCols !== VIS_COLS || newRows !== VIS_ROWS){
-      VIS_COLS = newCols;
-      VIS_ROWS = newRows;
-      PENTA_ROWS = computePentaRows(VIS_ROWS);
-      melodyStep = Math.min(melodyStep, PENTA_ROWS.length - 1);
-      grid.length = 0;
-      for (let c = 0; c < VIS_COLS; c++){ grid.push(generateColumn()); }
-    }
-  }
-
-  function dotColors(){
-    const dark = document.documentElement.getAttribute('data-theme') === 'dark';
-    return {
-      active: currentAccent,
-      inactive: dark ? '#333333' : '#dddddd'
-    };
-  }
-
-  let lastStep = 0;
-  function stepInterval(){
-    return wasConnected ? 80 : 120; // ms per column (faster when connected)
+    VIS_COLS = Math.max(1, Math.floor((visW + VIS_GAP) / VIS_CELL));
+    VIS_ROWS = Math.max(1, Math.floor((visH + VIS_GAP) / VIS_CELL));
   }
 
   function renderVisualizer(t){
-    // advance the scroll on a musical clock
-    if (t - lastStep >= stepInterval()){
-      lastStep = t;
-      grid.shift();
-      grid.push(generateColumn());
-    }
-
     vctx.clearRect(0, 0, visW, visH);
-    const colors = dotColors();
-    // center the 40x8 grid in the canvas
-    const gridW = VIS_COLS * VIS_CELL - VIS_GAP;
-    const gridH = VIS_ROWS * VIS_CELL - VIS_GAP;
-    const x0 = Math.max(0, (visW - gridW) / 2);
-    const y0 = Math.max(0, (visH - gridH) / 2);
+    
+    const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    // Always use the chosen color for the active wave, connected or not
+    const activeColor = currentAccent;
+    const inactiveColor = dark ? '#222222' : '#eeeeee';
+    
+    // Compute waveform row indices
+    const waveRows = [];
+    const timeOff = t * 0.003;
+    const amplitude = wasConnected ? (VIS_ROWS / 2.5) : (VIS_ROWS / 8);
+    const frequency = wasConnected ? 0.3 : 0.1;
+    
+    for (let c = 0; c < VIS_COLS; c++) {
+      let y = VIS_ROWS / 2;
+      if (wasConnected) {
+        y += Math.sin(c * frequency + timeOff) * amplitude;
+        y += Math.sin(c * frequency * 1.5 - timeOff * 2) * (amplitude * 0.4);
+        y += Math.sin(c * frequency * 0.5 + timeOff * 0.8) * (amplitude * 0.2);
+      } else {
+        y += Math.sin(c * frequency + timeOff) * amplitude;
+      }
+      waveRows.push(Math.floor(y));
+    }
+    
+    const x0 = Math.max(0, (visW - (VIS_COLS * VIS_CELL - VIS_GAP)) / 2);
+    const y0 = Math.max(0, (visH - (VIS_ROWS * VIS_CELL - VIS_GAP)) / 2);
     const r = VIS_DOT / 2;
 
     for (let c = 0; c < VIS_COLS; c++){
-      const activeRows = grid[c] || [];
       const cx = x0 + c * VIS_CELL + r;
+      const activeRow = waveRows[c];
+      
       for (let row = 0; row < VIS_ROWS; row++){
-        const isActive = activeRows.indexOf(row) !== -1;
         const cy = y0 + row * VIS_CELL + r;
         vctx.beginPath();
         vctx.arc(cx, cy, r, 0, Math.PI * 2);
+        
+        // line thickness
+        const dist = Math.abs(row - activeRow);
+        const isActive = dist <= (wasConnected ? 1 : 0);
+        
         if (isActive){
-          vctx.fillStyle = colors.active;
-          vctx.globalAlpha = 1;
+          vctx.fillStyle = activeColor;
+          // Dimmer if disconnected, fully bright if connected
+          vctx.globalAlpha = (wasConnected ? 1 : 0.6) - (dist * 0.3);
+          
+          if (wasConnected) {
+            vctx.shadowBlur = 6;
+            vctx.shadowColor = activeColor;
+          } else {
+            vctx.shadowBlur = 2;
+            vctx.shadowColor = activeColor;
+          }
         } else {
-          vctx.fillStyle = colors.inactive;
+          vctx.fillStyle = inactiveColor;
           vctx.globalAlpha = 0.3;
+          vctx.shadowBlur = 0;
         }
         vctx.fill();
+        vctx.shadowBlur = 0;
       }
     }
-    vctx.globalAlpha = 1;
+
     requestAnimationFrame(renderVisualizer);
   }
 
@@ -355,6 +376,7 @@
   const inSelect = document.getElementById('midiInSelect');
   const outSelect = document.getElementById('midiOutSelect');
   const chanSelect = document.getElementById('midiChannel');
+  const devIdSelect = document.getElementById('deviceIdSelect');
   const connDot = document.getElementById('connDot');
   const connLabel = document.getElementById('connLabel');
 
@@ -367,6 +389,18 @@
     chanSelect.appendChild(opt);
   }
   chanSelect.value = 1;
+
+  for (let i = 1; i <= 16; i++){
+    const opt = document.createElement('option');
+    opt.value = i - 1;
+    opt.textContent = 'ID ' + i;
+    devIdSelect.appendChild(opt);
+  }
+  const optOmni = document.createElement('option');
+  optOmni.value = 16; // 0x10 is Omni in Virus SysEx
+  optOmni.textContent = 'Omni';
+  devIdSelect.appendChild(optOmni);
+  devIdSelect.value = 16; // Default to Omni
 
   function flashConnected(){
     connDot.classList.remove('pulse');
@@ -401,8 +435,107 @@
 
   function handleIncomingMidi(event) {
     const bytes = event.data;
+
+    // Ignora il Clock (F8) e Active Sensing (FE) per non intasare il debug
+    if (bytes[0] !== 0xF8 && bytes[0] !== 0xFE) {
+       const hexStr = Array.from(bytes).map(b => b.toString(16).padStart(2,'0').toUpperCase()).join(' ');
+       document.getElementById('midi-debug').textContent = 'MIDI: ' + hexStr;
+    }
+
+    // --- RICEZIONE CC (Control Change) ---
+    // 0xB0 a 0xBF (176-191) sono i messaggi CC per i canali MIDI da 1 a 16
+    if ((bytes[0] & 0xF0) === 0xB0 && bytes.length === 3) {
+      const ccNumber = bytes[1];
+      const ccValue = bytes[2];
+      const param = PARAMS.find(p => p.cc === ccNumber);
+      if (param) {
+        patch[param.id] = ccValue;
+        if (knobRefs[param.id]) knobRefs[param.id]._render();
+      }
+      return; // Finito con questo pacchetto (era un CC)
+    }
+
+    // --- RICEZIONE SYSEX (Dump e parametri estesi) ---
     if (bytes[0] === 0xF0 && bytes[bytes.length - 1] === 0xF7) {
-      // Intestazione SysEx Access Virus
+      
+      // Controllo se è un Single Dump (il file SysEx enorme del Virus)
+      if (bytes.length > 500 && bytes[6] === 0x10) {
+        if (window.multiFetchState && window.multiFetchState.active) {
+          // --- RAW DUMP CAPTURE FOR MULTI PRESET ---
+          window.multiFetchState.dumps[window.multiFetchState.currentPart] = Array.from(bytes);
+          document.getElementById('midi-debug').textContent = '🔥 MULTI FETCH: Part ' + (window.multiFetchState.currentPart + 1) + '/4 ricevuto...';
+          
+          window.multiFetchState.currentPart++;
+          if (window.multiFetchState.currentPart < 4) {
+            setTimeout(() => { requestDump(window.multiFetchState.currentPart); }, 50);
+          } else {
+            finishMultiFetch();
+          }
+          return;
+        }
+
+        if (window.bankFetchState && window.bankFetchState.active) {
+          // --- RAW DUMP CAPTURE FOR BANK FETCHER (READ OR CAPTURE) ---
+          let patchName = "";
+          for (let i = 249; i <= 258; i++) {
+            if (bytes[i] >= 32 && bytes[i] <= 126) patchName += String.fromCharCode(bytes[i]);
+          }
+          patchName = patchName.trim();
+          
+          const bState = window.bankFetchState;
+          const bank = bytes[7];
+          const patchNum = bytes[8];
+          
+          const finalName = patchName ? `${bState.bankName}-${patchNum.toString().padStart(3,'0')} ${patchName}` : `${bState.bankName}-${patchNum.toString().padStart(3,'0')} Empty`;
+          
+          if (bState.mode === 'capture') {
+            const lib = loadLibrary(); // Normal patch library
+            lib[finalName] = Array.from(bytes);
+            saveLibrary(lib);
+            document.getElementById('midi-debug').textContent = `🔥 BANK CAPTURE: Salvato ${finalName}... (${bState.readPatches.length + 1}/128)`;
+          } else {
+            // mode === 'read'
+            bState.readPatches.push(finalName);
+            document.getElementById('midi-debug').textContent = `🔥 BANK READ: Letto ${finalName}... (${bState.readPatches.length}/128)`;
+          }
+          
+          // Reset the global timeout since we are actively receiving patches
+          if (bState.timeoutId) clearTimeout(bState.timeoutId);
+          bState.timeoutId = setTimeout(() => {
+            document.getElementById('midi-debug').textContent = `⚠️ BANK: Timeout di ricezione dopo ${bState.readPatches.length} patches.`;
+            finishBankOperation();
+          }, 3000); // 3 seconds of silence means it's done or failed
+          
+          if (bState.readPatches.length >= 128) {
+             finishBankOperation();
+          }
+          return;
+        }
+
+        // --- RAW DUMP CAPTURE FOR LIBRARIAN ---
+        window.lastReceivedDump = new Uint8Array(bytes);
+
+        // HACKER MODE: Estraiamo il Cutoff (byte 49)
+        const cutoffValue = bytes[49];
+        // HACKER MODE: Estraiamo Resonance (byte 50)
+        const resValue = bytes[50];
+        
+        // HACKER MODE: Estraiamo il NOME DELLA PATCH (byte 249 a 258)
+        let patchName = "";
+        for (let i = 249; i <= 258; i++) {
+          if (bytes[i] >= 32 && bytes[i] <= 126) {
+            patchName += String.fromCharCode(bytes[i]);
+          }
+        }
+        document.getElementById('patchNameDisplay').textContent = 'virus ti snow // PATCH: ' + patchName.trim();
+        const pInput = document.getElementById('patchName');
+        if (pInput) pInput.value = patchName.trim();
+        
+        document.getElementById('midi-debug').textContent = '🔥 DUMP IMPORTATO: ' + patchName.trim() + ' (Cutoff=' + cutoffValue + ')';
+        return;
+      }
+
+      // Altri messaggi SysEx...
       if (bytes.length >= 7 &&
           bytes[1] === 0x00 && bytes[2] === 0x20 && bytes[3] === 0x33 && bytes[4] === 0x01) {
         
@@ -496,7 +629,7 @@
   // SysEx send
   // ---------------------------------------------------------------------
   function deviceId(){
-    return parseInt(chanSelect.value, 10) - 1; // 0-15
+    return parseInt(devIdSelect.value, 10); // 0-15 or 16 (Omni)
   }
 
   function buildSysEx(cc, value){
@@ -513,7 +646,14 @@
   function sendParam(param, value){
     if (selectedOutput){
       try{
-        selectedOutput.send(buildSysEx(param.cc, value));
+        if (param.cc !== undefined && param.cc < 120) {
+          // Send standard MIDI CC
+          const channel = parseInt(document.getElementById('midiChannel').value, 10) - 1;
+          selectedOutput.send(new Uint8Array([0xB0 | channel, param.cc, value & 0x7F]));
+        } else {
+          // Fallback to SysEx if no standard CC exists
+          selectedOutput.send(buildSysEx(param.cc, value));
+        }
       } catch(e){ console.error('MIDI send error', e); }
     }
   }
@@ -702,81 +842,117 @@
     });
   }
 
-  // ---------------------------------------------------------------------
-  // Build sections
-  // ---------------------------------------------------------------------
-  const knobRefs = {}; // id -> container element
-  const allKnobsInOrder = [];
+  const knobRefs = {};
 
-  function buildSections(){
-    const root = document.getElementById('sectionsContainer');
+  function buildSingleView(){
+    const root = document.getElementById('singleView');
     root.innerHTML = '';
-    SECTIONS.forEach(sec => {
-      const div = document.createElement('div');
-      div.className = 'section section-' + sec.key;
-      if (sec.title) {
-        const h2 = document.createElement('h2');
-        h2.textContent = sec.title;
-        div.appendChild(h2);
-      }
+    
+    const container = document.createElement('div');
+    container.className = 'multi-global';
+    container.style.flexDirection = 'column';
+    container.style.alignItems = 'flex-start';
+    container.style.gap = '16px';
+    
+    const title = document.createElement('h2');
+    title.textContent = 'single patch selection';
+    title.style.margin = '0';
+    container.appendChild(title);
+    
+    const desc = document.createElement('div');
+    desc.textContent = 'select bank and program to send a program change directly to the virus.';
+    desc.style.color = 'var(--fg)';
+    desc.style.opacity = '0.6';
+    container.appendChild(desc);
 
-      const knobs = document.createElement('div');
-      knobs.className = 'knobs';
+    const row = document.createElement('div');
+    row.className = 'lib-row';
+    row.style.justifyContent = 'flex-start';
+    row.style.gap = '16px';
 
-      PARAMS.filter(p => p.section === sec.key).forEach(param => {
-        const knob = createKnob(param);
-        knobRefs[param.id] = knob;
-        allKnobsInOrder.push(knob);
-        knobs.appendChild(knob);
-      });
-
-      div.appendChild(knobs);
-      root.appendChild(div);
+    const bankField = document.createElement('div');
+    bankField.className = 'field';
+    const bankLabel = document.createElement('label');
+    bankLabel.textContent = 'bank';
+    const bankSelect = document.createElement('select');
+    const banks = ['RAM 1','RAM 2','RAM 3','RAM 4','RAM 5','RAM 6','RAM 7','RAM 8','ROM 1','ROM 2','ROM 3','ROM 4','ROM 5','ROM 6','ROM 7','ROM 8'];
+    banks.forEach((b, i) => {
+      const opt = document.createElement('option');
+      opt.value = i;
+      opt.textContent = b;
+      bankSelect.appendChild(opt);
     });
+    bankField.appendChild(bankLabel);
+    bankField.appendChild(bankSelect);
 
-    // patch library section
-    const libSection = document.createElement('div');
-    libSection.className = 'section section-lib';
-    const libTitle = document.createElement('h2');
-    libTitle.textContent = 'patch library';
-    libSection.appendChild(libTitle);
+    const prgField = document.createElement('div');
+    prgField.className = 'field';
+    const prgLabel = document.createElement('label');
+    prgLabel.textContent = 'program';
+    const prgInput = document.createElement('input');
+    prgInput.type = 'number';
+    prgInput.min = 0;
+    prgInput.max = 127;
+    prgInput.value = 0;
+    prgInput.style.width = '60px';
+    prgInput.style.background = 'transparent';
+    prgInput.style.color = 'var(--fg)';
+    prgInput.style.border = 'none';
+    prgInput.style.borderBottom = '1px solid var(--border)';
+    prgInput.style.fontFamily = 'inherit';
+    prgInput.style.fontSize = '11px';
+    prgInput.style.padding = '2px 0';
+    prgInput.style.outline = 'none';
+    prgField.appendChild(prgLabel);
+    prgField.appendChild(prgInput);
 
-    const libRow = document.createElement('div');
-    libRow.className = 'lib-row';
-    const nameInput = document.createElement('input');
-    nameInput.type = 'text';
-    nameInput.id = 'patchName';
-    nameInput.placeholder = 'patch name';
-    const saveBtn = document.createElement('button');
-    saveBtn.id = 'btnSavePatch';
-    saveBtn.textContent = 'save';
-    libRow.appendChild(nameInput);
-    libRow.appendChild(saveBtn);
-    libSection.appendChild(libRow);
-
-    const libList = document.createElement('div');
-    libList.className = 'lib-list';
-    libList.id = 'libList';
-    libSection.appendChild(libList);
-
-    root.appendChild(libSection);
-
-    saveBtn.addEventListener('click', () => {
-      const name = nameInput.value.trim();
-      if (!name){
-        alert('enter a patch name');
+    const btnSend = document.createElement('button');
+    btnSend.textContent = 'send program change';
+    btnSend.style.marginTop = '14px'; // align with inputs
+    btnSend.addEventListener('click', () => {
+      if (!selectedOutput) {
+        alert('MIDI Output non connesso!');
         return;
       }
-      const lib = loadLibrary();
-      lib[name] = { ...patch };
-      saveLibrary(lib);
-      nameInput.value = '';
-      renderLibrary();
+      const b = parseInt(bankSelect.value, 10);
+      const p = parseInt(prgInput.value, 10);
+      try {
+        selectedOutput.send([0xB0, 0x00, 0x00]); // CC 0 (MSB)
+        selectedOutput.send([0xB0, 0x20, b]);    // CC 32 (LSB)
+        selectedOutput.send([0xC0, p]);          // Program Change
+      } catch(e) {
+        console.error('MIDI send error', e);
+      }
     });
+
+    row.appendChild(bankField);
+    row.appendChild(prgField);
+    row.appendChild(btnSend);
+
+    container.appendChild(row);
+
+    root.appendChild(container);
+
+    // Initialize the big macro knobs (Cutoff & Resonance) and put them in the header
+    const macroKnobs = document.getElementById('globalMacroKnobs');
+    macroKnobs.innerHTML = '';
+    const cutParam = PARAMS.find(p => p.id === 'f1_cutoff');
+    const resParam = PARAMS.find(p => p.id === 'f1_resonance');
+    
+    if (cutParam && resParam) {
+      const cutKnob = createKnob(cutParam);
+      const resKnob = createKnob(resParam);
+      knobRefs[cutParam.id] = cutKnob;
+      knobRefs[resParam.id] = resKnob;
+      macroKnobs.appendChild(cutKnob);
+      macroKnobs.appendChild(resKnob);
+    }
   }
 
   function refreshAllKnobs(){
-    PARAMS.forEach(p => knobRefs[p.id]._render());
+    PARAMS.forEach(p => {
+      if(knobRefs[p.id]) knobRefs[p.id]._render();
+    });
   }
 
   function applyPatchObject(p, send){
@@ -788,74 +964,214 @@
     if (send) sendFullPatch(patch);
   }
 
-  // smoothly animate every knob's indicator with the same transition
-  function animateAllKnobs(duration){
-    allKnobsInOrder.forEach(knob => {
-      const indicator = knob.querySelector('.knob-indicator');
-      indicator.style.transition = `transform ${duration}ms ease-in-out`;
-    });
-    setTimeout(() => {
-      allKnobsInOrder.forEach(knob => {
-        knob.querySelector('.knob-indicator').style.transition = '';
-      });
-    }, duration + 50);
+  // ---------------------------------------------------------------------
+  // Raw Dump Library Logic
+  // ---------------------------------------------------------------------
+
+  function loadMultiLibrary(){
+    try{
+      return JSON.parse(localStorage.getItem(MULTI_LIB_KEY)) || {};
+    } catch(e){ return {}; }
   }
 
-  // animate knobs in a left-to-right cascade (used by randomize)
-  function animateCascade(stepDuration, stagger){
-    allKnobsInOrder.forEach((knob, i) => {
-      const indicator = knob.querySelector('.knob-indicator');
-      indicator.style.transition = `transform ${stepDuration}ms ease-out`;
-      indicator.style.transitionDelay = (i * stagger) + 'ms';
-    });
-    const total = stepDuration + allKnobsInOrder.length * stagger + 50;
-    setTimeout(() => {
-      allKnobsInOrder.forEach(knob => {
-        const indicator = knob.querySelector('.knob-indicator');
-        indicator.style.transition = '';
-        indicator.style.transitionDelay = '';
+  function saveMultiLibrary(lib){
+    localStorage.setItem(MULTI_LIB_KEY, JSON.stringify(lib));
+  }
+
+  window.multiFetchState = null;
+  function finishBankOperation() {
+    const bState = window.bankFetchState;
+    if (!bState) return;
+    
+    if (bState.timeoutId) {
+      clearTimeout(bState.timeoutId);
+    }
+    
+    const count = bState.mode === 'read' ? bState.readPatches.length : loadLibraryCount(bState.bankName);
+
+    if (bState.mode === 'capture') {
+      if (count === 0) {
+        document.getElementById('midi-debug').innerHTML = `<span style="color:#f00;">❌ ERRORE: Nessuna patch ricevuta (SysEx bloccato).</span>`;
+      } else {
+        document.getElementById('midi-debug').innerHTML = `<span style="color:#0f0;">✅ BANK CAPTURE: ${bState.bankName} Completato! (${count}/128)</span>`;
+      }
+      updateBrowserView();
+    } else if (bState.mode === 'read') {
+      if (count === 0) {
+        document.getElementById('midi-debug').innerHTML = `<span style="color:#f00;">❌ ERRORE: Nessuna patch ricevuta. SysEx OUT bloccato dal Fantom.</span>`;
+      } else {
+        document.getElementById('midi-debug').innerHTML = `<span style="color:#0f0;">✅ BANK READ: ${bState.bankName} Completato! (${count}/128)</span>`;
+        console.log("Patches lette:", bState.readPatches);
+      }
+    }
+    
+    window.bankFetchState.active = false;
+    window.bankFetchState = null;
+  }
+
+  function requestBankPatch(bankIndex, patchIndex) {
+    if (!selectedOutput) return;
+    try {
+      selectedOutput.send(new Uint8Array([
+        ...SYSEX_PREFIX, deviceId(), 0x00, bankIndex & 0x7F, patchIndex & 0x7F, 0xF7
+      ]));
+    } catch (e) { console.error('Bank dump request error', e); }
+  }
+
+  function requestFullBank(bankIndex) {
+    if (!selectedOutput) return;
+    try {
+      // 0x04 = Bank Print Request
+      selectedOutput.send(new Uint8Array([
+        ...SYSEX_PREFIX, deviceId(), 0x04, bankIndex & 0x7F, 0xF7
+      ]));
+    } catch (e) { console.error('Full Bank dump request error', e); }
+  }
+
+  function requestDump(partIndex) {
+    if (!selectedOutput) return;
+    try {
+      // 0x40 = Edit Buffer, partIndex = 0..3 (Part 1..4)
+      selectedOutput.send(new Uint8Array([
+        ...SYSEX_PREFIX, deviceId(), 0x00, 0x40, partIndex & 0x7F, 0xF7
+      ]));
+    } catch (e) { console.error('Dump request error', e); }
+  }
+
+  function finishMultiFetch() {
+    const lib = loadMultiLibrary();
+    const preset = {
+      name: window.multiFetchState.name,
+      parts: []
+    };
+    for (let i = 0; i < NUM_PARTS; i++) {
+      preset.parts.push({
+        enabled: multiParts[i].enabled,
+        values: JSON.parse(JSON.stringify(multiParts[i].values)), // deep copy mixer params
+        dump: window.multiFetchState.dumps[i] // The raw bytes array for this part
       });
-    }, total);
+    }
+    lib[window.multiFetchState.name] = preset;
+    saveMultiLibrary(lib);
+    window.multiFetchState = null;
+    document.getElementById('midi-debug').textContent = '✅ MULTI PRESET SAVED!';
+    document.getElementById('multiName').value = '';
+    renderMultiLibrary();
+  }
+
+  function renderMultiLibrary(){
+    const lib = loadMultiLibrary();
+    const list = document.getElementById('multiLibList');
+    list.innerHTML = '';
+    const names = Object.keys(lib).sort();
+    if (names.length === 0){
+      const empty = document.createElement('div');
+      empty.className = 'small';
+      empty.textContent = 'no multi presets saved';
+      list.appendChild(empty);
+      return;
+    }
+    names.forEach(name => {
+      const item = document.createElement('div');
+      item.className = 'lib-item';
+
+      const nameEl = document.createElement('span');
+      nameEl.className = 'name';
+      nameEl.textContent = name;
+
+      const btns = document.createElement('div');
+      btns.className = 'btns';
+
+      const loadBtn = document.createElement('button');
+      loadBtn.textContent = 'load';
+      loadBtn.addEventListener('click', () => {
+        const preset = lib[name];
+        for (let i = 0; i < NUM_PARTS; i++) {
+          const pData = preset.parts[i];
+          multiParts[i].enabled = pData.enabled;
+          multiParts[i].values = JSON.parse(JSON.stringify(pData.values));
+          
+          // Invia parametri Mixer (Volume, Pan, Output, ecc.)
+          sendMultiPartParam(i, 39, pData.values.volume);
+          setTimeout(() => sendMultiPartParam(i, 40, pData.values.pan), 10);
+          setTimeout(() => sendMultiPartParam(i, 34, pData.values.channel), 20);
+          setTimeout(() => sendMultiPartParam(i, 37, pData.values.transpose), 30);
+          setTimeout(() => sendMultiPartParam(i, 38, pData.values.detune), 40);
+          setTimeout(() => sendMultiPartParam(i, 41, pData.values.output), 50);
+          setTimeout(() => sendMultiPartParam(i, 35, pData.values.lowkey), 60);
+          setTimeout(() => sendMultiPartParam(i, 36, pData.values.highkey), 70);
+          
+          // Invia il Dump SysEx al sintetizzatore (Patch)
+          if (pData.dump && pData.dump.length > 500) {
+            setTimeout(() => {
+              loadPatchToPart(pData.dump, i);
+            }, 100 + (i * 50)); // stagger the heavy sysex dumps
+          }
+        }
+        buildMultiView(); // Ridisegna la UI per mostrare i nuovi valori
+      });
+
+      const delBtn = document.createElement('button');
+      delBtn.className = 'delete';
+      delBtn.textContent = 'x';
+      delBtn.addEventListener('click', () => {
+        if (confirm('Delete multi preset?')){
+          delete lib[name];
+          saveMultiLibrary(lib);
+          renderMultiLibrary();
+        }
+      });
+
+      btns.appendChild(loadBtn);
+      btns.appendChild(delBtn);
+      item.appendChild(nameEl);
+      item.appendChild(btns);
+      list.appendChild(item);
+    });
+  }
+
+  function loadPatchToPart(rawBytesArray, partIndex) {
+    if (!selectedOutput) return;
+    const dump = new Uint8Array(rawBytesArray);
+    // Byte 5 is the Device ID which routes the dump to a specific part!
+    dump[5] = partIndex & 0x7F; 
+    
+    try {
+      selectedOutput.send(dump);
+      
+      // Update UI Cutoff/Res if available in dump
+      if (dump.length > 50) {
+        multiParts[partIndex].sound['f1_cutoff'] = dump[49];
+        multiParts[partIndex].sound['f1_resonance'] = dump[50];
+        // Note: The knob rendering updates automatically when rotating, 
+        // but to force visual update we'd ideally trigger a render.
+      }
+
+      // Update Part Name
+      let patchName = "";
+      for (let i = 249; i <= 258 && i < dump.length; i++) {
+        if (dump[i] >= 32 && dump[i] <= 126) {
+          patchName += String.fromCharCode(dump[i]);
+        }
+      }
+      multiParts[partIndex].name = patchName.trim();
+      if (partDisplays[partIndex] && partDisplays[partIndex]._startReveal) {
+        partDisplays[partIndex]._startReveal();
+      }
+
+    } catch(e) {
+      console.error('MIDI send dump error', e);
+    }
   }
 
   // ---------------------------------------------------------------------
-  // Buttons: Randomize / Init
+  // Export / Import .syx (Single Dump)
   // ---------------------------------------------------------------------
-  document.getElementById('btnRandomize').addEventListener('click', () => {
-    animateCascade(150, 30);
-    const newPatch = {};
-    PARAMS.forEach(p => { newPatch[p.id] = Math.floor(Math.random() * 128); });
-    applyPatchObject(newPatch, true);
-  });
-
-  document.getElementById('btnInit').addEventListener('click', () => {
-    animateAllKnobs(300);
-    const newPatch = {};
-    PARAMS.forEach(p => { newPatch[p.id] = p.default; });
-    applyPatchObject(newPatch, true);
-  });
-
-  // ---------------------------------------------------------------------
-  // Export / Import .syx
-  // ---------------------------------------------------------------------
-  document.getElementById('btnExport').addEventListener('click', () => {
-    const bytes = [];
-    PARAMS.forEach(param => {
-      bytes.push(...buildSysEx(param.cc, patch[param.id]));
-    });
-    const blob = new Blob([new Uint8Array(bytes)], { type: 'application/octet-stream' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'virus_ti_patch.syx';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  });
-
-  const fileInput = document.getElementById('fileInput');
-  document.getElementById('btnImport').addEventListener('click', () => fileInput.click());
+  const fileInput = document.createElement('input');
+  fileInput.type = 'file';
+  fileInput.accept = '.syx';
+  fileInput.style.display = 'none';
+  document.body.appendChild(fileInput);
 
   fileInput.addEventListener('change', (e) => {
     const file = e.target.files[0];
@@ -863,35 +1179,24 @@
     const reader = new FileReader();
     reader.onload = () => {
       const bytes = new Uint8Array(reader.result);
-      const newPatch = {};
-      let i = 0;
-      while (i < bytes.length){
-        if (bytes[i] === 0xF0){
-          // find matching F7
-          let j = i + 1;
-          while (j < bytes.length && bytes[j] !== 0xF7) j++;
-          if (j < bytes.length){
-            const msg = bytes.slice(i, j + 1);
-            // Expect: F0 00 20 33 01 [DeviceID] 01 [param] [value] F7
-            if (msg.length === 10 &&
-                msg[1] === 0x00 && msg[2] === 0x20 && msg[3] === 0x33 &&
-                msg[4] === 0x01 && msg[6] === 0x01){
-              const cc = msg[7];
-              const value = msg[8];
-              const param = PARAMS.find(p => p.cc === cc);
-              if (param) newPatch[param.id] = value;
-            }
-            i = j + 1;
-            continue;
-          }
+      if (bytes.length > 500 && bytes[0] === 0xF0 && bytes[bytes.length-1] === 0xF7) {
+        window.lastReceivedDump = bytes;
+        
+        // Extract name
+        let patchName = "";
+        for (let i = 249; i <= 258 && i < bytes.length; i++) {
+          if (bytes[i] >= 32 && bytes[i] <= 126) patchName += String.fromCharCode(bytes[i]);
         }
-        i++;
+        document.getElementById('patchNameDisplay').textContent = 'virus ti snow // PATCH DUMP LOADED: ' + patchName.trim();
+        const pInput = document.getElementById('patchName');
+        if (pInput) pInput.value = patchName.trim();
+        alert('SysEx loaded successfully. You can now save it to the library.');
+      } else {
+        alert('Invalid or unsupported SysEx file.');
       }
-      animateAllKnobs(300);
-      applyPatchObject(newPatch, true);
     };
     reader.readAsArrayBuffer(file);
-    fileInput.value = '';
+    e.target.value = '';
   });
 
   // ---------------------------------------------------------------------
@@ -930,12 +1235,19 @@
       const btns = document.createElement('div');
       btns.className = 'btns';
 
-      const loadBtn = document.createElement('button');
-      loadBtn.textContent = 'load';
-      loadBtn.addEventListener('click', () => {
-        animateAllKnobs(300);
-        applyPatchObject(lib[name], true);
-      });
+      const loadLabel = document.createElement('span');
+      loadLabel.className = 'small';
+      loadLabel.textContent = 'load to: ';
+      btns.appendChild(loadLabel);
+
+      for(let i=0; i<4; i++){
+        const btn = document.createElement('button');
+        btn.textContent = 'P' + (i+1);
+        btn.addEventListener('click', () => {
+          loadPatchToPart(lib[name], i);
+        });
+        btns.appendChild(btn);
+      }
 
       const delBtn = document.createElement('button');
       delBtn.textContent = 'delete';
@@ -947,7 +1259,7 @@
         }
       });
 
-      btns.appendChild(loadBtn);
+      btns.appendChild(loadLabel);
       btns.appendChild(delBtn);
       item.appendChild(nameEl);
       item.appendChild(btns);
@@ -1063,7 +1375,7 @@
     function render(){
       if (w <= 0 || h <= 0) return;
       ctx.clearRect(0, 0, w, h);
-      const colors = dotColors();
+      const colors = { active: currentAccent, inactive: '#666' };
 
       // background dot grid
       const cols = Math.floor((w + GAP) / CELL);
@@ -1270,49 +1582,21 @@
       sendMultiPartParam(index, 41, v);
     }));
 
-    // expanded per-part sound editor
-    const editor = document.createElement('div');
-    editor.className = 'part-editor hidden';
+    // cutoff knob
+    const cutKnob = createPartSoundKnob(index, PARAMS.find(p => p.id === 'f1_cutoff'));
+    cutKnob.classList.add('cut-knob');
+    main.appendChild(cutKnob);
 
-    const editorRow = document.createElement('div');
-    editorRow.className = 'part-editor-row';
-    SECTIONS.forEach(sec => {
-      const sub = document.createElement('div');
-      sub.className = 'subsection section-' + sec.key;
-      if (sec.title) {
-        const h3 = document.createElement('h3');
-        h3.textContent = sec.title;
-        sub.appendChild(h3);
-      }
-
-      const knobs = document.createElement('div');
-      knobs.className = 'knobs';
-      PARAMS.filter(p => p.section === sec.key).forEach(param => {
-        knobs.appendChild(createPartSoundKnob(index, param));
-      });
-      sub.appendChild(knobs);
-      editorRow.appendChild(sub);
-    });
-    editor.appendChild(editorRow);
-
-    const editBtn = document.createElement('button');
-    editBtn.className = 'edit-btn';
-    editBtn.textContent = 'edit';
-    function setEditorOpen(open){
-      editor.classList.toggle('hidden', !open);
-      editBtn.textContent = open ? 'close' : 'edit';
-    }
-    editBtn.addEventListener('click', () => {
-      setEditorOpen(editor.classList.contains('hidden'));
-    });
-    main.appendChild(editBtn);
+    // resonance knob
+    const resKnob = createPartSoundKnob(index, PARAMS.find(p => p.id === 'f1_resonance'));
+    resKnob.classList.add('res-knob');
+    main.appendChild(resKnob);
 
     const display = createPartDisplay(index);
     main.appendChild(display);
     partDisplays.push(display);
 
     row.appendChild(main);
-    row.appendChild(editor);
     return row;
   }
 
@@ -1352,27 +1636,103 @@
     }
   });
 
-  // single | multi tab switching
-  const tabSingle = document.getElementById('tabSingle');
-  const tabMulti = document.getElementById('tabMulti');
-  const singleView = document.getElementById('singleView');
-  const multiView = document.getElementById('multiView');
-
-  function setMode(mode){
-    const isMulti = mode === 'multi';
-    tabMulti.classList.toggle('active', isMulti);
-    tabSingle.classList.toggle('active', !isMulti);
-    multiView.classList.toggle('hidden', !isMulti);
-    singleView.classList.toggle('hidden', isMulti);
-  }
-
-  tabSingle.addEventListener('click', () => setMode('single'));
-  tabMulti.addEventListener('click', () => setMode('multi'));
-
   // ---------------------------------------------------------------------
   // Init
   // ---------------------------------------------------------------------
-  buildSections();
+  document.getElementById('btnSavePatch').addEventListener('click', () => {
+    const nameInput = document.getElementById('patchName');
+    const name = nameInput.value.trim();
+    if (!name){
+      alert('enter a patch name');
+      return;
+    }
+    if (!window.lastReceivedDump) {
+      alert('Nessun Dump ricevuto! Invia prima un Single Dump dal synth premendo STORE.');
+      return;
+    }
+    const lib = loadLibrary();
+    lib[name] = Array.from(window.lastReceivedDump); // Save the raw array of bytes!
+    saveLibrary(lib);
+    nameInput.value = '';
+    renderLibrary();
+  });
+
+  document.getElementById('btnSaveMulti').addEventListener('click', () => {
+    const nameInput = document.getElementById('multiName');
+    const name = nameInput.value.trim();
+    if (!name){
+      alert('enter a multi preset name');
+      return;
+    }
+    if (!selectedOutput) {
+      alert('MIDI Output non connesso!');
+      return;
+    }
+    document.getElementById('midi-debug').textContent = '🔥 MULTI FETCH: Richiesta Part 1...';
+    window.multiFetchState = {
+      active: true,
+      currentPart: 0,
+      name: name,
+      dumps: []
+    };
+    requestDump(0);
+  });
+
+  function startBankOperation(mode) {
+    if (!selectedOutput) {
+      alert('MIDI Output non connesso!');
+      return;
+    }
+    const type = document.getElementById('bankTypeSelect').value;
+    const num = parseInt(document.getElementById('bankNumSelect').value, 10);
+    const bankIndex = (type === 'RAM' ? 0 : 8) + (num - 1);
+    const bankName = `${type} ${num}`;
+    
+    const msg = mode === 'capture' 
+      ? `Vuoi estrarre e SALVARE nella libreria tutte le 128 patch dal banco ${bankName}?`
+      : `Vuoi LEGGERE tutte le 128 patch dal banco ${bankName} senza salvarle?`;
+
+    if (confirm(msg)) {
+      document.getElementById('midi-debug').textContent = `🔥 BANK ${mode.toUpperCase()}: Richiesta ${bankName} patch 1/128...`;
+      if (mode === 'read') {
+         document.getElementById('synthBankList').innerHTML = '<div style="color: #00ffff; font-size: 12px; text-align: center; padding: 16px;">lettura in corso...</div>';
+      }
+      window.bankFetchState = {
+        active: true,
+        mode: mode,
+        bankIndex: bankIndex,
+        bankName: bankName,
+        readPatches: [],
+        timeoutId: null
+      };
+      
+      // Request the FULL bank at once (Command 0x04)
+      requestFullBank(bankIndex);
+      
+      // If we receive absolutely nothing for 3 seconds, we timeout the whole operation
+      window.bankFetchState.timeoutId = setTimeout(() => {
+        const bState = window.bankFetchState;
+        if (bState && bState.active) {
+          document.getElementById('midi-debug').textContent = `⚠️ BANK: Il synth non ha risposto. SysEx bloccato.`;
+          finishBankOperation();
+        }
+      }, 3000);
+    }
+  }
+
+  document.getElementById('btnReadBank').addEventListener('click', () => {
+    startBankOperation('read');
+  });
+
+  document.getElementById('btnFetchBank').addEventListener('click', () => {
+    startBankOperation('capture');
+  });
+
   renderLibrary();
+  renderMultiLibrary();
+  buildSingleView();
   buildMultiView();
+  // Hide library section by default
+  document.querySelector('.section-lib').style.display = 'none';
 })();
+</script>
