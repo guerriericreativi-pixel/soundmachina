@@ -1659,11 +1659,6 @@
               document.getElementById('midi-debug').textContent = `⚠️ BANK: Timeout di ricezione dopo ${bState.readPatches.length} patches.`;
               finishBankOperation();
             }, 3000);
-            
-            // Request next patch
-            setTimeout(() => { 
-              requestBankPatch(bState.bankIndex, bState.readPatches.length); 
-            }, 50);
           } else {
              finishBankOperation();
           }
@@ -2285,7 +2280,7 @@
     try {
       // 0x32 = Bank Dump Request
       selectedOutput.send(new Uint8Array([
-        ...SYSEX_PREFIX, deviceId(), 0x04, bankIndex & 0x7F, 0xF7
+        ...SYSEX_PREFIX, deviceId(), 0x32, bankIndex & 0x7F, 0xF7
       ]));
     } catch (e) { console.error('Full Bank dump request error', e); }
   }
@@ -2969,8 +2964,8 @@
         timeoutId: null
       };
       
-      // Request the first patch (Command 0x00)
-      requestBankPatch(bankIndex, 0);
+      // Request the full bank (Command 0x32)
+      requestFullBank(bankIndex);
       
       // If we receive absolutely nothing for 3 seconds, we timeout the whole operation
       window.bankFetchState.timeoutId = setTimeout(() => {
