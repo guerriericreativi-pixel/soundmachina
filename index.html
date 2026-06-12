@@ -557,11 +557,6 @@
     .section{
       display: flex;
       flex-direction: column;
-      height: 100%;
-    }
-    .section .knobs{
-      flex: 1 1 auto;
-      align-content: center;
     }
     .section-osc .knobs{
       flex-wrap: nowrap;
@@ -1145,19 +1140,25 @@
 
   document.getElementById('btnTabSynth').addEventListener('click', () => {
     hideAllViews();
-    document.getElementById('singleView').style.display = 'block';
+    const v = document.getElementById('singleView');
+    v.style.display = 'flex';
+    v.style.flexDirection = 'column';
     document.getElementById('btnTabSynth').classList.add('active');
   });
 
   document.getElementById('btnTabMultipart').addEventListener('click', () => {
     hideAllViews();
-    document.getElementById('multiView').style.display = 'flex';
+    const v = document.getElementById('multiView');
+    v.style.display = 'flex';
+    v.style.flexDirection = 'column';
     document.getElementById('btnTabMultipart').classList.add('active');
   });
 
   document.getElementById('btnTabPatchManager').addEventListener('click', () => {
     hideAllViews();
-    document.getElementById('patchManagerContent').style.display = 'block';
+    const v = document.getElementById('patchManagerContent');
+    v.style.display = 'flex';
+    v.style.flexDirection = 'column';
     document.getElementById('btnTabPatchManager').classList.add('active');
   });
 
