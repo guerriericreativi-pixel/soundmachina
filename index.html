@@ -23,13 +23,15 @@
   *{
     box-sizing: border-box;
   }
-  html, body{
-    height: 100dvh;
+  html {
+    height: 100%;
+    overflow: hidden;
+  }
+  body {
+    height: 100%;
     overflow: hidden;
     display: flex;
     flex-direction: column;
-  }
-  body{
     margin: 0;
     background-color: var(--bg);
     background-image: radial-gradient(circle, var(--dot-color) 1px, transparent 1.5px);
@@ -601,7 +603,7 @@
   #singleView,
   #arpContent,
   #sequencerContent {
-    flex: 1 1 auto;
+    flex: 1 1 0;
     overflow-y: auto;
     min-height: 0;
     padding-bottom: 20px;
