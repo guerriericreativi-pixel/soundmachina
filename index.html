@@ -1647,18 +1647,24 @@
             document.getElementById('midi-debug').textContent = `🔥 BANK CAPTURE: Salvato ${finalName}... (${bState.readPatches.length + 1}/128)`;
           } else {
             // mode === 'read'
-            bState.readPatches.push(finalName);
-            document.getElementById('midi-debug').textContent = `🔥 BANK READ: Letto ${finalName}... (${bState.readPatches.length}/128)`;
+            document.getElementById('midi-debug').textContent = `🔥 BANK READ: Letto ${finalName}... (${bState.readPatches.length + 1}/128)`;
           }
+          bState.readPatches.push(finalName);
           
           // Reset the global timeout since we are actively receiving patches
           if (bState.timeoutId) clearTimeout(bState.timeoutId);
-          bState.timeoutId = setTimeout(() => {
-            document.getElementById('midi-debug').textContent = `⚠️ BANK: Timeout di ricezione dopo ${bState.readPatches.length} patches.`;
-            finishBankOperation();
-          }, 3000); // 3 seconds of silence means it's done or failed
-          
-          if (bState.readPatches.length >= 128) {
+
+          if (bState.readPatches.length < 128) {
+            bState.timeoutId = setTimeout(() => {
+              document.getElementById('midi-debug').textContent = `⚠️ BANK: Timeout di ricezione dopo ${bState.readPatches.length} patches.`;
+              finishBankOperation();
+            }, 3000);
+            
+            // Request next patch
+            setTimeout(() => { 
+              requestBankPatch(bState.bankIndex, bState.readPatches.length); 
+            }, 50);
+          } else {
              finishBankOperation();
           }
           return;
@@ -2961,14 +2967,14 @@
         timeoutId: null
       };
       
-      // Request the FULL bank at once (Command 0x04)
-      requestFullBank(bankIndex);
+      // Request the first patch (Command 0x00)
+      requestBankPatch(bankIndex, 0);
       
       // If we receive absolutely nothing for 3 seconds, we timeout the whole operation
       window.bankFetchState.timeoutId = setTimeout(() => {
         const bState = window.bankFetchState;
         if (bState && bState.active) {
-          document.getElementById('midi-debug').textContent = `⚠️ BANK: Il synth non ha risposto. SysEx bloccato.`;
+          document.getElementById('midi-debug').innerHTML = `<span style="color:#f00;">❌ ERRORE: Nessuna patch ricevuta. Verifica la connessione MIDI.</span>`;
           finishBankOperation();
         }
       }, 3000);
