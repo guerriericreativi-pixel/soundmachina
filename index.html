@@ -1675,18 +1675,30 @@
           
           const bState = window.bankFetchState;
           
-          // Forza la numerazione in base all'ordine di arrivo (0-127) per i banchi completi
-          const patchNum = bState.readPatches.length;
+          // Calcola a quale banco appartiene questa patch
+          const totalReceived = bState.readPatches.length;
+          const patchNum = totalReceived % 128;
+          let currentBankName = bState.bankName;
           
-          const finalName = patchName ? `${bState.bankName}-${patchNum.toString().padStart(3,'0')} ${patchName}` : `${bState.bankName}-${patchNum.toString().padStart(3,'0')} Empty`;
+          const bankOffset = Math.floor(totalReceived / 128);
+          if (bankOffset > 0) {
+            const match = bState.bankName.match(/^([A-Z]+)\s+(\d+)$/i);
+            if (match) {
+              const prefix = match[1];
+              const num = parseInt(match[2], 10);
+              currentBankName = `${prefix} ${num + bankOffset}`;
+            }
+          }
+          
+          const finalName = patchName ? `${currentBankName}-${patchNum.toString().padStart(3,'0')} ${patchName}` : `${currentBankName}-${patchNum.toString().padStart(3,'0')} Empty`;
           
           if (bState.mode === 'capture') {
             const lib = loadLibrary();
             lib[finalName] = Array.from(msgBytes);
             saveLibrary(lib);
-            document.getElementById('midi-debug').textContent = `🔥 BANK CAPTURE: Salvato ${finalName}... (${bState.readPatches.length + 1}/128)`;
+            document.getElementById('midi-debug').textContent = `🔥 BANK CAPTURE: Salvato ${finalName}... (${totalReceived + 1} ricevute)`;
           } else {
-            document.getElementById('midi-debug').textContent = `🔥 BANK READ: Letto ${finalName}... (${bState.readPatches.length + 1}/128)`;
+            document.getElementById('midi-debug').textContent = `🔥 BANK READ: Letto ${finalName}... (${totalReceived + 1} ricevute)`;
           }
           
           if (!bState.readPatches.includes(finalName)) {
@@ -1695,14 +1707,10 @@
           
           if (bState.timeoutId) clearTimeout(bState.timeoutId);
 
-          if (bState.readPatches.length < 128) {
-            bState.timeoutId = setTimeout(() => {
-              document.getElementById('midi-debug').textContent = `⚠️ BANK: Timeout di ricezione dopo ${bState.readPatches.length} patches.`;
-              finishBankOperation();
-            }, 3000);
-          } else {
+          // Continua a ricevere fino a quando il Virus non smette di trasmettere (timeout di 3 secondi)
+          bState.timeoutId = setTimeout(() => {
              finishBankOperation();
-          }
+          }, 3000);
           continue;
         }
 
@@ -2282,14 +2290,14 @@
       if (count === 0) {
         document.getElementById('midi-debug').innerHTML = `<span style="color:#f00;">❌ ERRORE: Nessuna patch ricevuta (SysEx bloccato).</span>`;
       } else {
-        document.getElementById('midi-debug').innerHTML = `<span style="color:#0f0;">✅ BANK CAPTURE: ${bState.bankName} Completato! (${count}/128)</span>`;
+        document.getElementById('midi-debug').innerHTML = `<span style="color:#0f0;">✅ BANK CAPTURE: Completato! (${count} patch ricevute)</span>`;
       }
       updateBrowserView();
     } else if (bState.mode === 'read') {
       if (count === 0) {
         document.getElementById('midi-debug').innerHTML = `<span style="color:#f00;">❌ ERRORE: Nessuna patch ricevuta. Verifica la connessione MIDI.</span>`;
       } else {
-        document.getElementById('midi-debug').innerHTML = `<span style="color:#0f0;">✅ BANK READ: ${bState.bankName} Completato! (${count}/128)</span>`;
+        document.getElementById('midi-debug').innerHTML = `<span style="color:#0f0;">✅ BANK READ: Completato! (${count} patch ricevute)</span>`;
         console.log("Patches lette:", bState.readPatches);
       }
     }
