@@ -844,6 +844,15 @@
   <button class="mode-tab" id="btnToggleBrowser" style="background: var(--section-bg); border-color: var(--accent); color: var(--accent);">browser</button>
 </div>
 
+<div class="section section-lib" style="display: none;">
+  <h2>patch library</h2>
+  <div class="lib-row">
+    <input type="text" id="patchName" placeholder="patch name">
+    <button id="btnSavePatch">save dump</button>
+  </div>
+  <div class="lib-list" id="libList"></div>
+</div>
+
 <div id="multiView">
   <div class="multi-global">
     <div class="field">
@@ -1628,90 +1637,6 @@
   }
 
   // ---------------------------------------------------------------------
-  // Build sections
-  // ---------------------------------------------------------------------
-  const knobRefs = {}; // id -> container element
-  const allKnobsInOrder = [];
-
-  function buildSections(){
-    const root = document.getElementById('sectionsContainer');
-    root.innerHTML = '';
-    SECTIONS.forEach(sec => {
-      const div = document.createElement('div');
-      div.className = 'section section-' + sec.key;
-      if (sec.title) {
-        const h2 = document.createElement('h2');
-        h2.textContent = sec.title;
-        div.appendChild(h2);
-      }
-
-      const knobs = document.createElement('div');
-      knobs.className = 'knobs';
-
-      PARAMS.filter(p => p.section === sec.key).forEach(param => {
-        const knob = createKnob(param);
-        knobRefs[param.id] = knob;
-        allKnobsInOrder.push(knob);
-        knobs.appendChild(knob);
-      });
-
-      div.appendChild(knobs);
-      root.appendChild(div);
-    });
-
-    // patch library section
-    const libSection = document.createElement('div');
-    libSection.className = 'section section-lib';
-    const libTitle = document.createElement('h2');
-    libTitle.textContent = 'patch library';
-    libSection.appendChild(libTitle);
-
-    const libRow = document.createElement('div');
-    libRow.className = 'lib-row';
-    const nameInput = document.createElement('input');
-    nameInput.type = 'text';
-    nameInput.id = 'patchName';
-    nameInput.placeholder = 'patch name';
-    
-    const saveBtn = document.createElement('button');
-    saveBtn.id = 'btnSavePatch';
-    saveBtn.textContent = 'save dump';
-    
-    const importBtn = document.createElement('button');
-    importBtn.textContent = 'import .syx file';
-    importBtn.addEventListener('click', () => fileInput.click());
-
-    libRow.appendChild(nameInput);
-    libRow.appendChild(saveBtn);
-    libRow.appendChild(importBtn);
-    libSection.appendChild(libRow);
-
-    const libList = document.createElement('div');
-    libList.className = 'lib-list';
-    libList.id = 'libList';
-    libSection.appendChild(libList);
-
-    root.appendChild(libSection);
-
-    saveBtn.addEventListener('click', () => {
-      const name = nameInput.value.trim();
-      if (!name){
-        alert('enter a patch name');
-        return;
-      }
-      if (!window.lastReceivedDump) {
-        alert('Nessun Dump ricevuto! Invia prima un Single Dump dal synth premendo STORE.');
-        return;
-      }
-      const lib = loadLibrary();
-      lib[name] = Array.from(window.lastReceivedDump); // Save the raw array of bytes!
-      saveLibrary(lib);
-      nameInput.value = '';
-      renderLibrary();
-    });
-  }
-
-  // ---------------------------------------------------------------------
   // Raw Dump Library Logic
   // ---------------------------------------------------------------------
   function loadPatchToPart(rawBytesArray, partIndex) {
@@ -2238,6 +2163,24 @@
   // ---------------------------------------------------------------------
   // Init
   // ---------------------------------------------------------------------
+  document.getElementById('btnSavePatch').addEventListener('click', () => {
+    const nameInput = document.getElementById('patchName');
+    const name = nameInput.value.trim();
+    if (!name){
+      alert('enter a patch name');
+      return;
+    }
+    if (!window.lastReceivedDump) {
+      alert('Nessun Dump ricevuto! Invia prima un Single Dump dal synth premendo STORE.');
+      return;
+    }
+    const lib = loadLibrary();
+    lib[name] = Array.from(window.lastReceivedDump); // Save the raw array of bytes!
+    saveLibrary(lib);
+    nameInput.value = '';
+    renderLibrary();
+  });
+
   renderLibrary();
   buildMultiView();
   // Hide library section by default
