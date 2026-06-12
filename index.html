@@ -586,6 +586,22 @@
     background: var(--accent);
     opacity: 0;
     pointer-events: none;
+    transition: opacity 200ms ease;
+  }
+  .section.active-part::after{
+    opacity: 1;
+  }
+
+  /* Scrollable containers for tabs */
+  #patchManagerContent,
+  #multiView,
+  #singleView,
+  #arpContent,
+  #sequencerContent {
+    flex: 1 1 auto;
+    overflow-y: auto;
+    min-height: 0;
+    padding-bottom: 20px;
   }
   .section:hover{
     border-color: var(--accent);
@@ -1630,10 +1646,9 @@
 
     // Processa ogni messaggio SysEx trovato
     for (const msgBytes of sysexMessages) {
-      // Controllo se è un Dump (il file SysEx del Virus è > 300 bytes)
-      if (msgBytes.length > 300) {
+      // Un Single Patch Dump del Virus TI è di circa 267 bytes
+      if (msgBytes.length > 250) {
         if (window.multiFetchState && window.multiFetchState.active) {
-          // --- RAW DUMP CAPTURE FOR MULTI PRESET ---
           window.multiFetchState.dumps[window.multiFetchState.currentPart] = Array.from(msgBytes);
           document.getElementById('midi-debug').textContent = '🔥 MULTI FETCH: Part ' + (window.multiFetchState.currentPart + 1) + '/4 ricevuto...';
           
@@ -1643,29 +1658,34 @@
           } else {
             finishMultiFetch();
           }
-          continue; // vai al prossimo messaggio SysEx
+          continue;
         }
 
         if (window.bankFetchState && window.bankFetchState.active) {
           // --- RAW DUMP CAPTURE FOR BANK FETCHER (READ OR CAPTURE) ---
           let patchName = "";
-          for (let i = 249; i <= 258; i++) {
-            if (msgBytes[i] >= 32 && msgBytes[i] <= 126) patchName += String.fromCharCode(msgBytes[i]);
+          // Nello standard Virus C/TI il nome è solitamente verso la fine
+          // Cerchiamo di estrarlo dai byte validi
+          for (let i = msgBytes.length - 20; i < msgBytes.length - 1; i++) {
+            if (i > 0 && msgBytes[i] >= 32 && msgBytes[i] <= 126) {
+              patchName += String.fromCharCode(msgBytes[i]);
+            }
           }
           patchName = patchName.trim();
           
           const bState = window.bankFetchState;
-          const patchNum = msgBytes[8];
+          
+          // Forza la numerazione in base all'ordine di arrivo (0-127) per i banchi completi
+          const patchNum = bState.readPatches.length;
           
           const finalName = patchName ? `${bState.bankName}-${patchNum.toString().padStart(3,'0')} ${patchName}` : `${bState.bankName}-${patchNum.toString().padStart(3,'0')} Empty`;
           
           if (bState.mode === 'capture') {
-            const lib = loadLibrary(); // Normal patch library
+            const lib = loadLibrary();
             lib[finalName] = Array.from(msgBytes);
             saveLibrary(lib);
             document.getElementById('midi-debug').textContent = `🔥 BANK CAPTURE: Salvato ${finalName}... (${bState.readPatches.length + 1}/128)`;
           } else {
-            // mode === 'read'
             document.getElementById('midi-debug').textContent = `🔥 BANK READ: Letto ${finalName}... (${bState.readPatches.length + 1}/128)`;
           }
           
@@ -1673,7 +1693,6 @@
             bState.readPatches.push(finalName);
           }
           
-          // Reset the global timeout since we are actively receiving patches
           if (bState.timeoutId) clearTimeout(bState.timeoutId);
 
           if (bState.readPatches.length < 128) {
@@ -1684,67 +1703,49 @@
           } else {
              finishBankOperation();
           }
-          continue; // vai al prossimo messaggio SysEx
+          continue;
         }
 
         // --- RAW DUMP CAPTURE FOR LIBRARIAN ---
         window.lastReceivedDump = new Uint8Array(msgBytes);
 
-        // HACKER MODE: Estraiamo il Cutoff (byte 49)
-        const cutoffValue = msgBytes[49];
-        // HACKER MODE: Estraiamo Resonance (byte 50)
-        const resValue = msgBytes[50];
-        
-        // Assegno il valore alla patch e forzo la rotazione della manopola Cutoff!
-        patch["filter1_cutoff"] = cutoffValue;
-        if (knobRefs["filter1_cutoff"]) {
-           knobRefs["filter1_cutoff"]._render();
-        }
-        
-        document.getElementById('midi-debug').textContent = '🔥 DUMP IMPORTATO! Cutoff=' + cutoffValue;
-      }
-    }
-        
-        // HACKER MODE: Estraiamo il NOME DELLA PATCH (byte 249 a 258)
+        // HACKER MODE: Estraiamo il NOME DELLA PATCH
         let patchName = "";
-        for (let i = 249; i <= 258; i++) {
-          if (bytes[i] >= 32 && bytes[i] <= 126) {
-            patchName += String.fromCharCode(bytes[i]);
+        for (let i = msgBytes.length - 20; i < msgBytes.length - 1; i++) {
+          if (i > 0 && msgBytes[i] >= 32 && msgBytes[i] <= 126) {
+            patchName += String.fromCharCode(msgBytes[i]);
           }
         }
-        document.getElementById('patchNameDisplay').textContent = 'virus ti snow // PATCH: ' + patchName.trim();
+        patchName = patchName.trim();
+        document.getElementById('patchNameDisplay').textContent = 'virus ti snow // PATCH: ' + patchName;
         const pInput = document.getElementById('patchName');
-        if (pInput) pInput.value = patchName.trim();
+        if (pInput) pInput.value = patchName;
         
-        document.getElementById('midi-debug').textContent = '🔥 DUMP IMPORTATO: ' + patchName.trim() + ' (Cutoff=' + cutoffValue + ')';
-        return;
+        document.getElementById('midi-debug').textContent = '🔥 DUMP IMPORTATO: ' + patchName;
+        continue;
       }
 
-      // Altri messaggi SysEx...
-      if (bytes.length >= 7 &&
-          bytes[1] === 0x00 && bytes[2] === 0x20 && bytes[3] === 0x33 && bytes[4] === 0x01) {
+      // Altri messaggi SysEx (Parametri singoli)
+      if (msgBytes.length >= 7 &&
+          msgBytes[1] === 0x00 && msgBytes[2] === 0x20 && msgBytes[3] === 0x33 && msgBytes[4] === 0x01) {
         
-        const devId = bytes[5];
-        const cmd = bytes[6];
+        const devId = msgBytes[5];
+        const cmd = msgBytes[6];
 
         if (devId === deviceId() || devId === 0x10) {
            // Cambio singolo parametro
-           if (cmd === 0x01 && bytes.length === 10) {
-             const cc = bytes[7];
-             const value = bytes[8];
+           if (cmd === 0x01 && msgBytes.length === 10) {
+             const cc = msgBytes[7];
+             const value = msgBytes[8];
              const param = PARAMS.find(p => p.cc === cc);
              if (param) {
                patch[param.id] = value;
                if (knobRefs[param.id]) knobRefs[param.id]._render();
              }
            }
-           // Ricezione Dump Intero (Bank o Single)
-           else if ((cmd === 0x10 || cmd === 0x11 || cmd === 0x40) && bytes.length > 10) {
-             console.log("🔥 DUMP RICEVUTO! Byte:", bytes.length, "Comando:", cmd.toString(16));
-             alert(`Dump Ricevuto con successo dal tuo Virus!\nGrandezza: ${bytes.length} bytes.\nControlla la Console per sviluppatori per il blocco dati.`);
-           }
         }
       }
+    }
     }
   }
 
