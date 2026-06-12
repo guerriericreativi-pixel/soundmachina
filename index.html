@@ -851,6 +851,13 @@
     <button id="btnSavePatch">save dump</button>
   </div>
   <div class="lib-list" id="libList"></div>
+
+  <h2 style="margin-top: 32px;">multi presets</h2>
+  <div class="lib-row">
+    <input type="text" id="multiName" placeholder="multi name (eg. DM-Personal-Jesus)">
+    <button id="btnSaveMulti">fetch & save multi</button>
+  </div>
+  <div class="lib-list" id="multiLibList"></div>
 </div>
 
 <div id="multiView">
@@ -1047,6 +1054,7 @@
   let wasConnected = false;
 
   const LIB_KEY = 'virusTiSnow_patchLibrary';
+  const MULTI_LIB_KEY = 'virusTiSnow_multiLibrary';
   const THEME_KEY = 'virusTiSnow_theme';
 
   // ---------------------------------------------------------------------
@@ -1313,6 +1321,20 @@
       
       // Controllo se è un Single Dump (il file SysEx enorme del Virus)
       if (bytes.length > 500 && bytes[6] === 0x10) {
+        if (window.multiFetchState && window.multiFetchState.active) {
+          // --- RAW DUMP CAPTURE FOR MULTI PRESET ---
+          window.multiFetchState.dumps[window.multiFetchState.currentPart] = Array.from(bytes);
+          document.getElementById('midi-debug').textContent = '🔥 MULTI FETCH: Part ' + (window.multiFetchState.currentPart + 1) + '/4 ricevuto...';
+          
+          window.multiFetchState.currentPart++;
+          if (window.multiFetchState.currentPart < 4) {
+            setTimeout(() => { requestDump(window.multiFetchState.currentPart); }, 50);
+          } else {
+            finishMultiFetch();
+          }
+          return;
+        }
+
         // --- RAW DUMP CAPTURE FOR LIBRARIAN ---
         window.lastReceivedDump = new Uint8Array(bytes);
 
@@ -1639,6 +1661,121 @@
   // ---------------------------------------------------------------------
   // Raw Dump Library Logic
   // ---------------------------------------------------------------------
+
+  function loadMultiLibrary(){
+    try{
+      return JSON.parse(localStorage.getItem(MULTI_LIB_KEY)) || {};
+    } catch(e){ return {}; }
+  }
+
+  function saveMultiLibrary(lib){
+    localStorage.setItem(MULTI_LIB_KEY, JSON.stringify(lib));
+  }
+
+  window.multiFetchState = null;
+
+  function requestDump(partIndex) {
+    if (!selectedOutput) return;
+    try {
+      // 0x40 = Edit Buffer, partIndex = 0..3 (Part 1..4)
+      selectedOutput.send(new Uint8Array([
+        ...SYSEX_PREFIX, deviceId(), 0x00, 0x40, partIndex & 0x7F, 0xF7
+      ]));
+    } catch (e) { console.error('Dump request error', e); }
+  }
+
+  function finishMultiFetch() {
+    const lib = loadMultiLibrary();
+    const preset = {
+      name: window.multiFetchState.name,
+      parts: []
+    };
+    for (let i = 0; i < NUM_PARTS; i++) {
+      preset.parts.push({
+        enabled: multiParts[i].enabled,
+        values: JSON.parse(JSON.stringify(multiParts[i].values)), // deep copy mixer params
+        dump: window.multiFetchState.dumps[i] // The raw bytes array for this part
+      });
+    }
+    lib[window.multiFetchState.name] = preset;
+    saveMultiLibrary(lib);
+    window.multiFetchState = null;
+    document.getElementById('midi-debug').textContent = '✅ MULTI PRESET SAVED!';
+    document.getElementById('multiName').value = '';
+    renderMultiLibrary();
+  }
+
+  function renderMultiLibrary(){
+    const lib = loadMultiLibrary();
+    const list = document.getElementById('multiLibList');
+    list.innerHTML = '';
+    const names = Object.keys(lib).sort();
+    if (names.length === 0){
+      const empty = document.createElement('div');
+      empty.className = 'small';
+      empty.textContent = 'no multi presets saved';
+      list.appendChild(empty);
+      return;
+    }
+    names.forEach(name => {
+      const item = document.createElement('div');
+      item.className = 'lib-item';
+
+      const nameEl = document.createElement('span');
+      nameEl.className = 'name';
+      nameEl.textContent = name;
+
+      const btns = document.createElement('div');
+      btns.className = 'btns';
+
+      const loadBtn = document.createElement('button');
+      loadBtn.textContent = 'load';
+      loadBtn.addEventListener('click', () => {
+        const preset = lib[name];
+        for (let i = 0; i < NUM_PARTS; i++) {
+          const pData = preset.parts[i];
+          multiParts[i].enabled = pData.enabled;
+          multiParts[i].values = JSON.parse(JSON.stringify(pData.values));
+          
+          // Invia parametri Mixer (Volume, Pan, Output, ecc.)
+          sendMultiPartParam(i, 39, pData.values.volume);
+          setTimeout(() => sendMultiPartParam(i, 40, pData.values.pan), 10);
+          setTimeout(() => sendMultiPartParam(i, 34, pData.values.channel), 20);
+          setTimeout(() => sendMultiPartParam(i, 37, pData.values.transpose), 30);
+          setTimeout(() => sendMultiPartParam(i, 38, pData.values.detune), 40);
+          setTimeout(() => sendMultiPartParam(i, 41, pData.values.output), 50);
+          setTimeout(() => sendMultiPartParam(i, 35, pData.values.lowkey), 60);
+          setTimeout(() => sendMultiPartParam(i, 36, pData.values.highkey), 70);
+          
+          // Invia il Dump SysEx al sintetizzatore (Patch)
+          if (pData.dump && pData.dump.length > 500) {
+            setTimeout(() => {
+              loadPatchToPart(pData.dump, i);
+            }, 100 + (i * 50)); // stagger the heavy sysex dumps
+          }
+        }
+        buildMultiView(); // Ridisegna la UI per mostrare i nuovi valori
+      });
+
+      const delBtn = document.createElement('button');
+      delBtn.className = 'delete';
+      delBtn.textContent = 'x';
+      delBtn.addEventListener('click', () => {
+        if (confirm('Delete multi preset?')){
+          delete lib[name];
+          saveMultiLibrary(lib);
+          renderMultiLibrary();
+        }
+      });
+
+      btns.appendChild(loadBtn);
+      btns.appendChild(delBtn);
+      item.appendChild(nameEl);
+      item.appendChild(btns);
+      list.appendChild(item);
+    });
+  }
+
   function loadPatchToPart(rawBytesArray, partIndex) {
     if (!selectedOutput) return;
     const dump = new Uint8Array(rawBytesArray);
@@ -2181,7 +2318,29 @@
     renderLibrary();
   });
 
+  document.getElementById('btnSaveMulti').addEventListener('click', () => {
+    const nameInput = document.getElementById('multiName');
+    const name = nameInput.value.trim();
+    if (!name){
+      alert('enter a multi preset name');
+      return;
+    }
+    if (!selectedOutput) {
+      alert('MIDI Output non connesso!');
+      return;
+    }
+    document.getElementById('midi-debug').textContent = '🔥 MULTI FETCH: Richiesta Part 1...';
+    window.multiFetchState = {
+      active: true,
+      currentPart: 0,
+      name: name,
+      dumps: []
+    };
+    requestDump(0);
+  });
+
   renderLibrary();
+  renderMultiLibrary();
   buildMultiView();
   // Hide library section by default
   document.querySelector('.section-lib').style.display = 'none';
