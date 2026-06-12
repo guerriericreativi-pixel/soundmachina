@@ -840,29 +840,11 @@
   </div>
 </div>
 
-<div class="mode-tabs" id="partTabs">
-  <button class="mode-tab" id="tabOverview" data-mode="overview">multi overview</button>
-  <button class="mode-tab active" data-part="0">part 1</button>
-  <button class="mode-tab" data-part="1">part 2</button>
-  <button class="mode-tab" data-part="2">part 3</button>
-  <button class="mode-tab" data-part="3">part 4</button>
-  <div style="flex: 1"></div>
+<div class="mode-tabs" id="partTabs" style="justify-content: flex-end;">
   <button class="mode-tab" id="btnToggleBrowser" style="background: var(--section-bg); border-color: var(--accent); color: var(--accent);">browser</button>
 </div>
 
-<div id="singleView">
-  <div class="actions">
-    <button id="btnRandomize">randomize</button>
-    <button id="btnInit">init</button>
-    <button id="btnExport">export .syx</button>
-    <button id="btnImport">import .syx</button>
-    <input type="file" id="fileInput" accept=".syx" style="display:none">
-  </div>
-
-  <div class="grid" id="sectionsContainer"></div>
-</div>
-
-<div id="multiView" class="hidden">
+<div id="multiView">
   <div class="multi-global">
     <div class="field">
       <label>play mode</label>
@@ -1322,15 +1304,14 @@
       
       // Controllo se è un Single Dump (il file SysEx enorme del Virus)
       if (bytes.length > 500 && bytes[6] === 0x10) {
-        // HACKER MODE: Estraiamo il Cutoff (byte 49) che abbiamo appena scoperto
-        const cutoffValue = bytes[49];
-        
-        // Assegno il valore alla patch e forzo la rotazione della manopola Cutoff!
-        patch["filter1_cutoff"] = cutoffValue;
-        if (knobRefs["filter1_cutoff"]) {
-           knobRefs["filter1_cutoff"]._render();
-        }
+        // --- RAW DUMP CAPTURE FOR LIBRARIAN ---
+        window.lastReceivedDump = new Uint8Array(bytes);
 
+        // HACKER MODE: Estraiamo il Cutoff (byte 49)
+        const cutoffValue = bytes[49];
+        // HACKER MODE: Estraiamo Resonance (byte 50)
+        const resValue = bytes[50];
+        
         // HACKER MODE: Estraiamo il NOME DELLA PATCH (byte 249 a 258)
         let patchName = "";
         for (let i = 249; i <= 258; i++) {
@@ -1691,11 +1672,18 @@
     nameInput.type = 'text';
     nameInput.id = 'patchName';
     nameInput.placeholder = 'patch name';
+    
     const saveBtn = document.createElement('button');
     saveBtn.id = 'btnSavePatch';
-    saveBtn.textContent = 'save';
+    saveBtn.textContent = 'save dump';
+    
+    const importBtn = document.createElement('button');
+    importBtn.textContent = 'import .syx file';
+    importBtn.addEventListener('click', () => fileInput.click());
+
     libRow.appendChild(nameInput);
     libRow.appendChild(saveBtn);
+    libRow.appendChild(importBtn);
     libSection.appendChild(libRow);
 
     const libList = document.createElement('div');
@@ -1711,95 +1699,63 @@
         alert('enter a patch name');
         return;
       }
+      if (!window.lastReceivedDump) {
+        alert('Nessun Dump ricevuto! Invia prima un Single Dump dal synth premendo STORE.');
+        return;
+      }
       const lib = loadLibrary();
-      lib[name] = { ...patch };
+      lib[name] = Array.from(window.lastReceivedDump); // Save the raw array of bytes!
       saveLibrary(lib);
       nameInput.value = '';
       renderLibrary();
     });
   }
 
-  function refreshAllKnobs(){
-    PARAMS.forEach(p => knobRefs[p.id]._render());
-  }
+  // ---------------------------------------------------------------------
+  // Raw Dump Library Logic
+  // ---------------------------------------------------------------------
+  function loadPatchToPart(rawBytesArray, partIndex) {
+    if (!selectedOutput) return;
+    const dump = new Uint8Array(rawBytesArray);
+    // Byte 5 is the Device ID which routes the dump to a specific part!
+    dump[5] = partIndex & 0x7F; 
+    
+    try {
+      selectedOutput.send(dump);
+      
+      // Update UI Cutoff/Res if available in dump
+      if (dump.length > 50) {
+        multiParts[partIndex].sound['filter1_cutoff'] = dump[49];
+        multiParts[partIndex].sound['filter1_resonance'] = dump[50];
+        // Note: The knob rendering updates automatically when rotating, 
+        // but to force visual update we'd ideally trigger a render.
+      }
 
-  function applyPatchObject(p, send){
-    PARAMS.forEach(param => {
-      const value = (p[param.id] !== undefined) ? p[param.id] : param.default;
-      patch[param.id] = Math.max(0, Math.min(127, value));
-    });
-    refreshAllKnobs();
-    if (send) sendFullPatch(patch);
-  }
+      // Update Part Name
+      let patchName = "";
+      for (let i = 249; i <= 258 && i < dump.length; i++) {
+        if (dump[i] >= 32 && dump[i] <= 126) {
+          patchName += String.fromCharCode(dump[i]);
+        }
+      }
+      multiParts[partIndex].name = patchName.trim();
+      if (partDisplays[partIndex] && partDisplays[partIndex]._startReveal) {
+        partDisplays[partIndex]._startReveal();
+      }
 
-  // smoothly animate every knob's indicator with the same transition
-  function animateAllKnobs(duration){
-    allKnobsInOrder.forEach(knob => {
-      const indicator = knob.querySelector('.knob-indicator');
-      indicator.style.transition = `transform ${duration}ms ease-in-out`;
-    });
-    setTimeout(() => {
-      allKnobsInOrder.forEach(knob => {
-        knob.querySelector('.knob-indicator').style.transition = '';
-      });
-    }, duration + 50);
-  }
-
-  // animate knobs in a left-to-right cascade (used by randomize)
-  function animateCascade(stepDuration, stagger){
-    allKnobsInOrder.forEach((knob, i) => {
-      const indicator = knob.querySelector('.knob-indicator');
-      indicator.style.transition = `transform ${stepDuration}ms ease-out`;
-      indicator.style.transitionDelay = (i * stagger) + 'ms';
-    });
-    const total = stepDuration + allKnobsInOrder.length * stagger + 50;
-    setTimeout(() => {
-      allKnobsInOrder.forEach(knob => {
-        const indicator = knob.querySelector('.knob-indicator');
-        indicator.style.transition = '';
-        indicator.style.transitionDelay = '';
-      });
-    }, total);
+    } catch(e) {
+      console.error('MIDI send dump error', e);
+    }
   }
 
   // ---------------------------------------------------------------------
-  // Buttons: Randomize / Init
+  // Export / Import .syx (Single Dump)
   // ---------------------------------------------------------------------
-  document.getElementById('btnRandomize').addEventListener('click', () => {
-    animateCascade(150, 30);
-    const newPatch = {};
-    PARAMS.forEach(p => { newPatch[p.id] = Math.floor(Math.random() * 128); });
-    applyPatchObject(newPatch, true);
-  });
-
-  document.getElementById('btnInit').addEventListener('click', () => {
-    animateAllKnobs(300);
-    const newPatch = {};
-    PARAMS.forEach(p => { newPatch[p.id] = p.default; });
-    applyPatchObject(newPatch, true);
-  });
-
-  // ---------------------------------------------------------------------
-  // Export / Import .syx
-  // ---------------------------------------------------------------------
-  document.getElementById('btnExport').addEventListener('click', () => {
-    const bytes = [];
-    PARAMS.forEach(param => {
-      bytes.push(...buildSysEx(param.cc, patch[param.id]));
-    });
-    const blob = new Blob([new Uint8Array(bytes)], { type: 'application/octet-stream' });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement('a');
-    a.href = url;
-    a.download = 'virus_ti_patch.syx';
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
-  });
-
-  const fileInput = document.getElementById('fileInput');
-  document.getElementById('btnImport').addEventListener('click', () => fileInput.click());
+  const fileInput = document.createElement('input');
+  fileInput.type = 'file';
+  fileInput.accept = '.syx';
+  fileInput.style.display = 'none';
+  document.body.appendChild(fileInput);
 
   fileInput.addEventListener('change', (e) => {
     const file = e.target.files[0];
@@ -1807,35 +1763,24 @@
     const reader = new FileReader();
     reader.onload = () => {
       const bytes = new Uint8Array(reader.result);
-      const newPatch = {};
-      let i = 0;
-      while (i < bytes.length){
-        if (bytes[i] === 0xF0){
-          // find matching F7
-          let j = i + 1;
-          while (j < bytes.length && bytes[j] !== 0xF7) j++;
-          if (j < bytes.length){
-            const msg = bytes.slice(i, j + 1);
-            // Expect: F0 00 20 33 01 [DeviceID] 01 [param] [value] F7
-            if (msg.length === 10 &&
-                msg[1] === 0x00 && msg[2] === 0x20 && msg[3] === 0x33 &&
-                msg[4] === 0x01 && msg[6] === 0x01){
-              const cc = msg[7];
-              const value = msg[8];
-              const param = PARAMS.find(p => p.cc === cc);
-              if (param) newPatch[param.id] = value;
-            }
-            i = j + 1;
-            continue;
-          }
+      if (bytes.length > 500 && bytes[0] === 0xF0 && bytes[bytes.length-1] === 0xF7) {
+        window.lastReceivedDump = bytes;
+        
+        // Extract name
+        let patchName = "";
+        for (let i = 249; i <= 258 && i < bytes.length; i++) {
+          if (bytes[i] >= 32 && bytes[i] <= 126) patchName += String.fromCharCode(bytes[i]);
         }
-        i++;
+        document.getElementById('patchNameDisplay').textContent = 'virus ti snow // PATCH DUMP LOADED: ' + patchName.trim();
+        const pInput = document.getElementById('patchName');
+        if (pInput) pInput.value = patchName.trim();
+        alert('SysEx loaded successfully. You can now save it to the library.');
+      } else {
+        alert('Invalid or unsupported SysEx file.');
       }
-      animateAllKnobs(300);
-      applyPatchObject(newPatch, true);
     };
     reader.readAsArrayBuffer(file);
-    fileInput.value = '';
+    e.target.value = '';
   });
 
   // ---------------------------------------------------------------------
@@ -1874,12 +1819,19 @@
       const btns = document.createElement('div');
       btns.className = 'btns';
 
-      const loadBtn = document.createElement('button');
-      loadBtn.textContent = 'load';
-      loadBtn.addEventListener('click', () => {
-        animateAllKnobs(300);
-        applyPatchObject(lib[name], true);
-      });
+      const loadLabel = document.createElement('span');
+      loadLabel.className = 'small';
+      loadLabel.textContent = 'load to: ';
+      btns.appendChild(loadLabel);
+
+      for(let i=0; i<4; i++){
+        const btn = document.createElement('button');
+        btn.textContent = 'P' + (i+1);
+        btn.addEventListener('click', () => {
+          loadPatchToPart(lib[name], i);
+        });
+        btns.appendChild(btn);
+      }
 
       const delBtn = document.createElement('button');
       delBtn.textContent = 'delete';
@@ -2214,15 +2166,15 @@
       sendMultiPartParam(index, 41, v);
     }));
 
-    const editBtn = document.createElement('button');
-    editBtn.className = 'edit-btn';
-    editBtn.textContent = 'edit';
-    editBtn.addEventListener('click', () => {
-      // Instead of expanding inline, switch to the dedicated Part tab
-      setMode('part', index);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-    });
-    main.appendChild(editBtn);
+    // cutoff knob
+    const cutKnob = createPartSoundKnob(index, PARAMS.find(p => p.id === 'filter1_cutoff'));
+    cutKnob.classList.add('cut-knob');
+    main.appendChild(cutKnob);
+
+    // resonance knob
+    const resKnob = createPartSoundKnob(index, PARAMS.find(p => p.id === 'filter1_resonance'));
+    resKnob.classList.add('res-knob');
+    main.appendChild(resKnob);
 
     const display = createPartDisplay(index);
     main.appendChild(display);
@@ -2268,46 +2220,6 @@
     }
   });
 
-  // Part switching logic
-  const partTabs = document.querySelectorAll('#partTabs button[data-part]');
-  const overviewTab = document.getElementById('tabOverview');
-  const midiChannelSelect = document.getElementById('midiChannel');
-  const singleView = document.getElementById('singleView');
-  const multiView = document.getElementById('multiView');
-  
-  function setMode(mode, index) {
-    if (mode === 'overview') {
-      overviewTab.classList.add('active');
-      partTabs.forEach(t => t.classList.remove('active'));
-      multiView.classList.remove('hidden');
-      singleView.classList.add('hidden');
-      // restart displays animation
-      partDisplays.forEach(d => { if(d._startReveal) d._startReveal(); });
-    } else {
-      overviewTab.classList.remove('active');
-      partTabs.forEach(t => t.classList.toggle('active', parseInt(t.getAttribute('data-part'), 10) === index));
-      multiView.classList.add('hidden');
-      singleView.classList.remove('hidden');
-      currentPartIndex = index;
-      midiChannelSelect.value = multiParts[currentPartIndex].values.channel;
-      refreshAllKnobs();
-    }
-  }
-
-  overviewTab.addEventListener('click', () => setMode('overview'));
-  
-  partTabs.forEach(tab => {
-    tab.addEventListener('click', (e) => {
-      const idx = parseInt(e.target.getAttribute('data-part'), 10);
-      setMode('part', idx);
-    });
-  });
-
-  // When MIDI channel is changed in the UI, update the current part's channel
-  midiChannelSelect.addEventListener('change', (e) => {
-    multiParts[currentPartIndex].values.channel = e.target.value;
-  });
-
   // Browser toggle logic
   const btnToggleBrowser = document.getElementById('btnToggleBrowser');
   const libSection = document.querySelector('.section-lib');
@@ -2326,13 +2238,10 @@
   // ---------------------------------------------------------------------
   // Init
   // ---------------------------------------------------------------------
-  buildSections();
   renderLibrary();
   buildMultiView();
   // Hide library section by default
   document.querySelector('.section-lib').style.display = 'none';
-  // set initial part
-  setMode('part', 0);
 })();
 </script>
 </body>
