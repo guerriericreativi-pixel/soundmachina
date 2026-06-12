@@ -2273,8 +2273,9 @@
   function requestBankPatch(bankIndex, patchIndex) {
     if (!selectedOutput) return;
     try {
+      // 0x30 = Single Patch Dump Request
       selectedOutput.send(new Uint8Array([
-        ...SYSEX_PREFIX, deviceId(), 0x00, bankIndex & 0x7F, patchIndex & 0x7F, 0xF7
+        ...SYSEX_PREFIX, deviceId(), 0x30, bankIndex & 0x7F, patchIndex & 0x7F, 0xF7
       ]));
     } catch (e) { console.error('Bank dump request error', e); }
   }
@@ -2282,7 +2283,7 @@
   function requestFullBank(bankIndex) {
     if (!selectedOutput) return;
     try {
-      // 0x04 = Bank Print Request
+      // 0x32 = Bank Dump Request
       selectedOutput.send(new Uint8Array([
         ...SYSEX_PREFIX, deviceId(), 0x04, bankIndex & 0x7F, 0xF7
       ]));
