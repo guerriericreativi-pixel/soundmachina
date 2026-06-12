@@ -808,7 +808,7 @@
 <div class="header">
   <canvas class="header-display" id="visualizer"></canvas>
   <div class="header-bar">
-    <div class="header-title">virus ti snow</div>
+    <div class="header-title" id="patchNameDisplay">virus ti snow // [PATCH NAME]</div>
     <div class="header-controls">
       <div class="field">
         <label>input</label>
@@ -840,9 +840,13 @@
   </div>
 </div>
 
-<div class="mode-tabs">
-  <button class="mode-tab active" id="tabSingle" data-mode="single">single</button>
-  <button class="mode-tab" id="tabMulti" data-mode="multi">multi</button>
+<div class="mode-tabs" id="partTabs">
+  <button class="mode-tab active" data-part="0">part 1</button>
+  <button class="mode-tab" data-part="1">part 2</button>
+  <button class="mode-tab" data-part="2">part 3</button>
+  <button class="mode-tab" data-part="3">part 4</button>
+  <div style="flex: 1"></div>
+  <button class="mode-tab" id="btnToggleBrowser" style="background: var(--section-bg); border-color: var(--accent); color: var(--accent);">browser</button>
 </div>
 
 <div id="singleView">
@@ -851,13 +855,13 @@
     <button id="btnInit">init</button>
     <button id="btnExport">export .syx</button>
     <button id="btnImport">import .syx</button>
-    <input type="file" id="fileInput" accept=".syx">
+    <input type="file" id="fileInput" accept=".syx" style="display:none">
   </div>
 
   <div class="grid" id="sectionsContainer"></div>
 </div>
 
-<div id="multiView" class="hidden">
+<div id="multiView" class="hidden" style="display:none;">
   <div class="multi-global">
     <div class="field">
       <label>play mode</label>
@@ -1018,18 +1022,30 @@
   // ---------------------------------------------------------------------
   // State
   // ---------------------------------------------------------------------
-  const patch = {};
-  PARAMS.forEach(p => { patch[p.id] = p.default; });
+  let currentPartIndex = 0;
 
   // multiParts[i] = { enabled, values: {per-part mixer params}, sound: {per-part PARAMS} }
   const multiParts = [];
   for (let i = 0; i < NUM_PARTS; i++){
     const values = {};
     PART_PARAMS.forEach(pp => { values[pp.id] = pp.default; });
+    values.channel = String(i + 1); // Default MIDI channels 1, 2, 3, 4
     const sound = {};
     PARAMS.forEach(p => { sound[p.id] = p.default; });
     multiParts.push({ enabled: true, name: 'init', values, sound });
   }
+
+  // Define patch as a Proxy so that code modifying `patch.filter1_cutoff` updates the CURRENT part's sound.
+  const patch = new Proxy({}, {
+    get(target, prop) {
+      return multiParts[currentPartIndex].sound[prop];
+    },
+    set(target, prop, value) {
+      multiParts[currentPartIndex].sound[prop] = value;
+      return true;
+    }
+  });
+
 
   // partDisplays[i] = { _render, _startReveal } for the per-part dot-matrix name display
   let partDisplays = [];
@@ -1313,8 +1329,19 @@
         if (knobRefs["filter1_cutoff"]) {
            knobRefs["filter1_cutoff"]._render();
         }
+
+        // HACKER MODE: Estraiamo il NOME DELLA PATCH (byte 249 a 258)
+        let patchName = "";
+        for (let i = 249; i <= 258; i++) {
+          if (bytes[i] >= 32 && bytes[i] <= 126) {
+            patchName += String.fromCharCode(bytes[i]);
+          }
+        }
+        document.getElementById('patchNameDisplay').textContent = 'virus ti snow // PATCH: ' + patchName.trim();
+        const pInput = document.getElementById('patchName');
+        if (pInput) pInput.value = patchName.trim();
         
-        document.getElementById('midi-debug').textContent = '🔥 DUMP IMPORTATO! Cutoff=' + cutoffValue;
+        document.getElementById('midi-debug').textContent = '🔥 DUMP IMPORTATO: ' + patchName.trim() + ' (Cutoff=' + cutoffValue + ')';
         return;
       }
 
@@ -2268,29 +2295,56 @@
     }
   });
 
-  // single | multi tab switching
-  const tabSingle = document.getElementById('tabSingle');
-  const tabMulti = document.getElementById('tabMulti');
-  const singleView = document.getElementById('singleView');
-  const multiView = document.getElementById('multiView');
-
-  function setMode(mode){
-    const isMulti = mode === 'multi';
-    tabMulti.classList.toggle('active', isMulti);
-    tabSingle.classList.toggle('active', !isMulti);
-    multiView.classList.toggle('hidden', !isMulti);
-    singleView.classList.toggle('hidden', isMulti);
+  // Part switching logic
+  const partTabs = document.querySelectorAll('#partTabs button[data-part]');
+  const midiChannelSelect = document.getElementById('midiChannel');
+  
+  function setPart(index) {
+    currentPartIndex = index;
+    // Update active tab UI
+    partTabs.forEach(t => t.classList.toggle('active', parseInt(t.getAttribute('data-part'), 10) === index));
+    // Update MIDI channel dropdown
+    midiChannelSelect.value = multiParts[currentPartIndex].values.channel;
+    // Visually update all knobs to reflect the new part's values
+    refreshAllKnobs();
   }
 
-  tabSingle.addEventListener('click', () => setMode('single'));
-  tabMulti.addEventListener('click', () => setMode('multi'));
+  partTabs.forEach(tab => {
+    tab.addEventListener('click', (e) => {
+      const idx = parseInt(e.target.getAttribute('data-part'), 10);
+      setPart(idx);
+    });
+  });
+
+  // When MIDI channel is changed in the UI, update the current part's channel
+  midiChannelSelect.addEventListener('change', (e) => {
+    multiParts[currentPartIndex].values.channel = e.target.value;
+  });
+
+  // Browser toggle logic
+  const btnToggleBrowser = document.getElementById('btnToggleBrowser');
+  const libSection = document.querySelector('.section-lib');
+  let browserVisible = false;
+
+  btnToggleBrowser.addEventListener('click', () => {
+    browserVisible = !browserVisible;
+    if (browserVisible) {
+      libSection.style.display = 'block';
+      libSection.scrollIntoView({ behavior: 'smooth' });
+    } else {
+      libSection.style.display = 'none';
+    }
+  });
 
   // ---------------------------------------------------------------------
   // Init
   // ---------------------------------------------------------------------
   buildSections();
   renderLibrary();
-  buildMultiView();
+  // Hide library section by default
+  document.querySelector('.section-lib').style.display = 'none';
+  // set initial part
+  setPart(0);
 })();
 </script>
 </body>
