@@ -2214,40 +2214,13 @@
       sendMultiPartParam(index, 41, v);
     }));
 
-    // expanded per-part sound editor
-    const editor = document.createElement('div');
-    editor.className = 'part-editor hidden';
-
-    const editorRow = document.createElement('div');
-    editorRow.className = 'part-editor-row';
-    SECTIONS.forEach(sec => {
-      const sub = document.createElement('div');
-      sub.className = 'subsection section-' + sec.key;
-      if (sec.title) {
-        const h3 = document.createElement('h3');
-        h3.textContent = sec.title;
-        sub.appendChild(h3);
-      }
-
-      const knobs = document.createElement('div');
-      knobs.className = 'knobs';
-      PARAMS.filter(p => p.section === sec.key).forEach(param => {
-        knobs.appendChild(createPartSoundKnob(index, param));
-      });
-      sub.appendChild(knobs);
-      editorRow.appendChild(sub);
-    });
-    editor.appendChild(editorRow);
-
     const editBtn = document.createElement('button');
     editBtn.className = 'edit-btn';
     editBtn.textContent = 'edit';
-    function setEditorOpen(open){
-      editor.classList.toggle('hidden', !open);
-      editBtn.textContent = open ? 'close' : 'edit';
-    }
     editBtn.addEventListener('click', () => {
-      setEditorOpen(editor.classList.contains('hidden'));
+      // Instead of expanding inline, switch to the dedicated Part tab
+      setMode('part', index);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
     });
     main.appendChild(editBtn);
 
@@ -2256,7 +2229,6 @@
     partDisplays.push(display);
 
     row.appendChild(main);
-    row.appendChild(editor);
     return row;
   }
 
