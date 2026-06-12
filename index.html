@@ -841,6 +841,7 @@
 </div>
 
 <div class="mode-tabs" id="partTabs">
+  <button class="mode-tab" id="tabOverview" data-mode="overview">multi overview</button>
   <button class="mode-tab active" data-part="0">part 1</button>
   <button class="mode-tab" data-part="1">part 2</button>
   <button class="mode-tab" data-part="2">part 3</button>
@@ -2297,22 +2298,36 @@
 
   // Part switching logic
   const partTabs = document.querySelectorAll('#partTabs button[data-part]');
+  const overviewTab = document.getElementById('tabOverview');
   const midiChannelSelect = document.getElementById('midiChannel');
+  const singleView = document.getElementById('singleView');
+  const multiView = document.getElementById('multiView');
   
-  function setPart(index) {
-    currentPartIndex = index;
-    // Update active tab UI
-    partTabs.forEach(t => t.classList.toggle('active', parseInt(t.getAttribute('data-part'), 10) === index));
-    // Update MIDI channel dropdown
-    midiChannelSelect.value = multiParts[currentPartIndex].values.channel;
-    // Visually update all knobs to reflect the new part's values
-    refreshAllKnobs();
+  function setMode(mode, index) {
+    if (mode === 'overview') {
+      overviewTab.classList.add('active');
+      partTabs.forEach(t => t.classList.remove('active'));
+      multiView.style.display = 'block';
+      singleView.style.display = 'none';
+      // restart displays animation
+      partDisplays.forEach(d => { if(d._startReveal) d._startReveal(); });
+    } else {
+      overviewTab.classList.remove('active');
+      partTabs.forEach(t => t.classList.toggle('active', parseInt(t.getAttribute('data-part'), 10) === index));
+      multiView.style.display = 'none';
+      singleView.style.display = 'block';
+      currentPartIndex = index;
+      midiChannelSelect.value = multiParts[currentPartIndex].values.channel;
+      refreshAllKnobs();
+    }
   }
 
+  overviewTab.addEventListener('click', () => setMode('overview'));
+  
   partTabs.forEach(tab => {
     tab.addEventListener('click', (e) => {
       const idx = parseInt(e.target.getAttribute('data-part'), 10);
-      setPart(idx);
+      setMode('part', idx);
     });
   });
 
@@ -2341,10 +2356,11 @@
   // ---------------------------------------------------------------------
   buildSections();
   renderLibrary();
+  buildMultiView();
   // Hide library section by default
   document.querySelector('.section-lib').style.display = 'none';
   // set initial part
-  setPart(0);
+  setMode('part', 0);
 })();
 </script>
 </body>
