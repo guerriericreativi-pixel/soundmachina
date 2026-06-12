@@ -1610,9 +1610,8 @@
     // --- RICEZIONE SYSEX (Dump e parametri estesi) ---
     if (bytes[0] === 0xF0 && bytes[bytes.length - 1] === 0xF7) {
       
-      // Controllo se è un Single Dump (il file SysEx enorme del Virus)
-      // 0x10 = Edit Buffer Dump, 0x01 = Single Patch Dump (da Bank)
-      if (bytes.length > 500 && (bytes[6] === 0x10 || bytes[6] === 0x01)) {
+      // Controllo se è un Dump (il file SysEx del Virus è > 300 bytes)
+      if (bytes.length > 300) {
         if (window.multiFetchState && window.multiFetchState.active) {
           // --- RAW DUMP CAPTURE FOR MULTI PRESET ---
           window.multiFetchState.dumps[window.multiFetchState.currentPart] = Array.from(bytes);
