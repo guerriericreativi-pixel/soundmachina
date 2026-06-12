@@ -858,6 +858,43 @@
     <button id="btnSaveMulti">fetch & save multi</button>
   </div>
   <div class="lib-list" id="multiLibList"></div>
+
+  <h2 style="margin-top: 32px;">bank tools</h2>
+  <div class="lib-row">
+    <select id="bankSelect" style="flex: 1;">
+      <option value="0">RAM A</option>
+      <option value="1">RAM B</option>
+      <option value="2">RAM C</option>
+      <option value="3">RAM D</option>
+      <option value="4">ROM A</option>
+      <option value="5">ROM B</option>
+      <option value="6">ROM C</option>
+      <option value="7">ROM D</option>
+      <option value="8">ROM E</option>
+      <option value="9">ROM F</option>
+      <option value="10">ROM G</option>
+      <option value="11">ROM H</option>
+      <option value="12">ROM I</option>
+      <option value="13">ROM J</option>
+      <option value="14">ROM K</option>
+      <option value="15">ROM L</option>
+      <option value="16">ROM M</option>
+      <option value="17">ROM N</option>
+      <option value="18">ROM O</option>
+      <option value="19">ROM P</option>
+      <option value="20">ROM Q</option>
+      <option value="21">ROM R</option>
+      <option value="22">ROM S</option>
+      <option value="23">ROM T</option>
+      <option value="24">ROM U</option>
+      <option value="25">ROM V</option>
+      <option value="26">ROM W</option>
+      <option value="27">ROM X</option>
+      <option value="28">ROM Y</option>
+      <option value="29">ROM Z</option>
+    </select>
+    <button id="btnFetchBank">fetch full bank</button>
+  </div>
 </div>
 
 <div id="multiView">
@@ -1335,6 +1372,35 @@
           return;
         }
 
+        if (window.bankFetchState && window.bankFetchState.active) {
+          // --- RAW DUMP CAPTURE FOR BANK FETCHER ---
+          let patchName = "";
+          for (let i = 249; i <= 258; i++) {
+            if (bytes[i] >= 32 && bytes[i] <= 126) patchName += String.fromCharCode(bytes[i]);
+          }
+          patchName = patchName.trim();
+          
+          const bState = window.bankFetchState;
+          const bankName = document.getElementById('bankSelect').options[bState.bankIndex].text;
+          const finalName = patchName ? `${bankName}-${bState.currentPatch.toString().padStart(3,'0')} ${patchName}` : `${bankName}-${bState.currentPatch.toString().padStart(3,'0')} Empty`;
+          
+          const lib = loadLibrary(); // Normal patch library
+          lib[finalName] = Array.from(bytes);
+          saveLibrary(lib);
+
+          document.getElementById('midi-debug').textContent = `🔥 BANK FETCH: Salvato ${finalName}... (${bState.currentPatch + 1}/128)`;
+          
+          bState.currentPatch++;
+          if (bState.currentPatch < 128) {
+            setTimeout(() => { requestBankPatch(bState.bankIndex, bState.currentPatch); }, 50);
+          } else {
+            window.bankFetchState = null;
+            document.getElementById('midi-debug').textContent = `✅ BANK FETCH: ${bankName} Completato!`;
+            renderLibrary();
+          }
+          return;
+        }
+
         // --- RAW DUMP CAPTURE FOR LIBRARIAN ---
         window.lastReceivedDump = new Uint8Array(bytes);
 
@@ -1673,6 +1739,16 @@
   }
 
   window.multiFetchState = null;
+  window.bankFetchState = null;
+
+  function requestBankPatch(bankIndex, patchIndex) {
+    if (!selectedOutput) return;
+    try {
+      selectedOutput.send(new Uint8Array([
+        ...SYSEX_PREFIX, deviceId(), 0x00, bankIndex & 0x7F, patchIndex & 0x7F, 0xF7
+      ]));
+    } catch (e) { console.error('Bank dump request error', e); }
+  }
 
   function requestDump(partIndex) {
     if (!selectedOutput) return;
@@ -2337,6 +2413,26 @@
       dumps: []
     };
     requestDump(0);
+  });
+
+  document.getElementById('btnFetchBank').addEventListener('click', () => {
+    if (!selectedOutput) {
+      alert('MIDI Output non connesso!');
+      return;
+    }
+    const select = document.getElementById('bankSelect');
+    const bankIndex = parseInt(select.value, 10);
+    const bankName = select.options[select.selectedIndex].text;
+    
+    if (confirm(`Vuoi estrarre automaticamente tutte le 128 patch dal banco ${bankName}? Questo processo salverà i suoni nella libreria e richiederà circa 10 secondi.`)) {
+      document.getElementById('midi-debug').textContent = `🔥 BANK FETCH: Richiesta ${bankName} patch 1/128...`;
+      window.bankFetchState = {
+        active: true,
+        bankIndex: bankIndex,
+        currentPatch: 0
+      };
+      requestBankPatch(bankIndex, 0);
+    }
   });
 
   renderLibrary();
