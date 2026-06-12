@@ -2946,7 +2946,8 @@
     }
     const type = document.getElementById('bankTypeSelect').value;
     const num = parseInt(document.getElementById('bankNumSelect').value, 10);
-    const bankIndex = (type === 'RAM' ? 0 : 8) + (num - 1);
+    // Virus TI / Snow bank mapping: RAM 1-4 = 0-3, ROM 1-Z = 4+
+    const bankIndex = (type === 'RAM' ? 0 : 4) + (num - 1);
     const bankName = `${type} ${num}`;
     
     const msg = mode === 'capture' 
