@@ -1725,8 +1725,8 @@
       
       // Update UI Cutoff/Res if available in dump
       if (dump.length > 50) {
-        multiParts[partIndex].sound['filter1_cutoff'] = dump[49];
-        multiParts[partIndex].sound['filter1_resonance'] = dump[50];
+        multiParts[partIndex].sound['f1_cutoff'] = dump[49];
+        multiParts[partIndex].sound['f1_resonance'] = dump[50];
         // Note: The knob rendering updates automatically when rotating, 
         // but to force visual update we'd ideally trigger a render.
       }
@@ -2167,12 +2167,12 @@
     }));
 
     // cutoff knob
-    const cutKnob = createPartSoundKnob(index, PARAMS.find(p => p.id === 'filter1_cutoff'));
+    const cutKnob = createPartSoundKnob(index, PARAMS.find(p => p.id === 'f1_cutoff'));
     cutKnob.classList.add('cut-knob');
     main.appendChild(cutKnob);
 
     // resonance knob
-    const resKnob = createPartSoundKnob(index, PARAMS.find(p => p.id === 'filter1_resonance'));
+    const resKnob = createPartSoundKnob(index, PARAMS.find(p => p.id === 'f1_resonance'));
     resKnob.classList.add('res-knob');
     main.appendChild(resKnob);
 
