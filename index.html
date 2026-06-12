@@ -862,7 +862,7 @@
   <div class="grid" id="sectionsContainer"></div>
 </div>
 
-<div id="multiView" class="hidden" style="display:none;">
+<div id="multiView" class="hidden">
   <div class="multi-global">
     <div class="field">
       <label>play mode</label>
@@ -2307,15 +2307,15 @@
     if (mode === 'overview') {
       overviewTab.classList.add('active');
       partTabs.forEach(t => t.classList.remove('active'));
-      multiView.style.display = 'block';
-      singleView.style.display = 'none';
+      multiView.classList.remove('hidden');
+      singleView.classList.add('hidden');
       // restart displays animation
       partDisplays.forEach(d => { if(d._startReveal) d._startReveal(); });
     } else {
       overviewTab.classList.remove('active');
       partTabs.forEach(t => t.classList.toggle('active', parseInt(t.getAttribute('data-part'), 10) === index));
-      multiView.style.display = 'none';
-      singleView.style.display = 'block';
+      multiView.classList.add('hidden');
+      singleView.classList.remove('hidden');
       currentPartIndex = index;
       midiChannelSelect.value = multiParts[currentPartIndex].values.channel;
       refreshAllKnobs();
