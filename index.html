@@ -2044,6 +2044,111 @@
 
   const knobRefs = {};
 
+  // --- Graph rendering functions ---
+  function initLfoGraph() {
+    const canvas = document.getElementById('lfoGraph');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    
+    function draw(t) {
+      if (!canvas.offsetParent) { requestAnimationFrame(draw); return; }
+      const w = canvas.width = canvas.offsetWidth;
+      const h = canvas.height = canvas.offsetHeight;
+      ctx.clearRect(0, 0, w, h);
+      
+      const rateVal = patch['lfo1_rate'] || 64;
+      const shapeVal = patch['lfo1_shape'] || 0;
+      const freq = 0.05 + (rateVal / 127) * 0.5;
+      const timeOffset = t * freq * 0.01;
+      
+      ctx.beginPath();
+      ctx.strokeStyle = currentAccent;
+      ctx.lineWidth = 2;
+      ctx.shadowBlur = 10;
+      ctx.shadowColor = currentAccent;
+      
+      for(let x = 0; x < w; x++) {
+        const px = x / w;
+        let py = 0;
+        const phase = (px * Math.PI * 6 + timeOffset) % (Math.PI * 2);
+        
+        if (shapeVal < 20) {
+          py = Math.sin(phase);
+        } else if (shapeVal < 40) {
+          py = (phase < Math.PI) ? (phase/(Math.PI/2) - 1) : (3 - phase/(Math.PI/2));
+        } else if (shapeVal < 60) {
+          py = 1 - (phase / Math.PI);
+        } else if (shapeVal < 80) {
+          py = (phase < Math.PI) ? 1 : -1;
+        } else {
+          const steps = 6;
+          py = Math.sin(Math.floor(phase * steps) / steps);
+        }
+        
+        const y = h/2 - py * (h * 0.35);
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+      requestAnimationFrame(draw);
+    }
+    requestAnimationFrame(draw);
+  }
+
+  function initEnvGraph() {
+    const canvas = document.getElementById('envGraph');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+    
+    function draw() {
+      if (!canvas.offsetParent) { requestAnimationFrame(draw); return; }
+      const w = canvas.width = canvas.offsetWidth;
+      const h = canvas.height = canvas.offsetHeight;
+      ctx.clearRect(0, 0, w, h);
+      
+      const A = (patch['amp_attack'] || 0) / 127;
+      const D = (patch['amp_decay'] || 0) / 127;
+      const S = (patch['amp_sustain'] !== undefined ? patch['amp_sustain'] : 127) / 127;
+      const R = (patch['amp_release'] || 0) / 127;
+      
+      const pad = 16;
+      const effW = w - pad*2;
+      const effH = h - pad*2;
+      
+      const totalTime = Math.max(0.1, A + D + R + 0.5);
+      const ax = pad + (A / totalTime) * effW;
+      const dx = ax + (D / totalTime) * effW;
+      const sx = dx + (0.5 / totalTime) * effW;
+      const rx = sx + (R / totalTime) * effW;
+      
+      const sy = pad + (1 - S) * effH;
+      
+      ctx.beginPath();
+      ctx.strokeStyle = currentAccent;
+      ctx.lineWidth = 3;
+      ctx.lineJoin = 'round';
+      ctx.shadowBlur = 12;
+      ctx.shadowColor = currentAccent;
+      
+      ctx.moveTo(pad, h - pad);
+      ctx.lineTo(ax, pad);
+      ctx.lineTo(dx, sy);
+      ctx.lineTo(sx, sy);
+      ctx.lineTo(rx, h - pad);
+      ctx.stroke();
+      
+      ctx.lineTo(rx, h);
+      ctx.lineTo(pad, h);
+      ctx.closePath();
+      ctx.fillStyle = currentAccent + '33';
+      ctx.shadowBlur = 0;
+      ctx.fill();
+      
+      requestAnimationFrame(draw);
+    }
+    requestAnimationFrame(draw);
+  }
+
   function buildSingleView(){
     const root = document.getElementById('singleView');
     root.innerHTML = '';
@@ -2059,18 +2164,45 @@
     nav.className = 'synth-sub-nav';
     const tabs = ['OSC', 'FILTER', 'LFO', 'MATRIX', 'ARP', 'FX 1', 'FX 2', 'COMMON', 'PATCH UTILITY'];
     
+    const tabContainers = {};
+    const contentArea = document.createElement('div');
+    contentArea.style.width = '100%';
+
     tabs.forEach(t => {
       const btn = document.createElement('button');
       btn.className = 'synth-sub-tab';
       if (t === 'OSC') btn.classList.add('active');
       btn.textContent = t;
+      btn.onclick = () => {
+        nav.querySelectorAll('.synth-sub-tab').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        Object.values(tabContainers).forEach(c => c.style.display = 'none');
+        if (tabContainers[t]) {
+           if (t === 'OSC') tabContainers[t].style.display = 'grid';
+           else tabContainers[t].style.display = 'flex';
+        }
+      };
       nav.appendChild(btn);
+      
+      const tc = document.createElement('div');
+      tc.style.width = '100%';
+      if (t === 'OSC') {
+        tc.className = 'osc-container';
+        tc.style.display = 'grid';
+      } else {
+        tc.className = 'osc-container'; // Reuse styling rules for nested components
+        tc.style.display = 'none';
+        tc.style.flexDirection = 'column';
+      }
+      tabContainers[t] = tc;
+      contentArea.appendChild(tc);
     });
     container.appendChild(nav);
 
-    // --- OSC Grid Content ---
-    const oscContainer = document.createElement('div');
-    oscContainer.className = 'osc-container';
+    // --- Tab Containers ---
+    const oscContainer = tabContainers['OSC'];
+    const filterContainer = tabContainers['FILTER'];
+    const lfoContainer = tabContainers['LFO'];
 
     // Helper: Create Panel
     function createPanel(title, area) {
@@ -2233,8 +2365,69 @@
     oscContainer.appendChild(col2);
     oscContainer.appendChild(col3);
 
-    container.appendChild(oscContainer);
+    // --- FILTER TAB CONTENT ---
+    const filtCol1 = document.createElement('div');
+    filtCol1.style.display = 'flex'; filtCol1.style.flexDirection = 'column'; filtCol1.style.gap = '16px';
+    
+    const pFiltEnv = createPanel('AMP ENVELOPE');
+    const envCanvas = document.createElement('canvas');
+    envCanvas.id = 'envGraph';
+    envCanvas.style.width = '100%';
+    envCanvas.style.height = '140px';
+    envCanvas.style.background = 'var(--section-bg)';
+    envCanvas.style.border = '1px solid var(--border)';
+    envCanvas.style.borderRadius = '4px';
+    envCanvas.style.marginBottom = '16px';
+    envCanvas.style.boxShadow = 'inset 0 0 10px rgba(0,0,0,0.1)';
+    pFiltEnv.appendChild(envCanvas);
+
+    const rowEnv = document.createElement('div');
+    rowEnv.className = 'synth-panel-row';
+    const ampA = PARAMS.find(x => x.id === 'amp_attack');
+    const ampD = PARAMS.find(x => x.id === 'amp_decay');
+    const ampS = PARAMS.find(x => x.id === 'amp_sustain');
+    const ampR = PARAMS.find(x => x.id === 'amp_release');
+    if (ampA) rowEnv.appendChild(createKnob(ampA));
+    if (ampD) rowEnv.appendChild(createKnob(ampD));
+    if (ampS) rowEnv.appendChild(createKnob(ampS));
+    if (ampR) rowEnv.appendChild(createKnob(ampR));
+    pFiltEnv.appendChild(rowEnv);
+    filtCol1.appendChild(pFiltEnv);
+    filterContainer.appendChild(filtCol1);
+
+    // --- LFO TAB CONTENT ---
+    const lfoCol1 = document.createElement('div');
+    lfoCol1.style.display = 'flex'; lfoCol1.style.flexDirection = 'column'; lfoCol1.style.gap = '16px';
+
+    const pLfo1 = createPanel('LFO 1');
+    const lfoCanvas = document.createElement('canvas');
+    lfoCanvas.id = 'lfoGraph';
+    lfoCanvas.style.width = '100%';
+    lfoCanvas.style.height = '140px';
+    lfoCanvas.style.background = 'var(--section-bg)';
+    lfoCanvas.style.border = '1px solid var(--border)';
+    lfoCanvas.style.borderRadius = '4px';
+    lfoCanvas.style.marginBottom = '16px';
+    lfoCanvas.style.boxShadow = 'inset 0 0 10px rgba(0,0,0,0.1)';
+    pLfo1.appendChild(lfoCanvas);
+
+    const rowLfo1 = document.createElement('div');
+    rowLfo1.className = 'synth-panel-row';
+    const lrateKnob = PARAMS.find(x => x.id === 'lfo1_rate');
+    const lshapeKnob = PARAMS.find(x => x.id === 'lfo1_shape');
+    if (lrateKnob) rowLfo1.appendChild(createKnob(lrateKnob));
+    if (lshapeKnob) rowLfo1.appendChild(createKnob(lshapeKnob));
+    pLfo1.appendChild(rowLfo1);
+    lfoCol1.appendChild(pLfo1);
+    lfoContainer.appendChild(lfoCol1);
+
+    container.appendChild(contentArea);
     root.appendChild(container);
+
+    setTimeout(() => {
+      initLfoGraph();
+      initEnvGraph();
+    }, 100);
 
     // Initialize the big macro knobs (Cutoff & Resonance) and put them in the header
     const macroKnobs = document.getElementById('globalMacroKnobs');
