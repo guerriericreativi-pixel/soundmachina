@@ -541,14 +541,6 @@
     grid-column: 1 / -1;
   }
   @media (orientation: landscape) and (min-width: 900px){
-    html, body{
-      height: 100%;
-      overflow: hidden;
-    }
-    body{
-      display: flex;
-      flex-direction: column;
-    }
     .grid{
       grid-template-columns: repeat(4, 1fr);
       flex: 1 1 auto;
@@ -866,6 +858,11 @@
     flex-direction: column;
     gap: 12px;
   }
+  .main-content{
+    flex: 1 1 0;
+    display: block;
+    margin-bottom: 24px;
+  }
   .synth-panel-title {
     font-size: 11px;
     text-transform: uppercase;
@@ -1097,14 +1094,14 @@
 </div>
 
 <!-- ARP -->
-<div id="arpContent" class="main-content single-view" style="display: none; flex-direction: column; gap: 8px;"></div>
+<div id="arpContent" class="main-content single-view" style="display: none;"></div>
 
 <!-- Placeholder SEQUENCER -->
 <div id="sequencerContent" style="display: none; padding: 40px; text-align: center; border: 1px dashed var(--border); border-radius: 6px; margin-top: 20px;">
   <h2 style="margin:0; opacity: 0.5;">SEQUENCER / SONG MODE (IN COSTRUZIONE)</h2>
 </div>
 
-<div id="singleView" class="main-content single-view" style="display: flex; flex-direction: column; gap: 8px;"></div>
+<div id="singleView" class="main-content single-view" style="display: block;"></div>
 
 <div id="multiView" class="main-content multi-view" style="display: none;">
   <div class="multi-global">
@@ -1142,24 +1139,21 @@
   document.getElementById('btnTabSynth').addEventListener('click', () => {
     hideAllViews();
     const v = document.getElementById('singleView');
-    v.style.display = 'flex';
-    v.style.flexDirection = 'column';
+    v.style.display = 'block';
     document.getElementById('btnTabSynth').classList.add('active');
   });
 
   document.getElementById('btnTabMultipart').addEventListener('click', () => {
     hideAllViews();
     const v = document.getElementById('multiView');
-    v.style.display = 'flex';
-    v.style.flexDirection = 'column';
+    v.style.display = 'block';
     document.getElementById('btnTabMultipart').classList.add('active');
   });
 
   document.getElementById('btnTabPatchManager').addEventListener('click', () => {
     hideAllViews();
     const v = document.getElementById('patchManagerContent');
-    v.style.display = 'flex';
-    v.style.flexDirection = 'column';
+    v.style.display = 'block';
     document.getElementById('btnTabPatchManager').classList.add('active');
   });
 
