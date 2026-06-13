@@ -2054,12 +2054,23 @@
     function draw() {
       if (!canvas.offsetParent) { requestAnimationFrame(draw); return; }
       
-      const w = canvas.width = canvas.offsetWidth;
-      const h = canvas.height = canvas.offsetHeight;
+      const dpr = window.devicePixelRatio || 1;
+      const w = canvas.offsetWidth;
+      const h = canvas.offsetHeight;
+      if (canvas.width !== w * dpr || canvas.height !== h * dpr) {
+        canvas.width = w * dpr;
+        canvas.height = h * dpr;
+      }
+      
+      const scaleBase = Math.min(1, w / 440); // Responsive downscaling for mobile
+      ctx.setTransform(dpr * scaleBase, 0, 0, dpr * scaleBase, 0, 0);
+      
+      const effW = w / scaleBase;
+      const effH = h / scaleBase;
       
       // Background
       ctx.fillStyle = '#0f111a'; // Slight blueish dark gray (LCD background)
-      ctx.fillRect(0, 0, w, h);
+      ctx.fillRect(0, 0, effW, effH);
       
       // Pixel art settings
       ctx.imageSmoothingEnabled = false;
@@ -2162,8 +2173,8 @@
       drawCell(startX + cellW*3, row2Y, 'LEV2', '', (c) => drawLev(c, lev2));
       
       // Right edge dots (as in image)
-      ctx.fillRect(w - 20, row1Y + 30, 4, 4);
-      ctx.fillRect(w - 20, row2Y + 10, 4, 4);
+      ctx.fillRect(effW - 20, row1Y + 30, 4, 4);
+      ctx.fillRect(effW - 20, row2Y + 10, 4, 4);
       
       requestAnimationFrame(draw);
     }
@@ -2180,8 +2191,14 @@
     
     function draw(t) {
       if (!canvas.offsetParent) { requestAnimationFrame(draw); return; }
-      const w = canvas.width = canvas.offsetWidth;
-      const h = canvas.height = canvas.offsetHeight;
+      const dpr = window.devicePixelRatio || 1;
+      const w = canvas.offsetWidth;
+      const h = canvas.offsetHeight;
+      if (canvas.width !== w * dpr || canvas.height !== h * dpr) {
+        canvas.width = w * dpr;
+        canvas.height = h * dpr;
+      }
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, w, h);
       
       const rateVal = patch['lfo1_rate'] || 64;
@@ -2230,8 +2247,14 @@
     
     function draw() {
       if (!canvas.offsetParent) { requestAnimationFrame(draw); return; }
-      const w = canvas.width = canvas.offsetWidth;
-      const h = canvas.height = canvas.offsetHeight;
+      const dpr = window.devicePixelRatio || 1;
+      const w = canvas.offsetWidth;
+      const h = canvas.offsetHeight;
+      if (canvas.width !== w * dpr || canvas.height !== h * dpr) {
+        canvas.width = w * dpr;
+        canvas.height = h * dpr;
+      }
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, w, h);
       
       const A = (patch['amp_attack'] || 0) / 127;
