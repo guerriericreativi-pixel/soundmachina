@@ -5,21 +5,23 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>virus ti snow // editor</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Press+Start+2P&display=swap');
   :root{
-    --bg: #ffffff;
-    --fg: #000000;
-    --section-bg: #f5f5f5;
-    --border: #000000;
-    --dot-color: #e8e8e8;
-    --accent: #00ffff;
+    --bg: #f4f4f4;
+    --fg: #222222;
+    --section-bg: #e6e6e6;
+    --border: #cccccc;
+    --dot-color: #d8d8d8;
+    --accent: #f57b20;
+    --font-ui: 'Inter', sans-serif;
   }
-  html[data-theme="dark"]{
-    --bg: #111111;
+  html[data-skin="elektron"]{
+    --bg: #18181c;
     --fg: #eeeeee;
-    --section-bg: #1a1a1a;
-    --border: #333333;
-    --dot-color: #222222;
+    --section-bg: #222226;
+    --border: #333338;
+    --dot-color: #2a2a30;
+    --accent: #ff3300;
   }
   *{
     box-sizing: border-box;
@@ -38,7 +40,7 @@
     background-image: radial-gradient(circle, var(--dot-color) 1px, transparent 1.5px);
     background-size: 8px 8px;
     color: var(--fg);
-    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
+    font-family: var(--font-ui);
     font-weight: 300;
     font-size: 12px;
     letter-spacing: 0.05em;
@@ -65,7 +67,7 @@
     border-radius: 6px;
     transition: opacity 300ms ease, box-shadow 300ms ease;
   }
-  html[data-theme="dark"] .header-display{
+  html[data-skin="elektron"] .header-display{
     box-shadow: 0 4px 12px rgba(0,0,0,0.4);
   }
   .header-display.flash{
@@ -285,10 +287,10 @@
   .part-1{ border-left-color: #aaaaaa; }
   .part-2{ border-left-color: #555555; }
   .part-3{ border-left-color: #dddddd; }
-  html[data-theme="dark"] .part-0{ border-left-color: #ffffff; }
-  html[data-theme="dark"] .part-1{ border-left-color: #999999; }
-  html[data-theme="dark"] .part-2{ border-left-color: #555555; }
-  html[data-theme="dark"] .part-3{ border-left-color: #cccccc; }
+  html[data-skin="elektron"] .part-0{ border-left-color: #ffffff; }
+  html[data-skin="elektron"] .part-1{ border-left-color: #999999; }
+  html[data-skin="elektron"] .part-2{ border-left-color: #555555; }
+  html[data-skin="elektron"] .part-3{ border-left-color: #cccccc; }
   .part-main{
     display: flex;
     align-items: center;
@@ -982,6 +984,22 @@
       justify-content: center;
     }
   }
+
+  /* ------------------------------------------------------------------ */
+  /* Skins: TE vs Elektron */
+  /* ------------------------------------------------------------------ */
+  html[data-skin="te"] .knob-container[data-col="0"] .knob-ring { stroke: #3ba1ec; }
+  html[data-skin="te"] .knob-container[data-col="1"] .knob-ring { stroke: #5db542; }
+  html[data-skin="te"] .knob-container[data-col="2"] .knob-ring { stroke: #999999; }
+  html[data-skin="te"] .knob-container[data-col="3"] .knob-ring { stroke: #f57b20; }
+  
+  html[data-skin="te"] .knob-container[data-col="0"] .knob-line { stroke: #3ba1ec; stroke-width: 2; }
+  html[data-skin="te"] .knob-container[data-col="1"] .knob-line { stroke: #5db542; stroke-width: 2; }
+  html[data-skin="te"] .knob-container[data-col="2"] .knob-line { stroke: #999999; stroke-width: 2; }
+  html[data-skin="te"] .knob-container[data-col="3"] .knob-line { stroke: #f57b20; stroke-width: 2; }
+
+  html[data-skin="elektron"] .knob-ring { stroke: var(--accent); opacity: 0.5; }
+  html[data-skin="elektron"] .knob-line { stroke: var(--accent); stroke-width: 1.5; }
 </style>
 </head>
 <body>
@@ -1041,7 +1059,7 @@
         <button class="accent-dot" data-accent="#00ffff" style="background:#00ffff" title="cyan"></button>
         <button class="accent-dot" data-accent="#ff00ff" style="background:#ff00ff" title="fuchsia"></button>
       </div>
-      <button class="theme-toggle" id="themeToggle">○</button>
+      <button class="theme-toggle" id="themeToggle">SKIN: TE</button>
     </div>
   </div>
 </div>
@@ -1396,20 +1414,22 @@
   const themeToggle = document.getElementById('themeToggle');
 
   function applyTheme(theme){
-    if (theme === 'dark'){
-      document.documentElement.setAttribute('data-theme', 'dark');
-      themeToggle.textContent = '●'; // ●
+    if (theme === 'elektron'){
+      document.documentElement.setAttribute('data-skin', 'elektron');
+      themeToggle.textContent = 'SKIN: ELEKTRON';
     } else {
-      document.documentElement.removeAttribute('data-theme');
-      themeToggle.textContent = '○'; // ○
+      document.documentElement.setAttribute('data-skin', 'te');
+      themeToggle.textContent = 'SKIN: TE';
     }
+    if (typeof initElektronLcd === 'function') initElektronLcd();
   }
 
-  let currentTheme = localStorage.getItem(THEME_KEY) || 'light';
+  let currentTheme = localStorage.getItem(THEME_KEY) || 'te';
+  if (currentTheme === 'light' || currentTheme === 'dark') currentTheme = 'elektron';
   applyTheme(currentTheme);
 
   themeToggle.addEventListener('click', () => {
-    currentTheme = (currentTheme === 'light') ? 'dark' : 'light';
+    currentTheme = (currentTheme === 'te') ? 'elektron' : 'te';
     localStorage.setItem(THEME_KEY, currentTheme);
     applyTheme(currentTheme);
   });
@@ -1475,7 +1495,7 @@
   function renderVisualizer(t){
     vctx.clearRect(0, 0, visW, visH);
     
-    const dark = document.documentElement.getAttribute('data-theme') === 'dark';
+    const dark = document.documentElement.getAttribute('data-skin') === 'dark';
     // Always use the chosen color for the active wave, connected or not
     const activeColor = currentAccent;
     const inactiveColor = dark ? '#222222' : '#eeeeee';
@@ -1936,6 +1956,7 @@
 
     // thin stroke circle, no fill
     const circle = document.createElementNS(svgNS, 'circle');
+    circle.classList.add('knob-ring');
     circle.setAttribute('cx', KNOB_CENTER);
     circle.setAttribute('cy', KNOB_CENTER);
     circle.setAttribute('r', KNOB_RADIUS);
@@ -1948,6 +1969,7 @@
     const indicator = document.createElementNS(svgNS, 'g');
     indicator.classList.add('knob-indicator');
     const line = document.createElementNS(svgNS, 'line');
+    line.classList.add('knob-line');
     line.setAttribute('x1', KNOB_CENTER);
     line.setAttribute('y1', KNOB_CENTER);
     line.setAttribute('x2', KNOB_CENTER);
@@ -2202,7 +2224,15 @@ let hwEncoders = [];
     elektronLcd.style.border = '2px solid #222';
     elektronLcd.style.borderRadius = '8px';
     elektronLcd.style.boxShadow = 'inset 0 0 15px rgba(0,0,0,0.8), 0 4px 20px rgba(0,0,0,0.5)';
-    container.appendChild(elektronLcd);
+    const elektronWrapper = document.createElement('div');
+    elektronWrapper.style.display = 'flex';
+    elektronWrapper.style.flexWrap = 'wrap';
+    elektronWrapper.style.gap = '40px';
+    elektronWrapper.style.alignItems = 'center';
+    elektronWrapper.style.justifyContent = 'center';
+    container.appendChild(elektronWrapper);
+
+    elektronWrapper.appendChild(elektronLcd);
 
     // --- Page Buttons ---
     const pageNav = document.createElement('div');
@@ -2227,8 +2257,6 @@ let hwEncoders = [];
       };
       pageNav.appendChild(btn);
     });
-    container.appendChild(pageNav);
-
     // --- Hardware Encoders (4x2 Grid) ---
     const encoderGrid = document.createElement('div');
     encoderGrid.id = 'encoderGrid';
@@ -2236,7 +2264,9 @@ let hwEncoders = [];
     encoderGrid.style.gridTemplateColumns = 'repeat(4, 1fr)';
     encoderGrid.style.gap = '30px 50px';
     encoderGrid.style.marginTop = '20px';
-    container.appendChild(encoderGrid);
+    elektronWrapper.appendChild(encoderGrid);
+
+    container.appendChild(pageNav);
 
     root.appendChild(container);
     
@@ -2331,41 +2361,39 @@ let hwEncoders = [];
   }
 
   // --- Graph rendering functions ---
-  function drawWav(ctx, val) {
-    ctx.strokeStyle = currentAccent;
-    ctx.lineWidth = 2;
+  function drawWav(ctx, val, color, isTE) {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = isTE ? 4 : 2;
     ctx.beginPath();
-    // sine, saw, square, wave...
-    if(val < 32) { // sine
-      for(let x=0; x<20; x++){
-         ctx.lineTo(x-10, Math.sin(x/3)*10);
-      }
-    } else if(val < 64) { // saw
+    if(val < 32) { 
+      for(let x=0; x<20; x++) ctx.lineTo(x-10, Math.sin(x/3)*10);
+    } else if(val < 64) { 
       ctx.moveTo(-10, 10); ctx.lineTo(10, -10); ctx.lineTo(10, 10);
-    } else if(val < 96) { // square
+    } else if(val < 96) { 
       ctx.moveTo(-10, -10); ctx.lineTo(0, -10); ctx.lineTo(0, 10); ctx.lineTo(10, 10);
-    } else { // wave
+    } else { 
       ctx.moveTo(-10, 0);
       for(let i=0; i<10; i++) ctx.lineTo(-10 + i*2, (i%2===0)?-10:10);
     }
     ctx.stroke();
   }
-  function drawPd(ctx, val) {
-    ctx.strokeStyle = currentAccent;
-    ctx.lineWidth = 2;
+  function drawPd(ctx, val, color, isTE) {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = isTE ? 4 : 2;
     ctx.beginPath();
     const pw = (val/127)*20;
     ctx.moveTo(-10, -10); ctx.lineTo(-10+pw, -10); ctx.lineTo(-10+pw, 10); ctx.lineTo(10, 10);
     ctx.stroke();
   }
-  function drawEnv(ctx, val) {
-    ctx.fillStyle = currentAccent;
+  function drawEnv(ctx, val, color, isTE) {
+    ctx.fillStyle = color;
     const h = (val/127)*20;
-    ctx.fillRect(-10, 10-h, 20, h);
+    const width = isTE ? 24 : 20;
+    ctx.fillRect(-width/2, 10-h, width, h);
   }
-  function drawLfo(ctx, val) {
-    ctx.strokeStyle = currentAccent;
-    ctx.lineWidth = 2;
+  function drawLfo(ctx, val, color, isTE) {
+    ctx.strokeStyle = color;
+    ctx.lineWidth = isTE ? 4 : 2;
     ctx.beginPath();
     const speed = 1 + (127-val)/10;
     for(let x=0; x<20; x++){
@@ -2418,8 +2446,10 @@ let hwEncoders = [];
        ctx.save();
        ctx.translate(cx, cy);
        
-       // Draw borders (dotted or solid)
-       ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+       const isTEBg = document.documentElement.getAttribute('data-skin') === 'te';
+       // Draw borders
+       ctx.strokeStyle = isTEBg ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.1)';
+       ctx.lineWidth = isTEBg ? 2 : 1;
        ctx.strokeRect(0, 0, cellW, cellH);
        
        // Highlight active
