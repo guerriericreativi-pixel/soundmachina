@@ -1626,6 +1626,7 @@
       if (param) {
         patch[param.id] = ccValue;
         if (knobRefs[param.id]) knobRefs[param.id]._render();
+        if (typeof initElektronLcd === 'function') initElektronLcd();
       }
       return; // Finito con questo pacchetto (era un CC)
     }
@@ -2038,6 +2039,7 @@
       setValue: (value, send) => {
         patch[param.id] = value;
         if (send) sendParam(param, value);
+        if (typeof initElektronLcd === 'function') initElektronLcd();
       }
     });
   }
@@ -2463,6 +2465,7 @@ let hwEncoders = [];
     if (window.macroRefs) {
       window.macroRefs.forEach(m => m._render());
     }
+    if (typeof initElektronLcd === 'function') initElektronLcd();
   }
 
   function applyPatchObject(p, send){
