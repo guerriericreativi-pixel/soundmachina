@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>virus ti snow // editor</title>
 <style>
+  @import url('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
   :root{
     --bg: #ffffff;
     --fg: #000000;
@@ -2045,6 +2046,133 @@
   const knobRefs = {};
 
   // --- Graph rendering functions ---
+  function initElektronLcd() {
+    const canvas = document.getElementById('elektronLcd');
+    if (!canvas) return;
+    const ctx = canvas.getContext('2d');
+
+    function draw() {
+      if (!canvas.offsetParent) { requestAnimationFrame(draw); return; }
+      
+      const w = canvas.width = canvas.offsetWidth;
+      const h = canvas.height = canvas.offsetHeight;
+      
+      // Background
+      ctx.fillStyle = '#0f111a'; // Slight blueish dark gray (LCD background)
+      ctx.fillRect(0, 0, w, h);
+      
+      // Pixel art settings
+      ctx.imageSmoothingEnabled = false;
+      ctx.fillStyle = currentAccent;
+      ctx.strokeStyle = currentAccent;
+      ctx.textBaseline = 'top';
+      ctx.lineWidth = 2;
+      
+      const padX = 20;
+      const padY = 16;
+      
+      // --- HEADER ---
+      ctx.font = '16px "Press Start 2P", monospace';
+      ctx.textAlign = 'left';
+      ctx.fillText('[A01] PSYCHINE  [U]  136.0', padX, padY);
+      
+      // --- SIDE BLOCK (SYN 13) ---
+      const blockX = padX;
+      const blockY = padY + 36;
+      ctx.strokeRect(blockX, blockY, 48, 60);
+      ctx.font = '10px "Press Start 2P", monospace';
+      ctx.fillText('SYN', blockX + 8, blockY + 10);
+      ctx.font = '18px "Press Start 2P", monospace';
+      ctx.fillText('13', blockX + 6, blockY + 30);
+      
+      // --- PARAMS SETUP ---
+      const getVal = (id, def=64) => patch[id] !== undefined ? patch[id] : def;
+      
+      const tun1 = getVal('osc1_semitone') - 64;
+      const wav1 = getVal('osc1_shape');
+      const pd1  = getVal('osc1_pw');
+      const lev1 = getVal('osc1_vel'); 
+      
+      const tun2 = getVal('osc2_semitone') - 64;
+      const wav2 = getVal('osc2_shape');
+      const pd2  = getVal('osc2_pw');
+      const lev2 = getVal('osc2_vel'); 
+      
+      function drawCell(x, y, title, valText, drawIcon) {
+        ctx.font = '10px "Press Start 2P", monospace';
+        ctx.textAlign = 'center';
+        ctx.fillText(title, x + 30, y + 46);
+        
+        ctx.save();
+        ctx.translate(x, y);
+        // Box
+        ctx.strokeRect(0, 0, 60, 40);
+        // Value text inside box
+        ctx.font = '8px "Press Start 2P", monospace';
+        ctx.fillText(valText, 30, 28);
+        
+        // Icon drawing
+        drawIcon(ctx);
+        ctx.restore();
+        ctx.textAlign = 'left';
+      }
+      
+      const startX = blockX + 70;
+      const cellW = 80;
+      const row1Y = blockY - 14;
+      const row2Y = blockY + 50;
+      
+      // Helper for Waveform icon
+      const drawWav = (c, val) => {
+        c.beginPath();
+        if (val < 40) { // Sine/Triangle approx
+           c.moveTo(10, 20);
+           c.quadraticCurveTo(20, 0, 30, 20);
+           c.quadraticCurveTo(40, 40, 50, 20);
+        } else if (val < 80) { // Saw
+           c.moveTo(10, 30); c.lineTo(30, 10); c.lineTo(30, 30); c.lineTo(50, 10);
+        } else { // Square
+           c.moveTo(10, 30); c.lineTo(10, 10); c.lineTo(30, 10); c.lineTo(30, 30); c.lineTo(50, 30); c.lineTo(50, 10);
+        }
+        c.stroke();
+      };
+      
+      const drawPd = (c, val) => {
+        const pw = 10 + (val/127)*20; // 10 to 30
+        c.beginPath();
+        c.moveTo(10, 20); c.lineTo(10, 10); c.lineTo(10+pw, 10); c.lineTo(10+pw, 30); c.lineTo(50, 30);
+        c.stroke();
+      };
+      
+      const drawLev = (c, val) => {
+        const h = (val/127)*26;
+        c.fillRect(20, 32-h, 20, h);
+      };
+      
+      // ROW 1
+      drawCell(startX, row1Y, 'TUN1', '', (c) => { c.fillText('..'+tun1+'..', 30, 15); });
+      drawCell(startX + cellW, row1Y, 'WAV1', '', (c) => drawWav(c, wav1));
+      drawCell(startX + cellW*2, row1Y, 'PD1', '', (c) => drawPd(c, pd1));
+      drawCell(startX + cellW*3, row1Y, 'LEV1', '', (c) => drawLev(c, lev1));
+      
+      // ROW 2
+      drawCell(startX, row2Y, 'TUN2', '', (c) => { c.fillText('..'+tun2+'..', 30, 15); });
+      drawCell(startX + cellW, row2Y, 'WAV2', '', (c) => drawWav(c, wav2));
+      drawCell(startX + cellW*2, row2Y, 'PD2', '', (c) => drawPd(c, pd2));
+      drawCell(startX + cellW*3, row2Y, 'LEV2', '', (c) => drawLev(c, lev2));
+      
+      // Right edge dots (as in image)
+      ctx.fillRect(w - 20, row1Y + 30, 4, 4);
+      ctx.fillRect(w - 20, row2Y + 10, 4, 4);
+      
+      requestAnimationFrame(draw);
+    }
+    
+    // Wait a moment for font to load before first draw
+    setTimeout(() => requestAnimationFrame(draw), 200);
+  }
+
+  // --- Graph rendering functions ---
   function initLfoGraph() {
     const canvas = document.getElementById('lfoGraph');
     if (!canvas) return;
@@ -2159,6 +2287,16 @@
     container.style.alignItems = 'flex-start';
     container.style.gap = '0px';
 
+    // --- Elektron Global LCD ---
+    const elektronLcd = document.createElement('canvas');
+    elektronLcd.id = 'elektronLcd';
+    elektronLcd.style.width = '100%';
+    elektronLcd.style.height = '160px'; // good height for synth screen
+    elektronLcd.style.background = '#0a0a0a';
+    elektronLcd.style.borderBottom = '1px solid var(--border)';
+    elektronLcd.style.boxShadow = 'inset 0 0 15px rgba(0,0,0,0.8)';
+    container.appendChild(elektronLcd);
+
     // --- Sub-Navigation ---
     const nav = document.createElement('div');
     nav.className = 'synth-sub-nav';
@@ -2245,9 +2383,7 @@
     waveRow1.appendChild(createSelect('Wave', ['Classic', 'HyperSaw', 'Wavetable']));
     waveRow1.appendChild(createSelect('Sub Osc', ['Square', 'Triangle']));
     pOsc1.appendChild(waveRow1);
-    const lcd1 = document.createElement('canvas');
-    lcd1.className = 'synth-lcd-display';
-    pOsc1.appendChild(lcd1);
+    pOsc1.appendChild(waveRow1);
     const rowOsc1_1 = document.createElement('div');
     rowOsc1_1.className = 'synth-panel-row';
     rowOsc1_1.appendChild(createKnob(PARAMS.find(x => x.id === 'osc1_semitone')));
@@ -2326,9 +2462,7 @@
 
     const pOsc2 = createPanel('OSC 2');
     pOsc2.appendChild(createSelect('Wave', ['HyperSaw', 'Classic', 'Wavetable']));
-    const lcd2 = document.createElement('canvas');
-    lcd2.className = 'synth-lcd-display';
-    pOsc2.appendChild(lcd2);
+    pOsc2.appendChild(createSelect('Wave', ['HyperSaw', 'Classic', 'Wavetable']));
     const rowOsc2_1 = document.createElement('div');
     rowOsc2_1.className = 'synth-panel-row';
     rowOsc2_1.appendChild(createKnob(PARAMS.find(x => x.id === 'osc2_semitone')));
@@ -2425,6 +2559,7 @@
     root.appendChild(container);
 
     setTimeout(() => {
+      initElektronLcd();
       initLfoGraph();
       initEnvGraph();
     }, 100);
