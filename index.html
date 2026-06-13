@@ -2448,18 +2448,11 @@ let hwEncoders = [];
 
     // --- Hardware Encoders (4x2 Grid) ---
     const encoderGrid = document.createElement('div');
+    encoderGrid.id = 'encoderGrid';
     encoderGrid.style.display = 'grid';
     encoderGrid.style.gridTemplateColumns = 'repeat(4, 1fr)';
     encoderGrid.style.gap = '30px 50px';
     encoderGrid.style.marginTop = '20px';
-    
-    hwEncoders = [];
-    for(let i=0; i<8; i++) {
-      const knob = document.createElement('synth-knob');
-      knob.setAttribute('param-id', '');
-      hwEncoders.push(knob);
-      encoderGrid.appendChild(knob);
-    }
     container.appendChild(encoderGrid);
 
     root.appendChild(container);
@@ -2489,6 +2482,7 @@ let hwEncoders = [];
       if (paramId) {
         activeParam = PARAMS.find(p => p.id === paramId);
         if (activeParam) {
+           window.activeParam = activeParam;
            startY = e.clientY;
            startVal = patch[paramId] !== undefined ? patch[paramId] : activeParam.default;
            document.body.style.cursor = 'ns-resize';
@@ -2507,10 +2501,8 @@ let hwEncoders = [];
       patch[activeParam.id] = newVal;
       
       // Update hardware encoder if visible
-      const encoderIdx = PAGES[currentPage].indexOf(activeParam.id);
-      if (encoderIdx >= 0 && hwEncoders[encoderIdx]) {
-         hwEncoders[encoderIdx].setAttribute('value', newVal);
-      }
+      // Since createKnob handles its own DOM, we should call refreshAllKnobs()
+      if (typeof refreshAllKnobs === 'function') refreshAllKnobs();
       
       sendParam(activeParam.id, newVal);
       initElektronLcd();
@@ -2519,6 +2511,7 @@ let hwEncoders = [];
     window.addEventListener('mouseup', () => {
       if (activeParam) {
         activeParam = null;
+        window.activeParam = null;
         document.body.style.cursor = 'default';
         initElektronLcd();
       }
@@ -2530,26 +2523,31 @@ let hwEncoders = [];
   }
 
   function updateHwEncoders() {
+    const encoderGrid = document.getElementById('encoderGrid');
+    if (!encoderGrid) return;
+    encoderGrid.innerHTML = '';
+    
     const currentParams = PAGES[currentPage];
     for(let i=0; i<8; i++) {
       const paramId = currentParams[i];
-      const knob = hwEncoders[i];
       if (paramId) {
-        knob.style.visibility = 'visible';
         const pDef = PARAMS.find(p => p.id === paramId);
         if (pDef) {
-          knob.setAttribute('param-id', paramId);
-          knob.setAttribute('label', pDef.short || pDef.name);
-          if (pDef.bipolar) knob.setAttribute('bipolar', 'true');
-          else knob.removeAttribute('bipolar');
-          knob.setAttribute('value', patch[paramId] !== undefined ? patch[paramId] : pDef.default);
+          const knob = createKnob(pDef);
+          encoderGrid.appendChild(knob);
+          // Make sure it registers in knobRefs if needed, createKnob does this
+        } else {
+          const placeholder = document.createElement('div');
+          encoderGrid.appendChild(placeholder);
         }
       } else {
-        knob.style.visibility = 'hidden';
+        const placeholder = document.createElement('div');
+        encoderGrid.appendChild(placeholder);
       }
     }
   }
 
+  // --- Graph rendering functions ---
   function drawWav(ctx, val) {
     ctx.strokeStyle = currentAccent;
     ctx.lineWidth = 2;
@@ -2584,9 +2582,9 @@ let hwEncoders = [];
   }
   function drawLfo(ctx, val) {
     ctx.strokeStyle = currentAccent;
-    ctx.lineWidth = 1;
+    ctx.lineWidth = 2;
     ctx.beginPath();
-    const speed = val/10;
+    const speed = 1 + (127-val)/10;
     for(let x=0; x<20; x++){
        ctx.lineTo(x-10, Math.sin(x/speed)*10);
     }
@@ -2606,6 +2604,8 @@ let hwEncoders = [];
       canvas.height = h * dpr;
     }
     
+    // Reset transform before scaling!
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.scale(dpr, dpr);
     ctx.imageSmoothingEnabled = false;
 
@@ -2679,6 +2679,9 @@ let hwEncoders = [];
     PARAMS.forEach(p => {
       if(knobRefs[p.id]) knobRefs[p.id]._render();
     });
+    if (window.macroRefs) {
+      window.macroRefs.forEach(m => m._render());
+    }
   }
 
   function applyPatchObject(p, send){
@@ -3673,6 +3676,23 @@ let hwEncoders = [];
 
   renderLibrary();
   renderMultiLibrary();
+  
+  // Initialize the big macro knobs (Cutoff & Resonance) and put them in the header
+  const macroKnobs = document.getElementById('globalMacroKnobs');
+  if (macroKnobs) {
+    macroKnobs.innerHTML = '';
+    const cutParam = PARAMS.find(p => p.id === 'f1_cutoff');
+    const resParam = PARAMS.find(p => p.id === 'f1_resonance');
+    if (cutParam && resParam) {
+      const cutKnob = createKnob(cutParam);
+      const resKnob = createKnob(resParam);
+      macroKnobs.appendChild(cutKnob);
+      macroKnobs.appendChild(resKnob);
+      // We push them to a custom array so they still get updated even if knobRefs overrides them
+      window.macroRefs = [cutKnob, resKnob];
+    }
+  }
+  
   buildSingleView();
   buildMultiView();
   buildArpView();
