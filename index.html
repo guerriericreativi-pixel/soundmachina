@@ -2049,6 +2049,92 @@
     const canvas = document.getElementById('elektronLcd');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
+    
+    // Layout Constants
+    const padX = 20;
+    const padY = 16;
+    const blockX = padX;
+    const blockY = padY + 36;
+    const startX = blockX + 70;
+    const cellW = 80;
+    const row1Y = blockY - 14;
+    const row2Y = blockY + 50;
+    
+    // Interaction Regions
+    const regions = [
+      { id: 'osc1_semitone', x: startX, y: row1Y, w: 60, h: 40 },
+      { id: 'osc1_shape', x: startX + cellW, y: row1Y, w: 60, h: 40 },
+      { id: 'osc1_pw', x: startX + cellW*2, y: row1Y, w: 60, h: 40 },
+      { id: 'osc1_vel', x: startX + cellW*3, y: row1Y, w: 60, h: 40 },
+      { id: 'osc2_semitone', x: startX, y: row2Y, w: 60, h: 40 },
+      { id: 'osc2_shape', x: startX + cellW, y: row2Y, w: 60, h: 40 },
+      { id: 'osc2_pw', x: startX + cellW*2, y: row2Y, w: 60, h: 40 },
+      { id: 'osc2_vel', x: startX + cellW*3, y: row2Y, w: 60, h: 40 }
+    ];
+
+    let activeParam = null;
+    let startY = 0;
+    let startValue = 0;
+
+    function getEventPos(e) {
+      const rect = canvas.getBoundingClientRect();
+      const clientX = e.touches ? e.touches[0].clientX : e.clientX;
+      const clientY = e.touches ? e.touches[0].clientY : e.clientY;
+      const scaleBase = Math.min(1, canvas.offsetWidth / 440);
+      const x = (clientX - rect.left) / scaleBase;
+      const y = (clientY - rect.top) / scaleBase;
+      return { x, y, clientY };
+    }
+
+    function onPointerDown(e) {
+      const { x, y, clientY } = getEventPos(e);
+      for (const r of regions) {
+        if (x >= r.x && x <= r.x + r.w && y >= r.y && y <= r.y + r.h) {
+          activeParam = PARAMS.find(p => p.id === r.id);
+          if (activeParam) {
+            startY = clientY;
+            startValue = patch[r.id] !== undefined ? patch[r.id] : activeParam.default;
+            e.preventDefault();
+            canvas.style.cursor = 'ns-resize';
+            break;
+          }
+        }
+      }
+    }
+
+    function onPointerMove(e) {
+      if (!activeParam) return;
+      e.preventDefault();
+      const { clientY } = getEventPos(e);
+      const delta = startY - clientY;
+      
+      const range = activeParam.max - activeParam.min;
+      const step = (delta / 120) * range; // 120px drag for full range
+      let newVal = Math.round(startValue + step);
+      newVal = Math.max(activeParam.min, Math.min(activeParam.max, newVal));
+      
+      if (patch[activeParam.id] !== newVal) {
+        patch[activeParam.id] = newVal;
+        if (knobRefs[activeParam.id]) {
+           knobRefs[activeParam.id].setAttribute('value', newVal);
+           knobRefs[activeParam.id]._render();
+        }
+        sendParam(activeParam, newVal);
+      }
+    }
+
+    function onPointerUp() {
+      activeParam = null;
+      canvas.style.cursor = 'default';
+    }
+
+    canvas.addEventListener('mousedown', onPointerDown);
+    window.addEventListener('mousemove', onPointerMove, {passive: false});
+    window.addEventListener('mouseup', onPointerUp);
+    
+    canvas.addEventListener('touchstart', onPointerDown, {passive: false});
+    window.addEventListener('touchmove', onPointerMove, {passive: false});
+    window.addEventListener('touchend', onPointerUp);
 
     function draw() {
       if (!canvas.offsetParent) { requestAnimationFrame(draw); return; }
@@ -2078,17 +2164,12 @@
       ctx.textBaseline = 'top';
       ctx.lineWidth = 2;
       
-      const padX = 20;
-      const padY = 16;
-      
       // --- HEADER ---
       ctx.font = '16px "Press Start 2P", monospace';
       ctx.textAlign = 'left';
       ctx.fillText('[A01] PSYCHINE  [U]  136.0', padX, padY);
       
       // --- SIDE BLOCK (SYN 13) ---
-      const blockX = padX;
-      const blockY = padY + 36;
       ctx.strokeRect(blockX, blockY, 48, 60);
       ctx.font = '10px "Press Start 2P", monospace';
       ctx.fillText('SYN', blockX + 8, blockY + 10);
@@ -2108,7 +2189,14 @@
       const pd2  = getVal('osc2_pw');
       const lev2 = getVal('osc2_vel'); 
       
-      function drawCell(x, y, title, valText, drawIcon) {
+      function drawCell(x, y, title, valText, drawIcon, paramId) {
+        // Highlight active cell slightly if dragging
+        if (activeParam && activeParam.id === paramId) {
+          ctx.fillStyle = '#1a1f2e';
+          ctx.fillRect(x, y, 60, 40);
+          ctx.fillStyle = currentAccent;
+        }
+        
         ctx.font = '10px "Press Start 2P", monospace';
         ctx.textAlign = 'center';
         ctx.fillText(title, x + 30, y + 46);
@@ -2126,11 +2214,6 @@
         ctx.restore();
         ctx.textAlign = 'left';
       }
-      
-      const startX = blockX + 70;
-      const cellW = 80;
-      const row1Y = blockY - 14;
-      const row2Y = blockY + 50;
       
       // Helper for Waveform icon
       const drawWav = (c, val) => {
@@ -2160,16 +2243,16 @@
       };
       
       // ROW 1
-      drawCell(startX, row1Y, 'TUN1', '', (c) => { c.fillText('..'+tun1+'..', 30, 15); });
-      drawCell(startX + cellW, row1Y, 'WAV1', '', (c) => drawWav(c, wav1));
-      drawCell(startX + cellW*2, row1Y, 'PD1', '', (c) => drawPd(c, pd1));
-      drawCell(startX + cellW*3, row1Y, 'LEV1', '', (c) => drawLev(c, lev1));
+      drawCell(startX, row1Y, 'TUN1', '', (c) => { c.fillText('..'+tun1+'..', 30, 15); }, 'osc1_semitone');
+      drawCell(startX + cellW, row1Y, 'WAV1', '', (c) => drawWav(c, wav1), 'osc1_shape');
+      drawCell(startX + cellW*2, row1Y, 'PD1', '', (c) => drawPd(c, pd1), 'osc1_pw');
+      drawCell(startX + cellW*3, row1Y, 'LEV1', '', (c) => drawLev(c, lev1), 'osc1_vel');
       
       // ROW 2
-      drawCell(startX, row2Y, 'TUN2', '', (c) => { c.fillText('..'+tun2+'..', 30, 15); });
-      drawCell(startX + cellW, row2Y, 'WAV2', '', (c) => drawWav(c, wav2));
-      drawCell(startX + cellW*2, row2Y, 'PD2', '', (c) => drawPd(c, pd2));
-      drawCell(startX + cellW*3, row2Y, 'LEV2', '', (c) => drawLev(c, lev2));
+      drawCell(startX, row2Y, 'TUN2', '', (c) => { c.fillText('..'+tun2+'..', 30, 15); }, 'osc2_semitone');
+      drawCell(startX + cellW, row2Y, 'WAV2', '', (c) => drawWav(c, wav2), 'osc2_shape');
+      drawCell(startX + cellW*2, row2Y, 'PD2', '', (c) => drawPd(c, pd2), 'osc2_pw');
+      drawCell(startX + cellW*3, row2Y, 'LEV2', '', (c) => drawLev(c, lev2), 'osc2_vel');
       
       // Right edge dots (as in image)
       ctx.fillRect(effW - 20, row1Y + 30, 4, 4);
