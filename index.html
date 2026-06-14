@@ -1505,44 +1505,7 @@
     });
   });
 
-  // ---------------------------------------------------------------------
-  // Header visualizer — OP-XY style scrolling piano-roll dot matrix.
-  // 40x8 grid of dots scrolling right-to-left. New columns are generated
-  // as a musical sequence (pentatonic rows). Speed/density react to the
-  // MIDI connection state. Canvas + requestAnimationFrame for 60fps.
-  // ---------------------------------------------------------------------
-  const visualizer = document.getElementById('visualizer');
-  const vctx = visualizer.getContext('2d');
 
-  const VIS_DOT = 4;       // dot diameter
-  const VIS_GAP = 2;       // gap between dots
-  const VIS_CELL = VIS_DOT + VIS_GAP;
-
-  let VIS_COLS = 1;
-  let VIS_ROWS = 1;
-
-  let visDPR = 1;
-  let visW = 0, visH = 0;
-
-  function resizeVisualizer(){
-    const rect = visualizer.getBoundingClientRect();
-    visDPR = window.devicePixelRatio || 1;
-    visW = Math.max(1, Math.floor(rect.width));
-    visH = Math.max(1, Math.floor(rect.height));
-    visualizer.width = visW * visDPR;
-    visualizer.height = visH * visDPR;
-    vctx.setTransform(visDPR, 0, 0, visDPR, 0, 0);
-
-    VIS_COLS = Math.max(1, Math.floor((visW + VIS_GAP) / VIS_CELL));
-    VIS_ROWS = Math.max(1, Math.floor((visH + VIS_GAP) / VIS_CELL));
-  }
-
-  
-
-  resizeVisualizer();
-  window.addEventListener('resize', resizeVisualizer);
-  requestAnimationFrame(resizeVisualizer);
-  
 
   // ---------------------------------------------------------------------
   // MIDI setup
@@ -1581,11 +1544,6 @@
     // force reflow so the animation can restart
     void connDot.offsetWidth;
     connDot.classList.add('pulse');
-
-    visualizer.classList.remove('flash');
-    void visualizer.offsetWidth;
-    visualizer.classList.add('flash');
-    setTimeout(() => visualizer.classList.remove('flash'), 500);
   }
 
   function updateConnectionIndicator(){
