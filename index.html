@@ -1059,7 +1059,7 @@
         <button class="accent-dot" data-accent="#00ffff" style="background:#00ffff" title="cyan"></button>
         <button class="accent-dot" data-accent="#ff00ff" style="background:#ff00ff" title="fuchsia"></button>
       </div>
-      <button class="theme-toggle" id="themeToggle">SKIN: TE</button>
+      <button class="theme-toggle" id="themeToggle">○</button>
     </div>
   </div>
 </div>
@@ -1416,10 +1416,10 @@
   function applyTheme(theme){
     if (theme === 'elektron'){
       document.documentElement.setAttribute('data-skin', 'elektron');
-      themeToggle.textContent = 'SKIN: ELEKTRON';
+      themeToggle.textContent = '●';
     } else {
       document.documentElement.setAttribute('data-skin', 'te');
-      themeToggle.textContent = 'SKIN: TE';
+      themeToggle.textContent = '○';
     }
     if (typeof initElektronLcd === 'function') initElektronLcd();
   }
