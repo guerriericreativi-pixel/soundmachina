@@ -1061,7 +1061,7 @@
 <div class="app-header">
   <div class="app-header-left">
     <div>
-      <h1 style="margin: 0; font-size: 24px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;">VIRUS-H</h1>
+      <h1 style="margin: 0; font-size: 24px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap;">VIRUS-H</h1>
     </div>
     <div class="segmented-control" id="partTabs">
       <button class="segmented-tab" id="btnTabMultipart">MULTI</button>
@@ -1073,7 +1073,7 @@
   </div>
   
   <div class="app-header-right">
-    <div style="font-weight: 600; font-size: 14px; letter-spacing: 0.05em; background: var(--section-bg); padding: 4px 12px; border-radius: 4px; border: 1px solid var(--border);" id="patchNameDisplay">virus ti snow // [PATCH NAME]</div>
+    <div style="font-weight: 600; font-size: 14px; letter-spacing: 0.05em; background: var(--section-bg); padding: 4px 12px; border-radius: 4px; border: 1px solid var(--border); white-space: nowrap;" id="patchNameDisplay">virus ti snow // [PATCH NAME]</div>
     <div class="conn" style="margin-right: 16px;">
       <span class="dot" id="connDot"></span>
       <span id="connLabel" style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em;">disconnected</span>
@@ -2362,18 +2362,102 @@ let hwEncoders = [];
       canvas.height = h * dpr;
     }
     
-    // Reset transform before scaling!
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.scale(dpr, dpr);
     ctx.imageSmoothingEnabled = false;
 
-    // Clear
+    // Background
     ctx.fillStyle = '#0a0a0a';
     ctx.fillRect(0, 0, w, h);
     
-    const cellW = w / 4;
-    const cellH = h / 2;
+    const isTEBg = document.documentElement.getAttribute('data-skin') === 'te';
+    const mainColor = '#fff'; // LCD is always dark, so text/lines must be bright
+    const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#00e5ff';
     
+    const headerH = 40;
+    const leftW = 80;
+    
+    ctx.fillStyle = mainColor;
+    ctx.strokeStyle = mainColor;
+
+    // --- Header ---
+    ctx.font = 'bold 22px "JetBrains Mono", "Space Mono", monospace';
+    ctx.textAlign = 'left';
+    ctx.textBaseline = 'top';
+    ctx.fillText('A05', 15, 10);
+
+    ctx.textAlign = 'center';
+    ctx.font = 'bold 26px "JetBrains Mono", "Space Mono", monospace';
+    const patchInput = document.getElementById('patchName');
+    const pName = (patchInput && patchInput.value) ? patchInput.value.toUpperCase().substring(0, 12) : 'VIRUS TI';
+    ctx.fillText(pName, w / 2, 8);
+
+    ctx.textAlign = 'right';
+    ctx.font = '18px "JetBrains Mono", "Space Mono", monospace';
+    ctx.fillText('120.0', w - 15, 12);
+    
+    // Draw line separating header
+    ctx.lineWidth = 2;
+    ctx.beginPath();
+    ctx.moveTo(0, headerH);
+    ctx.lineTo(w, headerH);
+    ctx.stroke();
+
+    // --- Left Column ---
+    ctx.textAlign = 'center';
+    ctx.font = 'bold 20px "JetBrains Mono", "Space Mono", monospace';
+    
+    // Split page name (e.g. "OSC 1" -> "OSC", "1")
+    const pageParts = currentPage.split(' ');
+    if (pageParts.length > 1) {
+      ctx.fillText(pageParts[0], leftW / 2, headerH + 20);
+      ctx.font = 'bold 28px "JetBrains Mono", "Space Mono", monospace';
+      ctx.fillText(pageParts[1], leftW / 2, headerH + 45);
+    } else {
+      ctx.fillText(currentPage, leftW / 2, headerH + 30);
+    }
+
+    // Level meter "LEV"
+    ctx.font = 'bold 16px "JetBrains Mono", "Space Mono", monospace';
+    ctx.fillText('LEV', leftW / 2, h - 25);
+    
+    // Draw simple vertical meter
+    const meterW = 20;
+    const meterH = 60;
+    const meterX = (leftW - meterW) / 2;
+    const meterY = h - 95;
+    ctx.lineWidth = 2;
+    ctx.strokeRect(meterX, meterY, meterW, meterH);
+    // Mock level (e.g. 60% full)
+    ctx.fillStyle = mainColor;
+    ctx.fillRect(meterX + 4, meterY + meterH * 0.4, meterW - 8, meterH * 0.6 - 4);
+    
+    // Line separating left column
+    ctx.beginPath();
+    ctx.moveTo(leftW, headerH);
+    ctx.lineTo(leftW, h);
+    ctx.stroke();
+    
+    // --- 4x2 Grid ---
+    const gridX = leftW;
+    const gridY = headerH;
+    const gridW = w - gridX;
+    const gridH = h - gridY;
+    const cellW = gridW / 4;
+    const cellH = gridH / 2;
+
+    // Draw grid lines
+    ctx.lineWidth = 1;
+    ctx.strokeStyle = isTEBg ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.2)';
+    ctx.beginPath();
+    ctx.moveTo(gridX, gridY + cellH);
+    ctx.lineTo(w, gridY + cellH);
+    for(let i=1; i<4; i++){
+      ctx.moveTo(gridX + i*cellW, gridY);
+      ctx.lineTo(gridX + i*cellW, h);
+    }
+    ctx.stroke();
+
     const currentParams = PAGES[currentPage];
     
     for(let i=0; i<8; i++) {
@@ -2387,49 +2471,45 @@ let hwEncoders = [];
        const col = i % 4;
        const row = Math.floor(i / 4);
        
-       const cx = col * cellW;
-       const cy = row * cellH;
+       const cx = gridX + col * cellW;
+       const cy = gridY + row * cellH;
        
        ctx.save();
        ctx.translate(cx, cy);
        
-       const isTEBg = document.documentElement.getAttribute('data-skin') === 'te';
-       // Draw borders
-       ctx.strokeStyle = isTEBg ? 'rgba(255,255,255,0.2)' : 'rgba(255,255,255,0.1)';
-       ctx.lineWidth = isTEBg ? 2 : 1;
-       ctx.strokeRect(0, 0, cellW, cellH);
-       
        // Highlight active
        if (window.activeParam && window.activeParam.id === paramId) {
-         ctx.fillStyle = 'rgba(255,255,255,0.05)';
+         ctx.fillStyle = isTEBg ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)';
          ctx.fillRect(0, 0, cellW, cellH);
        }
        
-       // Center rendering context
-       ctx.translate(cellW/2, cellH/2);
+       // Center rendering context for graphics
+       ctx.translate(cellW/2, cellH/2 - 10);
        
        // Specific Graphics
        const idLower = paramId.toLowerCase();
-       ctx.save();
-       ctx.translate(0, -10);
-       if (idLower.includes('wave') || idLower.includes('shape')) drawWav(ctx, val);
-       else if (idLower.includes('pw')) drawPd(ctx, val);
-       else if (idLower.includes('rate') || idLower.includes('lfo')) drawLfo(ctx, val);
-       else drawEnv(ctx, val); // fallback bar
+       const drawColor = (window.activeParam && window.activeParam.id === paramId) ? accent : mainColor;
+       
+       if (typeof drawWav === 'function' && (idLower.includes('wave') || idLower.includes('shape'))) {
+         drawWav(ctx, val, drawColor, isTEBg);
+       } else if (typeof drawPd === 'function' && idLower.includes('pw')) {
+         drawPd(ctx, val, drawColor, isTEBg);
+       } else if (typeof drawLfo === 'function' && (idLower.includes('rate') || idLower.includes('lfo'))) {
+         drawLfo(ctx, val, drawColor, isTEBg);
+       } else if (typeof drawEnv === 'function') {
+         drawEnv(ctx, val, drawColor, isTEBg);
+       }
+       
        ctx.restore();
        
-       // Text
-       ctx.fillStyle = currentAccent;
-       ctx.font = '12px "JetBrains Mono", "Space Mono", monospace';
+       // Text label at bottom of cell
+       ctx.save();
+       ctx.translate(cx + cellW/2, cy + cellH - 10);
+       ctx.fillStyle = mainColor;
+       ctx.font = 'bold 14px "JetBrains Mono", "Space Mono", monospace';
        ctx.textAlign = 'center';
-       ctx.textBaseline = 'bottom';
-       ctx.fillText(pDef.short.toUpperCase(), 0, cellH/2 - 4);
-       
-       // Generic Value
-       ctx.fillStyle = currentAccent;
-       ctx.font = '10px "JetBrains Mono", "Space Mono", monospace';
-       ctx.fillText(val, 0, cellH/2 - 18);
-       
+       ctx.textBaseline = 'middle';
+       ctx.fillText(pDef.short.toUpperCase(), 0, 0);
        ctx.restore();
     }
   }
