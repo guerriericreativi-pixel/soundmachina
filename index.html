@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>virus ti snow // editor</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Press+Start+2P&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Press+Start+2P&family=JetBrains+Mono:wght@400;700&display=swap');
   :root{
     --bg: #f4f4f4;
     --fg: #222222;
@@ -211,13 +211,13 @@
   /* mode tabs / single-multi views                                      */
   /* ------------------------------------------------------------------ */
   .hidden{ display: none !important; }
-  .mode-tabs{
+  .segmented-tabs{
     display: flex;
     gap: 8px;
     margin-bottom: 8px;
     flex: 0 0 auto;
   }
-  .mode-tab{
+  .segmented-tab{
     background: none;
     border: 1px solid var(--border);
     color: var(--fg);
@@ -231,7 +231,7 @@
     padding: 6px 12px;
     transition: background-color 100ms ease, color 100ms ease;
   }
-  .mode-tab.active{
+  .segmented-tab.active{
     background: var(--accent);
     color: #000000;
     border-color: var(--accent);
@@ -1000,75 +1000,122 @@
 
   html[data-skin="elektron"] .knob-ring { stroke: var(--accent); opacity: 0.5; }
   html[data-skin="elektron"] .knob-line { stroke: var(--accent); stroke-width: 1.5; }
+
+  /* MODAL */
+  .modal-overlay {
+    position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
+    display: none; align-items: center; justify-content: center; z-index: 1000;
+  }
+  .modal-content {
+    background: var(--bg); border: 1px solid var(--border); border-radius: 12px;
+    padding: 30px; min-width: 400px; box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    display: flex; flex-direction: column; gap: 16px;
+  }
+  .modal-close {
+    align-self: flex-end; background: transparent; border: none; font-size: 20px;
+    color: var(--fg); cursor: pointer; margin-bottom: -10px;
+  }
+  
+  /* SEGMENTED CONTROL */
+  .segmented-control {
+    display: flex; background: var(--section-bg); border-radius: 8px;
+    padding: 4px; gap: 2px; border: 1px solid var(--border); margin: 0;
+  }
+  .segmented-tab {
+    flex: 1; padding: 8px 16px; font-size: 11px; font-weight: 600; letter-spacing: 0.1em;
+    text-transform: uppercase; border: none; border-radius: 6px;
+    background: transparent; color: var(--fg); opacity: 0.6; cursor: pointer;
+    transition: all 0.2s ease;
+  }
+  .segmented-tab:hover { opacity: 1; }
+  .segmented-tab.active {
+    background: var(--bg); opacity: 1; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+  }
+  html[data-skin="elektron"] .segmented-tab.active { box-shadow: 0 2px 8px rgba(0,0,0,0.4); }
+  
+  /* NEW HEADER */
+  .app-header {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 16px 24px; border-bottom: 1px solid var(--border);
+  }
+  .app-header-left { display: flex; align-items: center; gap: 24px; }
+  .app-header-right { display: flex; align-items: center; gap: 16px; }
+  
+  /* CHASSIS */
+  .hardware-chassis {
+    background: var(--section-bg); border-radius: 12px; padding: 40px;
+    border: 1px solid var(--border); box-shadow: inset 0 2px 0 rgba(255,255,255,0.05), 0 10px 30px rgba(0,0,0,0.1);
+    display: flex; flex-direction: column; gap: 40px; align-items: center;
+    max-width: 900px; margin: 40px auto;
+  }
+  html[data-skin="elektron"] .hardware-chassis {
+    box-shadow: inset 0 2px 0 rgba(255,255,255,0.05), 0 10px 30px rgba(0,0,0,0.5);
+  }
+
 </style>
 </head>
 <body>
 
-<div class="header">
-  <div class="header-top-row" style="display: flex; justify-content: space-between; align-items: stretch; gap: 20px; margin-bottom: 16px;">
-    
-    <!-- LEFT: Logo & Branding -->
-    <div class="header-left-block" style="flex: 1; border: 1px solid var(--border); border-radius: 6px; padding: 20px; display: flex; flex-direction: column; justify-content: flex-start;">
-      <div>
-        <h1 style="margin: 0; font-size: 32px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;">VIRUS-H</h1>
-        <div style="font-size: 11px; opacity: 0.6; margin-top: 4px; letter-spacing: 0.2em;">WEB EDITOR & LIBRARIAN</div>
-      </div>
-    </div>
 
-    <!-- CENTER: DOT Anim -->
-    
-
-    <!-- RIGHT: Macro Controls -->
-    <div class="header-right-block" style="flex: 1; border: 1px solid var(--border); border-radius: 6px; padding: 20px; display: flex; flex-direction: column; align-items: center; justify-content: center; position: relative;">
-      <div style="position: absolute; top: 12px; left: 16px; font-size: 10px; font-weight: bold; opacity: 0.5; letter-spacing: 0.2em; text-transform: uppercase;">MACRO CONTROLS</div>
-      <div id="globalMacroKnobs" class="section-main" style="display: flex; gap: 50px; margin-top: 16px; border: none; background: transparent; padding: 0;"></div>
+<div class="app-header">
+  <div class="app-header-left">
+    <div>
+      <h1 style="margin: 0; font-size: 24px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase;">VIRUS-H</h1>
     </div>
-    
+    <div class="segmented-control" id="partTabs">
+      <button class="segmented-tab" id="btnTabMultipart">MULTI</button>
+      <button class="segmented-tab" id="btnTabPatchManager">PATCH</button>
+      <button class="segmented-tab" id="btnTabArp">ARP</button>
+      <button class="segmented-tab" id="btnTabSequencer">SEQ</button>
+      <button class="segmented-tab active" id="btnTabSynth">SYNTH</button>
+    </div>
   </div>
-  <div class="header-bar">
-    <div class="header-title" id="patchNameDisplay">virus ti snow // [PATCH NAME]</div>
-    <div class="header-controls">
-      <div class="field">
-        <label>input</label>
-        <select id="midiInSelect"><option value="">none</option></select>
-      </div>
-      <div class="field">
-        <label>output</label>
-        <select id="midiOutSelect"><option value="">none</option></select>
-      </div>
-      <div class="field">
-        <label>channel</label>
-        <select id="midiChannel"></select>
-      </div>
-      <div class="header-control">
-        <label>device id</label>
-        <select id="deviceIdSelect"></select>
-      </div>
-      <div class="conn">
-        <span class="dot" id="connDot"></span>
-        <span id="connLabel">disconnected</span>
-      </div>
-      <div id="midi-debug" style="margin-left: 20px; font-family: monospace; color: #00ff00; background: #111; padding: 4px 8px; border-radius: 4px; font-size: 12px; min-width: 150px; text-align: center;">
-        MIDI: ...
-      </div>
-      <div class="accent-picker" id="accentPicker">
-        <button class="accent-dot" data-accent="#888888" style="background:#888888" title="grey"></button>
-        <button class="accent-dot" data-accent="#aaff00" style="background:#aaff00" title="lime"></button>
-        <button class="accent-dot" data-accent="#00ffff" style="background:#00ffff" title="cyan"></button>
-        <button class="accent-dot" data-accent="#ff00ff" style="background:#ff00ff" title="fuchsia"></button>
-      </div>
-      <button class="theme-toggle" id="themeToggle">○</button>
+  
+  <div class="app-header-right">
+    <div style="font-weight: 600; font-size: 14px; letter-spacing: 0.05em; background: var(--section-bg); padding: 4px 12px; border-radius: 4px; border: 1px solid var(--border);" id="patchNameDisplay">virus ti snow // [PATCH NAME]</div>
+    <div class="conn" style="margin-right: 16px;">
+      <span class="dot" id="connDot"></span>
+      <span id="connLabel" style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em;">disconnected</span>
+    </div>
+    
+    <div class="accent-picker" id="accentPicker">
+      <button class="accent-dot" data-accent="#888888" style="background:#888888" title="grey"></button>
+      <button class="accent-dot" data-accent="#aaff00" style="background:#aaff00" title="lime"></button>
+      <button class="accent-dot" data-accent="#00ffff" style="background:#00ffff" title="cyan"></button>
+      <button class="accent-dot" data-accent="#ff00ff" style="background:#ff00ff" title="fuchsia"></button>
+    </div>
+    <button class="theme-toggle" id="themeToggle" style="margin: 0;">○</button>
+    <button id="btnSettings" style="background:transparent; border:none; color:var(--fg); cursor:pointer; font-size:18px;">⚙️</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="settingsModal">
+  <div class="modal-content">
+    <button class="modal-close" id="btnCloseSettings">×</button>
+    <h2 style="margin-top:0;">MIDI Settings</h2>
+    <div class="field">
+      <label>input</label>
+      <select id="midiInSelect"><option value="">none</option></select>
+    </div>
+    <div class="field">
+      <label>output</label>
+      <select id="midiOutSelect"><option value="">none</option></select>
+    </div>
+    <div class="field">
+      <label>channel</label>
+      <select id="midiChannel"></select>
+    </div>
+    <div class="header-control">
+      <label>device id</label>
+      <select id="deviceIdSelect"></select>
+    </div>
+    <div id="midi-debug" style="font-family: monospace; color: #00ff00; background: #111; padding: 4px 8px; border-radius: 4px; font-size: 12px; text-align: center; margin-top: 10px;">
+      MIDI: ...
     </div>
   </div>
 </div>
 
-<div class="mode-tabs" id="partTabs" style="justify-content: flex-start; border-bottom: 1px solid var(--border); padding-bottom: 0;">
-  <button class="mode-tab" id="btnTabMultipart">MULTIPART</button>
-  <button class="mode-tab" id="btnTabPatchManager">PATCH MANAGER</button>
-  <button class="mode-tab" id="btnTabArp">ARP</button>
-  <button class="mode-tab" id="btnTabSequencer">SEQUENCER</button>
-  <button class="mode-tab active" id="btnTabSynth">SYNTH</button>
-</div>
 
 <div id="patchManagerContent" style="display: none;">
 <div class="section section-lib">
@@ -1155,7 +1202,7 @@
     document.getElementById('arpContent').style.display = 'none';
     document.getElementById('sequencerContent').style.display = 'none';
     
-    document.querySelectorAll('.mode-tab').forEach(btn => btn.classList.remove('active'));
+    document.querySelectorAll('.segmented-tab').forEach(btn => btn.classList.remove('active'));
   }
 
   document.getElementById('btnTabSynth').addEventListener('click', () => {
@@ -2157,11 +2204,12 @@ let hwEncoders = [];
     elektronLcd.style.borderRadius = '8px';
     elektronLcd.style.boxShadow = 'inset 0 0 15px rgba(0,0,0,0.8), 0 4px 20px rgba(0,0,0,0.5)';
     const elektronWrapper = document.createElement('div');
-    elektronWrapper.style.display = 'flex';
-    elektronWrapper.style.flexDirection = 'column';
-    elektronWrapper.style.gap = '40px';
-    elektronWrapper.style.alignItems = 'center';
-    elektronWrapper.style.justifyContent = 'center';
+    elektronWrapper.className = 'hardware-chassis';
+    
+    
+    
+    
+    
     container.appendChild(elektronWrapper);
 
     elektronWrapper.appendChild(elektronLcd);
@@ -2197,6 +2245,10 @@ let hwEncoders = [];
     encoderGrid.style.gap = '30px 50px';
     encoderGrid.style.marginTop = '20px';
     elektronWrapper.appendChild(encoderGrid);
+
+    const macrosDiv = document.createElement('div');
+    macrosDiv.innerHTML = `<div style="font-size: 10px; font-weight: bold; opacity: 0.5; letter-spacing: 0.2em; text-transform: uppercase; text-align: center; margin-bottom: 10px;">MACRO CONTROLS</div>${macrosHTML}`; 
+    elektronWrapper.appendChild(macrosDiv);
 
     container.appendChild(pageNav);
 
@@ -2405,14 +2457,14 @@ let hwEncoders = [];
        
        // Text
        ctx.fillStyle = currentAccent;
-       ctx.font = '10px "Press Start 2P"';
+       ctx.font = '12px "JetBrains Mono", "Space Mono", monospace';
        ctx.textAlign = 'center';
        ctx.textBaseline = 'bottom';
        ctx.fillText(pDef.short.toUpperCase(), 0, cellH/2 - 4);
        
        // Generic Value
        ctx.fillStyle = currentAccent;
-       ctx.font = '8px "Press Start 2P"';
+       ctx.font = '10px "JetBrains Mono", "Space Mono", monospace';
        ctx.fillText(val, 0, cellH/2 - 18);
        
        ctx.restore();
