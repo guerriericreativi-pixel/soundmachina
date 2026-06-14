@@ -2205,7 +2205,12 @@ let hwEncoders = [];
     elektronWrapper.appendChild(encoderGrid);
 
     const macrosDiv = document.createElement('div');
-    macrosDiv.innerHTML = `<div style="font-size: 10px; font-weight: bold; opacity: 0.5; letter-spacing: 0.2em; text-transform: uppercase; text-align: center; margin-bottom: 10px;">MACRO CONTROLS</div>${macrosHTML}`; 
+    macrosDiv.id = 'globalMacroKnobs';
+    macrosDiv.style.display = 'flex';
+    macrosDiv.style.flexWrap = 'wrap';
+    macrosDiv.style.justifyContent = 'center';
+    macrosDiv.style.gap = '30px';
+    // We will let the bottom initialization populate this div
     elektronWrapper.appendChild(macrosDiv);
 
     container.appendChild(pageNav);
