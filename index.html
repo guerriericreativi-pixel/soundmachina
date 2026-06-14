@@ -2361,8 +2361,10 @@ let hwEncoders = [];
     ctx.strokeStyle = color;
     ctx.lineWidth = 2;
     ctx.beginPath();
-    const peak = 10 - (val/127)*20;
-    ctx.moveTo(-10, 10); ctx.lineTo(-4, peak); ctx.lineTo(4, peak + 4); ctx.lineTo(10, 10);
+    // Val controls the attack peak position horizontally
+    const peakX = -6 + (val/127)*12;
+    const peakY = -8;
+    ctx.moveTo(-10, 10); ctx.lineTo(peakX, peakY); ctx.lineTo(4, peakY + 8); ctx.lineTo(10, 10);
     ctx.stroke();
   }
   
@@ -2380,10 +2382,20 @@ let hwEncoders = [];
   function drawTune(ctx, val, color) {
     ctx.strokeStyle = color;
     ctx.lineWidth = 2;
+    // Val moves the note up and down smoothly
+    const yOffset = 4 - (val/127)*8; 
+    
+    // Draw a static ledger line behind it
+    ctx.beginPath();
+    ctx.setLineDash([1, 2]);
+    ctx.moveTo(-8, 0); ctx.lineTo(8, 0);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    
     ctx.beginPath();
     // A small musical note
-    ctx.arc(-2, 4, 3, 0, Math.PI*2);
-    ctx.moveTo(1, 4); ctx.lineTo(1, -6); ctx.lineTo(6, -4);
+    ctx.arc(-2, 4 + yOffset, 3, 0, Math.PI*2);
+    ctx.moveTo(1, 4 + yOffset); ctx.lineTo(1, -6 + yOffset); ctx.lineTo(6, -4 + yOffset);
     ctx.stroke();
   }
 
@@ -2392,7 +2404,7 @@ let hwEncoders = [];
     ctx.lineWidth = 2;
     ctx.beginPath();
     // Two overlapping shapes
-    const offset = 1 + (val/127)*4;
+    const offset = (val/127)*6;
     ctx.strokeRect(-8, -4, 8, 8);
     ctx.strokeRect(-8 + offset, -4 - offset, 8, 8);
   }
@@ -2404,7 +2416,7 @@ let hwEncoders = [];
     // Filter cutoff curve
     ctx.moveTo(-10, -5); ctx.lineTo(0, -5); ctx.lineTo(8, 10);
     ctx.stroke();
-    // Vertical cutoff line
+    // Vertical cutoff line moves with val
     ctx.beginPath();
     const cx = -8 + (val/127)*16;
     ctx.setLineDash([2, 2]);
@@ -2417,13 +2429,22 @@ let hwEncoders = [];
     ctx.strokeStyle = color;
     ctx.fillStyle = color;
     ctx.lineWidth = 2;
-    // Diamond with dots
+    
+    ctx.save();
+    // Smoothly rotate the diamond based on val
+    ctx.rotate((val/127) * Math.PI);
+    
+    // Diamond
     ctx.beginPath();
     ctx.moveTo(0, -8); ctx.lineTo(8, 0); ctx.lineTo(0, 8); ctx.lineTo(-8, 0); ctx.closePath();
     ctx.stroke();
-    if(val > 64) {
-      ctx.fillRect(-2, -2, 4, 4);
+    
+    // Inner square scales smoothly instead of binary hard toggling
+    const size = (val/127) * 4;
+    if(size > 0.5) {
+      ctx.fillRect(-size, -size, size*2, size*2);
     }
+    ctx.restore();
   }
 
   function drawVolume(ctx, val, color) {
