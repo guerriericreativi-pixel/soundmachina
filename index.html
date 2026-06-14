@@ -2490,6 +2490,11 @@ let hwEncoders = [];
        const idLower = paramId.toLowerCase();
        const drawColor = (window.activeParam && window.activeParam.id === paramId) ? accent : mainColor;
        
+       ctx.save();
+       ctx.scale(2, 2); // Scale up shapes to fill the cell better
+       ctx.shadowColor = drawColor;
+       ctx.shadowBlur = (window.activeParam && window.activeParam.id === paramId) ? 8 : 2;
+       
        if (typeof drawWav === 'function' && (idLower.includes('wave') || idLower.includes('shape'))) {
          drawWav(ctx, val, drawColor, isTEBg);
        } else if (typeof drawPd === 'function' && idLower.includes('pw')) {
@@ -2506,7 +2511,9 @@ let hwEncoders = [];
        ctx.save();
        ctx.translate(cx + cellW/2, cy + cellH - 10);
        ctx.fillStyle = mainColor;
-       ctx.font = 'bold 14px "JetBrains Mono", "Space Mono", monospace';
+       ctx.shadowColor = mainColor;
+       ctx.shadowBlur = 2;
+       ctx.font = 'bold 15px "JetBrains Mono", "Space Mono", monospace';
        ctx.textAlign = 'center';
        ctx.textBaseline = 'middle';
        ctx.fillText(pDef.short.toUpperCase(), 0, 0);
