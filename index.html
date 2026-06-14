@@ -1047,7 +1047,7 @@
     background: var(--section-bg); border-radius: 12px; padding: 40px;
     border: 1px solid var(--border); box-shadow: inset 0 2px 0 rgba(255,255,255,0.05), 0 10px 30px rgba(0,0,0,0.1);
     display: flex; flex-direction: column; gap: 40px; align-items: center;
-    max-width: 900px; margin: 40px auto;
+    max-width: 1200px; margin: 40px auto; width: 95%;
   }
   html[data-skin="elektron"] .hardware-chassis {
     box-shadow: inset 0 2px 0 rgba(255,255,255,0.05), 0 10px 30px rgba(0,0,0,0.5);
@@ -2164,13 +2164,31 @@ let hwEncoders = [];
     const elektronWrapper = document.createElement('div');
     elektronWrapper.className = 'hardware-chassis';
     
+    const innerLayout = document.createElement('div');
+    innerLayout.style.display = 'flex';
+    innerLayout.style.flexDirection = 'row';
+    innerLayout.style.gap = '60px';
+    innerLayout.style.alignItems = 'flex-start';
+    innerLayout.style.justifyContent = 'center';
+    innerLayout.style.flexWrap = 'wrap';
     
+    const leftCol = document.createElement('div');
+    leftCol.style.display = 'flex';
+    leftCol.style.flexDirection = 'column';
+    leftCol.style.gap = '20px';
+    leftCol.style.alignItems = 'center';
     
-    
-    
-    container.appendChild(elektronWrapper);
+    const rightCol = document.createElement('div');
+    rightCol.style.display = 'flex';
+    rightCol.style.flexDirection = 'column';
+    rightCol.style.justifyContent = 'center';
 
-    elektronWrapper.appendChild(elektronLcd);
+    container.appendChild(elektronWrapper);
+    elektronWrapper.appendChild(innerLayout);
+    innerLayout.appendChild(leftCol);
+    innerLayout.appendChild(rightCol);
+
+    leftCol.appendChild(elektronLcd);
 
     // --- Page Buttons ---
     const pageNav = document.createElement('div');
@@ -2195,14 +2213,17 @@ let hwEncoders = [];
       };
       pageNav.appendChild(btn);
     });
+    
+    leftCol.appendChild(pageNav); // Page buttons under the screen
+
     // --- Hardware Encoders (4x2 Grid) ---
     const encoderGrid = document.createElement('div');
     encoderGrid.id = 'encoderGrid';
     encoderGrid.style.display = 'grid';
     encoderGrid.style.gridTemplateColumns = 'repeat(4, 1fr)';
     encoderGrid.style.gap = '30px 50px';
-    encoderGrid.style.marginTop = '20px';
-    elektronWrapper.appendChild(encoderGrid);
+    encoderGrid.style.marginTop = '10px';
+    rightCol.appendChild(encoderGrid);
 
     const macrosDiv = document.createElement('div');
     macrosDiv.id = 'globalMacroKnobs';
@@ -2210,10 +2231,13 @@ let hwEncoders = [];
     macrosDiv.style.flexWrap = 'wrap';
     macrosDiv.style.justifyContent = 'center';
     macrosDiv.style.gap = '30px';
+    macrosDiv.style.marginTop = '40px';
+    macrosDiv.style.width = '100%';
+    macrosDiv.style.borderTop = '1px solid var(--border)';
+    macrosDiv.style.paddingTop = '40px';
+    
     // We will let the bottom initialization populate this div
     elektronWrapper.appendChild(macrosDiv);
-
-    container.appendChild(pageNav);
 
     root.appendChild(container);
     
