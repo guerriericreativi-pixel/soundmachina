@@ -5,7 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
 <title>virus ti snow // editor</title>
 <style>
-  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Press+Start+2P&family=JetBrains+Mono:wght@400;700&display=swap');
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Press+Start+2P&family=VT323&family=JetBrains+Mono:wght@400;700&display=swap');
   :root{
     --bg: #f4f4f4;
     --fg: #222222;
@@ -2374,27 +2374,44 @@ let hwEncoders = [];
     const mainColor = '#fff'; // LCD is always dark, so text/lines must be bright
     const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#00e5ff';
     
-    const headerH = 40;
-    const leftW = 80;
+    const headerH = 46;
+    const leftW = 86;
     
     ctx.fillStyle = mainColor;
     ctx.strokeStyle = mainColor;
+    ctx.lineCap = 'square';
+    ctx.lineJoin = 'miter';
 
     // --- Header ---
-    ctx.font = 'bold 22px "JetBrains Mono", "Space Mono", monospace';
+    ctx.font = '28px "VT323", monospace';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'top';
-    ctx.fillText('A05', 15, 10);
+    
+    // Draw A05 box
+    ctx.fillText('A05', 18, 12);
+    ctx.lineWidth = 2;
+    ctx.setLineDash([2, 2]);
+    ctx.strokeRect(12, 8, 48, 30);
+    ctx.setLineDash([]); // reset
 
-    ctx.textAlign = 'center';
-    ctx.font = 'bold 26px "JetBrains Mono", "Space Mono", monospace';
+    ctx.textAlign = 'left';
+    ctx.font = '36px "VT323", monospace';
     const patchInput = document.getElementById('patchName');
-    const pName = (patchInput && patchInput.value) ? patchInput.value.toUpperCase().substring(0, 12) : 'VIRUS TI';
-    ctx.fillText(pName, w / 2, 8);
+    const pName = (patchInput && patchInput.value) ? patchInput.value.toUpperCase().substring(0, 10) : 'VIRUS TI';
+    ctx.fillText(pName, 80, 6);
 
     ctx.textAlign = 'right';
-    ctx.font = '18px "JetBrains Mono", "Space Mono", monospace';
-    ctx.fillText('120.0', w - 15, 12);
+    ctx.font = '28px "VT323", monospace';
+    // Draw Menu icon
+    const menuX = w - 120;
+    ctx.lineWidth = 2;
+    ctx.strokeRect(menuX, 12, 24, 22);
+    ctx.beginPath(); ctx.moveTo(menuX + 4, 17); ctx.lineTo(menuX + 20, 17); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(menuX + 4, 22); ctx.lineTo(menuX + 20, 22); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(menuX + 4, 27); ctx.lineTo(menuX + 20, 27); ctx.stroke();
+    
+    // Tempo
+    ctx.fillText('120.0', w - 16, 12);
     
     // Draw line separating header
     ctx.lineWidth = 2;
@@ -2405,30 +2422,44 @@ let hwEncoders = [];
 
     // --- Left Column ---
     ctx.textAlign = 'center';
-    ctx.font = 'bold 20px "JetBrains Mono", "Space Mono", monospace';
     
-    // Split page name (e.g. "OSC 1" -> "OSC", "1")
+    // Page Name Box
     const pageParts = currentPage.split(' ');
+    ctx.lineWidth = 2;
+    ctx.strokeRect(12, headerH + 12, leftW - 24, 60);
+    
     if (pageParts.length > 1) {
-      ctx.fillText(pageParts[0], leftW / 2, headerH + 20);
-      ctx.font = 'bold 28px "JetBrains Mono", "Space Mono", monospace';
-      ctx.fillText(pageParts[1], leftW / 2, headerH + 45);
+      ctx.font = '24px "VT323", monospace';
+      ctx.fillText(pageParts[0], leftW / 2, headerH + 16);
+      ctx.font = '36px "VT323", monospace';
+      ctx.fillText(pageParts[1], leftW / 2, headerH + 34);
     } else {
-      ctx.fillText(currentPage, leftW / 2, headerH + 30);
+      ctx.font = '28px "VT323", monospace';
+      ctx.fillText(currentPage, leftW / 2, headerH + 26);
     }
 
     // Level meter "LEV"
-    ctx.font = 'bold 16px "JetBrains Mono", "Space Mono", monospace';
-    ctx.fillText('LEV', leftW / 2, h - 25);
+    ctx.font = '22px "VT323", monospace';
+    ctx.fillText('LEV', leftW / 2, h - 26);
     
-    // Draw simple vertical meter
+    // Draw simple vertical meter with dotted sides like hardware
     const meterW = 20;
-    const meterH = 60;
+    const meterH = 50;
     const meterX = (leftW - meterW) / 2;
-    const meterY = h - 95;
+    const meterY = h - 86;
     ctx.lineWidth = 2;
     ctx.strokeRect(meterX, meterY, meterW, meterH);
-    // Mock level (e.g. 60% full)
+    
+    // Dotted side pins
+    ctx.beginPath();
+    for(let i=0; i<6; i++) {
+      let py = meterY + 4 + i*8;
+      ctx.moveTo(meterX - 4, py); ctx.lineTo(meterX, py);
+      ctx.moveTo(meterX + meterW, py); ctx.lineTo(meterX + meterW + 4, py);
+    }
+    ctx.stroke();
+
+    // Mock level
     ctx.fillStyle = mainColor;
     ctx.fillRect(meterX + 4, meterY + meterH * 0.4, meterW - 8, meterH * 0.6 - 4);
     
@@ -2445,18 +2476,6 @@ let hwEncoders = [];
     const gridH = h - gridY;
     const cellW = gridW / 4;
     const cellH = gridH / 2;
-
-    // Draw grid lines
-    ctx.lineWidth = 1;
-    ctx.strokeStyle = isTEBg ? 'rgba(0,0,0,0.2)' : 'rgba(255,255,255,0.2)';
-    ctx.beginPath();
-    ctx.moveTo(gridX, gridY + cellH);
-    ctx.lineTo(w, gridY + cellH);
-    for(let i=1; i<4; i++){
-      ctx.moveTo(gridX + i*cellW, gridY);
-      ctx.lineTo(gridX + i*cellW, h);
-    }
-    ctx.stroke();
 
     const currentParams = PAGES[currentPage];
     
@@ -2484,14 +2503,15 @@ let hwEncoders = [];
        }
        
        // Center rendering context for graphics
-       ctx.translate(cellW/2, cellH/2 - 10);
+       ctx.save();
+       ctx.translate(cellW/2, cellH/2 - 14);
        
        // Specific Graphics
        const idLower = paramId.toLowerCase();
        const drawColor = (window.activeParam && window.activeParam.id === paramId) ? accent : mainColor;
        
        ctx.save();
-       ctx.scale(2, 2); // Scale up shapes to fill the cell better
+       ctx.scale(2.4, 2.4); // Scale up shapes to fill the cell better
        ctx.shadowColor = drawColor;
        ctx.shadowBlur = (window.activeParam && window.activeParam.id === paramId) ? 8 : 2;
        
@@ -2506,17 +2526,20 @@ let hwEncoders = [];
        }
        
        ctx.restore();
+       ctx.restore();
        
        // Text label at bottom of cell
        ctx.save();
-       ctx.translate(cx + cellW/2, cy + cellH - 10);
+       ctx.translate(cellW/2, cellH - 12);
        ctx.fillStyle = mainColor;
        ctx.shadowColor = mainColor;
        ctx.shadowBlur = 2;
-       ctx.font = 'bold 15px "JetBrains Mono", "Space Mono", monospace';
+       ctx.font = '24px "VT323", monospace';
        ctx.textAlign = 'center';
        ctx.textBaseline = 'middle';
        ctx.fillText(pDef.short.toUpperCase(), 0, 0);
+       ctx.restore();
+       
        ctx.restore();
     }
   }
