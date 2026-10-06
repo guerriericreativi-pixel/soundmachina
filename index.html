@@ -2277,7 +2277,10 @@
       const param = PARAMS.find(p => p.cc === ccNumber);
       if (param) {
         patch[param.id] = ccValue;
-        if (knobRefs[param.id]) knobRefs[param.id]._render();
+        renderKnobsForParam(param.id);
+        if (window.macroRefs) {
+          window.macroRefs.forEach(m => m && typeof m._render === 'function' && m._render());
+        }
         if (typeof initElektronLcd === 'function') initElektronLcd();
       }
       return; // Finito con questo pacchetto (era un CC)
@@ -2397,21 +2400,26 @@
       }
 
       // Altri messaggi SysEx (Parametri singoli)
+      // Formato standard Virus: F0 00 20 33 01 [devId] [cmd] [cc/param] [value] F7
       if (msgBytes.length >= 7 &&
           msgBytes[1] === 0x00 && msgBytes[2] === 0x20 && msgBytes[3] === 0x33 && msgBytes[4] === 0x01) {
 
         const devId = msgBytes[5];
         const cmd = msgBytes[6];
 
-        if (devId === deviceId() || devId === 0x10) {
-           // Cambio singolo parametro
-           if (cmd === 0x01 && msgBytes.length === 10) {
+        if (devId === deviceId() || devId === 0x10 || deviceId() === 0x10) {
+           // Cambio singolo parametro: F0 00 20 33 01 [dev] 01 [cc] [val] F7 (length 9 o 10)
+           if (cmd === 0x01 && (msgBytes.length === 9 || msgBytes.length === 10)) {
              const cc = msgBytes[7];
              const value = msgBytes[8];
              const param = PARAMS.find(p => p.cc === cc);
              if (param) {
                patch[param.id] = value;
-               if (knobRefs[param.id]) knobRefs[param.id]._render();
+               renderKnobsForParam(param.id);
+               if (window.macroRefs) {
+                 window.macroRefs.forEach(m => m && typeof m._render === 'function' && m._render());
+               }
+               if (typeof initElektronLcd === 'function') initElektronLcd();
              }
            }
         }
@@ -2729,7 +2737,7 @@
   }
 
   function createKnob(param){
-    return createKnobGeneric({
+    const knob = createKnobGeneric({
       label: param.short || param.name,
       default: param.default,
       bipolar: param.bipolar,
@@ -2737,12 +2745,31 @@
       setValue: (value, send) => {
         patch[param.id] = value;
         if (send) sendParam(param, value);
+        renderKnobsForParam(param.id);
         if (typeof initElektronLcd === 'function') initElektronLcd();
       }
     });
+    registerKnobRef(param.id, knob);
+    return knob;
   }
 
+  const knobRefsList = {};
   const knobRefs = {};
+  function registerKnobRef(paramId, knobInstance){
+    knobRefs[paramId] = knobInstance;
+    if (!knobRefsList[paramId]) knobRefsList[paramId] = [];
+    if (!knobRefsList[paramId].includes(knobInstance)) {
+      knobRefsList[paramId].push(knobInstance);
+    }
+  }
+
+  function renderKnobsForParam(paramId){
+    if (knobRefsList[paramId]) {
+      knobRefsList[paramId].forEach(k => {
+        if (k && typeof k._render === 'function') k._render();
+      });
+    }
+  }
 
   // --- Graph rendering functions ---
 
@@ -3537,10 +3564,10 @@ let hwEncoders = [];
 
   function refreshAllKnobs(){
     PARAMS.forEach(p => {
-      if(knobRefs[p.id]) knobRefs[p.id]._render();
+      renderKnobsForParam(p.id);
     });
     if (window.macroRefs) {
-      window.macroRefs.forEach(m => m._render());
+      window.macroRefs.forEach(m => m && typeof m._render === 'function' && m._render());
     }
     if (typeof initElektronLcd === 'function') initElektronLcd();
   }
