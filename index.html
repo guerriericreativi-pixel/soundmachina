@@ -1642,29 +1642,29 @@
     <div class="chassis-screw screw-br"></div>
     <div class="chassis-logo">VIRUS-H PATCH</div>
     <div style="z-index: 1; width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 40px; padding: 0 40px;">
-      <div class="section section-lib" style="width: 100%; max-width: 800px; background: rgba(0,0,0,0.4); border: 1px solid #111; border-radius: 6px; padding: 20px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.05);">
-  <h2>patch library</h2>
+      <div class="section section-lib" style="width: 100%; max-width: 800px; background: rgba(10,10,12,0.85); border: 1px solid var(--border); border-radius: 6px; padding: 24px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.05); color: #fff;">
+  <h2 style="color: var(--accent); font-family: monospace; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px;">patch library</h2>
   <div class="lib-row">
-    <input type="text" id="patchName" placeholder="patch name">
-    <button id="btnSavePatch">save dump</button>
+    <input type="text" id="patchName" placeholder="patch name" style="color: #fff; border-bottom: 1px solid var(--accent); padding: 6px 4px; font-family: monospace;">
+    <button id="btnSavePatch" class="chassis-page-btn" style="color: #fff;">save dump</button>
   </div>
-  <div class="lib-list" id="libList"></div>
+  <div class="lib-list" id="libList" style="margin-top: 8px;"></div>
 
-  <h2 style="margin-top: 32px;">multi presets</h2>
+  <h2 style="margin-top: 32px; color: var(--accent); font-family: monospace; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px;">multi presets</h2>
   <div class="lib-row">
-    <input type="text" id="multiName" placeholder="multi name (eg. DM-Personal-Jesus)">
-    <button id="btnSaveMulti">fetch & save multi</button>
+    <input type="text" id="multiName" placeholder="multi name (eg. DM-Personal-Jesus)" style="color: #fff; border-bottom: 1px solid var(--accent); padding: 6px 4px; font-family: monospace;">
+    <button id="btnSaveMulti" class="chassis-page-btn" style="color: #fff;">fetch & save multi</button>
   </div>
-  <div class="lib-list" id="multiLibList"></div>
+  <div class="lib-list" id="multiLibList" style="margin-top: 8px;"></div>
 
-  <h2 style="margin-top: 32px;">bank tools</h2>
+  <h2 style="margin-top: 32px; color: var(--accent); font-family: monospace; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px;">bank tools</h2>
   <div class="lib-row">
     <div style="display: flex; gap: 8px; flex: 1;">
-      <select id="bankTypeSelect" style="flex: 1;">
+      <select id="bankTypeSelect" style="flex: 1; background: #222; color: #fff; border: 1px solid #444; padding: 6px;">
         <option value="RAM">RAM</option>
         <option value="ROM">ROM</option>
       </select>
-      <select id="bankNumSelect" style="flex: 1;">
+      <select id="bankNumSelect" style="flex: 1; background: #222; color: #fff; border: 1px solid #444; padding: 6px;">
         <option value="1">1</option>
         <option value="2">2</option>
         <option value="3">3</option>
@@ -1676,12 +1676,12 @@
       </select>
     </div>
     <div style="display: flex; gap: 8px;">
-      <button id="btnReadBank">leggi</button>
-      <button id="btnFetchBank">cattura</button>
+      <button id="btnReadBank" class="chassis-page-btn" style="color: #fff;">leggi</button>
+      <button id="btnFetchBank" class="chassis-page-btn" style="color: #fff;">cattura</button>
     </div>
   </div>
-  <div class="lib-list" id="synthBankList" style="margin-top: 16px; border: 1px dashed var(--border); background: rgba(0,0,0,0.2);">
-    <div style="color: #666; font-size: 12px; text-align: center; padding: 16px;">nessun banco letto</div>
+  <div class="lib-list" id="synthBankList" style="margin-top: 16px; border: 1px dashed var(--accent); background: rgba(0,0,0,0.4); border-radius: 4px;">
+    <div style="color: #aaa; font-size: 12px; text-align: center; padding: 16px; font-family: monospace;">nessun banco letto</div>
   </div>
       </div>
     </div>
@@ -1855,28 +1855,41 @@
     { id:'mix_sub',         name:'Sub Osc Vol',       short:'msb',  section:'osc', cc:113, default:0 },
     { id:'mix_ring',        name:'Ring Mod Vol',      short:'mrg',  section:'osc', cc:114, default:0 },
 
-    // Filter 1
+    // Filter 1 & 2
     { id:'f1_mode',      name:'Filt1 Mode',        short:'f1md', section:'filter', cc:39, default:0 },
     { id:'f1_cutoff',    name:'Cutoff',            short:'CUTOFF', section:'main', cc:40, default:127 },
     { id:'f1_resonance', name:'Resonance',         short:'RESONANCE',  section:'main', cc:42, default:0 },
     { id:'f1_envamt',    name:'Filt1 EnvAmt',      short:'f1ea', section:'filter', cc:43, default:64, bipolar:true },
     { id:'f1_keytrack',  name:'Keyboard Track',    short:'key',  section:'filter', cc:46, default:0 },
+    { id:'f2_cutoff',    name:'Cutoff 2',          short:'cut2', section:'filter', cc:41, default:64 },
+    { id:'f2_resonance', name:'Resonance 2',       short:'res2', section:'filter', cc:44, default:0 },
+    { id:'flt_balance',  name:'Filter Balance',    short:'fbal', section:'filter', cc:45, default:64, bipolar:true },
 
     // Amplifier
-    { id:'amp_attack',  name:'Attack',  short:'atk', section:'amp', cc:59, default:0 },
-    { id:'amp_decay',   name:'Decay',   short:'dcy', section:'amp', cc:60, default:0 },
-    { id:'amp_sustain', name:'Sustain', short:'sus', section:'amp', cc:61, default:127 },
-    { id:'amp_release', name:'Release', short:'rel', section:'amp', cc:63, default:0 },
+    { id:'amp_attack',   name:'Attack',            short:'atk',  section:'amp', cc:59, default:0 },
+    { id:'amp_decay',    name:'Decay',             short:'dcy',  section:'amp', cc:60, default:0 },
+    { id:'amp_sustain',  name:'Sustain',           short:'sus',  section:'amp', cc:61, default:127 },
+    { id:'amp_release',  name:'Release',           short:'rel',  section:'amp', cc:63, default:0 },
+    { id:'amp_pan',      name:'Panorama',          short:'pan',  section:'amp', cc:10, default:64, bipolar:true },
+    { id:'amp_vel',      name:'Vel>Amp',           short:'v>am', section:'amp', cc:62, default:64, bipolar:true },
+    { id:'com_porta',    name:'Portamento',        short:'prt',  section:'amp', cc:5,  default:0 },
 
     // LFO 1
-    { id:'lfo1_rate',  name:'Rate',  short:'rate', section:'lfo', cc:67, default:64 },
-    { id:'lfo1_shape', name:'Shape', short:'shp',  section:'lfo', cc:68, default:0 },
+    { id:'lfo1_rate',    name:'LFO1 Rate',         short:'rate', section:'lfo', cc:67, default:64 },
+    { id:'lfo1_shape',   name:'LFO1 Shape',        short:'shp',  section:'lfo', cc:68, default:0 },
+    { id:'lfo1_contour', name:'LFO1 Contour',      short:'cntr', section:'lfo', cc:71, default:64 },
+    { id:'lfo1_keyflw',  name:'LFO1 Key Follow',   short:'l1ky', section:'lfo', cc:72, default:0 },
+    { id:'lfo1_trig',    name:'LFO1 Trig Mode',    short:'trig', section:'lfo', cc:73, default:0 },
 
     // Effects
     { id:'fx_chorus_mix',      name:'Chorus Mix',      short:'chmx', section:'fx', cc:105, default:0 },
     { id:'fx_chorus_rate',     name:'Chorus Rate',     short:'chrt', section:'fx', cc:106, default:64 },
     { id:'fx_delay_time',      name:'Delay Time',      short:'dlt',  section:'fx', cc:114, default:0 },
     { id:'fx_delay_feedback',  name:'Delay Feedback',  short:'dlfb', section:'fx', cc:115, default:0 },
+    { id:'fx_reverb_mix',      name:'Reverb Mix',      short:'rvmx', section:'fx', cc:88,  default:0 },
+    { id:'fx_reverb_decay',    name:'Reverb Decay',    short:'rvdc', section:'fx', cc:89,  default:64 },
+    { id:'fx_dist_type',       name:'Distortion Type', short:'dstt', section:'fx', cc:92,  default:0 },
+    { id:'fx_dist_intensity',  name:'Dist Intensity',  short:'dist', section:'fx', cc:93,  default:0 },
   ];
 
   const SYSEX_PREFIX = [0xF0, 0x00, 0x20, 0x33, 0x01];
@@ -2857,10 +2870,10 @@ const PAGES = {
   'OSC 1': ['osc1_shape', 'osc1_semitone', 'osc1_pw', 'osc_detune', 'osc1_subshape', 'osc1_keyflw', 'osc1_vel', 'mix_oscvol'],
   'OSC 2': ['osc2_shape', 'osc2_semitone', 'osc2_pw', 'osc_balance', 'com_fmamt', 'com_sync', 'osc2_vel', 'mix_osc12'],
   'OSC 3 / NOISE': ['osc3_semi', 'osc3_detune', 'mix_osc3', 'noise_color', 'mix_noise', 'mix_sub', 'mix_ring', 'punch_int'],
-  'FILTER': ['f1_cutoff', 'f1_resonance', 'f1_mode', 'f1_envamt', 'f1_keytrack', null, null, null],
-  'AMP': ['amp_attack', 'amp_decay', 'amp_sustain', 'amp_release', 'com_porta', null, null, null],
-  'LFO 1': ['lfo1_rate', 'lfo1_shape', null, null, null, null, null, null],
-  'FX': ['fx_chorus_mix', 'fx_chorus_rate', 'fx_delay_time', 'fx_delay_feedback', null, null, null, null]
+  'FILTER': ['f1_cutoff', 'f1_resonance', 'f1_mode', 'f1_envamt', 'f1_keytrack', 'f2_cutoff', 'f2_resonance', 'flt_balance'],
+  'AMP': ['amp_attack', 'amp_decay', 'amp_sustain', 'amp_release', 'amp_pan', 'amp_vel', 'com_porta', null],
+  'LFO 1': ['lfo1_rate', 'lfo1_shape', 'lfo1_contour', 'lfo1_keyflw', 'lfo1_trig', null, null, null],
+  'FX': ['fx_chorus_mix', 'fx_chorus_rate', 'fx_delay_time', 'fx_delay_feedback', 'fx_reverb_mix', 'fx_reverb_decay', 'fx_dist_type', 'fx_dist_intensity']
 };
 
 let currentPage = 'OSC 1';
@@ -4948,25 +4961,65 @@ let hwEncoders = [];
 
     innerLayout.appendChild(gridContainer);
 
-    // Playback Controls
+    // Controls Container: Play, Stop, Loop & Save/Clear
     const controlsContainer = document.createElement('div');
     controlsContainer.style.display = 'flex';
-    controlsContainer.style.gap = '20px';
-    controlsContainer.style.marginTop = '10px';
+    controlsContainer.style.gap = '15px';
+    controlsContainer.style.marginTop = '15px';
+    controlsContainer.style.flexWrap = 'wrap';
+    controlsContainer.style.justifyContent = 'center';
+
+    const SONG_STORAGE_KEY = 'virusTiSnow_songData';
+
+    function saveSongState() {
+      const data = slotWrappers.map(w => ({
+        pat: w._patSel.value,
+        rep: w._repSel.value,
+        trn: w._trnSel.value
+      }));
+      localStorage.setItem(SONG_STORAGE_KEY, JSON.stringify(data));
+    }
+
+    function loadSongState() {
+      try {
+        const raw = localStorage.getItem(SONG_STORAGE_KEY);
+        if (!raw) return;
+        const data = JSON.parse(raw);
+        if (Array.isArray(data)) {
+          data.forEach((d, i) => {
+            if (slotWrappers[i]) {
+              if (d.pat !== undefined) slotWrappers[i]._patSel.value = d.pat;
+              if (d.rep !== undefined) slotWrappers[i]._repSel.value = d.rep;
+              if (d.trn !== undefined) slotWrappers[i]._trnSel.value = d.trn;
+            }
+          });
+        }
+      } catch(e) { console.error('Song load err', e); }
+    }
 
     const playBtn = document.createElement('button');
     playBtn.className = 'chassis-page-btn';
     playBtn.textContent = 'PLAY SONG';
     playBtn.style.padding = '0 20px';
     playBtn.style.width = 'auto';
-    playBtn.addEventListener('click', () => { playBtn.style.backgroundColor = '#ff9900'; playBtn.style.color = '#000'; setTimeout(()=> { playBtn.style.backgroundColor = 'var(--section-bg)'; playBtn.style.color = 'var(--text-main)'; }, 200); if(window.sendCC) window.sendCC(1, 115, 127); });
+    playBtn.addEventListener('click', () => { 
+      playBtn.style.backgroundColor = '#ff9900'; 
+      playBtn.style.color = '#000'; 
+      setTimeout(()=> { playBtn.style.backgroundColor = 'var(--section-bg)'; playBtn.style.color = 'var(--text-main)'; }, 200); 
+      if(window.sendCC) window.sendCC(1, 115, 127); 
+    });
 
     const stopBtn = document.createElement('button');
     stopBtn.className = 'chassis-page-btn';
     stopBtn.textContent = 'STOP';
     stopBtn.style.padding = '0 20px';
     stopBtn.style.width = 'auto';
-    stopBtn.addEventListener('click', () => { stopBtn.style.backgroundColor = '#ff9900'; stopBtn.style.color = '#000'; setTimeout(()=> { stopBtn.style.backgroundColor = 'var(--section-bg)'; stopBtn.style.color = 'var(--text-main)'; }, 200); if(window.sendCC) window.sendCC(1, 116, 127); });
+    stopBtn.addEventListener('click', () => { 
+      stopBtn.style.backgroundColor = '#ff9900'; 
+      stopBtn.style.color = '#000'; 
+      setTimeout(()=> { stopBtn.style.backgroundColor = 'var(--section-bg)'; stopBtn.style.color = 'var(--text-main)'; }, 200); 
+      if(window.sendCC) window.sendCC(1, 116, 127); 
+    });
 
     const loopBtn = document.createElement('button');
     loopBtn.className = 'chassis-page-btn';
@@ -4981,10 +5034,54 @@ let hwEncoders = [];
       if(window.sendCC) window.sendCC(1, 117, isLoop ? 127 : 0);
     });
 
+    const saveBtn = document.createElement('button');
+    saveBtn.className = 'chassis-page-btn';
+    saveBtn.textContent = 'SAVE SONG';
+    saveBtn.style.padding = '0 20px';
+    saveBtn.style.width = 'auto';
+    saveBtn.addEventListener('click', () => {
+      saveSongState();
+      saveBtn.textContent = 'SAVED ✓';
+      setTimeout(() => { saveBtn.textContent = 'SAVE SONG'; }, 1000);
+    });
+
+    const clearBtn = document.createElement('button');
+    clearBtn.className = 'chassis-page-btn';
+    clearBtn.textContent = 'CLEAR';
+    clearBtn.style.padding = '0 16px';
+    clearBtn.style.width = 'auto';
+    clearBtn.addEventListener('click', () => {
+      if (confirm('Clear all song steps?')) {
+        slotWrappers.forEach(w => {
+          w._patSel.value = 'OFF';
+          w._repSel.value = '1';
+          w._trnSel.value = '0';
+        });
+        saveSongState();
+      }
+    });
+
     controlsContainer.appendChild(playBtn);
     controlsContainer.appendChild(stopBtn);
     controlsContainer.appendChild(loopBtn);
+    controlsContainer.appendChild(saveBtn);
+    controlsContainer.appendChild(clearBtn);
     innerLayout.appendChild(controlsContainer);
+
+    // Collega riferimenti e listener di autosave su ogni select
+    slotWrappers.forEach(w => {
+      const selects = w.querySelectorAll('select');
+      if (selects.length >= 3) {
+        w._patSel = selects[0];
+        w._repSel = selects[1];
+        w._trnSel = selects[2];
+        w._patSel.addEventListener('change', saveSongState);
+        w._repSel.addEventListener('change', saveSongState);
+        w._trnSel.addEventListener('change', saveSongState);
+      }
+    });
+
+    loadSongState();
 
     elektronWrapper.appendChild(innerLayout);
 
