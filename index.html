@@ -13,6 +13,11 @@
     --border: #cccccc;
     --dot-color: #d8d8d8;
     --accent: #f57b20;
+    --light-limit: 0.72;
+    --led-halo: 10px;
+    --led-halo-soft: 22px;
+    --led-halo-small: 5px;
+    --led-core: 1;
     --font-ui: 'Inter', sans-serif;
   }
   html[data-skin="elektron"]{
@@ -129,15 +134,25 @@
     font-size: 11px;
   }
   .dot{
-    width: 8px;
-    height: 8px;
+    width: 10px;
+    height: 10px;
     border: 1px solid var(--border);
     border-radius: 50%;
-    background: transparent;
-    transition: transform 100ms ease;
+    background:
+      radial-gradient(circle at 35% 30%, rgba(255,255,255,0.88), var(--accent) 28%, color-mix(in srgb, var(--accent) 48%, #111111) 70%);
+    opacity: 0.28;
+    box-shadow:
+      inset 0 -1px 2px rgba(0,0,0,0.55),
+      0 0 var(--led-halo-small) color-mix(in srgb, var(--accent) 50%, transparent);
+    transition: transform 100ms ease, opacity 160ms ease, box-shadow 160ms ease, filter 160ms ease;
   }
   .dot.on{
-    background: var(--accent);
+    opacity: calc(0.45 + (var(--light-limit) * 0.55));
+    filter: brightness(calc(0.75 + (var(--light-limit) * 0.8))) saturate(1.35);
+    box-shadow:
+      inset 0 -1px 2px rgba(0,0,0,0.5),
+      0 0 var(--led-halo) color-mix(in srgb, var(--accent) 76%, transparent),
+      0 0 var(--led-halo-soft) color-mix(in srgb, var(--accent) 34%, transparent);
   }
   .dot.pulse{
     animation: ledBounce 400ms ease-out;
@@ -162,19 +177,183 @@
     gap: 8px;
   }
   .accent-dot{
-    width: 16px;
-    height: 16px;
+    --led-color: var(--accent);
+    width: 17px;
+    height: 17px;
     min-width: 0;
     min-height: 0;
     padding: 0;
-    border: 1px solid var(--border);
+    border: 1px solid color-mix(in srgb, var(--led-color) 60%, var(--border));
     border-radius: 50%;
     cursor: pointer;
-    box-shadow: none;
-    transition: box-shadow 100ms ease;
+    background:
+      radial-gradient(circle at 34% 28%, rgba(255,255,255,0.92) 0 10%, color-mix(in srgb, var(--led-color) 92%, #ffffff) 18%, var(--led-color) 46%, color-mix(in srgb, var(--led-color) 42%, #080808) 100%) !important;
+    box-shadow:
+      inset 0 -2px 3px rgba(0,0,0,0.55),
+      inset 0 1px 2px rgba(255,255,255,0.55),
+      0 0 var(--led-halo-small) color-mix(in srgb, var(--led-color) 42%, transparent);
+    filter: brightness(calc(0.72 + (var(--light-limit) * 0.34))) saturate(1.25);
+    opacity: calc(0.58 + (var(--light-limit) * 0.32));
+    transition: box-shadow 140ms ease, filter 140ms ease, opacity 140ms ease, transform 100ms ease;
+  }
+  .accent-dot:hover{
+    transform: translateY(-1px);
   }
   .accent-dot.selected{
-    box-shadow: 0 0 0 2px var(--bg), 0 0 0 4px var(--fg);
+    opacity: 1;
+    filter: brightness(calc(0.95 + (var(--light-limit) * 0.55))) saturate(1.7);
+    box-shadow:
+      0 0 0 2px var(--bg),
+      0 0 0 4px var(--fg),
+      0 0 var(--led-halo) color-mix(in srgb, var(--led-color) 88%, transparent),
+      0 0 var(--led-halo-soft) color-mix(in srgb, var(--led-color) 42%, transparent),
+      inset 0 -2px 3px rgba(0,0,0,0.52),
+      inset 0 1px 2px rgba(255,255,255,0.65);
+  }
+  .light-limiter{
+    display: inline-grid;
+    grid-template-columns: repeat(3, 18px);
+    align-items: center;
+    gap: 3px;
+    padding: 3px;
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--section-bg) 82%, transparent);
+  }
+  .light-limit-step{
+    width: 18px;
+    height: 18px;
+    min-width: 0;
+    min-height: 0;
+    padding: 0;
+    border: 1px solid color-mix(in srgb, var(--border) 78%, #000000);
+    background: transparent;
+    cursor: pointer;
+    position: relative;
+  }
+  .light-limit-step::before{
+    content: '';
+    position: absolute;
+    left: 4px;
+    right: 4px;
+    bottom: 4px;
+    height: var(--limit-fill, 4px);
+    background: var(--accent);
+    opacity: calc(0.35 + (var(--light-limit) * 0.45));
+    box-shadow: 0 0 var(--led-halo-small) color-mix(in srgb, var(--accent) 42%, transparent);
+  }
+  .light-limit-step[data-limit="0.35"]{ --limit-fill: 4px; }
+  .light-limit-step[data-limit="0.65"]{ --limit-fill: 8px; }
+  .light-limit-step[data-limit="1"]{ --limit-fill: 12px; }
+  .light-limit-step.active{
+    border-color: var(--accent);
+    background: color-mix(in srgb, var(--accent) 12%, transparent);
+  }
+  .control-room-rail{
+    display: grid;
+    grid-template-columns: 1.35fr repeat(5, minmax(110px, 1fr));
+    gap: 8px;
+    margin: 0 0 16px 0;
+  }
+  .ops-card{
+    min-height: 44px;
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--section-bg) 84%, transparent);
+    padding: 8px 10px;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    gap: 3px;
+  }
+  .ops-label{
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+  }
+  .ops-value{
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .ops-value.connected{
+    color: var(--accent);
+  }
+  .command-strip{
+    display: grid;
+    grid-template-columns: auto auto auto auto 1fr;
+    align-items: center;
+    gap: 8px;
+    margin: -8px 0 16px 0;
+  }
+  .command-strip button{
+    min-height: 34px;
+    border-color: color-mix(in srgb, var(--border) 72%, var(--fg));
+    background: color-mix(in srgb, var(--section-bg) 88%, transparent);
+    font-weight: 700;
+  }
+  .command-strip button.danger{
+    border-color: #7a2626;
+    color: #7a2626;
+  }
+  .command-strip button.danger:hover{
+    background: #7a2626;
+    color: #ffffff;
+  }
+  .command-state{
+    min-height: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    border: 1px solid var(--border);
+    background: color-mix(in srgb, var(--section-bg) 76%, transparent);
+    padding: 0 10px;
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    color: var(--muted);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .midi-diagnostics{
+    display: grid;
+    grid-template-columns: repeat(6, minmax(0, 1fr));
+    gap: 8px;
+    margin: -8px 0 16px 0;
+  }
+  .midi-diagnostics.hidden{
+    display: none;
+  }
+  .diag-cell{
+    border: 1px dashed var(--border);
+    background: color-mix(in srgb, var(--section-bg) 70%, transparent);
+    padding: 8px 10px;
+    min-width: 0;
+  }
+  .diag-cell.wide{
+    grid-column: span 2;
+  }
+  .diag-label{
+    font-size: 9px;
+    font-weight: 700;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+    color: var(--muted);
+    margin-bottom: 4px;
+  }
+  .diag-value{
+    font-size: 11px;
+    font-weight: 700;
+    letter-spacing: 0.04em;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   /* ------------------------------------------------------------------ */
@@ -236,6 +415,79 @@
     color: #000000;
     border-color: var(--accent);
   }
+  @media (max-width: 980px){
+    .control-room-rail{
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+    }
+  }
+  @media (max-width: 900px){
+    body{
+      padding: 10px;
+    }
+    .app-header{
+      flex-direction: column !important;
+      align-items: stretch !important;
+      gap: 10px;
+      padding: 10px 0 !important;
+    }
+    .app-header-left,
+    .app-header-right{
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+      flex-wrap: wrap;
+      gap: 10px !important;
+    }
+    .app-header-left{
+      align-items: flex-start !important;
+    }
+    .segmented-control{
+      width: 100%;
+      max-width: 100%;
+      flex: 0 0 100%;
+      overflow: visible;
+      flex-wrap: wrap;
+      padding-bottom: 0;
+    }
+    .segmented-tab{
+      flex: 1 1 calc(33.333% - 4px);
+      min-width: 0;
+      padding: 7px 8px;
+    }
+    #patchNameDisplay{
+      flex: 1 1 180px;
+      min-width: 0;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+    .conn{
+      margin-right: 0 !important;
+    }
+    .accent-picker{
+      margin-left: auto;
+    }
+    .control-room-rail{
+      margin-top: 4px;
+    }
+    .command-strip{
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .command-state{
+      grid-column: 1 / -1;
+      justify-content: flex-start;
+    }
+    .midi-diagnostics{
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+    .diag-cell.wide{
+      grid-column: span 2;
+    }
+  }
+  @media (max-width: 720px){
+    .control-room-rail{
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+    }
+  }
   #singleView,
   #multiView{
     display: flex;
@@ -257,6 +509,16 @@
     border: 1px solid var(--border);
     background: var(--section-bg);
     padding: 12px 16px;
+  }
+  .single-macros{
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    margin: 26px 0 0 0;
+    padding: 14px 18px;
+    border: 1px solid #1a1a1a;
+    background: linear-gradient(135deg, #303030 0%, #202020 100%);
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.08), 0 8px 20px rgba(0,0,0,0.25);
   }
   .part-list{
     display: flex;
@@ -295,12 +557,15 @@
     display: flex;
     align-items: center;
     align-content: center;
-    gap: 6px;
+    gap: 8px;
     flex-wrap: wrap;
     padding: 8px;
     height: auto;
     min-height: 80px;
     box-sizing: border-box;
+  }
+  .part-main > :not(.part-badge):not(.part-enable):not(.part-display){
+    order: 2;
   }
   .part-main .field{
     gap: 0;
@@ -339,6 +604,7 @@
     flex-shrink: 0;
   }
   .part-badge{
+    order: 0;
     font-size: 16px;
     font-weight: 700;
     letter-spacing: 0.05em;
@@ -350,6 +616,7 @@
     overflow: hidden;
   }
   .part-enable{
+    order: 0;
     flex: 0 0 44px;
     width: 44px;
     min-height: 44px;
@@ -423,8 +690,9 @@
     box-sizing: border-box;
   }
   .part-display{
-    flex: 1 1 200px;
-    min-width: 200px;
+    order: 1;
+    flex: 1 1 360px;
+    min-width: 260px;
     height: 60px;
     align-self: center;
     display: flex;
@@ -443,9 +711,10 @@
   }
   @media (max-width: 1023px){
     .part-display{
+      order: 1;
       flex-basis: 100%;
       min-width: 0;
-      margin-top: 4px;
+      margin-top: 0;
     }
   }
   input[type="number"]{
@@ -593,7 +862,8 @@
   #multiView,
   #singleView,
   #arpContent,
-  #sequencerContent {
+  #sequencerContent,
+  #songContent {
     flex: 1 1 0;
     overflow-y: auto;
     min-height: 0;
@@ -846,7 +1116,7 @@
   .synth-sub-tab:hover:not(.active) {
     background: #222;
   }
-  
+
   /* Synth OSC Grid Layout */
   .osc-container {
     display: grid;
@@ -862,9 +1132,18 @@
     gap: 12px;
   }
   .main-content{
-    flex: 1 1 0;
+    flex: 0 0 auto;
     display: block;
-    margin-bottom: 24px;
+    margin-bottom: 0;
+  }
+  .main-content[style*="display: none"],
+  #sequencerContent[style*="display: none"]{
+    display: none !important;
+    flex: 0 0 0;
+    min-height: 0;
+    margin: 0;
+    padding: 0;
+    border: 0;
   }
   .synth-panel-title {
     font-size: 11px;
@@ -992,7 +1271,7 @@
   html[data-skin="te"] .knob-container[data-col="1"] .knob-ring { stroke: #5db542; }
   html[data-skin="te"] .knob-container[data-col="2"] .knob-ring { stroke: #999999; }
   html[data-skin="te"] .knob-container[data-col="3"] .knob-ring { stroke: #f57b20; }
-  
+
   html[data-skin="te"] .knob-container[data-col="0"] .knob-line { stroke: #3ba1ec; stroke-width: 2; }
   html[data-skin="te"] .knob-container[data-col="1"] .knob-line { stroke: #5db542; stroke-width: 2; }
   html[data-skin="te"] .knob-container[data-col="2"] .knob-line { stroke: #999999; stroke-width: 2; }
@@ -1007,16 +1286,36 @@
     background: rgba(0,0,0,0.6); backdrop-filter: blur(4px);
     display: none; align-items: center; justify-content: center; z-index: 1000;
   }
+  .modal-overlay.open {
+    display: flex;
+  }
   .modal-content {
     background: var(--bg); border: 1px solid var(--border); border-radius: 12px;
-    padding: 30px; min-width: 400px; box-shadow: 0 20px 40px rgba(0,0,0,0.4);
+    padding: 30px; width: min(420px, calc(100vw - 32px)); box-shadow: 0 20px 40px rgba(0,0,0,0.4);
     display: flex; flex-direction: column; gap: 16px;
   }
   .modal-close {
     align-self: flex-end; background: transparent; border: none; font-size: 20px;
     color: var(--fg); cursor: pointer; margin-bottom: -10px;
   }
-  
+  .settings-trigger{
+    min-height: 28px;
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    border: 1px solid var(--border) !important;
+    background: var(--section-bg) !important;
+    color: var(--fg) !important;
+    padding: 5px 9px !important;
+    font-size: 10px !important;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+  }
+  .settings-trigger:hover{
+    border-color: var(--accent) !important;
+  }
+
   /* SEGMENTED CONTROL */
   .segmented-control {
     display: flex; background: var(--section-bg); border-radius: 8px;
@@ -1033,7 +1332,7 @@
     background: var(--bg); opacity: 1; box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   }
   html[data-skin="elektron"] .segmented-tab.active { box-shadow: 0 2px 8px rgba(0,0,0,0.4); }
-  
+
   /* NEW HEADER */
   .app-header {
     display: flex; justify-content: space-between; align-items: center;
@@ -1041,17 +1340,171 @@
   }
   .app-header-left { display: flex; align-items: center; gap: 24px; }
   .app-header-right { display: flex; align-items: center; gap: 16px; }
-  
+
+  /* CHASSIS */
+
   /* CHASSIS */
   .hardware-chassis {
-    background: var(--section-bg); border-radius: 12px; padding: 40px;
-    border: 1px solid var(--border); box-shadow: inset 0 2px 0 rgba(255,255,255,0.05), 0 10px 30px rgba(0,0,0,0.1);
+    background: linear-gradient(135deg, #383838 0%, #2a2a2a 100%);
+    border-radius: 8px;
+    padding: 60px 40px 40px 40px; /* Più spazio in alto per i loghi */
+    border: 1px solid #1a1a1a;
+    box-shadow:
+      inset 0 2px 0 rgba(255,255,255,0.1),
+      inset 0 -2px 0 rgba(0,0,0,0.5),
+      0 15px 40px rgba(0,0,0,0.6);
     display: flex; flex-direction: column; gap: 40px; align-items: center;
-    max-width: 1200px; margin: 40px auto; width: 95%;
+    max-width: 1200px; margin: 32px auto 24px auto; width: 95%;
+    position: relative;
+    overflow: hidden;
   }
+
   html[data-skin="elektron"] .hardware-chassis {
-    box-shadow: inset 0 2px 0 rgba(255,255,255,0.05), 0 10px 30px rgba(0,0,0,0.5);
+    background: linear-gradient(135deg, #252528 0%, #1a1a1c 100%);
   }
+
+  .chassis-screw {
+    position: absolute;
+    width: 12px; height: 12px;
+    background: #444;
+    border-radius: 50%;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.1);
+  }
+  .chassis-screw::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 10%; width: 80%; height: 2px;
+    background: rgba(0,0,0,0.6);
+    transform: translateY(-50%) rotate(45deg);
+  }
+  .screw-tl { top: 15px; left: 15px; }
+  .screw-tr { top: 15px; right: 15px; }
+  .screw-bl { bottom: 15px; left: 15px; }
+  .screw-br { bottom: 15px; right: 15px; }
+
+  .chassis-screen-recess {
+    background: #000;
+    border-radius: 6px;
+    padding: 8px;
+    box-shadow: inset 0 2px 10px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.05);
+    border: 1px solid #111;
+  }
+
+  .chassis-wood-strip {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    height: 18px;
+    background: linear-gradient(to right, #4a3018, #6b4423, #4a3018);
+    border-top: 1px solid #2a1b0d;
+    box-shadow: inset 0 2px 4px rgba(255,255,255,0.1);
+  }
+
+  .chassis-knob-container {
+    display: flex; flex-direction: column; align-items: center; gap: 8px;
+  }
+
+  .chassis-knob-outer {
+    position: relative;
+    width: 50px; height: 50px;
+    border-radius: 50%;
+    background: #2a2a2a;
+    box-shadow:
+      0 5px 10px rgba(0,0,0,0.5),
+      inset 0 1px 1px rgba(255,255,255,0.1);
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    touch-action: none;
+  }
+
+  .chassis-knob-ring {
+    position: absolute;
+    top: -4px; left: -4px; right: -4px; bottom: -4px;
+    border-radius: 50%;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  .chassis-knob-inner {
+    position: relative;
+    width: 44px; height: 44px;
+    border-radius: 50%;
+    background: repeating-conic-gradient(#555 0% 2%, #444 2% 4%);
+    box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 2px 4px rgba(0,0,0,0.5);
+    z-index: 1;
+    display: flex; align-items: center; justify-content: center;
+  }
+
+  .chassis-knob-top {
+    width: 34px; height: 34px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 30% 30%, #666 0%, #333 100%);
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.3);
+    position: relative;
+  }
+
+  .chassis-knob-indicator-container {
+    position: absolute;
+    width: 100%; height: 100%;
+    top: 0; left: 0;
+    transition: transform 50ms linear;
+  }
+
+  .chassis-knob-indicator {
+    position: absolute;
+    top: 4px; left: 50%;
+    width: 4px; height: 4px;
+    background: var(--accent);
+    border-radius: 50%;
+    transform: translateX(-50%);
+    box-shadow: 0 0 6px var(--accent);
+  }
+
+  .chassis-knob-label {
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.1em;
+    color: #999;
+    text-transform: uppercase;
+  }
+
+  .chassis-page-btn {
+    background: linear-gradient(to bottom, #333, #222);
+    border: 1px solid #111;
+    border-radius: 4px;
+    color: #aaa;
+    font-family: var(--font-ui);
+    font-size: 11px;
+    font-weight: 600;
+    padding: 6px 12px;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+    transition: all 0.1s;
+  }
+
+  .chassis-page-btn:active {
+    background: #1a1a1a;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.6);
+    transform: translateY(1px);
+  }
+
+  .chassis-page-btn.active {
+    color: #fff;
+    background: #2a2a2a;
+    border-color: var(--accent);
+    box-shadow: 0 0 8px rgba(255, 51, 0, 0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+  }
+
+  .chassis-logo {
+    position: absolute;
+    top: 20px; left: 40px;
+    font-family: 'Inter', sans-serif;
+    font-weight: 800;
+    font-size: 24px;
+    color: rgba(255,255,255,0.8);
+    letter-spacing: 0.2em;
+    text-shadow: 0 1px 2px rgba(0,0,0,0.8);
+  }
+
 
 </style>
 </head>
@@ -1068,25 +1521,89 @@
       <button class="segmented-tab" id="btnTabPatchManager">PATCH</button>
       <button class="segmented-tab" id="btnTabArp">ARP</button>
       <button class="segmented-tab" id="btnTabSequencer">SEQ</button>
-      <button class="segmented-tab active" id="btnTabSynth">SYNTH</button>
+      <button class="segmented-tab" id="btnTabSong">SONG</button>
+      <button class="segmented-tab active" id="btnTabSynth">SINGLE</button>
     </div>
   </div>
-  
+
   <div class="app-header-right">
     <div style="font-weight: 600; font-size: 14px; letter-spacing: 0.05em; background: var(--section-bg); padding: 4px 12px; border-radius: 4px; border: 1px solid var(--border); white-space: nowrap;" id="patchNameDisplay">virus ti snow // [PATCH NAME]</div>
     <div class="conn" style="margin-right: 16px;">
       <span class="dot" id="connDot"></span>
       <span id="connLabel" style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em;">disconnected</span>
     </div>
-    
+
     <div class="accent-picker" id="accentPicker">
-      <button class="accent-dot" data-accent="#888888" style="background:#888888" title="grey"></button>
-      <button class="accent-dot" data-accent="#aaff00" style="background:#aaff00" title="lime"></button>
-      <button class="accent-dot" data-accent="#00ffff" style="background:#00ffff" title="cyan"></button>
-      <button class="accent-dot" data-accent="#ff00ff" style="background:#ff00ff" title="fuchsia"></button>
+      <button class="accent-dot" data-accent="#888888" style="--led-color:#888888" title="grey"></button>
+      <button class="accent-dot" data-accent="#aaff00" style="--led-color:#aaff00" title="lime"></button>
+      <button class="accent-dot" data-accent="#00ffff" style="--led-color:#00ffff" title="cyan"></button>
+      <button class="accent-dot" data-accent="#ff00ff" style="--led-color:#ff00ff" title="fuchsia"></button>
+    </div>
+    <div class="light-limiter" id="lightLimiter" aria-label="light limiter">
+      <button class="light-limit-step" data-limit="0.35" title="low light"></button>
+      <button class="light-limit-step" data-limit="0.65" title="medium light"></button>
+      <button class="light-limit-step" data-limit="1" title="full light"></button>
     </div>
     <button class="theme-toggle" id="themeToggle" style="margin: 0;">○</button>
-    <button id="btnSettings" style="background:transparent; border:none; color:var(--fg); cursor:pointer; font-size:18px;">⚙️</button>
+    <button class="settings-trigger" id="btnSettings" type="button" aria-haspopup="dialog" aria-controls="settingsModal" aria-expanded="false" title="MIDI settings">MIDI</button>
+  </div>
+</div>
+
+<div class="control-room-rail" aria-label="Virus TI Snow control room status">
+  <div class="ops-card">
+    <div class="ops-label">MIDI</div>
+    <div class="ops-value" id="opsMidi">unavailable</div>
+  </div>
+  <div class="ops-card">
+    <div class="ops-label">Mode</div>
+    <div class="ops-value" id="opsMode">single</div>
+  </div>
+  <div class="ops-card">
+    <div class="ops-label">Channel</div>
+    <div class="ops-value" id="opsChannel">ch 1</div>
+  </div>
+  <div class="ops-card">
+    <div class="ops-label">Device ID</div>
+    <div class="ops-value" id="opsDevice">omni</div>
+  </div>
+  <div class="ops-card">
+    <div class="ops-label">Patch Memory</div>
+    <div class="ops-value" id="opsMemory">8 RAM + 8 ROM / 64</div>
+  </div>
+  <div class="ops-card">
+    <div class="ops-label">Multi</div>
+    <div class="ops-value" id="opsMulti">4 parts</div>
+  </div>
+</div>
+
+<div class="command-strip" aria-label="Virus TI Snow command strip">
+  <button id="btnReceiveSingle" type="button">receive single</button>
+  <button id="btnSendCurrent" type="button">send current</button>
+  <button id="btnPanic" class="danger" type="button">panic</button>
+  <button id="btnToggleDiagnostics" type="button">diagnostics</button>
+  <div class="command-state" id="opsLastAction">idle</div>
+</div>
+
+<div class="midi-diagnostics hidden" id="midiDiagnostics" aria-label="MIDI diagnostics">
+  <div class="diag-cell">
+    <div class="diag-label">RX</div>
+    <div class="diag-value" id="diagRx">0</div>
+  </div>
+  <div class="diag-cell">
+    <div class="diag-label">TX</div>
+    <div class="diag-value" id="diagTx">0</div>
+  </div>
+  <div class="diag-cell">
+    <div class="diag-label">CC</div>
+    <div class="diag-value" id="diagCc">0</div>
+  </div>
+  <div class="diag-cell">
+    <div class="diag-label">SysEx</div>
+    <div class="diag-value" id="diagSysex">0</div>
+  </div>
+  <div class="diag-cell wide">
+    <div class="diag-label">Last MIDI</div>
+    <div class="diag-value" id="diagLastMidi">none</div>
   </div>
 </div>
 
@@ -1117,8 +1634,15 @@
 </div>
 
 
-<div id="patchManagerContent" style="display: none;">
-<div class="section section-lib">
+<div id="patchManagerContent" class="main-content" style="display: none;">
+  <div class="hardware-chassis">
+    <div class="chassis-screw screw-tl"></div>
+    <div class="chassis-screw screw-tr"></div>
+    <div class="chassis-screw screw-bl"></div>
+    <div class="chassis-screw screw-br"></div>
+    <div class="chassis-logo">VIRUS-H PATCH</div>
+    <div style="z-index: 1; width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 40px; padding: 0 40px;">
+      <div class="section section-lib" style="width: 100%; max-width: 800px; background: rgba(0,0,0,0.4); border: 1px solid #111; border-radius: 6px; padding: 20px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.05);">
   <h2>patch library</h2>
   <div class="lib-row">
     <input type="text" id="patchName" placeholder="patch name">
@@ -1159,7 +1683,10 @@
   <div class="lib-list" id="synthBankList" style="margin-top: 16px; border: 1px dashed var(--border); background: rgba(0,0,0,0.2);">
     <div style="color: #666; font-size: 12px; text-align: center; padding: 16px;">nessun banco letto</div>
   </div>
-</div>
+      </div>
+    </div>
+    <div class="chassis-wood-strip"></div>
+  </div>
 </div>
 
 <!-- ARP -->
@@ -1169,11 +1696,19 @@
 <div id="sequencerContent" style="display: none; padding: 40px; text-align: center; border: 1px dashed var(--border); border-radius: 6px; margin-top: 20px;">
   <h2 style="margin:0; opacity: 0.5;">SEQUENCER / SONG MODE (IN COSTRUZIONE)</h2>
 </div>
+<div id="songContent" class="main-content" style="display: none;"></div>
 
 <div id="singleView" class="main-content single-view" style="display: block;"></div>
 
 <div id="multiView" class="main-content multi-view" style="display: none;">
-  <div class="multi-global">
+  <div class="hardware-chassis">
+    <div class="chassis-screw screw-tl"></div>
+    <div class="chassis-screw screw-tr"></div>
+    <div class="chassis-screw screw-bl"></div>
+    <div class="chassis-screw screw-br"></div>
+    <div class="chassis-logo">VIRUS-H MULTI</div>
+    <div style="z-index: 1; width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 40px; padding: 0 40px;">
+      <div class="multi-global" style="width: 100%; max-width: 1000px; background: rgba(0,0,0,0.4); border: 1px solid #111; border-radius: 6px; padding: 20px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.05); margin-bottom: 20px;">
     <div class="field">
       <label>play mode</label>
       <select id="playModeSelect">
@@ -1189,7 +1724,10 @@
     <button id="btnMultiSave">save</button>
   </div>
 
-  <div class="part-list" id="partList"></div>
+      <div class="part-list" id="partList" style="width: 100%; max-width: 1000px; background: rgba(0,0,0,0.4); border: 1px solid #111; border-radius: 6px; padding: 20px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.05);"></div>
+    </div>
+    <div class="chassis-wood-strip"></div>
+  </div>
 </div>
 
 <script>
@@ -1201,7 +1739,8 @@
     document.getElementById('patchManagerContent').style.display = 'none';
     document.getElementById('arpContent').style.display = 'none';
     document.getElementById('sequencerContent').style.display = 'none';
-    
+    document.getElementById('songContent').style.display = 'none';
+
     document.querySelectorAll('.segmented-tab').forEach(btn => btn.classList.remove('active'));
   }
 
@@ -1210,6 +1749,7 @@
     const v = document.getElementById('singleView');
     v.style.display = 'block';
     document.getElementById('btnTabSynth').classList.add('active');
+    updateControlRoomStatus();
   });
 
   document.getElementById('btnTabMultipart').addEventListener('click', () => {
@@ -1217,6 +1757,7 @@
     const v = document.getElementById('multiView');
     v.style.display = 'block';
     document.getElementById('btnTabMultipart').classList.add('active');
+    updateControlRoomStatus();
   });
 
   document.getElementById('btnTabPatchManager').addEventListener('click', () => {
@@ -1224,18 +1765,28 @@
     const v = document.getElementById('patchManagerContent');
     v.style.display = 'block';
     document.getElementById('btnTabPatchManager').classList.add('active');
+    updateControlRoomStatus();
   });
 
   document.getElementById('btnTabArp').addEventListener('click', () => {
     hideAllViews();
     document.getElementById('arpContent').style.display = 'block';
     document.getElementById('btnTabArp').classList.add('active');
+    updateControlRoomStatus();
   });
 
   document.getElementById('btnTabSequencer').addEventListener('click', () => {
     hideAllViews();
     document.getElementById('sequencerContent').style.display = 'block';
     document.getElementById('btnTabSequencer').classList.add('active');
+    updateControlRoomStatus();
+  });
+
+  document.getElementById('btnTabSong').addEventListener('click', () => {
+    hideAllViews();
+    document.getElementById('songContent').style.display = 'block';
+    document.getElementById('btnTabSong').classList.add('active');
+    updateControlRoomStatus();
   });
 
 
@@ -1258,7 +1809,7 @@
     { id:'osc1_keyflw',     name:'Osc1 Key Flw',      short:'o1ky', section:'osc', cc:21, default:64 },
     { id:'osc1_vel',        name:'Vel>Osc1',          short:'v>o1', section:'osc', cc:22, default:64, bipolar:true },
     { id:'osc1_subshape',   name:'Sub Osc Shape',     short:'sbsh', section:'osc', cc:23, default:0 },
-    
+
     // Oscillator 2
     { id:'osc2_wave',       name:'Osc2 Waveform',     short:'o2wv', section:'osc', cc:24, default:0 },
     { id:'osc2_pw',         name:'Osc2 Pulsewidth',   short:'o2pw', section:'osc', cc:25, default:64 },
@@ -1266,20 +1817,20 @@
     { id:'osc2_semitone',   name:'Osc2 Semitone',     short:'o2st', section:'osc', cc:27, default:64, bipolar:true },
     { id:'osc2_keyflw',     name:'Osc2 Key Flw',      short:'o2ky', section:'osc', cc:28, default:64 },
     { id:'osc2_vel',        name:'Vel>Osc2',          short:'v>o2', section:'osc', cc:29, default:64, bipolar:true },
-    
+
     // Shared Detune & Balance
     { id:'osc_detune',      name:'Osc Detune',        short:'det',  section:'osc', cc:30, default:0 },
     { id:'osc_balance',     name:'Osc Balance',       short:'bal',  section:'osc', cc:31, default:64, bipolar:true },
-    
+
     // Oscillator 3
     { id:'osc3_semi',       name:'Osc3 Semitone',     short:'o3st', section:'osc', cc:100, default:64, bipolar:true },
     { id:'osc3_detune',     name:'Osc3 Detune',       short:'o3dt', section:'osc', cc:101, default:64, bipolar:true },
-    
+
     // Unison
     { id:'uni_detune',      name:'Unison Detune',     short:'udt',  section:'osc', cc:102, default:0 },
     { id:'uni_pan',         name:'Unison Pan',        short:'upn',  section:'osc', cc:103, default:127 },
     { id:'uni_lfophs',      name:'Unison LFO Phs',    short:'lfoP', section:'osc', cc:115, default:0 },
-    
+
     // Common
     { id:'com_sync',        name:'Osc Sync',          short:'snc',  section:'osc', cc:104, default:0 }, // Sync mode button
     { id:'com_syncamt',     name:'Sync Amt',          short:'syam', section:'osc', cc:116, default:0 },
@@ -1291,11 +1842,11 @@
     { id:'com_envsync',     name:'Env>Sync',          short:'e>sy', section:'osc', cc:119, default:64, bipolar:true },
     { id:'com_fmmode',      name:'FM Mode',           short:'fmmd', section:'osc', cc:120, default:0 },
     { id:'com_fmamt',       name:'FM Amount',         short:'fmam', section:'osc', cc:121, default:0 },
-    
+
     // Noise & Punch
     { id:'noise_color',     name:'Noise Color',       short:'ncl',  section:'osc', cc:107, default:64, bipolar:true },
     { id:'punch_int',       name:'Punch Intensity',   short:'pnc',  section:'osc', cc:108, default:0 },
-    
+
     // Mixer
     { id:'mix_osc12',       name:'Osc1/2 Bal',        short:'m12',  section:'osc', cc:109, default:64, bipolar:true },
     { id:'mix_oscvol',      name:'Osc Vol (Sat)',     short:'mov',  section:'osc', cc:110, default:127 },
@@ -1448,10 +1999,20 @@
   let midiAccess = null;
   let selectedOutput = null;
   let wasConnected = false;
+  const midiStats = {
+    rx: 0,
+    tx: 0,
+    cc: 0,
+    sysex: 0,
+    last: 'none',
+    lastAction: 'idle'
+  };
 
   const LIB_KEY = 'virusTiSnow_patchLibrary';
   const MULTI_LIB_KEY = 'virusTiSnow_multiLibrary';
   const THEME_KEY = 'virusTiSnow_theme';
+  const MIDI_OUT_KEY = 'virusTiSnow_midiOutName';
+  const MIDI_IN_KEY = 'virusTiSnow_midiInName';
 
   // ---------------------------------------------------------------------
   // Theme toggle (persisted in localStorage)
@@ -1483,8 +2044,35 @@
   // Accent color picker (persisted in localStorage)
   // ---------------------------------------------------------------------
   const ACCENT_KEY = 'virusTiSnow_accent';
+  const LIGHT_LIMIT_KEY = 'virusTiSnow_lightLimit';
   const accentPicker = document.getElementById('accentPicker');
   const accentDots = Array.from(accentPicker.children);
+  const lightLimiter = document.getElementById('lightLimiter');
+  const lightLimitSteps = lightLimiter ? Array.from(lightLimiter.querySelectorAll('.light-limit-step')) : [];
+  let currentLightLimit = parseFloat(localStorage.getItem(LIGHT_LIMIT_KEY) || '0.65');
+
+  function applyLightLimit(limit){
+    currentLightLimit = Math.max(0.25, Math.min(1, Number(limit) || 0.65));
+    const halo = Math.round(5 + currentLightLimit * 15);
+    document.documentElement.style.setProperty('--light-limit', currentLightLimit.toFixed(2));
+    document.documentElement.style.setProperty('--led-halo', halo + 'px');
+    document.documentElement.style.setProperty('--led-halo-soft', Math.round(halo * 2.2) + 'px');
+    document.documentElement.style.setProperty('--led-halo-small', Math.max(2, Math.round(halo * 0.45)) + 'px');
+    document.documentElement.style.setProperty('--led-core', currentLightLimit.toFixed(2));
+    lightLimitSteps.forEach(step => {
+      const stepValue = parseFloat(step.getAttribute('data-limit') || '0');
+      step.classList.toggle('active', Math.abs(stepValue - currentLightLimit) < 0.02);
+    });
+    localStorage.setItem(LIGHT_LIMIT_KEY, String(currentLightLimit));
+    if (typeof initElektronLcd === 'function') initElektronLcd();
+    if (typeof drawLfoGraph === 'function') drawLfoGraph();
+    if (typeof drawEnvGraph === 'function') drawEnvGraph();
+    partDisplays.forEach(d => d._render());
+  }
+
+  function limitedGlow(base){
+    return Math.max(0, base * currentLightLimit);
+  }
 
   function applyAccent(color){
     document.documentElement.style.setProperty('--accent', color);
@@ -1495,6 +2083,7 @@
   }
 
   let currentAccent = localStorage.getItem(ACCENT_KEY) || '#00ffff';
+  applyLightLimit(currentLightLimit);
   applyAccent(currentAccent);
 
   accentDots.forEach(dot => {
@@ -1502,6 +2091,12 @@
       currentAccent = dot.getAttribute('data-accent');
       localStorage.setItem(ACCENT_KEY, currentAccent);
       applyAccent(currentAccent);
+    });
+  });
+
+  lightLimitSteps.forEach(step => {
+    step.addEventListener('click', () => {
+      applyLightLimit(parseFloat(step.getAttribute('data-limit') || '0.65'));
     });
   });
 
@@ -1516,6 +2111,20 @@
   const devIdSelect = document.getElementById('deviceIdSelect');
   const connDot = document.getElementById('connDot');
   const connLabel = document.getElementById('connLabel');
+  const opsMidi = document.getElementById('opsMidi');
+  const opsMode = document.getElementById('opsMode');
+  const opsChannel = document.getElementById('opsChannel');
+  const opsDevice = document.getElementById('opsDevice');
+  const opsLastAction = document.getElementById('opsLastAction');
+  const midiDiagnostics = document.getElementById('midiDiagnostics');
+  const diagRx = document.getElementById('diagRx');
+  const diagTx = document.getElementById('diagTx');
+  const diagCc = document.getElementById('diagCc');
+  const diagSysex = document.getElementById('diagSysex');
+  const diagLastMidi = document.getElementById('diagLastMidi');
+  const settingsModal = document.getElementById('settingsModal');
+  const btnSettings = document.getElementById('btnSettings');
+  const btnCloseSettings = document.getElementById('btnCloseSettings');
 
   let selectedInput = null;
 
@@ -1546,6 +2155,73 @@
     connDot.classList.add('pulse');
   }
 
+  function updateControlRoomStatus(){
+    const outConnected = !!(selectedOutput && selectedOutput.state === 'connected');
+    const inConnected = !!(selectedInput && selectedInput.state === 'connected');
+    const activeTab = document.querySelector('.segmented-tab.active');
+    const activeMode = activeTab ? activeTab.textContent.trim().toLowerCase() : 'single';
+    const deviceValue = devIdSelect.value === '16'
+      ? 'omni'
+      : 'id ' + (parseInt(devIdSelect.value, 10) + 1);
+
+    if (opsMode) opsMode.textContent = activeMode;
+    if (opsChannel) opsChannel.textContent = 'ch ' + chanSelect.value;
+    if (opsDevice) opsDevice.textContent = deviceValue;
+
+    if (!opsMidi) return;
+    opsMidi.classList.toggle('connected', outConnected || inConnected);
+    if (outConnected && inConnected) {
+      opsMidi.textContent = 'in/out ready';
+    } else if (outConnected) {
+      opsMidi.textContent = 'out ready';
+    } else if (inConnected) {
+      opsMidi.textContent = 'in ready';
+    } else if (midiAccess) {
+      opsMidi.textContent = 'no port selected';
+    } else {
+      opsMidi.textContent = 'unavailable';
+    }
+  }
+
+  function updateMidiDiagnostics(){
+    if (diagRx) diagRx.textContent = String(midiStats.rx);
+    if (diagTx) diagTx.textContent = String(midiStats.tx);
+    if (diagCc) diagCc.textContent = String(midiStats.cc);
+    if (diagSysex) diagSysex.textContent = String(midiStats.sysex);
+    if (diagLastMidi) diagLastMidi.textContent = midiStats.last;
+    if (opsLastAction) opsLastAction.textContent = midiStats.lastAction;
+  }
+
+  function setLastAction(label){
+    midiStats.lastAction = label;
+    updateMidiDiagnostics();
+  }
+
+  function openSettingsModal(){
+    if (!settingsModal) return;
+    settingsModal.classList.add('open');
+    btnSettings?.setAttribute('aria-expanded', 'true');
+    setLastAction('midi settings open');
+    inSelect?.focus();
+  }
+
+  function closeSettingsModal(){
+    if (!settingsModal) return;
+    settingsModal.classList.remove('open');
+    btnSettings?.setAttribute('aria-expanded', 'false');
+  }
+
+  btnSettings?.addEventListener('click', openSettingsModal);
+  btnCloseSettings?.addEventListener('click', closeSettingsModal);
+  settingsModal?.addEventListener('click', (event) => {
+    if (event.target === settingsModal) closeSettingsModal();
+  });
+  window.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && settingsModal?.classList.contains('open')) {
+      closeSettingsModal();
+    }
+  });
+
   function updateConnectionIndicator(){
     const outConnected = !!(selectedOutput && selectedOutput.state === 'connected');
     const inConnected = !!(selectedInput && selectedInput.state === 'connected');
@@ -1563,20 +2239,26 @@
       connLabel.textContent = 'disconnected';
     }
     wasConnected = (outConnected || inConnected);
+    updateControlRoomStatus();
   }
 
   function handleIncomingMidi(event) {
     const bytes = event.data;
+    midiStats.rx++;
 
     // Ignora il Clock (F8) e Active Sensing (FE) per non intasare il debug
     if (bytes[0] !== 0xF8 && bytes[0] !== 0xFE) {
        const hexStr = Array.from(bytes).map(b => b.toString(16).padStart(2,'0').toUpperCase()).join(' ');
        document.getElementById('midi-debug').textContent = 'MIDI: ' + hexStr;
+       midiStats.last = hexStr;
+       updateMidiDiagnostics();
     }
 
     // --- RICEZIONE CC (Control Change) ---
     // 0xB0 a 0xBF (176-191) sono i messaggi CC per i canali MIDI da 1 a 16
     if ((bytes[0] & 0xF0) === 0xB0 && bytes.length === 3) {
+      midiStats.cc++;
+      updateMidiDiagnostics();
       const ccNumber = bytes[1];
       const ccValue = bytes[2];
       const param = PARAMS.find(p => p.cc === ccNumber);
@@ -1594,7 +2276,7 @@
     let sysexMessages = [];
     let currentMsg = [];
     let inSysex = false;
-    
+
     for (let i = 0; i < bytes.length; i++) {
       if (bytes[i] === 0xF0) {
         inSysex = true;
@@ -1603,6 +2285,8 @@
         currentMsg.push(bytes[i]);
         if (bytes[i] === 0xF7) {
           sysexMessages.push(new Uint8Array(currentMsg));
+          midiStats.sysex++;
+          updateMidiDiagnostics();
           inSysex = false;
           currentMsg = [];
         }
@@ -1616,7 +2300,7 @@
         if (window.multiFetchState && window.multiFetchState.active) {
           window.multiFetchState.dumps[window.multiFetchState.currentPart] = Array.from(msgBytes);
           document.getElementById('midi-debug').textContent = '🔥 MULTI FETCH: Part ' + (window.multiFetchState.currentPart + 1) + '/4 ricevuto...';
-          
+
           window.multiFetchState.currentPart++;
           if (window.multiFetchState.currentPart < 4) {
             setTimeout(() => { requestDump(window.multiFetchState.currentPart); }, 50);
@@ -1637,14 +2321,14 @@
             }
           }
           patchName = patchName.trim();
-          
+
           const bState = window.bankFetchState;
-          
+
           // Calcola a quale banco appartiene questa patch
           const totalReceived = bState.readPatches.length;
           const patchNum = totalReceived % 128;
           let currentBankName = bState.bankName;
-          
+
           const bankOffset = Math.floor(totalReceived / 128);
           if (bankOffset > 0) {
             const match = bState.bankName.match(/^([A-Z]+)\s+(\d+)$/i);
@@ -1654,9 +2338,9 @@
               currentBankName = `${prefix} ${num + bankOffset}`;
             }
           }
-          
+
           const finalName = patchName ? `${currentBankName}-${patchNum.toString().padStart(3,'0')} ${patchName}` : `${currentBankName}-${patchNum.toString().padStart(3,'0')} Empty`;
-          
+
           if (bState.mode === 'capture') {
             const lib = loadLibrary();
             lib[finalName] = Array.from(msgBytes);
@@ -1665,11 +2349,11 @@
           } else {
             document.getElementById('midi-debug').textContent = `🔥 BANK READ: Letto ${finalName}... (${totalReceived + 1} ricevute)`;
           }
-          
+
           if (!bState.readPatches.includes(finalName)) {
             bState.readPatches.push(finalName);
           }
-          
+
           if (bState.timeoutId) clearTimeout(bState.timeoutId);
 
           // Continua a ricevere fino a quando il Virus non smette di trasmettere (timeout di 3 secondi)
@@ -1693,15 +2377,16 @@
         document.getElementById('patchNameDisplay').textContent = 'virus ti snow // PATCH: ' + patchName;
         const pInput = document.getElementById('patchName');
         if (pInput) pInput.value = patchName;
-        
+
         document.getElementById('midi-debug').textContent = '🔥 DUMP IMPORTATO: ' + patchName;
+        setLastAction('single dump received');
         continue;
       }
 
       // Altri messaggi SysEx (Parametri singoli)
       if (msgBytes.length >= 7 &&
           msgBytes[1] === 0x00 && msgBytes[2] === 0x20 && msgBytes[3] === 0x33 && msgBytes[4] === 0x01) {
-        
+
         const devId = msgBytes[5];
         const cmd = msgBytes[6];
 
@@ -1729,24 +2414,47 @@
 
     if (!midiAccess) return;
 
+    const savedOutName = localStorage.getItem(MIDI_OUT_KEY) || '';
+    const savedInName = localStorage.getItem(MIDI_IN_KEY) || '';
+
+    let matchedOutId = null;
+    let fallbackOutId = null;
     midiAccess.outputs.forEach(output => {
       const opt = document.createElement('option');
       opt.value = output.id;
       opt.textContent = output.name;
       outSelect.appendChild(opt);
+
+      if (savedOutName && output.name === savedOutName) matchedOutId = output.id;
+      if (!matchedOutId && /c2midi|virus/i.test(output.name)) fallbackOutId = output.id;
     });
+
     if (prevOut && [...outSelect.options].some(o => o.value === prevOut)){
       outSelect.value = prevOut;
+    } else if (matchedOutId) {
+      outSelect.value = matchedOutId;
+    } else if (fallbackOutId) {
+      outSelect.value = fallbackOutId;
     }
 
+    let matchedInId = null;
+    let fallbackInId = null;
     midiAccess.inputs.forEach(input => {
       const opt = document.createElement('option');
       opt.value = input.id;
       opt.textContent = input.name;
       inSelect.appendChild(opt);
+
+      if (savedInName && input.name === savedInName) matchedInId = input.id;
+      if (!matchedInId && /c2midi|virus/i.test(input.name)) fallbackInId = input.id;
     });
+
     if (prevIn && [...inSelect.options].some(o => o.value === prevIn)){
       inSelect.value = prevIn;
+    } else if (matchedInId) {
+      inSelect.value = matchedInId;
+    } else if (fallbackInId) {
+      inSelect.value = fallbackInId;
     }
 
     onOutputChange();
@@ -1756,6 +2464,11 @@
   function onOutputChange(){
     const id = outSelect.value;
     selectedOutput = (midiAccess && id) ? midiAccess.outputs.get(id) : null;
+    if (selectedOutput) {
+      localStorage.setItem(MIDI_OUT_KEY, selectedOutput.name);
+    } else {
+      localStorage.removeItem(MIDI_OUT_KEY);
+    }
     updateConnectionIndicator();
   }
 
@@ -1763,24 +2476,34 @@
     const id = inSelect.value;
     if (selectedInput) selectedInput.onmidimessage = null;
     selectedInput = (midiAccess && id) ? midiAccess.inputs.get(id) : null;
-    if (selectedInput) selectedInput.onmidimessage = handleIncomingMidi;
+    if (selectedInput) {
+      selectedInput.onmidimessage = handleIncomingMidi;
+      localStorage.setItem(MIDI_IN_KEY, selectedInput.name);
+    } else {
+      localStorage.removeItem(MIDI_IN_KEY);
+    }
     updateConnectionIndicator();
   }
 
   outSelect.addEventListener('change', onOutputChange);
   inSelect.addEventListener('change', onInputChange);
+  chanSelect.addEventListener('change', updateControlRoomStatus);
+  devIdSelect.addEventListener('change', updateControlRoomStatus);
 
   if (navigator.requestMIDIAccess){
     navigator.requestMIDIAccess({ sysex: true }).then(access => {
       midiAccess = access;
       refreshPorts();
       midiAccess.onstatechange = refreshPorts;
+      updateControlRoomStatus();
     }).catch(err => {
       connLabel.textContent = 'midi unavailable';
+      updateControlRoomStatus();
       console.error(err);
     });
   } else {
     connLabel.textContent = 'web midi not supported';
+    updateControlRoomStatus();
   }
 
   // ---------------------------------------------------------------------
@@ -1788,6 +2511,27 @@
   // ---------------------------------------------------------------------
   function deviceId(){
     return parseInt(devIdSelect.value, 10); // 0-15 or 16 (Omni)
+  }
+
+  function hexBytes(bytes){
+    return Array.from(bytes).map(b => b.toString(16).padStart(2,'0').toUpperCase()).join(' ');
+  }
+
+  function recordMidiTx(label, bytes){
+    midiStats.tx++;
+    midiStats.last = label || hexBytes(bytes);
+    midiStats.lastAction = 'tx: ' + (label || 'midi');
+    updateMidiDiagnostics();
+  }
+
+  function sendMidiBytes(bytes, label){
+    if (!selectedOutput) {
+      setLastAction('connect midi output first');
+      return false;
+    }
+    selectedOutput.send(bytes);
+    recordMidiTx(label, bytes);
+    return true;
   }
 
   function buildSysEx(cc, value){
@@ -1802,17 +2546,25 @@
   }
 
   function sendParam(param, value){
+    const paramDef = typeof param === 'string' ? PARAMS.find(p => p.id === param) : param;
+    if (!paramDef) return;
     if (selectedOutput){
       try{
-        if (param.cc !== undefined && param.cc < 120) {
+        if (paramDef.cc !== undefined && paramDef.cc < 120) {
           // Send standard MIDI CC
           const channel = parseInt(document.getElementById('midiChannel').value, 10) - 1;
-          selectedOutput.send(new Uint8Array([0xB0 | channel, param.cc, value & 0x7F]));
+          const bytes = new Uint8Array([0xB0 | channel, paramDef.cc, value & 0x7F]);
+          selectedOutput.send(bytes);
+          recordMidiTx('cc ' + paramDef.cc, bytes);
         } else {
           // Fallback to SysEx if no standard CC exists
-          selectedOutput.send(buildSysEx(param.cc, value));
+          const bytes = buildSysEx(paramDef.cc, value);
+          selectedOutput.send(bytes);
+          recordMidiTx('sysex param ' + paramDef.short, bytes);
         }
       } catch(e){ console.error('MIDI send error', e); }
+    } else {
+      setLastAction('connect midi output first');
     }
   }
 
@@ -1823,15 +2575,34 @@
   }
 
   // ---------------------------------------------------------------------
+
+  // Send standard MIDI CC
+  function sendCC(channel, cc, value) {
+    if (selectedOutput) {
+      try {
+        const chanByte = 0xB0 | ((channel - 1) & 0x0F);
+        const bytes = new Uint8Array([chanByte, cc & 0x7F, value & 0x7F]);
+        selectedOutput.send(bytes);
+        recordMidiTx('cc ' + cc, bytes);
+      } catch (e) { console.error('MIDI sendCC error', e); }
+    } else {
+      setLastAction('connect midi output first');
+    }
+  }
+
   // Multi mode SysEx send
   // ---------------------------------------------------------------------
   function sendMultiPartParam(partIndex, cc, value){
     if (selectedOutput){
       try{
-        selectedOutput.send(new Uint8Array([
+        const bytes = new Uint8Array([
           ...SYSEX_PREFIX, deviceId(), SYSEX_CMD_MULTI, partIndex & 0x7F, cc & 0x7F, value & 0x7F, 0xF7
-        ]));
+        ]);
+        selectedOutput.send(bytes);
+        recordMidiTx('multi p' + (partIndex + 1) + ' param ' + cc, bytes);
       } catch(e){ console.error('MIDI send error', e); }
+    } else {
+      setLastAction('connect midi output first');
     }
   }
 
@@ -1839,10 +2610,14 @@
   function sendPartSoundParam(partIndex, cc, value){
     if (selectedOutput){
       try{
-        selectedOutput.send(new Uint8Array([
+        const bytes = new Uint8Array([
           ...SYSEX_PREFIX, partIndex & 0x7F, SYSEX_CMD_PARAM, cc & 0x7F, value & 0x7F, 0xF7
-        ]));
+        ]);
+        selectedOutput.send(bytes);
+        recordMidiTx('part p' + (partIndex + 1) + ' param ' + cc, bytes);
       } catch(e){ console.error('MIDI send error', e); }
+    } else {
+      setLastAction('connect midi output first');
     }
   }
 
@@ -1850,89 +2625,50 @@
   // Knob UI — thin-stroke circle with a single radial indicator line
   // showing the current value (-135deg to +135deg sweep, 0deg = up).
   // ---------------------------------------------------------------------
-  const svgNS = 'http://www.w3.org/2000/svg';
-  const KNOB_SIZE = 52;
-  const KNOB_CENTER = KNOB_SIZE / 2;
-  const KNOB_RADIUS = 21;
-
-  function angleForValue(value){
-    return -135 + (value / 127) * 270;
-  }
-
-  function displayValue(value, bipolar){
-    if (bipolar) {
-      const v = value - 64;
-      return (v > 0 ? '+' : '') + v;
-    }
-    return String(value);
-  }
-
-  // spawn a brief ripple of dots radiating outward from a knob
-  function spawnRipple(container){
-    const RIPPLE_COUNT = 8;
-    for (let i = 0; i < RIPPLE_COUNT; i++){
-      const angle = (i / RIPPLE_COUNT) * Math.PI * 2;
-      const dot = document.createElement('div');
-      dot.className = 'ripple-dot';
-      dot.style.setProperty('--dx', (Math.cos(angle) * 28) + 'px');
-      dot.style.setProperty('--dy', (Math.sin(angle) * 28) + 'px');
-      container.appendChild(dot);
-      setTimeout(() => dot.remove(), 450);
-    }
-  }
-
-  // generic knob: caller supplies getValue/setValue so the same widget can
-  // back the single-mode patch, or any per-part value in multi mode.
   function createKnobGeneric(opts){
     const container = document.createElement('div');
-    container.className = 'knob-container';
+    container.className = 'chassis-knob-container';
 
-    const svg = document.createElementNS(svgNS, 'svg');
-    svg.setAttribute('viewBox', `0 0 ${KNOB_SIZE} ${KNOB_SIZE}`);
-    svg.classList.add('knob-svg');
+    const outer = document.createElement('div');
+    outer.className = 'chassis-knob-outer';
 
-    // thin stroke circle, no fill
-    const circle = document.createElementNS(svgNS, 'circle');
-    circle.classList.add('knob-ring');
-    circle.setAttribute('cx', KNOB_CENTER);
-    circle.setAttribute('cy', KNOB_CENTER);
-    circle.setAttribute('r', KNOB_RADIUS);
-    circle.setAttribute('fill', 'none');
-    circle.setAttribute('stroke', 'currentColor');
-    circle.setAttribute('stroke-width', '0.5');
-    svg.appendChild(circle);
+    const ring = document.createElement('div');
+    ring.className = 'chassis-knob-ring';
 
-    // single thin line from center to edge, rotated to show the value
-    const indicator = document.createElementNS(svgNS, 'g');
-    indicator.classList.add('knob-indicator');
-    const line = document.createElementNS(svgNS, 'line');
-    line.classList.add('knob-line');
-    line.setAttribute('x1', KNOB_CENTER);
-    line.setAttribute('y1', KNOB_CENTER);
-    line.setAttribute('x2', KNOB_CENTER);
-    line.setAttribute('y2', KNOB_CENTER - KNOB_RADIUS);
-    line.setAttribute('stroke', 'currentColor');
-    line.setAttribute('stroke-width', '1');
-    indicator.appendChild(line);
-    svg.appendChild(indicator);
+    const inner = document.createElement('div');
+    inner.className = 'chassis-knob-inner';
 
-    svg.style.color = 'var(--fg)';
+    const top = document.createElement('div');
+    top.className = 'chassis-knob-top';
+
+    const indicatorContainer = document.createElement('div');
+    indicatorContainer.className = 'chassis-knob-indicator-container';
+
+    const indicator = document.createElement('div');
+    indicator.className = 'chassis-knob-indicator';
+
+    indicatorContainer.appendChild(indicator);
+    top.appendChild(indicatorContainer);
+    inner.appendChild(top);
+    outer.appendChild(ring);
+    outer.appendChild(inner);
 
     const label = document.createElement('div');
-    label.className = 'knob-label';
+    label.className = 'chassis-knob-label';
     label.textContent = opts.label;
 
-    const valueLabel = document.createElement('div');
-    valueLabel.className = 'knob-value';
-
-    container.appendChild(svg);
+    container.appendChild(outer);
     container.appendChild(label);
-    container.appendChild(valueLabel);
 
     function render(){
       const value = opts.getValue();
-      indicator.style.transform = `rotate(${angleForValue(value)}deg)`;
-      valueLabel.textContent = displayValue(value, opts.bipolar);
+      const pct = value / 127;
+      const angle = -135 + (pct * 270);
+      indicatorContainer.style.transform = `rotate(${angle}deg)`;
+
+      const startAngle = 225;
+      const fillAngle = pct * 270;
+      ring.style.background = `conic-gradient(from ${startAngle}deg, var(--accent) 0deg, var(--accent) ${fillAngle}deg, transparent ${fillAngle}deg)`;
     }
 
     function setValue(value, send, setOpts){
@@ -1940,7 +2676,6 @@
       const changed = opts.getValue() !== value;
       opts.setValue(value, send);
       render();
-      if (changed && !(setOpts && setOpts.silent)) spawnRipple(container);
     }
 
     // drag interaction
@@ -1948,15 +2683,15 @@
     let startY = 0;
     let startVal = 0;
 
-    svg.addEventListener('pointerdown', (e) => {
+    outer.addEventListener('pointerdown', (e) => {
       dragging = true;
       startY = e.clientY;
       startVal = opts.getValue();
-      svg.setPointerCapture(e.pointerId);
+      outer.setPointerCapture(e.pointerId);
       e.preventDefault();
     });
 
-    svg.addEventListener('pointermove', (e) => {
+    outer.addEventListener('pointermove', (e) => {
       if (!dragging) return;
       const dy = startY - e.clientY;
       setValue(startVal + dy * 0.7, true);
@@ -1965,21 +2700,12 @@
     function endDrag(e){
       dragging = false;
     }
-    svg.addEventListener('pointerup', endDrag);
-    svg.addEventListener('pointercancel', endDrag);
+    outer.addEventListener('pointerup', endDrag);
+    outer.addEventListener('pointercancel', endDrag);
 
     // double-click resets to default
-    svg.addEventListener('dblclick', () => {
+    outer.addEventListener('dblclick', () => {
       setValue(opts.default, true);
-    });
-
-    // tap/click the value box to type an exact value
-    valueLabel.addEventListener('click', () => {
-      const current = opts.getValue();
-      const input = prompt('value (0-127):', current);
-      if (input === null) return;
-      const num = parseInt(input, 10);
-      if (!isNaN(num)) setValue(num, true);
     });
 
     container._render = render;
@@ -2012,7 +2738,7 @@
     const canvas = document.getElementById('lfoGraph');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    
+
     function draw(t) {
       if (!canvas.offsetParent) { requestAnimationFrame(draw); return; }
       const dpr = window.devicePixelRatio || 1;
@@ -2024,23 +2750,23 @@
       }
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, w, h);
-      
+
       const rateVal = patch['lfo1_rate'] || 64;
       const shapeVal = patch['lfo1_shape'] || 0;
       const freq = 0.05 + (rateVal / 127) * 0.5;
       const timeOffset = t * freq * 0.01;
-      
+
       ctx.beginPath();
       ctx.strokeStyle = currentAccent;
       ctx.lineWidth = 2;
-      ctx.shadowBlur = 10;
+      ctx.shadowBlur = limitedGlow(10);
       ctx.shadowColor = currentAccent;
-      
+
       for(let x = 0; x < w; x++) {
         const px = x / w;
         let py = 0;
         const phase = (px * Math.PI * 6 + timeOffset) % (Math.PI * 2);
-        
+
         if (shapeVal < 20) {
           py = Math.sin(phase);
         } else if (shapeVal < 40) {
@@ -2053,7 +2779,7 @@
           const steps = 6;
           py = Math.sin(Math.floor(phase * steps) / steps);
         }
-        
+
         const y = h/2 - py * (h * 0.35);
         if (x === 0) ctx.moveTo(x, y);
         else ctx.lineTo(x, y);
@@ -2068,7 +2794,7 @@
     const canvas = document.getElementById('envGraph');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    
+
     function draw() {
       if (!canvas.offsetParent) { requestAnimationFrame(draw); return; }
       const dpr = window.devicePixelRatio || 1;
@@ -2080,45 +2806,45 @@
       }
       ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       ctx.clearRect(0, 0, w, h);
-      
+
       const A = (patch['amp_attack'] || 0) / 127;
       const D = (patch['amp_decay'] || 0) / 127;
       const S = (patch['amp_sustain'] !== undefined ? patch['amp_sustain'] : 127) / 127;
       const R = (patch['amp_release'] || 0) / 127;
-      
+
       const pad = 16;
       const effW = w - pad*2;
       const effH = h - pad*2;
-      
+
       const totalTime = Math.max(0.1, A + D + R + 0.5);
       const ax = pad + (A / totalTime) * effW;
       const dx = ax + (D / totalTime) * effW;
       const sx = dx + (0.5 / totalTime) * effW;
       const rx = sx + (R / totalTime) * effW;
-      
+
       const sy = pad + (1 - S) * effH;
-      
+
       ctx.beginPath();
       ctx.strokeStyle = currentAccent;
       ctx.lineWidth = 3;
       ctx.lineJoin = 'round';
-      ctx.shadowBlur = 12;
+      ctx.shadowBlur = limitedGlow(12);
       ctx.shadowColor = currentAccent;
-      
+
       ctx.moveTo(pad, h - pad);
       ctx.lineTo(ax, pad);
       ctx.lineTo(dx, sy);
       ctx.lineTo(sx, sy);
       ctx.lineTo(rx, h - pad);
       ctx.stroke();
-      
+
       ctx.lineTo(rx, h);
       ctx.lineTo(pad, h);
       ctx.closePath();
       ctx.fillStyle = currentAccent + '33';
       ctx.shadowBlur = 0;
       ctx.fill();
-      
+
       requestAnimationFrame(draw);
     }
     requestAnimationFrame(draw);
@@ -2143,27 +2869,23 @@ let hwEncoders = [];
   function buildSingleView(){
     const root = document.getElementById('singleView');
     root.innerHTML = '';
-    
-    const container = document.createElement('div');
-    container.className = 'multi-global';
-    container.style.flexDirection = 'column';
-    container.style.alignItems = 'center';
-    container.style.gap = '20px';
-    container.style.padding = '20px';
 
-    // --- Elektron Global LCD ---
-    const elektronLcd = document.createElement('canvas');
-    elektronLcd.id = 'elektronLcd';
-    elektronLcd.style.width = '100%';
-    elektronLcd.style.maxWidth = '500px'; 
-    elektronLcd.style.height = '240px'; 
-    elektronLcd.style.background = '#0a0a0a';
-    elektronLcd.style.border = '2px solid #222';
-    elektronLcd.style.borderRadius = '8px';
-    elektronLcd.style.boxShadow = 'inset 0 0 15px rgba(0,0,0,0.8), 0 4px 20px rgba(0,0,0,0.5)';
     const elektronWrapper = document.createElement('div');
     elektronWrapper.className = 'hardware-chassis';
-    
+
+    const tlScrew = document.createElement('div'); tlScrew.className = 'chassis-screw screw-tl';
+    const trScrew = document.createElement('div'); trScrew.className = 'chassis-screw screw-tr';
+    const blScrew = document.createElement('div'); blScrew.className = 'chassis-screw screw-bl';
+    const brScrew = document.createElement('div'); brScrew.className = 'chassis-screw screw-br';
+    const logo = document.createElement('div'); logo.className = 'chassis-logo';
+    logo.textContent = 'VIRUS-H';
+
+    elektronWrapper.appendChild(tlScrew);
+    elektronWrapper.appendChild(trScrew);
+    elektronWrapper.appendChild(blScrew);
+    elektronWrapper.appendChild(brScrew);
+    elektronWrapper.appendChild(logo);
+
     const innerLayout = document.createElement('div');
     innerLayout.style.display = 'flex';
     innerLayout.style.flexDirection = 'row';
@@ -2171,24 +2893,40 @@ let hwEncoders = [];
     innerLayout.style.alignItems = 'flex-start';
     innerLayout.style.justifyContent = 'center';
     innerLayout.style.flexWrap = 'wrap';
-    
+    innerLayout.style.marginTop = '40px';
+    innerLayout.style.width = '100%';
+    innerLayout.style.zIndex = '1';
+
     const leftCol = document.createElement('div');
     leftCol.style.display = 'flex';
     leftCol.style.flexDirection = 'column';
     leftCol.style.gap = '20px';
     leftCol.style.alignItems = 'center';
-    
+
     const rightCol = document.createElement('div');
     rightCol.style.display = 'flex';
     rightCol.style.flexDirection = 'column';
     rightCol.style.justifyContent = 'center';
 
-    container.appendChild(elektronWrapper);
+    root.appendChild(elektronWrapper);
     elektronWrapper.appendChild(innerLayout);
     innerLayout.appendChild(leftCol);
     innerLayout.appendChild(rightCol);
 
-    leftCol.appendChild(elektronLcd);
+    // --- Elektron Global LCD ---
+    const screenRecess = document.createElement('div');
+    screenRecess.className = 'chassis-screen-recess';
+
+    const elektronLcd = document.createElement('canvas');
+    elektronLcd.id = 'elektronLcd';
+    elektronLcd.style.width = '100%';
+    elektronLcd.style.maxWidth = '500px';
+    elektronLcd.style.height = '240px';
+    elektronLcd.style.background = 'transparent';
+    elektronLcd.style.display = 'block';
+
+    screenRecess.appendChild(elektronLcd);
+    leftCol.appendChild(screenRecess);
 
     // --- Page Buttons ---
     const pageNav = document.createElement('div');
@@ -2197,15 +2935,15 @@ let hwEncoders = [];
     pageNav.style.flexWrap = 'wrap';
     pageNav.style.justifyContent = 'center';
     pageNav.style.marginTop = '10px';
-    
+
     const pageKeys = Object.keys(PAGES);
     pageKeys.forEach(p => {
       const btn = document.createElement('button');
-      btn.className = 'synth-sub-tab';
+      btn.className = 'chassis-page-btn';
       btn.textContent = p;
       if (p === currentPage) btn.classList.add('active');
       btn.onclick = () => {
-        pageNav.querySelectorAll('.synth-sub-tab').forEach(b => b.classList.remove('active'));
+        pageNav.querySelectorAll('.chassis-page-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         currentPage = p;
         updateHwEncoders();
@@ -2213,8 +2951,8 @@ let hwEncoders = [];
       };
       pageNav.appendChild(btn);
     });
-    
-    leftCol.appendChild(pageNav); // Page buttons under the screen
+
+    leftCol.appendChild(pageNav);
 
     // --- Hardware Encoders (4x2 Grid) ---
     const encoderGrid = document.createElement('div');
@@ -2225,25 +2963,31 @@ let hwEncoders = [];
     encoderGrid.style.marginTop = '10px';
     rightCol.appendChild(encoderGrid);
 
+    // --- Wood strip ---
+    const woodStrip = document.createElement('div');
+    woodStrip.className = 'chassis-wood-strip';
+    elektronWrapper.appendChild(woodStrip);
+
+    // I macro knobs in basso
+    const macrosContainer = document.createElement('div');
+    macrosContainer.className = 'single-macros';
+
     const macrosDiv = document.createElement('div');
     macrosDiv.id = 'globalMacroKnobs';
     macrosDiv.style.display = 'flex';
     macrosDiv.style.flexWrap = 'wrap';
     macrosDiv.style.justifyContent = 'center';
     macrosDiv.style.gap = '30px';
-    macrosDiv.style.marginTop = '40px';
     macrosDiv.style.width = '100%';
-    macrosDiv.style.borderTop = '1px solid var(--border)';
-    macrosDiv.style.paddingTop = '40px';
-    
-    // We will let the bottom initialization populate this div
-    elektronWrapper.appendChild(macrosDiv);
 
-    root.appendChild(container);
-    
+    macrosContainer.appendChild(macrosDiv);
+    rightCol.appendChild(macrosContainer);
+
+    // We will let the bottom initialization populate this div
+
     updateHwEncoders();
     initElektronLcd();
-    
+
     // --- LCD DRAG INTERACTIVITY ---
     let activeParam = null;
     let startY = 0;
@@ -2253,16 +2997,16 @@ let hwEncoders = [];
       const rect = elektronLcd.getBoundingClientRect();
       const x = e.clientX - rect.left;
       const y = e.clientY - rect.top;
-      
+
       const colWidth = rect.width / 4;
       const rowHeight = rect.height / 2;
-      
+
       const col = Math.floor(x / colWidth);
       const row = Math.floor(y / rowHeight);
-      
+
       const index = row * 4 + col;
       const paramId = PAGES[currentPage][index];
-      
+
       if (paramId) {
         activeParam = PARAMS.find(p => p.id === paramId);
         if (activeParam) {
@@ -2277,17 +3021,17 @@ let hwEncoders = [];
 
     window.addEventListener('mousemove', (e) => {
       if (!activeParam) return;
-      const dy = startY - e.clientY; 
+      const dy = startY - e.clientY;
       let newVal = startVal + dy;
       if(newVal < 0) newVal = 0;
       if(newVal > 127) newVal = 127;
-      
+
       patch[activeParam.id] = newVal;
-      
+
       // Update hardware encoder if visible
       // Since createKnob handles its own DOM, we should call refreshAllKnobs()
       if (typeof refreshAllKnobs === 'function') refreshAllKnobs();
-      
+
       sendParam(activeParam.id, newVal);
       initElektronLcd();
     });
@@ -2300,7 +3044,7 @@ let hwEncoders = [];
         initElektronLcd();
       }
     });
-    
+
     elektronLcd.addEventListener('touchstart', (e) => {
        // Omitted for brevity, will implement later or mapping
     });
@@ -2310,7 +3054,7 @@ let hwEncoders = [];
     const encoderGrid = document.getElementById('encoderGrid');
     if (!encoderGrid) return;
     encoderGrid.innerHTML = '';
-    
+
     const currentParams = PAGES[currentPage];
     for(let i=0; i<8; i++) {
       const paramId = currentParams[i];
@@ -2331,136 +3075,244 @@ let hwEncoders = [];
     }
   }
 
-  // --- Creative Graph Rendering Functions (Pixel/Hardware Style) ---
+  // --- Refined Graph Rendering Functions (Fine Pixel-Art Style) ---
+  function drawIconGuide(ctx, color){
+    ctx.save();
+    ctx.strokeStyle = color;
+    ctx.globalAlpha = 0.08;
+    ctx.lineWidth = 0.6;
+    ctx.setLineDash([1, 2]);
+    ctx.beginPath();
+    ctx.moveTo(-10, 0); ctx.lineTo(10, 0);
+    ctx.moveTo(0, -10); ctx.lineTo(0, 10);
+    ctx.stroke();
+    ctx.restore();
+  }
+
   function drawWav(ctx, val, color) {
     ctx.strokeStyle = color;
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 1;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
     ctx.beginPath();
-    if(val < 32) { // sine
-      ctx.moveTo(-10, 0); ctx.lineTo(-5, -10); ctx.lineTo(5, 10); ctx.lineTo(10, 0);
-    } else if(val < 64) { // tri
-      ctx.moveTo(-10, 10); ctx.lineTo(0, -10); ctx.lineTo(10, 10);
-    } else if(val < 96) { // saw
-      ctx.moveTo(-10, 10); ctx.lineTo(10, -10); ctx.lineTo(10, 10);
-    } else { // square
-      ctx.moveTo(-10, 10); ctx.lineTo(-10, -10); ctx.lineTo(0, -10); ctx.lineTo(0, 10); ctx.lineTo(10, 10);
+    if(val < 32) {
+      for(let x=-10; x<=10; x++) {
+        const y = -7 * Math.sin((x / 10) * Math.PI);
+        x === -10 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+      }
+    } else if(val < 64) {
+      ctx.moveTo(-10, 7); ctx.lineTo(-5, -7); ctx.lineTo(0, 7); ctx.lineTo(5, -7); ctx.lineTo(10, 7);
+    } else if(val < 96) {
+      ctx.moveTo(-10, 7); ctx.lineTo(-3, -7); ctx.lineTo(-3, 7);
+      ctx.moveTo(-3, 7); ctx.lineTo(4, -7); ctx.lineTo(4, 7);
+      ctx.moveTo(4, 7); ctx.lineTo(10, -5);
+    } else {
+      ctx.moveTo(-10, 6); ctx.lineTo(-10, -6); ctx.lineTo(-2, -6); ctx.lineTo(-2, 6);
+      ctx.lineTo(6, 6); ctx.lineTo(6, -6); ctx.lineTo(10, -6);
     }
     ctx.stroke();
   }
-  
+
   function drawPd(ctx, val, color) {
     ctx.strokeStyle = color;
-    ctx.lineWidth = 2;
+    ctx.fillStyle = color;
+    ctx.lineWidth = 1;
+    ctx.lineCap = 'square';
+    ctx.lineJoin = 'miter';
     ctx.beginPath();
-    const pw = -6 + (val/127)*12;
-    ctx.moveTo(-10, 10); ctx.lineTo(-10, -10); ctx.lineTo(pw, -10); ctx.lineTo(pw, 10); ctx.lineTo(10, 10);
+    const pw = -7 + (val / 127) * 14;
+    ctx.moveTo(-10, 7); ctx.lineTo(-10, -7); ctx.lineTo(pw, -7); ctx.lineTo(pw, 7); ctx.lineTo(10, 7);
+    ctx.stroke();
+    ctx.setLineDash([1, 2]);
+    ctx.beginPath();
+    ctx.moveTo(pw, -9); ctx.lineTo(pw, 9);
+    ctx.stroke();
+    ctx.setLineDash([]);
+    ctx.beginPath();
+    ctx.moveTo(pw - 2, -9); ctx.lineTo(pw, -7); ctx.lineTo(pw + 2, -9);
+    ctx.moveTo(pw - 2, 9); ctx.lineTo(pw, 7); ctx.lineTo(pw + 2, 9);
     ctx.stroke();
   }
-  
+
   function drawEnv(ctx, val, color) {
     ctx.strokeStyle = color;
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 1;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
     ctx.beginPath();
-    // Val controls the attack peak position horizontally
-    const peakX = -6 + (val/127)*12;
-    const peakY = -8;
-    ctx.moveTo(-10, 10); ctx.lineTo(peakX, peakY); ctx.lineTo(4, peakY + 8); ctx.lineTo(10, 10);
+    const peakX = -6 + (val/127)*8;
+    ctx.moveTo(-10, 8); ctx.lineTo(peakX, -8); ctx.lineTo(2, -2); ctx.lineTo(6, -2); ctx.lineTo(10, 8);
     ctx.stroke();
+    // Tiny dots at ADSR points
+    ctx.fillStyle = color;
+    [[-10,8],[peakX,-8],[2,-2],[6,-2],[10,8]].forEach(([x,y])=>{
+      ctx.beginPath(); ctx.arc(x, y, 1, 0, Math.PI*2); ctx.fill();
+    });
   }
-  
+
   function drawLfo(ctx, val, color) {
     ctx.strokeStyle = color;
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 1;
+    ctx.lineCap = 'round';
+    // Outer circle
     ctx.beginPath();
-    // Clock/Speed dial
-    ctx.arc(0, 0, 8, 0, Math.PI*2);
-    const angle = -Math.PI/2 + (val/127) * Math.PI * 1.5;
-    ctx.moveTo(0, 0); ctx.lineTo(Math.cos(angle)*6, Math.sin(angle)*6);
+    ctx.arc(0, 0, 9, 0, Math.PI*2);
     ctx.stroke();
+    // Inner ring
+    ctx.beginPath();
+    ctx.arc(0, 0, 6, 0, Math.PI*2);
+    ctx.stroke();
+    // Needle
+    const angle = -Math.PI/2 + (val/127) * Math.PI * 1.6;
+    ctx.beginPath();
+    ctx.moveTo(0, 0); ctx.lineTo(Math.cos(angle)*8, Math.sin(angle)*8);
+    ctx.stroke();
+    // Center dot
+    ctx.fillStyle = color;
+    ctx.beginPath(); ctx.arc(0, 0, 1.5, 0, Math.PI*2); ctx.fill();
+    // Tick marks
+    for(let i=0; i<8; i++) {
+      const a = (i/8) * Math.PI * 2;
+      ctx.beginPath();
+      ctx.moveTo(Math.cos(a)*7.5, Math.sin(a)*7.5);
+      ctx.lineTo(Math.cos(a)*9, Math.sin(a)*9);
+      ctx.stroke();
+    }
   }
 
   function drawTune(ctx, val, color) {
     ctx.strokeStyle = color;
-    ctx.lineWidth = 2;
-    // Val moves the note up and down smoothly
-    const yOffset = 4 - (val/127)*8; 
-    
-    // Draw a static ledger line behind it
+    ctx.fillStyle = color;
+    ctx.lineWidth = 1;
+    ctx.lineCap = 'round';
+    const pitchX = -8 + (val / 127) * 16;
     ctx.beginPath();
+    ctx.moveTo(-9, 0); ctx.lineTo(9, 0);
+    ctx.stroke();
+    for (let i = -2; i <= 2; i++) {
+      const x = i * 4;
+      ctx.beginPath();
+      ctx.moveTo(x, -1.5); ctx.lineTo(x, 1.5);
+      ctx.stroke();
+    }
     ctx.setLineDash([1, 2]);
-    ctx.moveTo(-8, 0); ctx.lineTo(8, 0);
+    ctx.beginPath();
+    ctx.moveTo(0, -8); ctx.lineTo(0, 8);
     ctx.stroke();
     ctx.setLineDash([]);
-    
     ctx.beginPath();
-    // A small musical note
-    ctx.arc(-2, 4 + yOffset, 3, 0, Math.PI*2);
-    ctx.moveTo(1, 4 + yOffset); ctx.lineTo(1, -6 + yOffset); ctx.lineTo(6, -4 + yOffset);
+    ctx.moveTo(pitchX, -8);
+    ctx.lineTo(pitchX, 8);
+    ctx.moveTo(pitchX - 2, -6); ctx.lineTo(pitchX, -8); ctx.lineTo(pitchX + 2, -6);
+    ctx.moveTo(pitchX - 2, 6); ctx.lineTo(pitchX, 8); ctx.lineTo(pitchX + 2, 6);
     ctx.stroke();
+    ctx.beginPath();
+    ctx.arc(pitchX, 0, 1.4, 0, Math.PI * 2);
+    ctx.fill();
   }
 
   function drawDetune(ctx, val, color) {
     ctx.strokeStyle = color;
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 1;
+    ctx.lineCap = 'round';
+    const offset = -4 + (val / 127) * 8;
     ctx.beginPath();
-    // Two overlapping shapes
-    const offset = (val/127)*6;
-    ctx.strokeRect(-8, -4, 8, 8);
-    ctx.strokeRect(-8 + offset, -4 - offset, 8, 8);
+    for(let x=-10; x<=10; x++) {
+      const y = -5 * Math.sin((x / 10) * Math.PI * 2);
+      x === -10 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+    ctx.beginPath();
+    ctx.globalAlpha = 0.62;
+    for(let x=-10; x<=10; x++) {
+      const y = -5 * Math.sin(((x + offset) / 10) * Math.PI * 2);
+      x === -10 ? ctx.moveTo(x, y) : ctx.lineTo(x, y);
+    }
+    ctx.stroke();
+    ctx.globalAlpha = 1;
+    ctx.beginPath();
+    ctx.arc(-8, 7, 1, 0, Math.PI * 2);
+    ctx.arc(8, -7, 1, 0, Math.PI * 2);
+    ctx.fillStyle = color;
+    ctx.fill();
   }
 
   function drawFilter(ctx, val, color) {
     ctx.strokeStyle = color;
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 1;
+    ctx.lineCap = 'round';
+    ctx.lineJoin = 'round';
+    drawIconGuide(ctx, color);
+    const cutoff = -7 + (val / 127) * 14;
     ctx.beginPath();
-    // Filter cutoff curve
-    ctx.moveTo(-10, -5); ctx.lineTo(0, -5); ctx.lineTo(8, 10);
+    ctx.moveTo(-10, -3);
+    ctx.lineTo(cutoff - 2, -3);
+    ctx.quadraticCurveTo(cutoff, -9, cutoff + 2, -1);
+    ctx.lineTo(10, 8);
     ctx.stroke();
-    // Vertical cutoff line moves with val
-    ctx.beginPath();
-    const cx = -8 + (val/127)*16;
-    ctx.setLineDash([2, 2]);
-    ctx.moveTo(cx, -10); ctx.lineTo(cx, 10);
-    ctx.stroke();
-    ctx.setLineDash([]);
+    ctx.fillStyle = color;
+    ctx.beginPath(); ctx.arc(cutoff, -6.2, 1.4, 0, Math.PI * 2); ctx.fill();
   }
 
   function drawFx(ctx, val, color) {
     ctx.strokeStyle = color;
     ctx.fillStyle = color;
-    ctx.lineWidth = 2;
-    
+    ctx.lineWidth = 1;
+    ctx.lineCap = 'round';
+
     ctx.save();
-    // Smoothly rotate the diamond based on val
-    ctx.rotate((val/127) * Math.PI);
-    
-    // Diamond
+    ctx.rotate((val/127) * Math.PI * 0.5);
+
+    // Outer diamond
     ctx.beginPath();
-    ctx.moveTo(0, -8); ctx.lineTo(8, 0); ctx.lineTo(0, 8); ctx.lineTo(-8, 0); ctx.closePath();
+    ctx.moveTo(0, -9); ctx.lineTo(9, 0); ctx.lineTo(0, 9); ctx.lineTo(-9, 0); ctx.closePath();
     ctx.stroke();
-    
-    // Inner square scales smoothly instead of binary hard toggling
-    const size = (val/127) * 4;
-    if(size > 0.5) {
-      ctx.fillRect(-size, -size, size*2, size*2);
+    // Inner diamond
+    ctx.beginPath();
+    ctx.moveTo(0, -5); ctx.lineTo(5, 0); ctx.lineTo(0, 5); ctx.lineTo(-5, 0); ctx.closePath();
+    ctx.stroke();
+    // Center dot
+    const sz = (val/127) * 2.5;
+    if(sz > 0.3) {
+      ctx.beginPath(); ctx.arc(0, 0, sz, 0, Math.PI*2); ctx.fill();
     }
+    // Corner dots
+    ctx.globalAlpha = 0.5;
+    [[-6,-6],[6,-6],[6,6],[-6,6]].forEach(([x,y])=>{
+      ctx.beginPath(); ctx.arc(x, y, 1, 0, Math.PI*2); ctx.fill();
+    });
+    ctx.globalAlpha = 1;
     ctx.restore();
   }
 
   function drawVolume(ctx, val, color) {
     ctx.strokeStyle = color;
     ctx.fillStyle = color;
-    ctx.lineWidth = 2;
-    const h = (val/127)*16;
-    ctx.fillRect(-6, 8-h, 12, h);
-    ctx.strokeRect(-6, -8, 12, 16);
+    ctx.lineWidth = 1;
+    ctx.lineCap = 'square';
+    ctx.lineJoin = 'miter';
+    const level = val / 127;
+    drawIconGuide(ctx, color);
+    ctx.beginPath();
+    ctx.rect(-9, -8, 18, 16);
+    ctx.stroke();
+    for (let i = 0; i < 5; i++) {
+      const x = -6 + i * 3;
+      const barH = 3 + Math.max(0, level - i * 0.16) * 14;
+      ctx.globalAlpha = level > i * 0.16 ? 1 : 0.24;
+      ctx.fillRect(x, 8 - barH, 1.8, barH);
+    }
+    ctx.globalAlpha = 1;
+    ctx.beginPath();
+    ctx.moveTo(-9, 9.5); ctx.lineTo(9, 9.5);
+    ctx.stroke();
   }
 
   function initElektronLcd() {
     const canvas = document.getElementById('elektronLcd');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
-    
+
     const dpr = window.devicePixelRatio || 1;
     const w = canvas.offsetWidth;
     const h = canvas.offsetHeight;
@@ -2468,35 +3320,42 @@ let hwEncoders = [];
       canvas.width = w * dpr;
       canvas.height = h * dpr;
     }
-    
+
     ctx.setTransform(1, 0, 0, 1, 0, 0);
     ctx.scale(dpr, dpr);
     ctx.imageSmoothingEnabled = false;
 
-    // Background
-    ctx.fillStyle = '#0a0a0a';
-    ctx.fillRect(0, 0, w, h);
-    
+    // Clear background to show chassis recess glass effect
+    ctx.clearRect(0, 0, w, h);
+
+    // Scanlines
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
+    for(let sy=0; sy<h; sy+=2) {
+      ctx.fillRect(0, sy, w, 1);
+    }
+
     const isTEBg = document.documentElement.getAttribute('data-skin') === 'te';
-    const mainColor = '#fff'; // LCD is always dark, so text/lines must be bright
-    const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#00e5ff';
-    
+    const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#ff9900';
+    const mainColor = accent; // Copia il colore arancione degli altri visori
+
     const headerH = 46;
     const leftW = 86;
-    
+
     ctx.fillStyle = mainColor;
     ctx.strokeStyle = mainColor;
     ctx.lineCap = 'square';
     ctx.lineJoin = 'miter';
+    ctx.shadowColor = mainColor;
+    ctx.shadowBlur = limitedGlow(2); // Glow OLED (limited)
 
     // --- Header ---
     ctx.font = '28px "VT323", monospace';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'top';
-    
+
     // Draw A05 box
     ctx.fillText('A05', 18, 12);
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 1;
     ctx.setLineDash([2, 2]);
     ctx.strokeRect(12, 8, 48, 30);
     ctx.setLineDash([]); // reset
@@ -2511,17 +3370,17 @@ let hwEncoders = [];
     ctx.font = '28px "VT323", monospace';
     // Draw Menu icon
     const menuX = w - 120;
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 1;
     ctx.strokeRect(menuX, 12, 24, 22);
     ctx.beginPath(); ctx.moveTo(menuX + 4, 17); ctx.lineTo(menuX + 20, 17); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(menuX + 4, 22); ctx.lineTo(menuX + 20, 22); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(menuX + 4, 27); ctx.lineTo(menuX + 20, 27); ctx.stroke();
-    
+
     // Tempo
     ctx.fillText('120.0', w - 16, 12);
-    
+
     // Draw line separating header
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(0, headerH);
     ctx.lineTo(w, headerH);
@@ -2529,12 +3388,12 @@ let hwEncoders = [];
 
     // --- Left Column ---
     ctx.textAlign = 'center';
-    
+
     // Page Name Box
     const pageParts = currentPage.split(' ');
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 1;
     ctx.strokeRect(12, headerH + 12, leftW - 24, 60);
-    
+
     if (pageParts.length > 1) {
       ctx.font = '24px "VT323", monospace';
       ctx.fillText(pageParts[0], leftW / 2, headerH + 16);
@@ -2548,15 +3407,15 @@ let hwEncoders = [];
     // Level meter "LEV"
     ctx.font = '22px "VT323", monospace';
     ctx.fillText('LEV', leftW / 2, h - 26);
-    
+
     // Draw simple vertical meter with dotted sides like hardware
     const meterW = 20;
     const meterH = 50;
     const meterX = (leftW - meterW) / 2;
     const meterY = h - 86;
-    ctx.lineWidth = 2;
+    ctx.lineWidth = 1;
     ctx.strokeRect(meterX, meterY, meterW, meterH);
-    
+
     // Dotted side pins
     ctx.beginPath();
     for(let i=0; i<6; i++) {
@@ -2569,13 +3428,13 @@ let hwEncoders = [];
     // Mock level
     ctx.fillStyle = mainColor;
     ctx.fillRect(meterX + 4, meterY + meterH * 0.4, meterW - 8, meterH * 0.6 - 4);
-    
+
     // Line separating left column
     ctx.beginPath();
     ctx.moveTo(leftW, headerH);
     ctx.lineTo(leftW, h);
     ctx.stroke();
-    
+
     // --- 4x2 Grid ---
     const gridX = leftW;
     const gridY = headerH;
@@ -2585,43 +3444,44 @@ let hwEncoders = [];
     const cellH = gridH / 2;
 
     const currentParams = PAGES[currentPage];
-    
+
     for(let i=0; i<8; i++) {
        const paramId = currentParams[i];
        if(!paramId) continue;
-       
+
        const pDef = PARAMS.find(p => p.id === paramId);
        if(!pDef) continue;
-       
+
        const val = patch[paramId] !== undefined ? patch[paramId] : pDef.default;
        const col = i % 4;
        const row = Math.floor(i / 4);
-       
+
        const cx = gridX + col * cellW;
        const cy = gridY + row * cellH;
-       
+
        ctx.save();
        ctx.translate(cx, cy);
-       
+
        // Highlight active
        if (window.activeParam && window.activeParam.id === paramId) {
          ctx.fillStyle = isTEBg ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)';
          ctx.fillRect(0, 0, cellW, cellH);
        }
-       
+
        // Center rendering context for graphics
        ctx.save();
        ctx.translate(cellW/2, cellH/2 - 14);
-       
+
        // Specific Graphics
        const idLower = paramId.toLowerCase();
        const drawColor = (window.activeParam && window.activeParam.id === paramId) ? accent : mainColor;
-       
+
        ctx.save();
        ctx.scale(2.4, 2.4); // Scale up shapes to fill the cell better
+       ctx.lineWidth = 1 / 2.4; // Linee fini come richiesto
        ctx.shadowColor = drawColor;
-       ctx.shadowBlur = (window.activeParam && window.activeParam.id === paramId) ? 8 : 2;
-       
+       ctx.shadowBlur = limitedGlow((window.activeParam && window.activeParam.id === paramId) ? 4 : 1);
+
        if (idLower.includes('wave') || idLower.includes('shape')) {
          drawWav(ctx, val, drawColor);
        } else if (idLower.includes('pw')) {
@@ -2641,22 +3501,22 @@ let hwEncoders = [];
        } else {
          drawFx(ctx, val, drawColor); // Fallback to a nice generic FX icon
        }
-       
+
        ctx.restore();
        ctx.restore();
-       
+
        // Text label at bottom of cell
        ctx.save();
        ctx.translate(cellW/2, cellH - 12);
        ctx.fillStyle = mainColor;
        ctx.shadowColor = mainColor;
-       ctx.shadowBlur = 2;
+       ctx.shadowBlur = limitedGlow(2);
        ctx.font = '24px "VT323", monospace';
        ctx.textAlign = 'center';
        ctx.textBaseline = 'middle';
        ctx.fillText(pDef.short.toUpperCase(), 0, 0);
        ctx.restore();
-       
+
        ctx.restore();
     }
   }
@@ -2699,11 +3559,11 @@ let hwEncoders = [];
   function finishBankOperation() {
     const bState = window.bankFetchState;
     if (!bState) return;
-    
+
     if (bState.timeoutId) {
       clearTimeout(bState.timeoutId);
     }
-    
+
     const count = bState.mode === 'read' ? bState.readPatches.length : loadLibraryCount(bState.bankName);
 
     if (bState.mode === 'capture') {
@@ -2711,6 +3571,7 @@ let hwEncoders = [];
         document.getElementById('midi-debug').innerHTML = `<span style="color:#f00;">❌ ERRORE: Nessuna patch ricevuta (SysEx bloccato).</span>`;
       } else {
         document.getElementById('midi-debug').innerHTML = `<span style="color:#0f0;">✅ BANK CAPTURE: Completato! (${count} patch ricevute)</span>`;
+        setLastAction('bank capture complete: ' + count);
       }
       updateBrowserView();
     } else if (bState.mode === 'read') {
@@ -2718,10 +3579,10 @@ let hwEncoders = [];
         document.getElementById('midi-debug').innerHTML = `<span style="color:#f00;">❌ ERRORE: Nessuna patch ricevuta. Verifica la connessione MIDI.</span>`;
       } else {
         document.getElementById('midi-debug').innerHTML = `<span style="color:#0f0;">✅ BANK READ: Completato! (${count} patch ricevute)</span>`;
-        console.log("Patches lette:", bState.readPatches);
+        setLastAction('bank read complete: ' + count);
       }
     }
-    
+
     window.bankFetchState.active = false;
     window.bankFetchState = null;
   }
@@ -2730,9 +3591,11 @@ let hwEncoders = [];
     if (!selectedOutput) return;
     try {
       // 0x30 = Single Patch Dump Request
-      selectedOutput.send(new Uint8Array([
+      const bytes = new Uint8Array([
         ...SYSEX_PREFIX, deviceId(), 0x30, bankIndex & 0x7F, patchIndex & 0x7F, 0xF7
-      ]));
+      ]);
+      selectedOutput.send(bytes);
+      recordMidiTx('request patch dump', bytes);
     } catch (e) { console.error('Bank dump request error', e); }
   }
 
@@ -2740,9 +3603,11 @@ let hwEncoders = [];
     if (!selectedOutput) return;
     try {
       // 0x32 = Bank Dump Request
-      selectedOutput.send(new Uint8Array([
+      const bytes = new Uint8Array([
         ...SYSEX_PREFIX, deviceId(), 0x32, bankIndex & 0x7F, 0xF7
-      ]));
+      ]);
+      selectedOutput.send(bytes);
+      recordMidiTx('request bank dump', bytes);
     } catch (e) { console.error('Full Bank dump request error', e); }
   }
 
@@ -2750,9 +3615,11 @@ let hwEncoders = [];
     if (!selectedOutput) return;
     try {
       // 0x40 = Edit Buffer, partIndex = 0..3 (Part 1..4)
-      selectedOutput.send(new Uint8Array([
+      const bytes = new Uint8Array([
         ...SYSEX_PREFIX, deviceId(), 0x00, 0x40, partIndex & 0x7F, 0xF7
-      ]));
+      ]);
+      selectedOutput.send(bytes);
+      recordMidiTx('request edit buffer p' + (partIndex + 1), bytes);
     } catch (e) { console.error('Dump request error', e); }
   }
 
@@ -2773,6 +3640,7 @@ let hwEncoders = [];
     saveMultiLibrary(lib);
     window.multiFetchState = null;
     document.getElementById('midi-debug').textContent = '✅ MULTI PRESET SAVED!';
+    setLastAction('multi preset saved');
     document.getElementById('multiName').value = '';
     renderMultiLibrary();
   }
@@ -2808,7 +3676,7 @@ let hwEncoders = [];
           const pData = preset.parts[i];
           multiParts[i].enabled = pData.enabled;
           multiParts[i].values = JSON.parse(JSON.stringify(pData.values));
-          
+
           // Invia parametri Mixer (Volume, Pan, Output, ecc.)
           sendMultiPartParam(i, 39, pData.values.volume);
           setTimeout(() => sendMultiPartParam(i, 40, pData.values.pan), 10);
@@ -2818,7 +3686,7 @@ let hwEncoders = [];
           setTimeout(() => sendMultiPartParam(i, 41, pData.values.output), 50);
           setTimeout(() => sendMultiPartParam(i, 35, pData.values.lowkey), 60);
           setTimeout(() => sendMultiPartParam(i, 36, pData.values.highkey), 70);
-          
+
           // Invia il Dump SysEx al sintetizzatore (Patch)
           if (pData.dump && pData.dump.length > 500) {
             setTimeout(() => {
@@ -2852,16 +3720,16 @@ let hwEncoders = [];
     if (!selectedOutput) return;
     const dump = new Uint8Array(rawBytesArray);
     // Byte 5 is the Device ID which routes the dump to a specific part!
-    dump[5] = partIndex & 0x7F; 
-    
+    dump[5] = partIndex & 0x7F;
+
     try {
       selectedOutput.send(dump);
-      
+
       // Update UI Cutoff/Res if available in dump
       if (dump.length > 50) {
         multiParts[partIndex].sound['f1_cutoff'] = dump[49];
         multiParts[partIndex].sound['f1_resonance'] = dump[50];
-        // Note: The knob rendering updates automatically when rotating, 
+        // Note: The knob rendering updates automatically when rotating,
         // but to force visual update we'd ideally trigger a render.
       }
 
@@ -2899,7 +3767,7 @@ let hwEncoders = [];
       const bytes = new Uint8Array(reader.result);
       if (bytes.length > 500 && bytes[0] === 0xF0 && bytes[bytes.length-1] === 0xF7) {
         window.lastReceivedDump = bytes;
-        
+
         // Extract name
         let patchName = "";
         for (let i = 249; i <= 258 && i < bytes.length; i++) {
@@ -3124,8 +3992,8 @@ let hwEncoders = [];
       // main patch name, centered, revealed column by column
       const text = getName();
       const textH = FONT_ROWS * CELL - GAP;
-      const ox = 0;
-      const oy = Math.max(0, Math.floor((h - textH) / 2));
+      const ox = 10;
+      const oy = Math.max(20, Math.floor((h - textH) / 2) + 10);
 
       ctx.fillStyle = colors.active;
       let gcol = 0;
@@ -3357,6 +4225,43 @@ let hwEncoders = [];
   // ---------------------------------------------------------------------
   // Init
   // ---------------------------------------------------------------------
+  document.getElementById('btnToggleDiagnostics').addEventListener('click', () => {
+    midiDiagnostics.classList.toggle('hidden');
+    setLastAction(midiDiagnostics.classList.contains('hidden') ? 'diagnostics hidden' : 'diagnostics visible');
+  });
+
+  document.getElementById('btnReceiveSingle').addEventListener('click', () => {
+    if (!selectedOutput) {
+      setLastAction('connect midi output first');
+      return;
+    }
+    window.lastReceivedDump = null;
+    setLastAction('waiting for single dump');
+    document.getElementById('midi-debug').textContent = 'REQUEST: Single edit buffer...';
+    requestDump(0);
+  });
+
+  document.getElementById('btnSendCurrent').addEventListener('click', () => {
+    if (!selectedOutput) {
+      setLastAction('connect midi output first');
+      return;
+    }
+    setLastAction('sending current single');
+    sendFullPatch(patch);
+  });
+
+  document.getElementById('btnPanic').addEventListener('click', () => {
+    if (!selectedOutput) {
+      setLastAction('connect midi output first');
+      return;
+    }
+    for (let ch = 1; ch <= 16; ch++) {
+      sendCC(ch, 120, 0); // All Sound Off
+      sendCC(ch, 123, 0); // All Notes Off
+    }
+    setLastAction('panic sent on 16 channels');
+  });
+
   document.getElementById('btnSavePatch').addEventListener('click', () => {
     const nameInput = document.getElementById('patchName');
     const name = nameInput.value.trim();
@@ -3406,8 +4311,8 @@ let hwEncoders = [];
     // Virus TI / Snow bank mapping: RAM 1-4 = 0-3, ROM 1-Z = 4+
     const bankIndex = (type === 'RAM' ? 0 : 4) + (num - 1);
     const bankName = `${type} ${num}`;
-    
-    const msg = mode === 'capture' 
+
+    const msg = mode === 'capture'
       ? `Vuoi estrarre e SALVARE nella libreria tutte le 128 patch dal banco ${bankName}?`
       : `Vuoi LEGGERE tutte le 128 patch dal banco ${bankName} senza salvarle?`;
 
@@ -3424,10 +4329,10 @@ let hwEncoders = [];
         readPatches: [],
         timeoutId: null
       };
-      
+
       // Request the full bank (Command 0x32)
       requestFullBank(bankIndex);
-      
+
       // If we receive absolutely nothing for 3 seconds, we timeout the whole operation
       window.bankFetchState.timeoutId = setTimeout(() => {
         const bState = window.bankFetchState;
@@ -3450,222 +4355,654 @@ let hwEncoders = [];
   function buildArpView() {
     const root = document.getElementById('arpContent');
     root.innerHTML = '';
-    
-    const container = document.createElement('div');
-    container.className = 'multi-global';
-    container.style.flexDirection = 'column';
-    container.style.alignItems = 'flex-start';
-    container.style.gap = '24px';
-    
-    const title = document.createElement('h2');
-    title.textContent = 'arpeggiator settings';
-    title.style.margin = '0';
-    container.appendChild(title);
-    
-    // Create grid for arp controls
+
+    const elektronWrapper = document.createElement('div');
+    elektronWrapper.className = 'hardware-chassis';
+
+    const tlScrew = document.createElement('div'); tlScrew.className = 'chassis-screw screw-tl';
+    const trScrew = document.createElement('div'); trScrew.className = 'chassis-screw screw-tr';
+    const blScrew = document.createElement('div'); blScrew.className = 'chassis-screw screw-bl';
+    const brScrew = document.createElement('div'); brScrew.className = 'chassis-screw screw-br';
+    const logo = document.createElement('div'); logo.className = 'chassis-logo';
+    logo.textContent = 'VIRUS-H ARP';
+
+    elektronWrapper.appendChild(tlScrew);
+    elektronWrapper.appendChild(trScrew);
+    elektronWrapper.appendChild(blScrew);
+    elektronWrapper.appendChild(brScrew);
+    elektronWrapper.appendChild(logo);
+
+    const innerLayout = document.createElement('div');
+    innerLayout.style.display = 'flex';
+    innerLayout.style.flexDirection = 'row';
+    innerLayout.style.gap = '60px';
+    innerLayout.style.alignItems = 'flex-start';
+    innerLayout.style.justifyContent = 'center';
+    innerLayout.style.flexWrap = 'wrap';
+    innerLayout.style.marginTop = '40px';
+    innerLayout.style.width = '100%';
+    innerLayout.style.zIndex = '1';
+
+    // Helper for ARP Discrete controls mapped to Knobs
+    function createArpDiscreteKnob(label, options, ccIndex) {
+      let currentIdx = 0;
+
+      const knobContainer = createKnobGeneric({
+        label: label,
+        default: 0,
+        bipolar: false,
+        getValue: () => Math.round((currentIdx / (options.length - 1)) * 127),
+        setValue: (v, send) => {
+          let step = Math.round((v / 127) * (options.length - 1));
+          if(step >= options.length) step = options.length - 1;
+          currentIdx = step;
+
+          const labelEl = knobContainer.querySelector('.chassis-knob-label');
+          if(labelEl) labelEl.textContent = label + ': ' + options[step].name;
+
+          if(send) sendCC(1, ccIndex, options[step].val);
+        }
+      });
+      const labelEl = knobContainer.querySelector('.chassis-knob-label');
+      if(labelEl) labelEl.textContent = label + ': ' + options[currentIdx].name;
+      return knobContainer;
+    }
+
     const grid = document.createElement('div');
     grid.style.display = 'grid';
     grid.style.gridTemplateColumns = 'repeat(4, 1fr)';
     grid.style.gap = '32px';
-    grid.style.width = '100%';
+    grid.style.padding = '20px';
 
-    // Helper for Selects
-    function createArpSelect(label, options, ccIndex) {
-      const field = document.createElement('div');
-      field.className = 'field';
-      field.style.flexDirection = 'column';
-      field.style.alignItems = 'flex-start';
-      field.style.gap = '8px';
+    grid.appendChild(createArpDiscreteKnob('Mode', [
+      {val: 0, name: 'Off'}, {val: 1, name: 'Up'}, {val: 2, name: 'Down'},
+      {val: 3, name: 'Up/Dn'}, {val: 4, name: 'As Ply'}, {val: 5, name: 'Rand'}, {val: 6, name: 'Chord'}
+    ], 100));
 
-      const lbl = document.createElement('label');
-      lbl.textContent = label;
-      field.appendChild(lbl);
-
-      const sel = document.createElement('select');
-      sel.style.width = '100%';
-      options.forEach(opt => {
-        const option = document.createElement('option');
-        option.value = opt.val;
-        option.textContent = opt.name;
-        sel.appendChild(option);
-      });
-
-      sel.addEventListener('change', (e) => {
-        const v = parseInt(e.target.value, 10);
-        sendCC(1, ccIndex, v); // Send CC on Channel 1 for now
-      });
-
-      field.appendChild(sel);
-      return field;
-    }
-
-    // 1. Arp Mode
-    const modeOpts = [
-      {val: 0, name: 'Off'},
-      {val: 1, name: 'Up'},
-      {val: 2, name: 'Down'},
-      {val: 3, name: 'Up & Down'},
-      {val: 4, name: 'As Played'},
-      {val: 5, name: 'Random'},
-      {val: 6, name: 'Chord'}
-    ];
-    grid.appendChild(createArpSelect('mode', modeOpts, 100)); // CC 100 placeholder
-
-    // 2. Pattern
     const patternOpts = [];
-    for(let i=1; i<=64; i++) {
-      patternOpts.push({val: i-1, name: `Pattern ${i}`});
-    }
+    for(let i=1; i<=64; i++) patternOpts.push({val: i-1, name: `Pat ${i}`});
     patternOpts.push({val: 64, name: 'User'});
-    grid.appendChild(createArpSelect('pattern', patternOpts, 101)); // CC 101 placeholder
+    grid.appendChild(createArpDiscreteKnob('Pattern', patternOpts, 101));
 
-    // 3. Resolution
-    const resOpts = [
-      {val: 0, name: '1/2'},
-      {val: 1, name: '1/4'},
-      {val: 2, name: '1/8'},
-      {val: 3, name: '1/16'},
-      {val: 4, name: '1/32'},
-      {val: 5, name: '1/64'}
-    ];
-    grid.appendChild(createArpSelect('resolution', resOpts, 102)); // CC 102 placeholder
+    grid.appendChild(createArpDiscreteKnob('Res', [
+      {val: 0, name: '1/2'}, {val: 1, name: '1/4'}, {val: 2, name: '1/8'},
+      {val: 3, name: '1/16'}, {val: 4, name: '1/32'}, {val: 5, name: '1/64'}
+    ], 102));
 
-    // 4. Octaves
-    const octOpts = [
-      {val: 0, name: '1'},
-      {val: 1, name: '2'},
-      {val: 2, name: '3'},
-      {val: 3, name: '4'}
-    ];
-    grid.appendChild(createArpSelect('octaves', octOpts, 103)); // CC 103 placeholder
+    grid.appendChild(createArpDiscreteKnob('Octaves', [
+      {val: 0, name: '1'}, {val: 1, name: '2'}, {val: 2, name: '3'}, {val: 3, name: '4'}
+    ], 103));
 
-    // 5. Note Length (Knob)
-    const lengthKnob = document.createElement('div');
-    lengthKnob.className = 'field';
-    lengthKnob.style.flexDirection = 'column';
-    lengthKnob.style.alignItems = 'center';
-    lengthKnob.style.gap = '8px';
-    
-    const lengthLabel = document.createElement('label');
-    lengthLabel.textContent = 'note length';
-    lengthKnob.appendChild(lengthLabel);
-    
-    // create a visual knob placeholder for now (we'll adapt the createGlobalMacroKnob if needed)
-    const lengthInput = document.createElement('input');
-    lengthInput.type = 'range';
-    lengthInput.min = '0';
-    lengthInput.max = '127';
-    lengthInput.value = '64';
-    lengthInput.style.width = '100%';
-    lengthInput.addEventListener('input', (e) => {
-      sendCC(1, 104, e.target.value); // CC 104 placeholder
+    let lenVal = 64;
+    const arpLenKnob = createKnobGeneric({
+      label: 'Length', default: 64, bipolar: false,
+      getValue: () => lenVal,
+      setValue: (v, send) => {
+        lenVal = v;
+        const lbl = arpLenKnob.querySelector('.chassis-knob-label');
+        if(lbl) lbl.textContent = 'Length: ' + Math.round(v);
+        if(send) sendCC(1, 104, v);
+      }
     });
-    lengthKnob.appendChild(lengthInput);
-    grid.appendChild(lengthKnob);
+    grid.appendChild(arpLenKnob);
 
-    // 6. Swing (Knob)
-    const swingKnob = document.createElement('div');
-    swingKnob.className = 'field';
-    swingKnob.style.flexDirection = 'column';
-    swingKnob.style.alignItems = 'center';
-    swingKnob.style.gap = '8px';
-    
-    const swingLabel = document.createElement('label');
-    swingLabel.textContent = 'swing';
-    swingKnob.appendChild(swingLabel);
-    
-    const swingInput = document.createElement('input');
-    swingInput.type = 'range';
-    swingInput.min = '0';
-    swingInput.max = '127';
-    swingInput.value = '0';
-    swingInput.style.width = '100%';
-    swingInput.addEventListener('input', (e) => {
-      sendCC(1, 105, e.target.value); // CC 105 placeholder
+    let swingVal = 0;
+    const arpSwingKnob = createKnobGeneric({
+      label: 'Swing', default: 0, bipolar: false,
+      getValue: () => swingVal,
+      setValue: (v, send) => {
+        swingVal = v;
+        const lbl = arpSwingKnob.querySelector('.chassis-knob-label');
+        if(lbl) lbl.textContent = 'Swing: ' + Math.round(v);
+        if(send) sendCC(1, 105, v);
+      }
     });
-    swingKnob.appendChild(swingInput);
-    grid.appendChild(swingKnob);
+    grid.appendChild(arpSwingKnob);
 
-    // 7. Hold (Checkbox/Toggle)
-    const holdField = document.createElement('div');
-    holdField.className = 'field';
-    holdField.style.flexDirection = 'column';
-    holdField.style.alignItems = 'center';
-    holdField.style.gap = '8px';
-    
-    const holdLabel = document.createElement('label');
-    holdLabel.textContent = 'hold';
-    holdField.appendChild(holdLabel);
-    
+    const holdBtnContainer = document.createElement('div');
+    holdBtnContainer.className = 'chassis-knob-container';
+    holdBtnContainer.style.justifyContent = 'flex-end';
+
     const holdBtn = document.createElement('button');
-    holdBtn.textContent = 'off';
-    holdBtn.style.width = '100%';
+    holdBtn.className = 'chassis-page-btn';
+    holdBtn.textContent = 'HOLD';
+    holdBtn.style.width = '40px';
+    holdBtn.style.height = '24px';
     let holdState = false;
     holdBtn.addEventListener('click', () => {
       holdState = !holdState;
-      holdBtn.textContent = holdState ? 'on' : 'off';
-      holdBtn.style.background = holdState ? 'var(--accent)' : 'none';
+      holdBtn.style.background = holdState ? 'var(--accent)' : '#222';
       holdBtn.style.color = holdState ? '#000' : 'var(--fg)';
-      sendCC(1, 106, holdState ? 127 : 0); // CC 106 placeholder
+      sendCC(1, 106, holdState ? 127 : 0);
     });
-    holdField.appendChild(holdBtn);
-    grid.appendChild(holdField);
 
-    container.appendChild(grid);
+    const holdLabel = document.createElement('div');
+    holdLabel.className = 'chassis-knob-label';
+    holdLabel.textContent = 'Hold';
 
-    // --- 16-STEP SEQUENCER ---
-    const seqTitle = document.createElement('h3');
-    seqTitle.textContent = 'user pattern (16 steps)';
-    seqTitle.style.margin = '16px 0 0 0';
-    seqTitle.style.opacity = '0.6';
-    seqTitle.style.fontSize = '11px';
-    container.appendChild(seqTitle);
+    holdBtnContainer.appendChild(holdBtn);
+    holdBtnContainer.appendChild(holdLabel);
+    grid.appendChild(holdBtnContainer);
 
+    innerLayout.appendChild(grid);
+
+    const arpStepsContainer = document.createElement('div');
+    arpStepsContainer.style.width = '100%';
+    arpStepsContainer.style.marginTop = '20px';
+    arpStepsContainer.style.display = 'flex';
+    arpStepsContainer.style.flexDirection = 'column';
+    arpStepsContainer.style.alignItems = 'center';
+
+    const arpSeqGrid = document.createElement('div');
+    arpSeqGrid.style.display = 'grid';
+    arpSeqGrid.style.gridTemplateColumns = 'repeat(16, 1fr)';
+    arpSeqGrid.style.gap = '16px';
+    arpSeqGrid.style.padding = '0 40px';
+
+    for(let i = 0; i < 16; i++) {
+      const stepWrapper = document.createElement('div');
+      stepWrapper.style.display = 'flex';
+      stepWrapper.style.flexDirection = 'column';
+      stepWrapper.style.alignItems = 'center';
+      stepWrapper.style.gap = '8px';
+
+      const stepLabel = document.createElement('div');
+      stepLabel.textContent = (i + 1).toString();
+      stepLabel.style.color = '#666';
+      stepLabel.style.fontSize = '10px';
+      stepLabel.style.fontFamily = 'monospace';
+
+      const stepBtn = document.createElement('div');
+      stepBtn.style.width = '40px';
+      stepBtn.style.height = '30px';
+      stepBtn.style.backgroundColor = '#1a1a1a';
+      stepBtn.style.border = '2px solid #111';
+      stepBtn.style.borderRadius = '4px';
+      stepBtn.style.boxShadow = 'inset 0 1px 2px rgba(255,255,255,0.1), 0 2px 4px rgba(0,0,0,0.5)';
+      stepBtn.style.cursor = 'pointer';
+      stepBtn.style.transition = 'all 100ms ease';
+
+      let stepActive = false;
+      stepBtn.addEventListener('click', () => {
+        stepActive = !stepActive;
+        if (stepActive) {
+          stepBtn.style.backgroundColor = 'var(--accent)';
+          stepBtn.style.boxShadow = `0 0 ${Math.round(limitedGlow(10))}px var(--accent), inset 0 1px 2px rgba(255,255,255,0.5)`;
+          stepBtn.style.borderColor = '#ff9900';
+        } else {
+          stepBtn.style.backgroundColor = '#1a1a1a';
+          stepBtn.style.boxShadow = 'inset 0 1px 2px rgba(255,255,255,0.1), 0 2px 4px rgba(0,0,0,0.5)';
+          stepBtn.style.borderColor = '#111';
+        }
+        sendCC(1, 110 + i, stepActive ? 127 : 0);
+      });
+
+      stepWrapper.appendChild(stepBtn);
+      stepWrapper.appendChild(stepLabel);
+      arpSeqGrid.appendChild(stepWrapper);
+    }
+
+    arpStepsContainer.appendChild(arpSeqGrid);
+    innerLayout.appendChild(arpStepsContainer);
+
+    elektronWrapper.appendChild(innerLayout);
+
+    const woodStrip = document.createElement('div');
+    woodStrip.className = 'chassis-wood-strip';
+    elektronWrapper.appendChild(woodStrip);
+
+    root.appendChild(elektronWrapper);
+  }
+
+  function buildSeqView() {
+    const root = document.getElementById('sequencerContent');
+    root.innerHTML = '';
+
+    const elektronWrapper = document.createElement('div');
+    elektronWrapper.className = 'hardware-chassis';
+    elektronWrapper.style.width = '95%';
+    elektronWrapper.style.maxWidth = '1100px';
+    elektronWrapper.style.padding = '30px 20px';
+
+    const tlScrew = document.createElement('div'); tlScrew.className = 'chassis-screw screw-tl';
+    const trScrew = document.createElement('div'); trScrew.className = 'chassis-screw screw-tr';
+    const blScrew = document.createElement('div'); blScrew.className = 'chassis-screw screw-bl';
+    const brScrew = document.createElement('div'); brScrew.className = 'chassis-screw screw-br';
+    const logo = document.createElement('div'); logo.className = 'chassis-logo';
+    logo.textContent = 'VIRUS-H SEQ';
+
+    elektronWrapper.appendChild(tlScrew);
+    elektronWrapper.appendChild(trScrew);
+    elektronWrapper.appendChild(blScrew);
+    elektronWrapper.appendChild(brScrew);
+    elektronWrapper.appendChild(logo);
+
+    const innerLayout = document.createElement('div');
+    innerLayout.style.display = 'flex';
+    innerLayout.style.flexDirection = 'column';
+    innerLayout.style.gap = '20px';
+    innerLayout.style.alignItems = 'center';
+    innerLayout.style.marginTop = '40px';
+    innerLayout.style.width = '100%';
+    innerLayout.style.zIndex = '1';
+
+    const topSection = document.createElement('div');
+    topSection.style.display = 'flex';
+    topSection.style.width = '100%';
+    topSection.style.justifyContent = 'space-between';
+    topSection.style.alignItems = 'center';
+    topSection.style.gap = '20px';
+
+
+    // Helper for Seq Discrete controls mapped to Knobs
+    function createSeqDiscreteKnob(label, options, ccIndex) {
+      let currentIdx = 0;
+      const knobContainer = createKnobGeneric({
+        label: label,
+        default: 0,
+        bipolar: false,
+        getValue: () => Math.round((currentIdx / (options.length - 1)) * 127),
+        setValue: (v, send) => {
+          let step = Math.round((v / 127) * (options.length - 1));
+          if(step >= options.length) step = options.length - 1;
+          currentIdx = step;
+          const labelEl = knobContainer.querySelector('.chassis-knob-label');
+          if(labelEl) labelEl.textContent = label + ': ' + options[step].name;
+          if(send) window.sendCC(1, ccIndex, options[step].val);
+        }
+      });
+      const labelEl = knobContainer.querySelector('.chassis-knob-label');
+      if(labelEl) labelEl.textContent = label + ': ' + options[currentIdx].name;
+      return knobContainer;
+    }
+
+    const leftKnobs = document.createElement('div');
+    leftKnobs.style.display = 'flex';
+    leftKnobs.style.gap = '30px';
+
+    leftKnobs.appendChild(createSeqDiscreteKnob('Scale', [
+      {val: 0, name: '1/16'}, {val: 1, name: '1/32'}, {val: 2, name: '1/8'}, {val: 3, name: '1/4'}
+    ], 107));
+
+    let lenValRaw = 64;
+    const lenKnob = createKnobGeneric({
+      label: 'Length', default: 64, bipolar: false,
+      getValue: () => lenValRaw,
+      setValue: (v, send) => {
+        lenValRaw = v;
+        let actualLen = Math.max(1, Math.round(v/127 * 64));
+        const lbl = lenKnob.querySelector('.chassis-knob-label');
+        if(lbl) lbl.textContent = 'Length: ' + actualLen;
+        if(send) window.sendCC(1, 108, actualLen);
+      }
+    });
+    leftKnobs.appendChild(lenKnob);
+
+    let gateVal = 50;
+    const gateKnob = createKnobGeneric({
+      label: 'Gate Time', default: 50, bipolar: false,
+      getValue: () => gateVal,
+      setValue: (v, send) => {
+        gateVal = v;
+        const lbl = gateKnob.querySelector('.chassis-knob-label');
+        if(lbl) lbl.textContent = 'Gate Time: ' + Math.round(v);
+        if(send) window.sendCC(1, 109, v);
+      }
+    });
+    leftKnobs.appendChild(gateKnob);
+
+    const rightKnobs = document.createElement('div');
+    rightKnobs.style.display = 'flex';
+    rightKnobs.style.gap = '30px';
+
+    let velVal = 100;
+    const velKnob = createKnobGeneric({
+      label: 'Velocity', default: 100, bipolar: false,
+      getValue: () => velVal,
+      setValue: (v, send) => {
+        velVal = v;
+        const lbl = velKnob.querySelector('.chassis-knob-label');
+        if(lbl) lbl.textContent = 'Velocity: ' + Math.round(v);
+        if(send) window.sendCC(1, 110, v);
+      }
+    });
+    rightKnobs.appendChild(velKnob);
+
+    rightKnobs.appendChild(createSeqDiscreteKnob('Direction', [
+      {val: 0, name: 'Fwd'}, {val: 1, name: 'Bwd'}, {val: 2, name: 'Ping'}, {val: 3, name: 'Rand'}
+    ], 111));
+
+    let seqSwingVal = 0;
+    const swingKnob = createKnobGeneric({
+      label: 'Swing', default: 0, bipolar: false,
+      getValue: () => seqSwingVal,
+      setValue: (v, send) => {
+        seqSwingVal = v;
+        const lbl = swingKnob.querySelector('.chassis-knob-label');
+        if(lbl) lbl.textContent = 'Swing: ' + Math.round(v);
+        if(send) window.sendCC(1, 112, v);
+      }
+    });
+    rightKnobs.appendChild(swingKnob);
+
+    // OLED Screen for Sequencer
+    const screenRecess = document.createElement('div');
+    screenRecess.className = 'chassis-screen-recess';
+    screenRecess.style.width = '300px';
+    screenRecess.style.height = '100px';
+    screenRecess.style.display = 'flex';
+    screenRecess.style.flexDirection = 'column';
+    screenRecess.style.justifyContent = 'center';
+    screenRecess.style.alignItems = 'center';
+
+    const seqTitle = document.createElement('div');
+    seqTitle.textContent = 'PATTERN 01';
+    seqTitle.style.color = 'var(--accent)';
+    seqTitle.style.fontSize = '24px';
+    seqTitle.style.textShadow = `0 0 ${Math.round(limitedGlow(6))}px var(--accent)`;
+    seqTitle.style.position = 'relative';
+    seqTitle.style.zIndex = '2';
+
+    const seqInfo = document.createElement('div');
+    seqInfo.textContent = 'SEQ RUNNING';
+    seqInfo.style.color = 'var(--accent)';
+    seqInfo.style.fontSize = '12px';
+    seqInfo.style.marginTop = '8px';
+    seqInfo.style.opacity = '0.8';
+    seqInfo.style.position = 'relative';
+    seqInfo.style.zIndex = '2';
+
+    screenRecess.appendChild(seqTitle);
+    screenRecess.appendChild(seqInfo);
+
+    topSection.appendChild(leftKnobs);
+    topSection.appendChild(screenRecess);
+    topSection.appendChild(rightKnobs);
+
+    innerLayout.appendChild(topSection);
+
+    // 64-step grid (4 rows of 16)
     const seqGrid = document.createElement('div');
     seqGrid.style.display = 'grid';
     seqGrid.style.gridTemplateColumns = 'repeat(16, 1fr)';
-    seqGrid.style.gap = '4px';
+    seqGrid.style.gap = '12px';
     seqGrid.style.width = '100%';
-    seqGrid.style.marginTop = '8px';
+    seqGrid.style.padding = '20px 0';
 
-    for(let i = 0; i < 16; i++) {
-      const step = document.createElement('div');
-      step.style.aspectRatio = '1 / 1';
-      step.style.border = '1px solid var(--border)';
-      step.style.borderRadius = '2px';
-      step.style.cursor = 'pointer';
-      step.style.transition = 'background-color 100ms ease, box-shadow 100ms ease';
-      
+    for(let i = 0; i < 64; i++) {
+      const stepWrapper = document.createElement('div');
+      stepWrapper.style.display = 'flex';
+      stepWrapper.style.flexDirection = 'column';
+      stepWrapper.style.alignItems = 'center';
+      stepWrapper.style.gap = '6px';
+
+      const stepLabel = document.createElement('div');
+      stepLabel.textContent = (i + 1).toString();
+      stepLabel.style.color = '#666';
+      stepLabel.style.fontSize = '10px';
+      stepLabel.style.fontFamily = 'monospace';
+
+      const stepBtn = document.createElement('div');
+      stepBtn.style.width = '35px';
+      stepBtn.style.height = '25px';
+      stepBtn.style.backgroundColor = '#1a1a1a';
+      stepBtn.style.border = '2px solid #111';
+      stepBtn.style.borderRadius = '3px';
+      stepBtn.style.boxShadow = 'inset 0 1px 2px rgba(255,255,255,0.1), 0 2px 4px rgba(0,0,0,0.5)';
+      stepBtn.style.cursor = 'pointer';
+      stepBtn.style.transition = 'all 100ms ease';
+
       let stepActive = false;
-      step.addEventListener('click', () => {
+      stepBtn.addEventListener('click', () => {
         stepActive = !stepActive;
-        step.style.background = stepActive ? 'var(--accent)' : 'transparent';
-        step.style.borderColor = stepActive ? 'var(--accent)' : 'var(--border)';
-        step.style.boxShadow = stepActive ? '0 0 8px var(--accent)' : 'none';
-        
-        // Simula invio MIDI per lo step N (Placeholder CC 110 + step index)
-        sendCC(1, 110 + i, stepActive ? 127 : 0); 
+        if (stepActive) {
+          stepBtn.style.backgroundColor = 'var(--accent)';
+          stepBtn.style.boxShadow = `0 0 ${Math.round(limitedGlow(10))}px var(--accent), inset 0 1px 2px rgba(255,255,255,0.5)`;
+          stepBtn.style.borderColor = '#ff9900';
+        } else {
+          stepBtn.style.backgroundColor = '#1a1a1a';
+          stepBtn.style.boxShadow = 'inset 0 1px 2px rgba(255,255,255,0.1), 0 2px 4px rgba(0,0,0,0.5)';
+          stepBtn.style.borderColor = '#111';
+        }
+        if(window.sendCC) window.sendCC(1, 110 + (i%32), stepActive ? 127 : 0);
       });
 
-      // Hover effect
-      step.addEventListener('mouseenter', () => {
-        if(!stepActive) step.style.background = '#222';
-      });
-      step.addEventListener('mouseleave', () => {
-        if(!stepActive) step.style.background = 'transparent';
-      });
-
-      seqGrid.appendChild(step);
+      stepWrapper.appendChild(stepBtn);
+      stepWrapper.appendChild(stepLabel);
+      seqGrid.appendChild(stepWrapper);
     }
-    container.appendChild(seqGrid);
 
-    root.appendChild(container);
+    innerLayout.appendChild(seqGrid);
+
+    elektronWrapper.appendChild(innerLayout);
+
+    const woodStrip = document.createElement('div');
+    woodStrip.className = 'chassis-wood-strip';
+    elektronWrapper.appendChild(woodStrip);
+
+    root.appendChild(elektronWrapper);
   }
+  function buildSongView() {
+    const root = document.getElementById('songContent');
+    root.innerHTML = '';
+
+    const elektronWrapper = document.createElement('div');
+    elektronWrapper.className = 'hardware-chassis';
+    elektronWrapper.style.width = '95%';
+    elektronWrapper.style.maxWidth = '1100px';
+    elektronWrapper.style.padding = '30px 20px';
+
+    const tlScrew = document.createElement('div'); tlScrew.className = 'chassis-screw screw-tl';
+    const trScrew = document.createElement('div'); trScrew.className = 'chassis-screw screw-tr';
+    const blScrew = document.createElement('div'); blScrew.className = 'chassis-screw screw-bl';
+    const brScrew = document.createElement('div'); brScrew.className = 'chassis-screw screw-br';
+    const logo = document.createElement('div'); logo.className = 'chassis-logo';
+    logo.textContent = 'VIRUS-H SONG';
+
+    elektronWrapper.appendChild(tlScrew);
+    elektronWrapper.appendChild(trScrew);
+    elektronWrapper.appendChild(blScrew);
+    elektronWrapper.appendChild(brScrew);
+    elektronWrapper.appendChild(logo);
+
+    const innerLayout = document.createElement('div');
+    innerLayout.style.display = 'flex';
+    innerLayout.style.flexDirection = 'column';
+    innerLayout.style.gap = '20px';
+    innerLayout.style.alignItems = 'center';
+    innerLayout.style.marginTop = '40px';
+    innerLayout.style.width = '100%';
+    innerLayout.style.zIndex = '1';
+
+    // Page Buttons for SONG
+    const pageContainer = document.createElement('div');
+    pageContainer.style.display = 'flex';
+    pageContainer.style.gap = '10px';
+    pageContainer.style.marginBottom = '10px';
+
+    const pages = ['1:16', '17:32', '33:48', '49:64'];
+    const pageBtns = [];
+    let currentPage = 0;
+
+    pages.forEach((lbl, idx) => {
+      const btn = document.createElement('button');
+      btn.className = 'chassis-page-btn';
+      btn.textContent = lbl;
+      btn.style.padding = '4px 12px';
+      btn.style.width = 'auto';
+      if (idx === currentPage) {
+        btn.style.backgroundColor = '#ff9900';
+        btn.style.color = '#000';
+      }
+      btn.addEventListener('click', () => {
+        currentPage = idx;
+        pageBtns.forEach((b, i) => {
+          if (i === currentPage) {
+            b.style.backgroundColor = '#ff9900';
+            b.style.color = '#000';
+          } else {
+            b.style.backgroundColor = 'var(--section-bg)';
+            b.style.color = 'var(--text-main)';
+          }
+        });
+        slotWrappers.forEach((w, i) => {
+          if (i >= currentPage * 16 && i < (currentPage + 1) * 16) {
+            w.style.display = 'flex';
+          } else {
+            w.style.display = 'none';
+          }
+        });
+      });
+      pageBtns.push(btn);
+      pageContainer.appendChild(btn);
+    });
+
+    innerLayout.appendChild(pageContainer);
+
+    // Grid of 16 independent visors
+    const gridContainer = document.createElement('div');
+    gridContainer.style.display = 'grid';
+    gridContainer.style.gridTemplateColumns = 'repeat(4, 1fr)';
+    gridContainer.style.gap = '20px'; // margine di spazio nello chassis
+    gridContainer.style.width = '100%';
+
+    const slotWrappers = [];
+
+    for(let i=0; i<64; i++){
+      const display = document.createElement('div');
+      display.className = 'chassis-screen-recess';
+      display.style.display = 'flex';
+      display.style.flexDirection = 'column';
+      display.style.alignItems = 'center';
+      display.style.justifyContent = 'center';
+      display.style.padding = '10px';
+      display.style.height = '90px';
+      display.style.boxSizing = 'border-box';
+      display.style.position = 'relative';
+      display.style.gap = '8px';
+
+      const headerRow = document.createElement('div');
+      headerRow.style.display = 'flex';
+      headerRow.style.justifyContent = 'space-between';
+      headerRow.style.width = '100%';
+      headerRow.style.color = 'var(--accent)';
+      headerRow.style.fontFamily = 'monospace';
+      headerRow.style.fontSize = '12px';
+      headerRow.style.fontWeight = 'bold';
+      headerRow.style.borderBottom = '1px dashed var(--accent)';
+      headerRow.style.paddingBottom = '4px';
+      headerRow.style.position = 'relative';
+      headerRow.style.zIndex = '2';
+
+      const stepIdx = document.createElement('div');
+      stepIdx.textContent = 'STP ' + (i+1).toString().padStart(2, '0');
+      headerRow.appendChild(stepIdx);
+      display.appendChild(headerRow);
+
+      const row = document.createElement('div');
+      row.style.display = 'flex';
+      row.style.gap = '10px';
+      row.style.alignItems = 'center';
+      row.style.position = 'relative';
+      row.style.zIndex = '2';
+      row.style.marginTop = '4px';
+
+      const selStyle = "background: transparent; color: var(--accent); border: 1px solid #333; font-family: monospace; font-size: 14px; outline: none; padding: 2px;";
+
+      const patternSel = document.createElement('select');
+      patternSel.style.cssText = selStyle;
+      const offOpt = document.createElement('option'); offOpt.value = 'OFF'; offOpt.textContent = '--';
+      patternSel.appendChild(offOpt);
+      for(let p=1; p<=64; p++) {
+        const opt = document.createElement('option');
+        opt.value = p; opt.textContent = 'P' + p.toString().padStart(2, '0');
+        patternSel.appendChild(opt);
+      }
+
+      const repsSel = document.createElement('select');
+      repsSel.style.cssText = selStyle;
+      for(let r=1; r<=16; r++) {
+        const opt = document.createElement('option');
+        opt.value = r; opt.textContent = 'x' + r;
+        repsSel.appendChild(opt);
+      }
+
+      const transpSel = document.createElement('select');
+      transpSel.style.cssText = selStyle;
+      for(let t=-24; t<=24; t++) {
+        const opt = document.createElement('option');
+        opt.value = t; opt.textContent = (t > 0 ? '+' : '') + t;
+        if(t === 0) opt.selected = true;
+        transpSel.appendChild(opt);
+      }
+
+      row.appendChild(patternSel);
+      row.appendChild(repsSel);
+      row.appendChild(transpSel);
+      display.appendChild(row);
+
+      if (i >= 16) display.style.display = 'none';
+      slotWrappers.push(display);
+      gridContainer.appendChild(display);
+    }
+
+    innerLayout.appendChild(gridContainer);
+
+    // Playback Controls
+    const controlsContainer = document.createElement('div');
+    controlsContainer.style.display = 'flex';
+    controlsContainer.style.gap = '20px';
+    controlsContainer.style.marginTop = '10px';
+
+    const playBtn = document.createElement('button');
+    playBtn.className = 'chassis-page-btn';
+    playBtn.textContent = 'PLAY SONG';
+    playBtn.style.padding = '0 20px';
+    playBtn.style.width = 'auto';
+    playBtn.addEventListener('click', () => { playBtn.style.backgroundColor = '#ff9900'; playBtn.style.color = '#000'; setTimeout(()=> { playBtn.style.backgroundColor = 'var(--section-bg)'; playBtn.style.color = 'var(--text-main)'; }, 200); if(window.sendCC) window.sendCC(1, 115, 127); });
+
+    const stopBtn = document.createElement('button');
+    stopBtn.className = 'chassis-page-btn';
+    stopBtn.textContent = 'STOP';
+    stopBtn.style.padding = '0 20px';
+    stopBtn.style.width = 'auto';
+    stopBtn.addEventListener('click', () => { stopBtn.style.backgroundColor = '#ff9900'; stopBtn.style.color = '#000'; setTimeout(()=> { stopBtn.style.backgroundColor = 'var(--section-bg)'; stopBtn.style.color = 'var(--text-main)'; }, 200); if(window.sendCC) window.sendCC(1, 116, 127); });
+
+    const loopBtn = document.createElement('button');
+    loopBtn.className = 'chassis-page-btn';
+    loopBtn.textContent = 'LOOP';
+    loopBtn.style.padding = '0 20px';
+    loopBtn.style.width = 'auto';
+    let isLoop = false;
+    loopBtn.addEventListener('click', () => {
+      isLoop = !isLoop;
+      loopBtn.style.backgroundColor = isLoop ? '#ff9900' : 'var(--section-bg)';
+      loopBtn.style.color = isLoop ? '#000' : 'var(--text-main)';
+      if(window.sendCC) window.sendCC(1, 117, isLoop ? 127 : 0);
+    });
+
+    controlsContainer.appendChild(playBtn);
+    controlsContainer.appendChild(stopBtn);
+    controlsContainer.appendChild(loopBtn);
+    innerLayout.appendChild(controlsContainer);
+
+    elektronWrapper.appendChild(innerLayout);
+
+    const woodStrip = document.createElement('div');
+    woodStrip.className = 'chassis-wood-strip';
+    elektronWrapper.appendChild(woodStrip);
+
+    root.appendChild(elektronWrapper);
+  }
+
+
 
   renderLibrary();
   renderMultiLibrary();
-  
-  // Initialize the big macro knobs (Cutoff & Resonance) and put them in the header
+
+  buildSingleView();
+
+  // Initialize the big macro knobs (Cutoff & Resonance) after the Single view exists.
   const macroKnobs = document.getElementById('globalMacroKnobs');
   if (macroKnobs) {
     macroKnobs.innerHTML = '';
@@ -3676,15 +5013,16 @@ let hwEncoders = [];
       const resKnob = createKnob(resParam);
       macroKnobs.appendChild(cutKnob);
       macroKnobs.appendChild(resKnob);
-      // We push them to a custom array so they still get updated even if knobRefs overrides them
       window.macroRefs = [cutKnob, resKnob];
     }
   }
-  
-  buildSingleView();
+
   buildMultiView();
   buildArpView();
+  buildSeqView();
+  buildSongView();
 })();
+
 </script>
 </body>
 </html>
