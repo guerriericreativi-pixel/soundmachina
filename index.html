@@ -12,12 +12,12 @@
     --section-bg: #e6e6e6;
     --border: #cccccc;
     --dot-color: #d8d8d8;
-    --accent: #f57b20;
+    --accent: #56b6c2;
     --light-limit: 0.72;
-    --led-halo: 10px;
-    --led-halo-soft: 22px;
-    --led-halo-small: 5px;
-    --led-core: 1;
+    --led-halo: 6px;
+    --led-halo-soft: 14px;
+    --led-halo-small: 3px;
+    --led-core: 0.9;
     --font-ui: 'Inter', sans-serif;
   }
   html[data-skin="elektron"]{
@@ -26,7 +26,7 @@
     --section-bg: #222226;
     --border: #333338;
     --dot-color: #2a2a30;
-    --accent: #ff3300;
+    --accent: #56b6c2;
   }
   *{
     box-sizing: border-box;
@@ -147,12 +147,12 @@
     transition: transform 100ms ease, opacity 160ms ease, box-shadow 160ms ease, filter 160ms ease;
   }
   .dot.on{
-    opacity: calc(0.45 + (var(--light-limit) * 0.55));
-    filter: brightness(calc(0.75 + (var(--light-limit) * 0.8))) saturate(1.35);
+    opacity: calc(0.45 + (var(--light-limit) * 0.5));
+    filter: brightness(calc(0.8 + (var(--light-limit) * 0.35))) saturate(1.1);
     box-shadow:
       inset 0 -1px 2px rgba(0,0,0,0.5),
-      0 0 var(--led-halo) color-mix(in srgb, var(--accent) 76%, transparent),
-      0 0 var(--led-halo-soft) color-mix(in srgb, var(--accent) 34%, transparent);
+      0 0 var(--led-halo) color-mix(in srgb, var(--accent) 55%, transparent),
+      0 0 var(--led-halo-soft) color-mix(in srgb, var(--accent) 22%, transparent);
   }
   .dot.pulse{
     animation: ledBounce 400ms ease-out;
@@ -183,17 +183,17 @@
     min-width: 0;
     min-height: 0;
     padding: 0;
-    border: 1px solid color-mix(in srgb, var(--led-color) 60%, var(--border));
+    border: 1px solid color-mix(in srgb, var(--led-color) 45%, var(--border));
     border-radius: 50%;
     cursor: pointer;
     background:
-      radial-gradient(circle at 34% 28%, rgba(255,255,255,0.92) 0 10%, color-mix(in srgb, var(--led-color) 92%, #ffffff) 18%, var(--led-color) 46%, color-mix(in srgb, var(--led-color) 42%, #080808) 100%) !important;
+      radial-gradient(circle at 34% 28%, rgba(255,255,255,0.7) 0 10%, color-mix(in srgb, var(--led-color) 85%, #ffffff) 20%, var(--led-color) 55%, color-mix(in srgb, var(--led-color) 45%, #151515) 100%) !important;
     box-shadow:
-      inset 0 -2px 3px rgba(0,0,0,0.55),
-      inset 0 1px 2px rgba(255,255,255,0.55),
-      0 0 var(--led-halo-small) color-mix(in srgb, var(--led-color) 42%, transparent);
-    filter: brightness(calc(0.72 + (var(--light-limit) * 0.34))) saturate(1.25);
-    opacity: calc(0.58 + (var(--light-limit) * 0.32));
+      inset 0 -1px 2px rgba(0,0,0,0.5),
+      inset 0 1px 1px rgba(255,255,255,0.4),
+      0 0 var(--led-halo-small) color-mix(in srgb, var(--led-color) 30%, transparent);
+    filter: brightness(calc(0.75 + (var(--light-limit) * 0.25))) saturate(1.1);
+    opacity: calc(0.65 + (var(--light-limit) * 0.3));
     transition: box-shadow 140ms ease, filter 140ms ease, opacity 140ms ease, transform 100ms ease;
   }
   .accent-dot:hover{
@@ -201,14 +201,14 @@
   }
   .accent-dot.selected{
     opacity: 1;
-    filter: brightness(calc(0.95 + (var(--light-limit) * 0.55))) saturate(1.7);
+    filter: brightness(calc(0.92 + (var(--light-limit) * 0.2))) saturate(1.15);
     box-shadow:
       0 0 0 2px var(--bg),
       0 0 0 4px var(--fg),
-      0 0 var(--led-halo) color-mix(in srgb, var(--led-color) 88%, transparent),
-      0 0 var(--led-halo-soft) color-mix(in srgb, var(--led-color) 42%, transparent),
-      inset 0 -2px 3px rgba(0,0,0,0.52),
-      inset 0 1px 2px rgba(255,255,255,0.65);
+      0 0 var(--led-halo) color-mix(in srgb, var(--led-color) 60%, transparent),
+      0 0 var(--led-halo-soft) color-mix(in srgb, var(--led-color) 25%, transparent),
+      inset 0 -1px 2px rgba(0,0,0,0.4),
+      inset 0 1px 1px rgba(255,255,255,0.5);
   }
   .light-limiter{
     display: inline-grid;
@@ -1535,9 +1535,10 @@
 
     <div class="accent-picker" id="accentPicker">
       <button class="accent-dot" data-accent="#888888" style="--led-color:#888888" title="grey"></button>
-      <button class="accent-dot" data-accent="#aaff00" style="--led-color:#aaff00" title="lime"></button>
-      <button class="accent-dot" data-accent="#00ffff" style="--led-color:#00ffff" title="cyan"></button>
-      <button class="accent-dot" data-accent="#ff00ff" style="--led-color:#ff00ff" title="fuchsia"></button>
+      <button class="accent-dot" data-accent="#74c476" style="--led-color:#74c476" title="sage green"></button>
+      <button class="accent-dot" data-accent="#56b6c2" style="--led-color:#56b6c2" title="soft cyan"></button>
+      <button class="accent-dot" data-accent="#c678dd" style="--led-color:#c678dd" title="soft mauve"></button>
+      <button class="accent-dot" data-accent="#e59500" style="--led-color:#e59500" title="warm amber"></button>
     </div>
     <div class="light-limiter" id="lightLimiter" aria-label="light limiter">
       <button class="light-limit-step" data-limit="0.35" title="low light"></button>
@@ -1545,6 +1546,7 @@
       <button class="light-limit-step" data-limit="1" title="full light"></button>
     </div>
     <button class="theme-toggle" id="themeToggle" style="margin: 0;">○</button>
+    <button class="settings-trigger" id="btnToggleKeyboard" type="button" title="Tastiera virtuale per provare i suoni" style="margin: 0;">🎹 KEYS</button>
     <button class="settings-trigger" id="btnSettings" type="button" aria-haspopup="dialog" aria-controls="settingsModal" aria-expanded="false" title="MIDI settings">MIDI</button>
   </div>
 </div>
@@ -1627,7 +1629,7 @@
       <label>device id</label>
       <select id="deviceIdSelect"></select>
     </div>
-    <div id="midi-debug" style="font-family: monospace; color: #00ff00; background: #111; padding: 4px 8px; border-radius: 4px; font-size: 12px; text-align: center; margin-top: 10px;">
+    <div id="midi-debug" style="font-family: monospace; color: #80c090; background: #111; padding: 4px 8px; border-radius: 4px; font-size: 12px; text-align: center; margin-top: 10px;">
       MIDI: ...
     </div>
   </div>
@@ -1647,7 +1649,21 @@
     <h2 style="color: var(--accent); font-family: monospace; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin: 0;">suoni attivi nel multi (p1 - p4)</h2>
     <button id="btnSyncMultiParts" class="chassis-page-btn" style="color: #fff; font-size: 11px; padding: 4px 10px;">leggi parti dal synth</button>
   </div>
-  <div id="multiPartsOverview" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-bottom: 28px;"></div>
+  <div id="multiPartsOverview" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-bottom: 24px;"></div>
+
+  <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 4px; padding: 12px; margin-bottom: 24px; display: flex; flex-direction: column; gap: 10px;">
+    <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
+      <input type="text" id="libSearchInput" placeholder="🔍 Cerca patch o preset per nome..." style="flex: 2; min-width: 200px; background: rgba(0,0,0,0.6); color: #fff; border: 1px solid var(--border); border-radius: 4px; padding: 6px 12px; font-family: monospace; font-size: 12px;">
+      <button id="btnImportSyx" class="chassis-page-btn" style="color: #fff; font-size: 11px; padding: 5px 10px;">📂 importa .syx / .mid</button>
+      <input type="file" id="fileSyxInput" accept=".syx,.mid,.midi" style="display:none" multiple>
+      <button id="btnExportBackup" class="chassis-page-btn" style="color: #fff; font-size: 11px; padding: 5px 10px;">💾 backup json</button>
+      <button id="btnRestoreBackup" class="chassis-page-btn" style="color: #fff; font-size: 11px; padding: 5px 10px;">📥 ripristina json</button>
+      <input type="file" id="fileBackupInput" accept=".json" style="display:none">
+    </div>
+    <div style="font-size: 11px; color: #888; font-family: monospace;">
+      💡 Puoi anche trascinare un file <b>.syx</b> o <b>.mid</b> direttamente in questa finestra per importarlo (Drag & Drop).
+    </div>
+  </div>
 
   <h2 style="color: var(--accent); font-family: monospace; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px;">patch library</h2>
   <div class="lib-row">
@@ -1735,6 +1751,23 @@
     </div>
     <div class="chassis-wood-strip"></div>
   </div>
+</div>
+
+<!-- Virtual Keyboard Dock -->
+<div id="virtualKeyboardDock" style="display: none; width: 100%; background: #141418; border-top: 1px solid var(--border); padding: 8px 16px; flex-direction: column; gap: 6px; z-index: 99; flex-shrink: 0; box-shadow: 0 -4px 16px rgba(0,0,0,0.6);">
+  <div style="display: flex; justify-content: space-between; align-items: center; font-family: monospace; font-size: 11px;">
+    <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
+      <span style="color: var(--accent); font-weight: bold; letter-spacing: 0.05em;">🎹 TEST TASTIERA</span>
+      <span>OTTAVA: <button id="btnOctDown" class="chassis-page-btn" style="padding: 1px 6px; font-size: 11px;">-</button> <b id="octaveDisplay" style="color: var(--accent);">3</b> <button id="btnOctUp" class="chassis-page-btn" style="padding: 1px 6px; font-size: 11px;">+</button></span>
+      <span style="color: #888;">(Tasti PC: A S D F G H J K | W E T Y U)</span>
+    </div>
+    <div style="display: flex; gap: 6px; align-items: center;">
+      <button id="btnAuditionNote" class="chassis-page-btn" style="font-size: 10px; padding: 2px 8px;">▶ PROVA NOTA</button>
+      <button id="btnAuditionChord" class="chassis-page-btn" style="font-size: 10px; padding: 2px 8px;">▶ PROVA ACCORDO</button>
+      <button id="btnCloseKeyboard" style="background: transparent; border: none; color: #888; cursor: pointer; font-size: 14px; padding: 0 4px;" title="Chiudi tastiera">✕</button>
+    </div>
+  </div>
+  <div id="virtualPianoKeys" style="display: flex; position: relative; height: 75px; user-select: none; margin: 4px 0; overflow-x: auto; justify-content: center;"></div>
 </div>
 
 <script>
@@ -2109,7 +2142,19 @@
     partDisplays.forEach(d => d._render());
   }
 
-  let currentAccent = localStorage.getItem(ACCENT_KEY) || '#00ffff';
+  const ACCENT_MIGRATION = {
+    '#aaff00': '#74c476',
+    '#00ffff': '#56b6c2',
+    '#ff00ff': '#c678dd',
+    '#ff3300': '#56b6c2',
+    '#f57b20': '#e59500'
+  };
+  let storedAccent = localStorage.getItem(ACCENT_KEY) || '#56b6c2';
+  if (ACCENT_MIGRATION[storedAccent]) {
+    storedAccent = ACCENT_MIGRATION[storedAccent];
+    localStorage.setItem(ACCENT_KEY, storedAccent);
+  }
+  let currentAccent = storedAccent;
   applyLightLimit(currentLightLimit);
   applyAccent(currentAccent);
 
@@ -2464,7 +2509,11 @@
           if (typeof renderMultiPartsOverview === 'function') {
             renderMultiPartsOverview();
           }
-          document.getElementById('midi-debug').innerHTML = `<span style="color:#0f0;">🔊 P${pIdx + 1}: Letto dal synth <b>${escapeHtml(patchName)}</b></span>`;
+          if (window.activeSinglePartIndex === pIdx) {
+            window.lastReceivedDump = new Uint8Array(msgBytes);
+            applyDumpToActivePatch(msgBytes);
+          }
+          document.getElementById('midi-debug').innerHTML = `<span style="color:#80c090;">🔊 P${pIdx + 1}: Letto dal synth <b>${escapeHtml(patchName)}</b></span>`;
           setLastAction('read P' + (pIdx + 1) + ': ' + patchName);
           continue;
         }
@@ -2473,7 +2522,7 @@
         window.lastReceivedDump = new Uint8Array(msgBytes);
         applyDumpToActivePatch(msgBytes);
 
-        document.getElementById('midi-debug').innerHTML = `<span style="color:#0f0;">🔥 DUMP IMPORTATO: <b>${escapeHtml(patchName)}</b></span>`;
+        document.getElementById('midi-debug').innerHTML = `<span style="color:#80c090;">🔥 DUMP IMPORTATO: <b>${escapeHtml(patchName)}</b></span>`;
         setLastAction('single dump: ' + patchName);
         continue;
       }
@@ -2985,6 +3034,103 @@ const PAGES = {
 let currentPage = 'OSC 1';
 let hwEncoders = [];
 
+window.activeSinglePartIndex = 0;
+
+function downloadBlob(bytes, filename, mimeType = 'application/octet-stream') {
+  const blob = new Blob([bytes], { type: mimeType });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  setTimeout(() => {
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }, 100);
+}
+
+function setSingleEditingPart(partIndex) {
+  window.activeSinglePartIndex = partIndex;
+  const container = document.getElementById('singlePartSelector');
+  if (container) {
+    container.querySelectorAll('button').forEach((b, idx) => {
+      b.classList.toggle('active', idx === partIndex);
+      b.style.borderColor = (idx === partIndex) ? 'var(--accent)' : 'var(--border)';
+    });
+  }
+  if (multiParts[partIndex]) {
+    const ch = multiParts[partIndex].values.channel + 1;
+    const chEl = document.getElementById('midiChannel');
+    if (chEl) chEl.value = String(ch);
+    setLastAction(`editing P${partIndex + 1} (ch ${ch})`);
+  }
+  requestPartDump(partIndex);
+}
+
+function randomizePatch() {
+  PARAMS.forEach(p => {
+    if (p.id === 'amp_pan') {
+      patch[p.id] = 64;
+    } else if (p.id === 'amp_vel') {
+      patch[p.id] = 64 + Math.floor(Math.random() * 40);
+    } else if (p.id === 'f1_cutoff') {
+      patch[p.id] = 30 + Math.floor(Math.random() * 80);
+    } else if (p.id === 'f1_resonance') {
+      patch[p.id] = Math.floor(Math.random() * 75);
+    } else if (p.id === 'com_porta') {
+      patch[p.id] = Math.floor(Math.random() * 15);
+    } else if (p.id === 'amp_attack') {
+      patch[p.id] = Math.floor(Math.random() * 60);
+    } else if (p.id === 'amp_decay') {
+      patch[p.id] = 30 + Math.floor(Math.random() * 70);
+    } else if (p.id === 'amp_sustain') {
+      patch[p.id] = 40 + Math.floor(Math.random() * 87);
+    } else if (p.id === 'amp_release') {
+      patch[p.id] = 20 + Math.floor(Math.random() * 80);
+    } else if (p.min !== undefined && p.max !== undefined) {
+      patch[p.id] = p.min + Math.floor(Math.random() * (p.max - p.min + 1));
+    }
+  });
+
+  refreshAllKnobs();
+  if (typeof initElektronLcd === 'function') initElektronLcd();
+  sendFullPatch(patch);
+  document.getElementById('midi-debug').innerHTML = `<span style="color:#80c090;">🎲 PATCH RANDOMIZZATA</span>`;
+  setLastAction('randomized patch');
+}
+
+function mutatePatch(amount = 0.2) {
+  const timbralParams = [
+    'f1_cutoff', 'f1_resonance', 'f1_envamt', 'f2_cutoff', 'f2_resonance',
+    'osc1_shape', 'osc1_pw', 'osc_detune', 'osc2_shape', 'osc2_pw',
+    'lfo1_rate', 'lfo1_contour', 'fx_reverb_decay', 'fx_chorus_mix',
+    'amp_decay', 'amp_release'
+  ];
+  timbralParams.forEach(id => {
+    const p = PARAMS.find(item => item.id === id);
+    if (p && patch[id] !== undefined) {
+      const delta = Math.round((Math.random() * 2 - 1) * 127 * amount);
+      patch[id] = Math.max(p.min, Math.min(p.max, patch[id] + delta));
+    }
+  });
+  refreshAllKnobs();
+  if (typeof initElektronLcd === 'function') initElektronLcd();
+  sendFullPatch(patch);
+  document.getElementById('midi-debug').innerHTML = `<span style="color:#80c090;">🧬 PATCH MUTATA (${Math.round(amount * 100)}%)</span>`;
+  setLastAction('mutated patch');
+}
+
+function exportCurrentPatchSyx() {
+  const dump = window.lastReceivedDump;
+  if (!dump || dump.length < 250) {
+    alert('Nessun dump completo ricevuto dal synth per questa patch. Clicca prima "leggi" o premi "STORE" sul synth per sincronizzarla.');
+    return;
+  }
+  const name = extractPatchName(dump) || 'patch';
+  downloadBlob(dump, `${name.replace(/[^a-zA-Z0-9_-]/g, '_')}.syx`);
+}
+
   function buildSingleView(){
     const root = document.getElementById('singleView');
     root.innerHTML = '';
@@ -3005,6 +3151,78 @@ let hwEncoders = [];
     elektronWrapper.appendChild(brScrew);
     elektronWrapper.appendChild(logo);
 
+    // Toolbar: Multi-Part editing selector & Sound design tools
+    const toolBar = document.createElement('div');
+    toolBar.className = 'single-toolbar';
+    toolBar.style.cssText = 'width: 100%; max-width: 900px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 36px; padding: 6px 14px; background: rgba(0,0,0,0.5); border: 1px solid var(--border); border-radius: 4px; font-family: monospace; font-size: 11px; z-index: 2;';
+
+    const partBox = document.createElement('div');
+    partBox.style.cssText = 'display: flex; align-items: center; gap: 8px;';
+    const partLabel = document.createElement('span');
+    partLabel.style.cssText = 'color: var(--accent); font-weight: bold; letter-spacing: 0.05em;';
+    partLabel.textContent = 'PARTE:';
+    partBox.appendChild(partLabel);
+
+    const partBtnsContainer = document.createElement('div');
+    partBtnsContainer.id = 'singlePartSelector';
+    partBtnsContainer.style.cssText = 'display: flex; gap: 4px;';
+
+    for (let i = 0; i < NUM_PARTS; i++) {
+      const pBtn = document.createElement('button');
+      pBtn.className = 'chassis-page-btn';
+      pBtn.style.cssText = 'padding: 3px 8px; font-size: 11px;';
+      pBtn.textContent = `P${i + 1}`;
+      pBtn.title = `Edita i suoni e filtri di P${i + 1} (ch ${multiParts[i].values.channel + 1})`;
+      if (i === window.activeSinglePartIndex) {
+        pBtn.classList.add('active');
+        pBtn.style.borderColor = 'var(--accent)';
+      }
+      pBtn.addEventListener('click', () => {
+        setSingleEditingPart(i);
+      });
+      partBtnsContainer.appendChild(pBtn);
+    }
+    partBox.appendChild(partBtnsContainer);
+
+    const toolsBox = document.createElement('div');
+    toolsBox.style.cssText = 'display: flex; align-items: center; gap: 6px;';
+
+    const btnRand = document.createElement('button');
+    btnRand.className = 'chassis-page-btn';
+    btnRand.style.cssText = 'padding: 3px 8px; font-size: 11px;';
+    btnRand.textContent = '🎲 RANDOM';
+    btnRand.title = 'Genera parametri casuali ma musicali';
+    btnRand.addEventListener('click', () => {
+      randomizePatch();
+    });
+
+    const btnMut = document.createElement('button');
+    btnMut.className = 'chassis-page-btn';
+    btnMut.style.cssText = 'padding: 3px 8px; font-size: 11px;';
+    btnMut.textContent = '🧬 MUTATE 20%';
+    btnMut.title = 'Variazione organica del 20% sui parametri timbrici';
+    btnMut.addEventListener('click', () => {
+      mutatePatch(0.2);
+    });
+
+    const btnExpSyx = document.createElement('button');
+    btnExpSyx.className = 'chassis-page-btn';
+    btnExpSyx.style.cssText = 'padding: 3px 8px; font-size: 11px;';
+    btnExpSyx.textContent = '💾 SALVA .SYX';
+    btnExpSyx.title = 'Scarica la patch attiva come file .syx standard';
+    btnExpSyx.addEventListener('click', () => {
+      exportCurrentPatchSyx();
+    });
+
+    toolsBox.appendChild(btnRand);
+    toolsBox.appendChild(btnMut);
+    toolsBox.appendChild(btnExpSyx);
+
+    toolBar.appendChild(partBox);
+    toolBar.appendChild(toolsBox);
+
+    elektronWrapper.appendChild(toolBar);
+
     const innerLayout = document.createElement('div');
     innerLayout.style.display = 'flex';
     innerLayout.style.flexDirection = 'row';
@@ -3012,7 +3230,7 @@ let hwEncoders = [];
     innerLayout.style.alignItems = 'flex-start';
     innerLayout.style.justifyContent = 'center';
     innerLayout.style.flexWrap = 'wrap';
-    innerLayout.style.marginTop = '40px';
+    innerLayout.style.marginTop = '20px';
     innerLayout.style.width = '100%';
     innerLayout.style.zIndex = '1';
 
@@ -3709,12 +3927,16 @@ let hwEncoders = [];
   function renderSynthBankList(bState) {
     const list = document.getElementById('synthBankList');
     if (!list) return;
-    const patches = Object.values(bState.readPatches).sort((a, b) => a.num - b.num);
+    const searchVal = (document.getElementById('libSearchInput')?.value || '').trim().toLowerCase();
+    let patches = Object.values(bState.readPatches).sort((a, b) => a.num - b.num);
+    if (searchVal) {
+      patches = patches.filter(p => (p.name || '').toLowerCase().includes(searchVal) || (p.fullName || '').toLowerCase().includes(searchVal));
+    }
 
     if (patches.length === 0) {
       list.innerHTML = `
-        <div style="color: #ff5555; font-size: 12px; text-align: center; padding: 16px; font-family: monospace;">
-          ❌ Nessuna patch ricevuta. Verifica che il cavo MIDI sia connesso e che il synth risponda su ID <b>${deviceId() === 16 ? 'Omni' : (deviceId() + 1)}</b>.
+        <div style="color: #ff8888; font-size: 12px; text-align: center; padding: 16px; font-family: monospace;">
+          ${searchVal ? `Nessuna patch trovata per "${escapeHtml(searchVal)}"` : `❌ Nessuna patch ricevuta. Verifica cavo MIDI e ID synth.`}
         </div>
       `;
       return;
@@ -3722,12 +3944,33 @@ let hwEncoders = [];
 
     list.innerHTML = '';
 
-    // Header con pulsante "Salva tutte"
+    // Header con pulsanti
     const header = document.createElement('div');
-    header.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.1); font-family: monospace; font-size: 12px;';
+    header.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.1); font-family: monospace; font-size: 12px; gap: 8px; flex-wrap: wrap;';
     header.innerHTML = `
       <span style="color: var(--accent); font-weight: bold;">BANCO ${escapeHtml(bState.bankName)} (${patches.length} PATCH)</span>
     `;
+
+    const hdrBtns = document.createElement('div');
+    hdrBtns.style.cssText = 'display: flex; gap: 6px;';
+
+    const btnExportBank = document.createElement('button');
+    btnExportBank.className = 'chassis-page-btn';
+    btnExportBank.style.cssText = 'font-size: 11px; padding: 4px 10px; color: #fff; background: rgba(255,255,255,0.1); cursor: pointer; border-radius: 3px;';
+    btnExportBank.textContent = '⬇ esporta banco .syx';
+    btnExportBank.title = 'Scarica l\'intero banco in formato .syx';
+    btnExportBank.addEventListener('click', () => {
+      let totalLen = 0;
+      patches.forEach(p => totalLen += p.bytes.length);
+      const bankBytes = new Uint8Array(totalLen);
+      let offset = 0;
+      patches.forEach(p => {
+        bankBytes.set(p.bytes, offset);
+        offset += p.bytes.length;
+      });
+      downloadBlob(bankBytes, `Virus_TI_${bState.bankName.replace(/\s+/g, '_')}.syx`);
+    });
+    hdrBtns.appendChild(btnExportBank);
 
     const btnSaveAll = document.createElement('button');
     btnSaveAll.className = 'chassis-page-btn';
@@ -3742,7 +3985,8 @@ let hwEncoders = [];
       renderLibrary();
       alert(`Salvate ${patches.length} patch nella libreria!`);
     });
-    header.appendChild(btnSaveAll);
+    hdrBtns.appendChild(btnSaveAll);
+    header.appendChild(hdrBtns);
     list.appendChild(header);
 
     // Scrollable container per le patch
@@ -3781,7 +4025,7 @@ let hwEncoders = [];
         raw[7] = 0x00;
         raw[8] = 0x40;
         sendMidiBytes(raw, 'load patch ' + p.name);
-        document.getElementById('midi-debug').innerHTML = `<span style="color:#0f0;">🔊 CARICATA: <b>${escapeHtml(p.fullName)}</b></span>`;
+        document.getElementById('midi-debug').innerHTML = `<span style="color:#80c090;">🔊 CARICATA: <b>${escapeHtml(p.fullName)}</b></span>`;
       });
       btns.appendChild(btnLoad);
 
@@ -3795,6 +4039,14 @@ let hwEncoders = [];
         });
         btns.appendChild(pBtn);
       }
+
+      const btnSyx = document.createElement('button');
+      btnSyx.textContent = '.syx';
+      btnSyx.title = 'Scarica file .syx di questa patch';
+      btnSyx.addEventListener('click', () => {
+        downloadBlob(new Uint8Array(p.bytes), `${(p.name || 'patch').replace(/[^a-zA-Z0-9_-]/g, '_')}.syx`);
+      });
+      btns.appendChild(btnSyx);
 
       const btnSave = document.createElement('button');
       btnSave.textContent = 'salva';
@@ -3828,17 +4080,17 @@ let hwEncoders = [];
 
     if (bState.mode === 'capture') {
       if (count === 0) {
-        document.getElementById('midi-debug').innerHTML = `<span style="color:#f00;">❌ ERRORE: Nessuna patch ricevuta. Verifica cavo MIDI e ID synth.</span>`;
+        document.getElementById('midi-debug').innerHTML = `<span style="color:#e06c75;">❌ ERRORE: Nessuna patch ricevuta. Verifica cavo MIDI e ID synth.</span>`;
       } else {
-        document.getElementById('midi-debug').innerHTML = `<span style="color:#0f0;">✅ BANK CAPTURE: Completato! (${count} patch salvate)</span>`;
+        document.getElementById('midi-debug').innerHTML = `<span style="color:#80c090;">✅ BANK CAPTURE: Completato! (${count} patch salvate)</span>`;
         setLastAction('bank capture complete: ' + count);
       }
       renderLibrary();
     } else if (bState.mode === 'read') {
       if (count === 0) {
-        document.getElementById('midi-debug').innerHTML = `<span style="color:#f00;">❌ ERRORE: Nessuna patch ricevuta. Verifica cavo MIDI e ID synth.</span>`;
+        document.getElementById('midi-debug').innerHTML = `<span style="color:#e06c75;">❌ ERRORE: Nessuna patch ricevuta. Verifica cavo MIDI e ID synth.</span>`;
       } else {
-        document.getElementById('midi-debug').innerHTML = `<span style="color:#0f0;">✅ BANK READ: Completato! (${count} patch lette)</span>`;
+        document.getElementById('midi-debug').innerHTML = `<span style="color:#80c090;">✅ BANK READ: Completato! (${count} patch lette)</span>`;
         setLastAction('bank read complete: ' + count);
       }
       renderSynthBankList(bState);
@@ -4141,7 +4393,7 @@ let hwEncoders = [];
         renderMultiPartsOverview();
       }
 
-      document.getElementById('midi-debug').innerHTML = `<span style="color:#0f0;">🔊 P${partIndex + 1}: Caricato <b>${escapeHtml(patchName)}</b></span>`;
+      document.getElementById('midi-debug').innerHTML = `<span style="color:#80c090;">🔊 P${partIndex + 1}: Caricato <b>${escapeHtml(patchName)}</b></span>`;
       setLastAction('loaded P' + (partIndex + 1) + ': ' + patchName);
     } catch(e) {
       console.error('MIDI send dump error', e);
@@ -4149,39 +4401,166 @@ let hwEncoders = [];
   }
 
   // ---------------------------------------------------------------------
-  // Export / Import .syx (Single Dump)
+  // Universal .syx / .mid Import & JSON Backup Logic
   // ---------------------------------------------------------------------
-  const fileInput = document.createElement('input');
-  fileInput.type = 'file';
-  fileInput.accept = '.syx';
-  fileInput.style.display = 'none';
-  document.body.appendChild(fileInput);
-
-  fileInput.addEventListener('change', (e) => {
-    const file = e.target.files[0];
-    if (!file) return;
-    const reader = new FileReader();
-    reader.onload = () => {
-      const bytes = new Uint8Array(reader.result);
-      if (bytes.length > 500 && bytes[0] === 0xF0 && bytes[bytes.length-1] === 0xF7) {
-        window.lastReceivedDump = bytes;
-
-        // Extract name
-        let patchName = "";
-        for (let i = 249; i <= 258 && i < bytes.length; i++) {
-          if (bytes[i] >= 32 && bytes[i] <= 126) patchName += String.fromCharCode(bytes[i]);
+  function parseAndImportSysex(buffer, filename = 'soundset.syx') {
+    let i = 0;
+    const patchesFound = [];
+    while (i < buffer.length) {
+      if (buffer[i] === 0xF0) {
+        const start = i;
+        while (i < buffer.length && buffer[i] !== 0xF7) {
+          i++;
         }
-        document.getElementById('patchNameDisplay').textContent = 'virus ti snow // PATCH DUMP LOADED: ' + patchName.trim();
-        const pInput = document.getElementById('patchName');
-        if (pInput) pInput.value = patchName.trim();
-        alert('SysEx loaded successfully. You can now save it to the library.');
-      } else {
-        alert('Invalid or unsupported SysEx file.');
+        if (i < buffer.length && buffer[i] === 0xF7) {
+          const msg = buffer.slice(start, i + 1);
+          // Verifica se è SysEx di Access Virus TI: F0 00 20 33 01
+          if (msg.length >= 250 && msg[1] === 0x00 && msg[2] === 0x20 && msg[3] === 0x33 && msg[4] === 0x01) {
+            const name = extractPatchName(msg);
+            patchesFound.push({ name: name, bytes: Array.from(msg) });
+          }
+        }
       }
-    };
-    reader.readAsArrayBuffer(file);
-    e.target.value = '';
+      i++;
+    }
+
+    if (patchesFound.length === 0) {
+      alert('Nessun dump valido per Access Virus TI trovato nel file (supportati file SysEx .syx e .mid).');
+      return;
+    }
+
+    const lib = loadLibrary();
+    patchesFound.forEach(p => {
+      lib[p.name] = p.bytes;
+    });
+    saveLibrary(lib);
+    renderLibrary();
+
+    if (patchesFound.length === 1) {
+      const p = patchesFound[0];
+      window.lastReceivedDump = new Uint8Array(p.bytes);
+      applyDumpToActivePatch(window.lastReceivedDump);
+      document.getElementById('midi-debug').innerHTML = `<span style="color:#80c090;">📂 Patch importata: <b>${escapeHtml(p.name)}</b></span>`;
+      alert(`Patch "${p.name}" importata e caricata!`);
+    } else {
+      document.getElementById('midi-debug').innerHTML = `<span style="color:#80c090;">📂 Banco importato: <b>${patchesFound.length} patch</b> da ${escapeHtml(filename)}</span>`;
+      alert(`Importate con successo ${patchesFound.length} patch dal file "${filename}" nella libreria!`);
+    }
+  }
+
+  // File import inputs & triggers
+  const btnImportSyx = document.getElementById('btnImportSyx');
+  const fileSyxInput = document.getElementById('fileSyxInput');
+  if (btnImportSyx && fileSyxInput) {
+    btnImportSyx.addEventListener('click', () => fileSyxInput.click());
+    fileSyxInput.addEventListener('change', (e) => {
+      const files = Array.from(e.target.files);
+      files.forEach(file => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          parseAndImportSysex(new Uint8Array(reader.result), file.name);
+        };
+        reader.readAsArrayBuffer(file);
+      });
+      e.target.value = '';
+    });
+  }
+
+  // Backup & Restore JSON
+  const btnExportBackup = document.getElementById('btnExportBackup');
+  const btnRestoreBackup = document.getElementById('btnRestoreBackup');
+  const fileBackupInput = document.getElementById('fileBackupInput');
+
+  if (btnExportBackup) {
+    btnExportBackup.addEventListener('click', () => {
+      const backupData = {
+        app: 'soundmachina-virus-ti',
+        version: 1,
+        exportedAt: new Date().toISOString(),
+        patches: loadLibrary(),
+        multiPresets: loadMultiLibrary()
+      };
+      const jsonStr = JSON.stringify(backupData, null, 2);
+      downloadBlob(new TextEncoder().encode(jsonStr), `Virus_TI_Library_Backup_${new Date().toISOString().slice(0,10)}.json`, 'application/json');
+    });
+  }
+
+  if (btnRestoreBackup && fileBackupInput) {
+    btnRestoreBackup.addEventListener('click', () => fileBackupInput.click());
+    fileBackupInput.addEventListener('change', (e) => {
+      const file = e.target.files[0];
+      if (!file) return;
+      const reader = new FileReader();
+      reader.onload = () => {
+        try {
+          const data = JSON.parse(reader.result);
+          if (data && data.patches) {
+            const currentLib = loadLibrary();
+            const mergedLib = Object.assign({}, currentLib, data.patches);
+            saveLibrary(mergedLib);
+            if (data.multiPresets) {
+              const currentMulti = loadMultiLibrary();
+              saveMultiLibrary(Object.assign({}, currentMulti, data.multiPresets));
+              renderMultiLibrary();
+            }
+            renderLibrary();
+            alert(`Ripristino completato! ${Object.keys(data.patches).length} patch importate dal backup.`);
+          } else {
+            alert('File di backup JSON non valido o mancante del campo "patches".');
+          }
+        } catch(err) {
+          alert('Errore nella lettura del file JSON: ' + err.message);
+        }
+      };
+      reader.readAsText(file);
+      e.target.value = '';
+    });
+  }
+
+  // Drag & Drop universale per .syx, .mid e .json
+  window.addEventListener('dragover', (e) => {
+    e.preventDefault();
   });
+  window.addEventListener('drop', (e) => {
+    e.preventDefault();
+    if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
+      const files = Array.from(e.dataTransfer.files);
+      files.forEach(file => {
+        if (file.name.endsWith('.json')) {
+          const reader = new FileReader();
+          reader.onload = () => {
+            try {
+              const data = JSON.parse(reader.result);
+              if (data && data.patches) {
+                const merged = Object.assign({}, loadLibrary(), data.patches);
+                saveLibrary(merged);
+                renderLibrary();
+                alert(`Ripristino JSON completato: ${Object.keys(data.patches).length} patch importate!`);
+              }
+            } catch(err) { console.error(err); }
+          };
+          reader.readAsText(file);
+        } else {
+          const reader = new FileReader();
+          reader.onload = () => {
+            parseAndImportSysex(new Uint8Array(reader.result), file.name);
+          };
+          reader.readAsArrayBuffer(file);
+        }
+      });
+    }
+  });
+
+  // Search input event
+  const libSearchInput = document.getElementById('libSearchInput');
+  if (libSearchInput) {
+    libSearchInput.addEventListener('input', () => {
+      renderLibrary();
+      if (window.bankFetchState && window.bankFetchState.active === false) {
+        renderSynthBankList(window.bankFetchState);
+      }
+    });
+  }
 
   // ---------------------------------------------------------------------
   // Patch library (localStorage)
@@ -4199,25 +4578,37 @@ let hwEncoders = [];
   function renderLibrary(){
     const lib = loadLibrary();
     const list = document.getElementById('libList');
+    if (!list) return;
     list.innerHTML = '';
-    const names = Object.keys(lib).sort();
+    const searchVal = (document.getElementById('libSearchInput')?.value || '').trim().toLowerCase();
+    let names = Object.keys(lib).sort();
+
+    if (searchVal) {
+      names = names.filter(n => n.toLowerCase().includes(searchVal));
+    }
+
     if (names.length === 0){
       const empty = document.createElement('div');
       empty.className = 'small';
-      empty.textContent = 'no patches saved';
+      empty.style.cssText = 'color: #888; font-family: monospace; padding: 8px 0;';
+      empty.textContent = searchVal ? `nessuna patch trovata per "${searchVal}"` : 'nessuna patch salvata';
       list.appendChild(empty);
       return;
     }
+
     names.forEach(name => {
       const item = document.createElement('div');
       item.className = 'lib-item';
+      item.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 6px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace; font-size: 12px;';
 
       const nameEl = document.createElement('span');
       nameEl.className = 'name';
+      nameEl.style.cssText = 'color: #fff; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;';
       nameEl.textContent = name;
 
       const btns = document.createElement('div');
       btns.className = 'btns';
+      btns.style.cssText = 'display: flex; gap: 4px; align-items: center;';
 
       const editBtn = document.createElement('button');
       editBtn.textContent = 'carica';
@@ -4232,24 +4623,32 @@ let hwEncoders = [];
       });
       btns.appendChild(editBtn);
 
-      const loadLabel = document.createElement('span');
-      loadLabel.className = 'small';
-      loadLabel.textContent = 'parte: ';
-      btns.appendChild(loadLabel);
-
       for(let i=0; i<4; i++){
         const btn = document.createElement('button');
         btn.textContent = 'P' + (i+1);
+        btn.title = `Carica nella Parte ${i + 1} del Multi`;
+        btn.style.cssText = 'padding: 2px 6px; font-size: 11px;';
         btn.addEventListener('click', () => {
           loadPatchToPart(lib[name], i);
         });
         btns.appendChild(btn);
       }
 
+      const syxBtn = document.createElement('button');
+      syxBtn.textContent = '.syx';
+      syxBtn.title = 'Scarica file .syx di questa patch';
+      syxBtn.style.cssText = 'padding: 2px 6px; font-size: 11px;';
+      syxBtn.addEventListener('click', () => {
+        downloadBlob(new Uint8Array(lib[name]), `${name.replace(/[^a-zA-Z0-9_-]/g, '_')}.syx`);
+      });
+      btns.appendChild(syxBtn);
+
       const delBtn = document.createElement('button');
-      delBtn.textContent = 'delete';
+      delBtn.textContent = 'x';
+      delBtn.className = 'delete';
+      delBtn.title = 'Cancella patch';
       delBtn.addEventListener('click', () => {
-        if (confirm(`delete patch "${name}"?`)){
+        if (confirm(`Cancellare la patch "${name}" dalla libreria?`)){
           delete lib[name];
           saveLibrary(lib);
           renderLibrary();
@@ -4809,6 +5208,193 @@ let hwEncoders = [];
 
   document.getElementById('btnSyncMultiInView')?.addEventListener('click', syncAllMultiParts);
   document.getElementById('btnSyncMultiParts')?.addEventListener('click', syncAllMultiParts);
+
+  // ---------------------------------------------------------------------
+  // Virtual Keyboard & Audition Controller
+  // ---------------------------------------------------------------------
+  let currentOctave = 3;
+  let activeNotes = new Set();
+
+  function getActiveMidiChannel() {
+    if (multiParts && multiParts[window.activeSinglePartIndex]) {
+      return multiParts[window.activeSinglePartIndex].values.channel & 0x0F;
+    }
+    const chEl = document.getElementById('midiChannel');
+    return chEl ? (parseInt(chEl.value, 10) - 1) & 0x0F : 0;
+  }
+
+  function playNote(noteNumber, velocity = 100) {
+    if (!selectedOutput) {
+      setLastAction('connect midi output first');
+      return;
+    }
+    if (activeNotes.has(noteNumber)) return;
+    activeNotes.add(noteNumber);
+    const ch = getActiveMidiChannel();
+    try {
+      selectedOutput.send(new Uint8Array([0x90 | ch, noteNumber & 0x7F, velocity & 0x7F]));
+      recordMidiTx('note on ' + noteNumber, [0x90 | ch, noteNumber, velocity]);
+    } catch(e) { console.error('playNote error', e); }
+    highlightPianoKey(noteNumber, true);
+  }
+
+  function stopNote(noteNumber) {
+    if (!selectedOutput) return;
+    if (!activeNotes.has(noteNumber)) return;
+    activeNotes.delete(noteNumber);
+    const ch = getActiveMidiChannel();
+    try {
+      selectedOutput.send(new Uint8Array([0x80 | ch, noteNumber & 0x7F, 0]));
+    } catch(e) { console.error('stopNote error', e); }
+    highlightPianoKey(noteNumber, false);
+  }
+
+  function highlightPianoKey(noteNumber, isOn) {
+    const keyEl = document.querySelector(`.piano-key[data-note="${noteNumber}"]`);
+    if (keyEl) {
+      if (isOn) {
+        keyEl.classList.add('active');
+        keyEl.style.background = 'var(--accent)';
+      } else {
+        keyEl.classList.remove('active');
+        keyEl.style.background = keyEl.getAttribute('data-is-black') === 'true' ? '#1c1c20' : '#e0e0e0';
+      }
+    }
+  }
+
+  function renderPianoKeys() {
+    const container = document.getElementById('virtualPianoKeys');
+    if (!container) return;
+    container.innerHTML = '';
+
+    const isBlackMap = [false, true, false, true, false, false, true, false, true, false, true, false];
+    const baseNote = (currentOctave + 1) * 12; // C of current octave
+
+    const wrapper = document.createElement('div');
+    wrapper.style.cssText = 'position: relative; display: flex; height: 100%;';
+
+    let whiteCount = 0;
+    const blackKeys = [];
+
+    for (let i = 0; i < 25; i++) {
+      const semitone = i % 12;
+      const noteNum = baseNote + i;
+      const isBlack = (i < 24) ? isBlackMap[semitone] : false;
+
+      const key = document.createElement('div');
+      key.className = 'piano-key';
+      key.setAttribute('data-note', noteNum);
+      key.setAttribute('data-is-black', isBlack ? 'true' : 'false');
+
+      if (!isBlack) {
+        key.style.cssText = 'width: 28px; height: 100%; background: #e0e0e0; border: 1px solid #333; border-radius: 0 0 3px 3px; cursor: pointer; position: relative; z-index: 1; transition: background 0.05s; flex-shrink: 0;';
+        key.setAttribute('data-white-index', whiteCount);
+        whiteCount++;
+      } else {
+        key.style.cssText = 'width: 18px; height: 60%; background: #1c1c20; border: 1px solid #111; border-radius: 0 0 2px 2px; cursor: pointer; position: absolute; z-index: 3; transition: background 0.05s; flex-shrink: 0;';
+        key.setAttribute('data-after-white', whiteCount - 1);
+        blackKeys.push(key);
+      }
+
+      key.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        playNote(noteNum);
+      });
+      key.addEventListener('mouseup', () => stopNote(noteNum));
+      key.addEventListener('mouseleave', () => stopNote(noteNum));
+      key.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        playNote(noteNum);
+      });
+      key.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        stopNote(noteNum);
+      });
+
+      wrapper.appendChild(key);
+    }
+
+    const whiteWidth = 28;
+    blackKeys.forEach(bk => {
+      const afterWhite = parseInt(bk.getAttribute('data-after-white'), 10);
+      bk.style.left = (afterWhite * whiteWidth + 19) + 'px';
+    });
+
+    container.appendChild(wrapper);
+  }
+
+  function changeOctave(delta) {
+    currentOctave = Math.max(1, Math.min(6, currentOctave + delta));
+    const disp = document.getElementById('octaveDisplay');
+    if (disp) disp.textContent = String(currentOctave);
+    renderPianoKeys();
+  }
+
+  const PC_KEY_MAP = {
+    'KeyA': 0, 'KeyW': 1, 'KeyS': 2, 'KeyE': 3, 'KeyD': 4,
+    'KeyF': 5, 'KeyT': 6, 'KeyG': 7, 'KeyY': 8, 'KeyH': 9,
+    'KeyU': 10, 'KeyJ': 11, 'KeyK': 12, 'KeyO': 13, 'KeyL': 14
+  };
+
+  window.addEventListener('keydown', (e) => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
+    if (e.repeat) return;
+    if (e.code === 'KeyZ') {
+      changeOctave(-1);
+      return;
+    }
+    if (e.code === 'KeyX') {
+      changeOctave(1);
+      return;
+    }
+    if (PC_KEY_MAP[e.code] !== undefined) {
+      const semitone = PC_KEY_MAP[e.code];
+      const note = (currentOctave + 1) * 12 + semitone;
+      playNote(note);
+    }
+  });
+
+  window.addEventListener('keyup', (e) => {
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
+    if (PC_KEY_MAP[e.code] !== undefined) {
+      const semitone = PC_KEY_MAP[e.code];
+      const note = (currentOctave + 1) * 12 + semitone;
+      stopNote(note);
+    }
+  });
+
+  document.getElementById('btnOctDown')?.addEventListener('click', () => changeOctave(-1));
+  document.getElementById('btnOctUp')?.addEventListener('click', () => changeOctave(1));
+
+  document.getElementById('btnAuditionNote')?.addEventListener('click', () => {
+    const root = (currentOctave + 1) * 12; // C
+    playNote(root);
+    setTimeout(() => stopNote(root), 400);
+  });
+
+  document.getElementById('btnAuditionChord')?.addEventListener('click', () => {
+    const root = (currentOctave + 1) * 12; // C
+    playNote(root);
+    playNote(root + 4); // E
+    playNote(root + 7); // G
+    setTimeout(() => {
+      stopNote(root);
+      stopNote(root + 4);
+      stopNote(root + 7);
+    }, 600);
+  });
+
+  const kbdDock = document.getElementById('virtualKeyboardDock');
+  document.getElementById('btnToggleKeyboard')?.addEventListener('click', () => {
+    if (kbdDock) {
+      const isHidden = (kbdDock.style.display === 'none');
+      kbdDock.style.display = isHidden ? 'flex' : 'none';
+      if (isHidden) renderPianoKeys();
+    }
+  });
+  document.getElementById('btnCloseKeyboard')?.addEventListener('click', () => {
+    if (kbdDock) kbdDock.style.display = 'none';
+  });
 
   function buildArpView() {
     const root = document.getElementById('arpContent');
