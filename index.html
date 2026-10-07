@@ -2255,6 +2255,53 @@
     updateControlRoomStatus();
   }
 
+  // Persistent SysEx reception buffer across chunked Web MIDI events
+  let rxSysexBuffer = [];
+  let rxInSysex = false;
+
+  function extractPatchName(msgBytes) {
+    if (!msgBytes || msgBytes.length < 20) return 'INIT';
+    let name = '';
+    // In Virus Single Dump (267 bytes), Page B starts at byte 137. Name is at offset 112..121 (bytes 249..258)
+    if (msgBytes.length >= 260) {
+      for (let i = 249; i <= Math.min(258, msgBytes.length - 2); i++) {
+        const c = msgBytes[i];
+        if (c >= 32 && c <= 126) name += String.fromCharCode(c);
+      }
+      name = name.trim();
+    }
+    if (!name) {
+      // Fallback search in tail bytes before checksum
+      for (let i = Math.max(0, msgBytes.length - 25); i < msgBytes.length - 1; i++) {
+        const c = msgBytes[i];
+        if (c >= 32 && c <= 126) name += String.fromCharCode(c);
+      }
+      name = name.trim();
+    }
+    return name || 'INIT';
+  }
+
+  function applyDumpToActivePatch(msgBytes) {
+    if (!msgBytes || msgBytes.length < 250) return;
+    const name = extractPatchName(msgBytes);
+    const pDisp = document.getElementById('patchNameDisplay');
+    if (pDisp) pDisp.textContent = 'virus ti snow // PATCH: ' + name;
+    const pInput = document.getElementById('patchName');
+    if (pInput) pInput.value = name;
+
+    // Apply Page A parameters (starts at byte offset 9)
+    PARAMS.forEach(p => {
+      if (p.cc !== undefined && p.cc < 128) {
+        const val = msgBytes[9 + p.cc];
+        if (val !== undefined && val <= 127) {
+          patch[p.id] = val;
+        }
+      }
+    });
+
+    refreshAllKnobs();
+  }
+
   function handleIncomingMidi(event) {
     const bytes = event.data;
     midiStats.rx++;
@@ -2268,7 +2315,6 @@
     }
 
     // --- RICEZIONE CC (Control Change) ---
-    // 0xB0 a 0xBF (176-191) sono i messaggi CC per i canali MIDI da 1 a 16
     if ((bytes[0] & 0xF0) === 0xB0 && bytes.length === 3) {
       midiStats.cc++;
       updateMidiDiagnostics();
@@ -2283,39 +2329,46 @@
         }
         if (typeof initElektronLcd === 'function') initElektronLcd();
       }
-      return; // Finito con questo pacchetto (era un CC)
+      return; // Finito con questo pacchetto (CC)
     }
 
-    // --- RICEZIONE SYSEX (Dump e parametri estesi) ---
-    // A volte le interfacce MIDI uniscono più messaggi in un solo buffer.
-    // Separiamo i messaggi usando F7 (End of SysEx) come delimitatore.
+    // --- RICEZIONE SYSEX (Streaming buffer persistente) ---
     let sysexMessages = [];
-    let currentMsg = [];
-    let inSysex = false;
 
     for (let i = 0; i < bytes.length; i++) {
-      if (bytes[i] === 0xF0) {
-        inSysex = true;
-        currentMsg = [0xF0];
-      } else if (inSysex) {
-        currentMsg.push(bytes[i]);
-        if (bytes[i] === 0xF7) {
-          sysexMessages.push(new Uint8Array(currentMsg));
+      const b = bytes[i];
+      // Ignora MIDI real-time (clock, active sensing, start, stop) che possono arrivare dentro SysEx
+      if (b >= 0xF8) continue;
+
+      if (b === 0xF0) {
+        rxInSysex = true;
+        rxSysexBuffer = [0xF0];
+      } else if (rxInSysex) {
+        rxSysexBuffer.push(b);
+        if (b === 0xF7) {
+          sysexMessages.push(new Uint8Array(rxSysexBuffer));
           midiStats.sysex++;
           updateMidiDiagnostics();
-          inSysex = false;
-          currentMsg = [];
+          rxInSysex = false;
+          rxSysexBuffer = [];
+        } else if (rxSysexBuffer.length > 4096) {
+          // Safety timeout reset per evitare memory leak se manca F7
+          rxInSysex = false;
+          rxSysexBuffer = [];
         }
       }
     }
 
-    // Processa ogni messaggio SysEx trovato
+    // Processa ogni messaggio SysEx completo
     for (const msgBytes of sysexMessages) {
-      // Un Single Patch Dump del Virus TI è di circa 267 bytes
-      if (msgBytes.length > 250) {
+      // Un Single Patch Dump del Virus TI ha almeno 265 bytes (tipicamente 267 bytes)
+      if (msgBytes.length >= 250) {
+        const patchName = extractPatchName(msgBytes);
+
+        // Caso 1: Fetch di una Parte Multi (Part 1..4)
         if (window.multiFetchState && window.multiFetchState.active) {
           window.multiFetchState.dumps[window.multiFetchState.currentPart] = Array.from(msgBytes);
-          document.getElementById('midi-debug').textContent = '🔥 MULTI FETCH: Part ' + (window.multiFetchState.currentPart + 1) + '/4 ricevuto...';
+          document.getElementById('midi-debug').textContent = '🔥 MULTI FETCH: Part ' + (window.multiFetchState.currentPart + 1) + '/4 ricevuto (' + patchName + ')...';
 
           window.multiFetchState.currentPart++;
           if (window.multiFetchState.currentPart < 4) {
@@ -2326,76 +2379,68 @@
           continue;
         }
 
+        // Caso 2: Operazione Banco (Read o Capture)
         if (window.bankFetchState && window.bankFetchState.active) {
-          // --- RAW DUMP CAPTURE FOR BANK FETCHER (READ OR CAPTURE) ---
-          let patchName = "";
-          // Nello standard Virus C/TI il nome è solitamente verso la fine
-          // Cerchiamo di estrarlo dai byte validi
-          for (let i = msgBytes.length - 20; i < msgBytes.length - 1; i++) {
-            if (i > 0 && msgBytes[i] >= 32 && msgBytes[i] <= 126) {
-              patchName += String.fromCharCode(msgBytes[i]);
-            }
-          }
-          patchName = patchName.trim();
-
           const bState = window.bankFetchState;
 
-          // Calcola a quale banco appartiene questa patch
-          const totalReceived = bState.readPatches.length;
-          const patchNum = totalReceived % 128;
-          let currentBankName = bState.bankName;
+          // In Virus Single Dump:
+          // Byte 7 = Bank (1 = RAM A, 2 = RAM B, etc.)
+          // Byte 8 = Patch number (0..127)
+          let patchNum = (msgBytes.length >= 9 && msgBytes[8] >= 0 && msgBytes[8] < 128)
+            ? msgBytes[8]
+            : (Object.keys(bState.readPatches).length % 128);
 
-          const bankOffset = Math.floor(totalReceived / 128);
-          if (bankOffset > 0) {
-            const match = bState.bankName.match(/^([A-Z]+)\s+(\d+)$/i);
-            if (match) {
-              const prefix = match[1];
-              const num = parseInt(match[2], 10);
-              currentBankName = `${prefix} ${num + bankOffset}`;
-            }
-          }
+          const finalName = `${bState.bankName}-${patchNum.toString().padStart(3,'0')} ${patchName}`;
 
-          const finalName = patchName ? `${currentBankName}-${patchNum.toString().padStart(3,'0')} ${patchName}` : `${currentBankName}-${patchNum.toString().padStart(3,'0')} Empty`;
+          bState.readPatches[patchNum] = {
+            num: patchNum,
+            name: patchName,
+            fullName: finalName,
+            bytes: Array.from(msgBytes)
+          };
+
+          bState.receivedCount = Object.keys(bState.readPatches).length;
+          const totalReceived = bState.receivedCount;
 
           if (bState.mode === 'capture') {
             const lib = loadLibrary();
             lib[finalName] = Array.from(msgBytes);
             saveLibrary(lib);
-            document.getElementById('midi-debug').textContent = `🔥 BANK CAPTURE: Salvato ${finalName}... (${totalReceived + 1} ricevute)`;
+            document.getElementById('midi-debug').textContent = `🔥 BANK CAPTURE: Salvato ${finalName}... (${totalReceived}/128)`;
           } else {
-            document.getElementById('midi-debug').textContent = `🔥 BANK READ: Letto ${finalName}... (${totalReceived + 1} ricevute)`;
-          }
-
-          if (!bState.readPatches.includes(finalName)) {
-            bState.readPatches.push(finalName);
+            document.getElementById('midi-debug').textContent = `🔥 BANK READ: Letto ${finalName}... (${totalReceived}/128)`;
+            updateSynthBankProgress(bState);
           }
 
           if (bState.timeoutId) clearTimeout(bState.timeoutId);
 
-          // Continua a ricevere fino a quando il Virus non smette di trasmettere (timeout di 3 secondi)
-          bState.timeoutId = setTimeout(() => {
-             finishBankOperation();
-          }, 3000);
+          if (bState.sequentialMode) {
+            if (bState.sequentialTimer) clearTimeout(bState.sequentialTimer);
+            bState.sequentialIndex = patchNum + 1;
+            if (bState.sequentialIndex < 128) {
+              setTimeout(() => { requestNextSequentialPatch(); }, 20);
+            } else {
+              finishBankOperation();
+            }
+          } else {
+            // Bulk streaming mode
+            if (totalReceived >= 128) {
+              finishBankOperation();
+            } else {
+              bState.timeoutId = setTimeout(() => {
+                finishBankOperation();
+              }, 2500);
+            }
+          }
           continue;
         }
 
-        // --- RAW DUMP CAPTURE FOR LIBRARIAN ---
+        // Caso 3: Ricezione Singola Patch (Editor o Librarian)
         window.lastReceivedDump = new Uint8Array(msgBytes);
+        applyDumpToActivePatch(msgBytes);
 
-        // HACKER MODE: Estraiamo il NOME DELLA PATCH
-        let patchName = "";
-        for (let i = msgBytes.length - 20; i < msgBytes.length - 1; i++) {
-          if (i > 0 && msgBytes[i] >= 32 && msgBytes[i] <= 126) {
-            patchName += String.fromCharCode(msgBytes[i]);
-          }
-        }
-        patchName = patchName.trim();
-        document.getElementById('patchNameDisplay').textContent = 'virus ti snow // PATCH: ' + patchName;
-        const pInput = document.getElementById('patchName');
-        if (pInput) pInput.value = patchName;
-
-        document.getElementById('midi-debug').textContent = '🔥 DUMP IMPORTATO: ' + patchName;
-        setLastAction('single dump received');
+        document.getElementById('midi-debug').innerHTML = `<span style="color:#0f0;">🔥 DUMP IMPORTATO: <b>${escapeHtml(patchName)}</b></span>`;
+        setLastAction('single dump: ' + patchName);
         continue;
       }
 
@@ -3596,70 +3641,228 @@ let hwEncoders = [];
   }
 
   window.multiFetchState = null;
+
+  function escapeHtml(str) {
+    if (typeof str !== 'string') return String(str || '');
+    return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+  }
+
+  function loadLibraryCount(bankPrefix) {
+    const lib = loadLibrary();
+    if (!bankPrefix) return Object.keys(lib).length;
+    return Object.keys(lib).filter(k => k.startsWith(bankPrefix)).length;
+  }
+
+  function updateSynthBankProgress(bState) {
+    const list = document.getElementById('synthBankList');
+    if (!list) return;
+    const count = Object.keys(bState.readPatches).length;
+    list.innerHTML = `
+      <div style="padding: 16px; text-align: center; font-family: monospace;">
+        <div style="color: var(--accent); font-weight: bold; margin-bottom: 8px;">
+          LETTURA ${escapeHtml(bState.bankName)} IN CORSO...
+        </div>
+        <div style="color: #fff; font-size: 14px; margin-bottom: 8px;">
+          ${count} / 128 patch ricevute
+        </div>
+        <div style="width: 80%; height: 6px; background: rgba(255,255,255,0.1); margin: 0 auto; border-radius: 3px; overflow: hidden;">
+          <div style="width: ${(count / 128 * 100).toFixed(1)}%; height: 100%; background: var(--accent); transition: width 0.1s ease;"></div>
+        </div>
+      </div>
+    `;
+  }
+
+  function renderSynthBankList(bState) {
+    const list = document.getElementById('synthBankList');
+    if (!list) return;
+    const patches = Object.values(bState.readPatches).sort((a, b) => a.num - b.num);
+
+    if (patches.length === 0) {
+      list.innerHTML = `
+        <div style="color: #ff5555; font-size: 12px; text-align: center; padding: 16px; font-family: monospace;">
+          ❌ Nessuna patch ricevuta. Verifica che il cavo MIDI sia connesso e che il synth risponda su ID <b>${deviceId() === 16 ? 'Omni' : (deviceId() + 1)}</b>.
+        </div>
+      `;
+      return;
+    }
+
+    list.innerHTML = '';
+
+    // Header con pulsante "Salva tutte"
+    const header = document.createElement('div');
+    header.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.1); font-family: monospace; font-size: 12px;';
+    header.innerHTML = `
+      <span style="color: var(--accent); font-weight: bold;">BANCO ${escapeHtml(bState.bankName)} (${patches.length} PATCH)</span>
+    `;
+
+    const btnSaveAll = document.createElement('button');
+    btnSaveAll.className = 'chassis-page-btn';
+    btnSaveAll.style.cssText = 'font-size: 11px; padding: 4px 10px; color: #fff; background: var(--accent); border: none; cursor: pointer; border-radius: 3px;';
+    btnSaveAll.textContent = 'salva tutte in libreria';
+    btnSaveAll.addEventListener('click', () => {
+      const lib = loadLibrary();
+      patches.forEach(p => {
+        lib[p.fullName] = p.bytes;
+      });
+      saveLibrary(lib);
+      renderLibrary();
+      alert(`Salvate ${patches.length} patch nella libreria!`);
+    });
+    header.appendChild(btnSaveAll);
+    list.appendChild(header);
+
+    // Scrollable container per le patch
+    const scrollContainer = document.createElement('div');
+    scrollContainer.style.cssText = 'max-height: 380px; overflow-y: auto; padding: 4px 0;';
+
+    patches.forEach(p => {
+      const row = document.createElement('div');
+      row.className = 'lib-item';
+      row.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 6px 14px; border-bottom: 1px solid rgba(255,255,255,0.03); font-family: monospace; font-size: 12px;';
+
+      const left = document.createElement('div');
+      left.style.cssText = 'display: flex; align-items: center; gap: 10px; overflow: hidden;';
+
+      const numBadge = document.createElement('span');
+      numBadge.style.cssText = 'color: #888; font-size: 11px; min-width: 32px;';
+      numBadge.textContent = '#' + p.num.toString().padStart(3, '0');
+
+      const nameSpan = document.createElement('span');
+      nameSpan.style.cssText = 'color: #fff; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;';
+      nameSpan.textContent = p.name || 'INIT';
+
+      left.appendChild(numBadge);
+      left.appendChild(nameSpan);
+
+      const btns = document.createElement('div');
+      btns.className = 'btns';
+      btns.style.cssText = 'display: flex; gap: 6px;';
+
+      const btnLoad = document.createElement('button');
+      btnLoad.textContent = 'carica';
+      btnLoad.title = 'Carica nell\'editor e invia al buffer di ascolto';
+      btnLoad.addEventListener('click', () => {
+        const raw = new Uint8Array(p.bytes);
+        applyDumpToActivePatch(raw);
+        // Invia al Virus Edit Buffer (bank 0, prog 0x40) per farlo suonare immediatamente
+        raw[7] = 0x00;
+        raw[8] = 0x40;
+        sendMidiBytes(raw, 'load patch ' + p.name);
+        document.getElementById('midi-debug').innerHTML = `<span style="color:#0f0;">🔊 CARICATA: <b>${escapeHtml(p.fullName)}</b></span>`;
+      });
+
+      const btnSave = document.createElement('button');
+      btnSave.textContent = 'salva';
+      btnSave.title = 'Salva questa patch nella libreria';
+      btnSave.addEventListener('click', () => {
+        const lib = loadLibrary();
+        lib[p.fullName] = p.bytes;
+        saveLibrary(lib);
+        renderLibrary();
+        btnSave.textContent = 'salvata!';
+        btnSave.disabled = true;
+      });
+
+      btns.appendChild(btnLoad);
+      btns.appendChild(btnSave);
+
+      row.appendChild(left);
+      row.appendChild(btns);
+      scrollContainer.appendChild(row);
+    });
+
+    list.appendChild(scrollContainer);
+  }
+
   function finishBankOperation() {
     const bState = window.bankFetchState;
     if (!bState) return;
 
-    if (bState.timeoutId) {
-      clearTimeout(bState.timeoutId);
-    }
+    if (bState.timeoutId) clearTimeout(bState.timeoutId);
+    if (bState.sequentialTimer) clearTimeout(bState.sequentialTimer);
 
-    const count = bState.mode === 'read' ? bState.readPatches.length : loadLibraryCount(bState.bankName);
+    const count = Object.keys(bState.readPatches).length;
 
     if (bState.mode === 'capture') {
       if (count === 0) {
-        document.getElementById('midi-debug').innerHTML = `<span style="color:#f00;">❌ ERRORE: Nessuna patch ricevuta (SysEx bloccato).</span>`;
+        document.getElementById('midi-debug').innerHTML = `<span style="color:#f00;">❌ ERRORE: Nessuna patch ricevuta. Verifica cavo MIDI e ID synth.</span>`;
       } else {
-        document.getElementById('midi-debug').innerHTML = `<span style="color:#0f0;">✅ BANK CAPTURE: Completato! (${count} patch ricevute)</span>`;
+        document.getElementById('midi-debug').innerHTML = `<span style="color:#0f0;">✅ BANK CAPTURE: Completato! (${count} patch salvate)</span>`;
         setLastAction('bank capture complete: ' + count);
       }
-      updateBrowserView();
+      renderLibrary();
     } else if (bState.mode === 'read') {
       if (count === 0) {
-        document.getElementById('midi-debug').innerHTML = `<span style="color:#f00;">❌ ERRORE: Nessuna patch ricevuta. Verifica la connessione MIDI.</span>`;
+        document.getElementById('midi-debug').innerHTML = `<span style="color:#f00;">❌ ERRORE: Nessuna patch ricevuta. Verifica cavo MIDI e ID synth.</span>`;
       } else {
-        document.getElementById('midi-debug').innerHTML = `<span style="color:#0f0;">✅ BANK READ: Completato! (${count} patch ricevute)</span>`;
+        document.getElementById('midi-debug').innerHTML = `<span style="color:#0f0;">✅ BANK READ: Completato! (${count} patch lette)</span>`;
         setLastAction('bank read complete: ' + count);
       }
+      renderSynthBankList(bState);
     }
 
     window.bankFetchState.active = false;
     window.bankFetchState = null;
   }
 
+  function requestNextSequentialPatch() {
+    const bState = window.bankFetchState;
+    if (!bState || !bState.active) return;
+    if (bState.sequentialIndex >= 128) {
+      finishBankOperation();
+      return;
+    }
+    const patchIdx = bState.sequentialIndex;
+    requestBankPatch(bState.bankIndex, patchIdx);
+
+    if (bState.sequentialTimer) clearTimeout(bState.sequentialTimer);
+    // Timeout di sicurezza per singola patch (350ms): se il synth non risponde, passa alla successiva
+    bState.sequentialTimer = setTimeout(() => {
+      const bs = window.bankFetchState;
+      if (bs && bs.active && bs.sequentialMode) {
+        bs.sequentialIndex++;
+        requestNextSequentialPatch();
+      }
+    }, 350);
+  }
+
   function requestBankPatch(bankIndex, patchIndex) {
     if (!selectedOutput) return;
     try {
-      // 0x30 = Single Patch Dump Request
+      // 0x30 = Single Patch Dump Request: F0 00 20 33 01 <deviceId> 30 <bank> <prog> F7
       const bytes = new Uint8Array([
         ...SYSEX_PREFIX, deviceId(), 0x30, bankIndex & 0x7F, patchIndex & 0x7F, 0xF7
       ]);
       selectedOutput.send(bytes);
-      recordMidiTx('request patch dump', bytes);
+      recordMidiTx('request patch ' + patchIndex + ' bank ' + bankIndex, bytes);
     } catch (e) { console.error('Bank dump request error', e); }
   }
 
   function requestFullBank(bankIndex) {
     if (!selectedOutput) return;
     try {
-      // 0x32 = Bank Dump Request
+      // 0x32 = Bank Dump Request: F0 00 20 33 01 <deviceId> 32 <bank> F7
       const bytes = new Uint8Array([
         ...SYSEX_PREFIX, deviceId(), 0x32, bankIndex & 0x7F, 0xF7
       ]);
       selectedOutput.send(bytes);
-      recordMidiTx('request bank dump', bytes);
+      recordMidiTx('request bank dump ' + bankIndex, bytes);
     } catch (e) { console.error('Full Bank dump request error', e); }
   }
 
   function requestDump(partIndex) {
     if (!selectedOutput) return;
     try {
-      // 0x40 = Edit Buffer, partIndex = 0..3 (Part 1..4)
+      // 0x30 = Single Dump Request: F0 00 20 33 01 <deviceId> 30 <bank> <prog> F7
+      // bank 0, prog 0x40 (64) = Single Mode Edit Buffer
+      // bank 0, prog 0x00..0x03 = Multi Mode Part 1..4 Edit Buffer
+      const isMulti = window.multiFetchState && window.multiFetchState.active;
+      const prog = isMulti ? (partIndex & 0x0F) : 0x40;
       const bytes = new Uint8Array([
-        ...SYSEX_PREFIX, deviceId(), 0x00, 0x40, partIndex & 0x7F, 0xF7
+        ...SYSEX_PREFIX, deviceId(), 0x30, 0x00, prog, 0xF7
       ]);
       selectedOutput.send(bytes);
-      recordMidiTx('request edit buffer p' + (partIndex + 1), bytes);
+      recordMidiTx(isMulti ? ('request edit buffer p' + (partIndex + 1)) : 'request single edit buffer', bytes);
     } catch (e) { console.error('Dump request error', e); }
   }
 
@@ -3861,9 +4064,22 @@ let hwEncoders = [];
       const btns = document.createElement('div');
       btns.className = 'btns';
 
+      const editBtn = document.createElement('button');
+      editBtn.textContent = 'carica';
+      editBtn.title = 'Carica nell\'editor singolo e ascolta';
+      editBtn.addEventListener('click', () => {
+        const raw = new Uint8Array(lib[name]);
+        applyDumpToActivePatch(raw);
+        raw[7] = 0x00;
+        raw[8] = 0x40;
+        sendMidiBytes(raw, 'load patch ' + name);
+        document.getElementById('btnTabSynth').click();
+      });
+      btns.appendChild(editBtn);
+
       const loadLabel = document.createElement('span');
       loadLabel.className = 'small';
-      loadLabel.textContent = 'load to: ';
+      loadLabel.textContent = 'parte: ';
       btns.appendChild(loadLabel);
 
       for(let i=0; i<4; i++){
@@ -3884,9 +4100,8 @@ let hwEncoders = [];
           renderLibrary();
         }
       });
-
-      btns.appendChild(loadLabel);
       btns.appendChild(delBtn);
+
       item.appendChild(nameEl);
       item.appendChild(btns);
       list.appendChild(item);
@@ -4348,8 +4563,11 @@ let hwEncoders = [];
     }
     const type = document.getElementById('bankTypeSelect').value;
     const num = parseInt(document.getElementById('bankNumSelect').value, 10);
-    // Virus TI / Snow bank mapping: RAM 1-4 = 0-3, ROM 1-Z = 4+
-    const bankIndex = (type === 'RAM' ? 0 : 4) + (num - 1);
+    // Virus TI / Snow bank mapping:
+    // Bank 0 = Edit buffer
+    // Bank 1..4 = RAM A..D (RAM 1..4)
+    // Bank 5+ = ROM A+ (ROM 1+)
+    const bankIndex = (type === 'RAM' ? 1 : 5) + (num - 1);
     const bankName = `${type} ${num}`;
 
     const msg = mode === 'capture'
@@ -4357,30 +4575,51 @@ let hwEncoders = [];
       : `Vuoi LEGGERE tutte le 128 patch dal banco ${bankName} senza salvarle?`;
 
     if (confirm(msg)) {
-      document.getElementById('midi-debug').textContent = `🔥 BANK ${mode.toUpperCase()}: Richiesta ${bankName} patch 1/128...`;
+      document.getElementById('midi-debug').textContent = `🔥 BANK ${mode.toUpperCase()}: Avvio richiesta ${bankName}...`;
       if (mode === 'read') {
-         document.getElementById('synthBankList').innerHTML = '<div style="color: #00ffff; font-size: 12px; text-align: center; padding: 16px;">lettura in corso...</div>';
+        const list = document.getElementById('synthBankList');
+        if (list) {
+          list.innerHTML = `
+            <div style="padding: 16px; text-align: center; font-family: monospace;">
+              <div style="color: var(--accent); font-weight: bold; margin-bottom: 8px;">
+                LETTURA ${escapeHtml(bankName)} IN CORSO...
+              </div>
+              <div style="color: #aaa; font-size: 12px; margin-bottom: 8px;">In attesa di risposta dal synth...</div>
+              <div style="width: 80%; height: 6px; background: rgba(255,255,255,0.1); margin: 0 auto; border-radius: 3px; overflow: hidden;">
+                <div style="width: 5%; height: 100%; background: var(--accent);"></div>
+              </div>
+            </div>
+          `;
+        }
       }
       window.bankFetchState = {
         active: true,
         mode: mode,
         bankIndex: bankIndex,
         bankName: bankName,
-        readPatches: [],
+        readPatches: {},
+        receivedCount: 0,
+        sequentialMode: false,
+        sequentialIndex: 0,
+        sequentialTimer: null,
         timeoutId: null
       };
 
-      // Request the full bank (Command 0x32)
+      // 1. Prova prima il bulk dump (Comando 0x32)
       requestFullBank(bankIndex);
 
-      // If we receive absolutely nothing for 3 seconds, we timeout the whole operation
+      // 2. Se dopo 750ms nessuna patch è arrivata, attiva automaticamente la lettura sequenziale (Comando 0x30, 0..127)
       window.bankFetchState.timeoutId = setTimeout(() => {
         const bState = window.bankFetchState;
         if (bState && bState.active) {
-          document.getElementById('midi-debug').innerHTML = `<span style="color:#f00;">❌ ERRORE: Nessuna patch ricevuta. Verifica la connessione MIDI.</span>`;
-          finishBankOperation();
+          if (bState.receivedCount === 0) {
+            document.getElementById('midi-debug').textContent = `🔥 BANK ${mode.toUpperCase()}: Lettura sequenziale patch 1/128...`;
+            bState.sequentialMode = true;
+            bState.sequentialIndex = 0;
+            requestNextSequentialPatch();
+          }
         }
-      }, 3000);
+      }, 750);
     }
   }
 
