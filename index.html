@@ -1703,15 +1703,16 @@
     z-index: 1;
     width: 100%;
     display: grid;
-    grid-template-columns: 140px minmax(430px, 510px) minmax(290px, 340px);
-    gap: 20px;
+    grid-template-columns: 88px minmax(390px, 480px) minmax(390px, 480px);
+    gap: 18px;
     justify-content: center;
-    align-items: center;
-    margin-top: 6px;
+    align-items: start;
+    margin-top: 10px;
   }
-  @media (max-width: 960px) {
+  @media (max-width: 1040px) {
     .snow-front-grid {
       grid-template-columns: 1fr;
+      justify-items: center;
     }
   }
   .snow-front-col {
@@ -1720,52 +1721,73 @@
     box-shadow: none !important;
     padding: 0 !important;
   }
-  .snow-front-left {
+  .snow-col-left {
     display: flex;
     flex-direction: column;
     align-items: center;
-    justify-content: space-between;
-    height: 100%;
-    box-sizing: border-box;
-    padding: 10px 0 !important;
+    justify-content: flex-start;
+    gap: 28px;
+    padding-top: 18px !important;
   }
-  .snow-front-center {
+  .snow-col-center {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 14px;
+    gap: 16px;
   }
-  .snow-front-right {
+  .snow-col-right {
     display: flex;
     flex-direction: column;
     gap: 14px;
+    align-items: stretch;
   }
 
-  /* Finestra Acrilica Scura Smoked Glossy (Access Virus Originale) */
+  /* LASTRA SAGOMATA IN PLASTICA/ACRILICO TRASPARENTE (CLEAR ACRYLIC FACEPLATE) */
   .snow-front-acrylic-window {
-    background: linear-gradient(180deg, #2b303b 0%, #171a22 100%) !important;
-    border: 2px solid #3c4250 !important;
-    border-radius: 8px !important;
-    padding: 10px 14px !important;
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.62) 0%, rgba(240, 245, 252, 0.30) 45%, rgba(255, 255, 255, 0.48) 100%) !important;
+    backdrop-filter: blur(2.5px) !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.88) !important;
+    border-radius: 7px !important;
+    padding: 10px 14px 12px 14px !important;
     box-shadow:
-      0 6px 20px rgba(0,0,0,0.38),
-      inset 0 1px 1px rgba(255,255,255,0.4),
-      inset 0 -1px 2px rgba(0,0,0,0.6) !important;
+      0 6px 18px rgba(0, 0, 0, 0.12),
+      inset 0 1.5px 2px rgba(255, 255, 255, 0.95),
+      inset 0 -1px 2px rgba(0, 0, 0, 0.06),
+      0 0 0 1px rgba(180, 185, 195, 0.45) !important;
     position: relative;
     width: 100%;
     box-sizing: border-box;
   }
+  .acrylic-screw {
+    position: absolute;
+    width: 9px; height: 9px;
+    background: radial-gradient(circle at 35% 35%, #f0f2f5 0%, #9ca0a8 100%);
+    border-radius: 50%;
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.9), 0 1px 2px rgba(0,0,0,0.3);
+    border: 1px solid #7c8088;
+    z-index: 5;
+  }
+  .acrylic-screw::after {
+    content: '';
+    position: absolute;
+    top: 50%; left: 50%; width: 4px; height: 4px;
+    background: #3b3e45;
+    transform: translate(-50%, -50%);
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
+  }
+
+  /* Schermo LCD Incassato Fondo Ghiaccio/Azzurro Chiaro */
   .virus-snow-lcd-front {
-    background: linear-gradient(180deg, #e3eff9 0%, #cde3f3 100%) !important;
-    border: 3px solid #12161f !important;
-    border-radius: 4px !important;
-    padding: 7px 12px !important;
-    box-shadow: inset 0 3px 8px rgba(0,0,0,0.5), 0 1px 1px rgba(255,255,255,0.15) !important;
+    background: linear-gradient(180deg, #d9ecf8 0%, #c4ddf1 100%) !important;
+    border: 2px solid #16202c !important;
+    border-radius: 3px !important;
+    padding: 6px 10px !important;
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.35), 0 1px 1px rgba(255,255,255,0.6) !important;
     font-family: monospace;
-    color: #1a2938;
+    color: #142434;
     position: relative;
     overflow: hidden;
-    min-height: 82px;
+    min-height: 84px;
   }
   .lcd-header-bar {
     display: flex;
@@ -1773,15 +1795,15 @@
     align-items: center;
     font-size: 10px;
     font-weight: bold;
-    background: #203142;
+    background: #1f3244;
     color: #d7e9f5;
     padding: 2px 8px;
     border-radius: 2px;
-    margin-bottom: 6px;
+    margin-bottom: 5px;
   }
   .lcd-badge {
     background: #d7e9f5;
-    color: #203142;
+    color: #1f3244;
     padding: 0 5px;
     border-radius: 2px;
     font-weight: 900;
@@ -1790,7 +1812,7 @@
   .lcd-bank-prog {
     font-size: 16px;
     font-weight: 900;
-    color: #1c2a38;
+    color: #162737;
     letter-spacing: 0.05em;
     min-width: 55px;
   }
@@ -1799,8 +1821,8 @@
     font-weight: 900;
     letter-spacing: 0.06em;
     text-transform: uppercase;
-    color: #1a2836;
-    text-shadow: 0 1px 0 rgba(255,255,255,0.7);
+    color: #142434;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.6);
     overflow: hidden;
     text-overflow: ellipsis;
     white-space: nowrap;
@@ -1811,111 +1833,218 @@
     align-items: center;
     font-size: 9.5px;
     font-weight: 700;
-    color: #3d5065;
-    border-top: 1px dotted rgba(35, 52, 70, 0.35);
+    color: #36495c;
+    border-top: 1px dotted rgba(25, 42, 58, 0.35);
     padding-top: 4px;
     margin-top: 4px;
   }
-  .snow-front-soft-knobs {
+
+  /* RIGA ORIZZONTALE DELLE 4 MANOPOLE SOTTO IL DISPLAY (Volume, Value 1, 2, 3) */
+  .snow-front-4knobs {
     display: flex;
     justify-content: space-between;
     width: 100%;
-    padding: 0 18px;
+    padding: 0 8px;
     box-sizing: border-box;
   }
-  .snow-front-label {
-    font-size: 9.5px;
+  .snow-knob-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+  }
+  .snow-knob-top-label {
+    font-size: 9px;
     font-weight: 900;
-    letter-spacing: 0.12em;
+    letter-spacing: 0.08em;
     color: #333;
     text-transform: uppercase;
-    text-shadow: 0 1px 0 rgba(255,255,255,0.8);
+  }
+  .snow-knob-sub-label {
+    font-size: 8px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: #666;
+    text-transform: uppercase;
+    margin-top: 1px;
   }
   .snow-front-val {
-    font-size: 11px;
+    font-size: 10.5px;
     font-family: monospace;
     font-weight: bold;
     color: #222;
-    margin-top: 2px;
+    margin-top: 1px;
   }
 
-  /* Dial con tacche radiali per potenziometri hardware */
-  .knob-tick-dial {
+  /* MATRICE PULSANTI A 3 FILE CON LED HARDWARE */
+  .snow-matrix-section {
+    display: flex;
+    flex-direction: column;
+    gap: 9px;
+    background: rgba(0,0,0,0.03);
+    border: 1px solid rgba(0,0,0,0.09);
+    border-radius: 6px;
+    padding: 8px 10px;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.05);
+  }
+  .snow-matrix-header-row {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 4px;
+  }
+  .snow-led-row {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 4px;
+    justify-items: center;
+    align-items: center;
+    margin-bottom: 2px;
+  }
+  .snow-btn-row-8 {
+    display: grid;
+    grid-template-columns: repeat(8, 1fr);
+    gap: 4px;
+  }
+  .snow-matrix-btn {
+    background: linear-gradient(180deg, #ffffff 0%, #e2e5eb 100%);
+    border: 1px solid #afb3bc;
+    border-radius: 3px;
+    color: #222;
+    font-size: 8.5px;
+    font-weight: 800;
+    letter-spacing: 0.03em;
+    padding: 5px 2px;
+    text-align: center;
+    box-shadow: 0 1.5px 3px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.9);
+    cursor: pointer;
+    transition: all 0.08s ease;
+    user-select: none;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+  .snow-matrix-btn:active {
+    background: #d0d4de;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.25);
+    transform: translateY(1px);
+  }
+  .snow-matrix-btn.audition-active {
+    background: #ffecd1 !important;
+    border-color: #ff9900 !important;
+    box-shadow: 0 0 8px rgba(255, 153, 0, 0.6), inset 0 1px 0 #fff !important;
+    color: #b75900 !important;
+  }
+
+  .snow-indicator-led {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #3c4048;
+    border: 1px solid #282a30;
+    display: inline-block;
+  }
+  .snow-indicator-led.active-amber {
+    background: #ff9900 !important;
+    box-shadow: 0 0 6px #ff9900 !important;
+    border-color: #d87d00 !important;
+  }
+  .snow-indicator-led.active-green {
+    background: #48bb78 !important;
+    box-shadow: 0 0 6px #48bb78 !important;
+    border-color: #2f855a !important;
+  }
+
+  /* Fila 3 Tasti Larghi: EDIT/SHIFT, PART, BANK/SEARCH */
+  .snow-bottom-3btns {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1.2fr;
+    gap: 6px;
+    margin-top: 2px;
+  }
+  .snow-wide-tactile-btn {
+    background: linear-gradient(180deg, #ffffff 0%, #e2e5eb 100%);
+    border: 1px solid #aeb2bb;
+    border-radius: 4px;
+    color: #222;
+    font-size: 9.5px;
+    font-weight: 800;
+    letter-spacing: 0.05em;
+    padding: 6px 6px;
+    text-align: center;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.9);
+    cursor: pointer;
+    transition: all 0.08s ease;
+  }
+  .snow-wide-tactile-btn:active {
+    background: #d0d4de;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.25);
+    transform: translateY(1px);
+  }
+
+  /* MODULO FILTRO HARDWARE SAGOMATO (CUTOFF & RESONANCE) */
+  .snow-filter-module {
+    background: rgba(0,0,0,0.03);
+    border: 1px solid rgba(0,0,0,0.1);
+    border-radius: 6px;
+    padding: 8px 12px 10px 12px;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.04);
+  }
+  .snow-filter-knobs-row {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    margin-top: 2px;
+  }
+  .snow-filter-scale-box {
     position: relative;
     display: flex;
     align-items: center;
     justify-content: center;
   }
-  .knob-tick-dial::before {
-    content: '';
+  .snow-filter-scale-marks {
     position: absolute;
-    width: calc(100% + 14px);
-    height: calc(100% + 14px);
+    width: 68px;
+    height: 68px;
     border-radius: 50%;
-    border: 1.5px dotted rgba(50, 60, 75, 0.35);
+    border: 1.5px dotted rgba(60, 70, 85, 0.4);
     pointer-events: none;
-    z-index: 0;
   }
 
-  /* Pulsanti Tattili Hardware */
-  .snow-tactile-btn {
-    background: linear-gradient(180deg, #ffffff 0%, #e3e6ec 100%);
-    border: 1px solid #afb3bd;
-    border-radius: 4px;
-    color: #222;
-    font-size: 10px;
-    font-weight: 800;
-    letter-spacing: 0.06em;
-    padding: 6px 10px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.9);
-    cursor: pointer;
-    transition: all 0.08s ease;
-  }
-  .snow-tactile-btn:active {
-    background: #d4d7df;
-    box-shadow: inset 0 1px 3px rgba(0,0,0,0.25);
-    transform: translateY(1px);
-  }
-
-  /* Part Selector Matrix */
-  .snow-front-part-box {
-    background: rgba(0,0,0,0.04);
-    border: 1px solid rgba(0,0,0,0.12);
-    border-radius: 6px;
-    padding: 8px 10px;
-    display: flex;
-    flex-direction: column;
-    gap: 7px;
-    box-shadow: inset 0 1px 2px rgba(0,0,0,0.06);
-  }
-  .front-part-pill {
-    flex: 1;
-    padding: 5px 2px;
-    font-size: 11px;
-    font-weight: 900;
-    font-family: monospace;
-    border-radius: 4px;
-    border: 1px solid #b8bac2;
-    background: linear-gradient(180deg, #f8f9fb 0%, #e3e6ec 100%);
-    cursor: pointer;
+  /* Tasti Laterali (TAP TEMPO, EXIT) */
+  .snow-vert-btn-unit {
     display: flex;
     flex-direction: column;
     align-items: center;
     gap: 3px;
-    transition: all 0.1s;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.9);
   }
-  .front-part-pill.active {
-    background: #fff;
-    border-color: #777;
-    box-shadow: 0 1px 4px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.95);
+  .snow-sq-btn {
+    width: 44px;
+    height: 42px;
+    background: linear-gradient(180deg, #ffffff 0%, #dfe2e8 100%);
+    border: 1px solid #aeb2bb;
+    border-radius: 5px;
+    color: #222;
+    font-size: 8.5px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    line-height: 1.1;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.9);
+    cursor: pointer;
+    transition: all 0.08s ease;
   }
-  .front-part-led {
-    width: 6px;
-    height: 6px;
-    border-radius: 50%;
-    background: #3a3d44;
-    display: inline-block;
+  .snow-sq-btn:active {
+    background: #cbcfd8;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.25);
+    transform: translateY(1px);
   }
 
   /* Dock inferiore integrato */
@@ -1927,8 +2056,8 @@
     align-items: center;
     flex-wrap: wrap;
     gap: 10px;
-    margin-top: 16px;
-    padding: 9px 14px;
+    margin-top: 14px;
+    padding: 8px 14px;
     background: linear-gradient(180deg, rgba(0,0,0,0.03) 0%, rgba(0,0,0,0.07) 100%);
     border: 1px solid rgba(0,0,0,0.12);
     border-radius: 6px;
@@ -2181,58 +2310,46 @@
       <span style="font-size: 18px; color: #222;">❖</span> access
     </div>
 
-    <!-- Front Panel Grid matching physical hardware unit -->
+    <!-- Griglia a 3 sezioni (Sinistra: 2 tasti verticali, Centro: Schermo su acrilico trasparente + 4 manopole, Destra: Matrice tasti con LED + modulo Filtro) -->
     <div class="snow-front-grid">
-      <!-- 1. LEFT: MASTER VOL & AUDIO -->
-      <div class="snow-front-col snow-front-left">
-        <div style="display: flex; flex-direction: column; align-items: center; gap: 6px;">
-          <div class="snow-front-label">MASTER VOL</div>
-          <div class="knob-tick-dial">
-            <div class="chassis-knob-outer snow-front-knob" id="frontKnobMasterVol" data-val="100" style="width: 50px; height: 50px; cursor: grab;" title="Trascina su/giù per regolare Master Volume (CC 7)">
-              <div class="chassis-knob-inner" style="width: 44px; height: 44px;">
-                <div class="chassis-knob-top" style="width: 34px; height: 34px;">
-                  <div class="chassis-knob-indicator-container" id="frontKnobMasterVolInd" style="transform: rotate(50deg);">
-                    <div class="chassis-knob-indicator" style="height: 11px; width: 2.5px; top: 1px;"></div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-          <span id="frontValMasterVol" class="snow-front-val">100</span>
+      <!-- 1. COLONNA SINISTRA: TAP TEMPO / PANIC & EXIT / MODE -->
+      <div class="snow-front-col snow-col-left">
+        <div class="snow-vert-btn-unit">
+          <button id="frontBtnTapPanic" class="snow-sq-btn" title="Tap Tempo / Invia All Notes Off (PANIC)">
+            <span style="font-size: 8.5px; font-weight: 900;">TAP</span>
+            <span style="font-size: 8px; font-weight: 800; opacity: 0.85;">TEMPO</span>
+          </button>
+          <span style="font-size: 7.5px; font-weight: 900; color: #c53030; letter-spacing: 0.08em; text-transform: uppercase;">PANIC</span>
         </div>
 
-        <div style="display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 22px;">
-          <div style="display: flex; align-items: center; gap: 6px;">
-            <span id="frontInputLed" style="width: 7px; height: 7px; border-radius: 50%; background: #48bb78; box-shadow: 0 0 5px #48bb78; display: inline-block;"></span>
-            <span style="font-size: 8.5px; font-weight: 900; letter-spacing: 0.12em; color: #444;">INPUT</span>
-          </div>
-          <div style="display: flex; flex-direction: column; align-items: center; gap: 2px; color: #555;">
-            <span style="font-size: 15px;">🎧</span>
-            <span style="font-size: 8px; font-weight: 900; letter-spacing: 0.1em; color: #444;">PHONES</span>
-          </div>
+        <div class="snow-vert-btn-unit">
+          <button id="frontBtnExitMode" class="snow-sq-btn" title="Exit / Commuta modalità Single/Multi">
+            <span style="font-size: 9px; font-weight: 900;">EXIT</span>
+          </button>
+          <span style="font-size: 7.5px; font-weight: 900; color: #444; letter-spacing: 0.08em; text-transform: uppercase;">MODE</span>
         </div>
       </div>
 
-      <!-- 2. CENTER: ACRYLIC DISPLAY WINDOW & 3 SOFT KNOBS -->
-      <div class="snow-front-col snow-front-center">
-        <!-- Acrylic Glass Frame Scura Smoked Glossy con 4 viti -->
+      <!-- 2. COLONNA CENTRO: LASTRA ACRILICA TRASPARENTE + 4 MANOPOLE ORIZZONTALI -->
+      <div class="snow-front-col snow-col-center">
+        <!-- Lastra trasparente acrilica con 4 viti metalliche ai 4 angoli -->
         <div class="snow-front-acrylic-window">
-          <div class="chassis-screw" style="top: 5px; left: 5px; width: 7px; height: 7px;"></div>
-          <div class="chassis-screw" style="top: 5px; right: 5px; width: 7px; height: 7px;"></div>
-          <div class="chassis-screw" style="bottom: 5px; left: 5px; width: 7px; height: 7px;"></div>
-          <div class="chassis-screw" style="bottom: 5px; right: 5px; width: 7px; height: 7px;"></div>
+          <div class="acrylic-screw" style="top: 6px; left: 6px;"></div>
+          <div class="acrylic-screw" style="top: 6px; right: 6px;"></div>
+          <div class="acrylic-screw" style="bottom: 6px; left: 6px;"></div>
+          <div class="acrylic-screw" style="bottom: 6px; right: 6px;"></div>
 
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; padding: 0 6px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; padding: 0 8px;">
             <div style="display: flex; align-items: center; gap: 6px;">
               <span class="pulse-bpm" style="width: 7px; height: 7px; border-radius: 50%; background: #ff3b4b; box-shadow: 0 0 7px #ff3b4b; display: inline-block;"></span>
-              <span style="font-size: 8.5px; font-weight: 800; letter-spacing: 0.12em; color: #cbd5e1;">BPM / LFO</span>
+              <span style="font-size: 8.5px; font-weight: 800; letter-spacing: 0.12em; color: #334155;">BPM / LFO</span>
             </div>
-            <div style="font-weight: 900; font-size: 11px; letter-spacing: 0.14em; color: #f1f5f9; font-family: 'Inter', sans-serif;">
-              VIRUS <span style="font-weight: 300; opacity: 0.6;">|</span> TI SNOW
+            <div style="font-weight: 900; font-size: 11px; letter-spacing: 0.14em; color: #1e293b; font-family: 'Inter', sans-serif;">
+              VIRUS <span style="font-weight: 300; opacity: 0.5;">|</span> TI SNOW
             </div>
           </div>
 
-          <!-- LCD Backlit Screen identico alla foto reale: fondo chiaro, testi e icone grigie -->
+          <!-- LCD Backlit Screen: fondo azzurro-ghiaccio, testi antracite scuri ad alto contrasto -->
           <div id="frontLcdScreen" class="virus-snow-lcd-front">
             <div class="lcd-header-bar">
               <span id="frontLcdModeBadge" class="lcd-badge">MULTI</span>
@@ -2240,160 +2357,226 @@
               <span style="display: flex; align-items: center; gap: 4px; color: #d7e9f5;">
                 <span style="font-size: 9px;">▤</span>
                 <span>🔒</span>
-                <span id="frontLcdMultiPrg" style="font-weight: 900;">02</span>
+                <span id="frontLcdMultiPrg" style="font-weight: 900;">01</span>
               </span>
             </div>
-            <div style="display: flex; align-items: baseline; gap: 12px; margin: 6px 0;">
+            <div style="display: flex; align-items: baseline; gap: 12px; margin: 4px 0;">
               <span id="frontLcdBankProg" class="lcd-bank-prog">A-01</span>
-              <span id="frontLcdPatchName" class="lcd-patch-name">SAVEPRAYER</span>
+              <span id="frontLcdPatchName" class="lcd-patch-name">SNOWFALL BC</span>
             </div>
             <div class="lcd-footer-bar">
-              <span id="frontLcdSoft1" style="flex: 1; text-align: left;">&lt;global&gt;</span>
-              <span id="frontLcdSoft2" style="flex: 1; text-align: center; color: #1c2a38; font-weight: 800;">Energy</span>
-              <span id="frontLcdSoft3" style="flex: 1; text-align: right;">&lt;global&gt;</span>
+              <span id="frontLcdSoft1" style="flex: 1; text-align: left;">Transp: 0</span>
+              <span id="frontLcdSoft2" style="flex: 1; text-align: center; color: #142434; font-weight: 800;">Pan: Center</span>
+              <span id="frontLcdSoft3" style="flex: 1; text-align: right;">Assign: 20</span>
             </div>
           </div>
         </div>
 
-        <!-- 3 Knurled Soft Knobs directly beneath screen -->
-        <div class="snow-front-soft-knobs">
-          <!-- SOFT 1 -->
-          <div class="chassis-knob-container">
+        <!-- Fila delle 4 manopole rotative esattamente come il vero Snow -->
+        <div class="snow-front-4knobs">
+          <!-- 1. VOLUME / PART VOLUME -->
+          <div class="snow-knob-unit">
+            <span class="snow-knob-top-label">VOLUME</span>
             <div class="knob-tick-dial">
-              <div class="chassis-knob-outer snow-front-knob" id="frontKnobSoft1" data-val="0" style="width: 42px; height: 42px; cursor: grab;" title="Trascina per regolare Soft 1 (CC 1 / Mod)">
-                <div class="chassis-knob-inner" style="width: 36px; height: 36px;">
-                  <div class="chassis-knob-top" style="width: 28px; height: 28px;">
-                    <div class="chassis-knob-indicator-container" id="frontKnobSoft1Ind" style="transform: rotate(-135deg);">
-                      <div class="chassis-knob-indicator" style="height: 9px; width: 2px;"></div>
+              <div class="chassis-knob-outer snow-front-knob" id="frontKnobVolume" data-val="100" style="width: 44px; height: 44px; cursor: grab;" title="Volume Parte corrente (CC 7)">
+                <div class="chassis-knob-inner" style="width: 38px; height: 38px;">
+                  <div class="chassis-knob-top" style="width: 29px; height: 29px;">
+                    <div class="chassis-knob-indicator-container" id="frontKnobVolumeInd" style="transform: rotate(50deg);">
+                      <div class="chassis-knob-indicator" style="height: 9px; width: 2px; top: 1px;"></div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-            <span class="chassis-knob-label" style="margin-top: 3px;">SOFT 1</span>
-            <span id="frontValSoft1" class="snow-front-val">0</span>
+            <span class="snow-knob-sub-label">PART VOLUME</span>
+            <span id="frontValVolume" class="snow-front-val">100</span>
           </div>
 
-          <!-- SOFT 2 -->
-          <div class="chassis-knob-container">
+          <!-- 2. VALUE 1 / TRANSPOSE -->
+          <div class="snow-knob-unit">
+            <span class="snow-knob-top-label">VALUE 1</span>
             <div class="knob-tick-dial">
-              <div class="chassis-knob-outer snow-front-knob" id="frontKnobSoft2" data-val="64" style="width: 42px; height: 42px; cursor: grab;" title="Trascina per regolare Soft 2 (Energy / Filter Env)">
-                <div class="chassis-knob-inner" style="width: 36px; height: 36px;">
-                  <div class="chassis-knob-top" style="width: 28px; height: 28px;">
-                    <div class="chassis-knob-indicator-container" id="frontKnobSoft2Ind" style="transform: rotate(0deg);">
-                      <div class="chassis-knob-indicator" style="height: 9px; width: 2px;"></div>
+              <div class="chassis-knob-outer snow-front-knob" id="frontKnobValue1" data-val="64" style="width: 44px; height: 44px; cursor: grab;" title="Value 1 / Transpose / Modulation (CC 1)">
+                <div class="chassis-knob-inner" style="width: 38px; height: 38px;">
+                  <div class="chassis-knob-top" style="width: 29px; height: 29px;">
+                    <div class="chassis-knob-indicator-container" id="frontKnobValue1Ind" style="transform: rotate(0deg);">
+                      <div class="chassis-knob-indicator" style="height: 9px; width: 2px; top: 1px;"></div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-            <span class="chassis-knob-label" style="margin-top: 3px;">SOFT 2</span>
-            <span id="frontValSoft2" class="snow-front-val">64</span>
+            <span class="snow-knob-sub-label">TRANSPOSE</span>
+            <span id="frontValValue1" class="snow-front-val">0</span>
           </div>
 
-          <!-- SOFT 3 -->
-          <div class="chassis-knob-container">
+          <!-- 3. VALUE 2 / PANORAMA -->
+          <div class="snow-knob-unit">
+            <span class="snow-knob-top-label">VALUE 2</span>
             <div class="knob-tick-dial">
-              <div class="chassis-knob-outer snow-front-knob" id="frontKnobSoft3" data-val="20" style="width: 42px; height: 42px; cursor: grab;" title="Trascina per regolare Soft 3 (FX Send / CC 91)">
-                <div class="chassis-knob-inner" style="width: 36px; height: 36px;">
-                  <div class="chassis-knob-top" style="width: 28px; height: 28px;">
-                    <div class="chassis-knob-indicator-container" id="frontKnobSoft3Ind" style="transform: rotate(-80deg);">
-                      <div class="chassis-knob-indicator" style="height: 9px; width: 2px;"></div>
+              <div class="chassis-knob-outer snow-front-knob" id="frontKnobValue2" data-val="64" style="width: 44px; height: 44px; cursor: grab;" title="Value 2 / Panorama (CC 10)">
+                <div class="chassis-knob-inner" style="width: 38px; height: 38px;">
+                  <div class="chassis-knob-top" style="width: 29px; height: 29px;">
+                    <div class="chassis-knob-indicator-container" id="frontKnobValue2Ind" style="transform: rotate(0deg);">
+                      <div class="chassis-knob-indicator" style="height: 9px; width: 2px; top: 1px;"></div>
                     </div>
                   </div>
                 </div>
               </div>
             </div>
-            <span class="chassis-knob-label" style="margin-top: 3px;">SOFT 3</span>
-            <span id="frontValSoft3" class="snow-front-val">20</span>
+            <span class="snow-knob-sub-label">PANORAMA</span>
+            <span id="frontValValue2" class="snow-front-val">C</span>
+          </div>
+
+          <!-- 4. VALUE 3 / ASSIGN -->
+          <div class="snow-knob-unit">
+            <span class="snow-knob-top-label">VALUE 3</span>
+            <div class="knob-tick-dial">
+              <div class="chassis-knob-outer snow-front-knob" id="frontKnobValue3" data-val="20" style="width: 44px; height: 44px; cursor: grab;" title="Value 3 / Parameter Assign (CC 91 / FX Send)">
+                <div class="chassis-knob-inner" style="width: 38px; height: 38px;">
+                  <div class="chassis-knob-top" style="width: 29px; height: 29px;">
+                    <div class="chassis-knob-indicator-container" id="frontKnobValue3Ind" style="transform: rotate(-80deg);">
+                      <div class="chassis-knob-indicator" style="height: 9px; width: 2px; top: 1px;"></div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <span class="snow-knob-sub-label">ASSIGN</span>
+            <span id="frontValValue3" class="snow-front-val">20</span>
           </div>
         </div>
       </div>
 
-      <!-- 3. RIGHT: FILTER & MATRIX NAVIGATION -->
-      <div class="snow-front-col snow-front-right">
-        <!-- Filter Knobs -->
-        <div style="display: flex; justify-content: space-around; align-items: flex-end; width: 100%;">
-          <!-- Hero CUTOFF Knob (Larger, more prominent) -->
-          <div class="chassis-knob-container">
-            <div class="knob-tick-dial">
-              <div class="chassis-knob-outer snow-front-knob" id="frontKnobCutoff" data-val="64" style="width: 58px; height: 58px; cursor: grab;" title="Trascina per regolare Cutoff Filtro 1 (CC 40)">
-                <div class="chassis-knob-inner" style="width: 50px; height: 50px;">
-                  <div class="chassis-knob-top" style="width: 38px; height: 38px;">
-                    <div class="chassis-knob-indicator-container" id="frontKnobCutoffInd" style="transform: rotate(0deg);">
-                      <div class="chassis-knob-indicator" style="height: 12px; width: 3px; top: 1px;"></div>
+      <!-- 3. COLONNA DESTRA: MATRICE TASTI CON LED + SEZIONE FILTRO -->
+      <div class="snow-front-col snow-col-right">
+        <!-- Matrice Pulsanti Hardware (19 pulsanti come il vero Snow) -->
+        <div class="snow-matrix-section">
+          <!-- Fila Superiore: 8 LED numerati 1-8 e serigrafia ROM -->
+          <div>
+            <div class="snow-matrix-header-row" style="font-size: 8px; font-weight: 800; color: #555;">
+              <div class="snow-led-row" style="flex: 1;">
+                <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span>
+              </div>
+              <span style="font-size: 8px; font-weight: 900; letter-spacing: 0.05em; color: #444; margin-left: 6px;">ROM</span>
+            </div>
+            <div class="snow-led-row">
+              <span class="snow-indicator-led" id="frontRomLed0"></span>
+              <span class="snow-indicator-led" id="frontRomLed1"></span>
+              <span class="snow-indicator-led" id="frontRomLed2"></span>
+              <span class="snow-indicator-led" id="frontRomLed3"></span>
+              <span class="snow-indicator-led" id="frontRomLed4"></span>
+              <span class="snow-indicator-led" id="frontRomLed5"></span>
+              <span class="snow-indicator-led" id="frontRomLed6"></span>
+              <span class="snow-indicator-led" id="frontRomLed7"></span>
+            </div>
+            <!-- 8 Tasti Fila Superiore -->
+            <div class="snow-btn-row-8">
+              <button class="snow-matrix-btn" id="frontBtnOsc1" title="Oscillatore 1">OSC 1</button>
+              <button class="snow-matrix-btn" id="frontBtnOsc2" title="Oscillatore 2">OSC 2</button>
+              <button class="snow-matrix-btn" id="frontBtnFilters" title="Filtri">FILTERS</button>
+              <button class="snow-matrix-btn" id="frontBtnMod" title="Matrice di Modulazione / LFO">MOD</button>
+              <button class="snow-matrix-btn" id="frontBtnEnv" title="Inviluppi">ENV</button>
+              <button class="snow-matrix-btn" id="frontBtnEffects" title="Effetti Delay, Reverb...">EFFECTS</button>
+              <button class="snow-matrix-btn" id="frontBtnArp" title="Arpeggiatore">ARP</button>
+              <button class="snow-matrix-btn" id="frontBtnCommon" title="Parametri Comuni">COMMON</button>
+            </div>
+          </div>
+
+          <!-- Seconda Fila: 8 LED numerati 1-8 e serigrafia RAM / PART (I LED 1-4 indicano quale parte del multi è attiva!) -->
+          <div style="margin-top: 4px;">
+            <div class="snow-matrix-header-row" style="font-size: 8px; font-weight: 800; color: #555;">
+              <div class="snow-led-row" style="flex: 1;">
+                <span>1</span><span>2</span><span>3</span><span>4</span><span>5</span><span>6</span><span>7</span><span>8</span>
+              </div>
+              <span style="font-size: 7.5px; font-weight: 900; letter-spacing: 0.05em; color: #444; margin-left: 6px;">RAM/PART</span>
+            </div>
+            <div class="snow-led-row">
+              <span class="snow-indicator-led active-amber" id="frontRamLed0" title="Part 1 LED"></span>
+              <span class="snow-indicator-led" id="frontRamLed1" title="Part 2 LED"></span>
+              <span class="snow-indicator-led" id="frontRamLed2" title="Part 3 LED"></span>
+              <span class="snow-indicator-led" id="frontRamLed3" title="Part 4 LED"></span>
+              <span class="snow-indicator-led" id="frontRamLed4"></span>
+              <span class="snow-indicator-led" id="frontRamLed5"></span>
+              <span class="snow-indicator-led" id="frontRamLed6"></span>
+              <span class="snow-indicator-led" id="frontRamLed7"></span>
+            </div>
+            <!-- 8 Tasti Seconda Fila -->
+            <div class="snow-btn-row-8">
+              <button class="snow-matrix-btn" id="frontBtnValMinus" title="Patch precedente (Value -)">VALUE -</button>
+              <button class="snow-matrix-btn" id="frontBtnValPlus" title="Patch successiva (Value +)">VALUE +</button>
+              <button class="snow-matrix-btn" id="frontBtnParamPrev" title="Parametro precedente">◄ PARAM</button>
+              <button class="snow-matrix-btn" id="frontBtnParamNext" title="Parametro successivo">PARAM ►</button>
+              <button class="snow-matrix-btn" id="frontBtnAudition" title="AUDITION: Tieni premuto o clicca per suonare la nota di prova!" style="font-weight: 900; color: #b75900; background: #fffaf0;">AUDITION 🎵</button>
+              <button class="snow-matrix-btn" id="frontBtnMulti" title="Vista Multi / Mixer">MULTI</button>
+              <button class="snow-matrix-btn" id="frontBtnConfig" title="Configurazione MIDI">CONFIG</button>
+              <button class="snow-matrix-btn" id="frontBtnStore" title="Salva suono (STORE)" style="color: #c53030;">STORE</button>
+            </div>
+          </div>
+
+          <!-- Terza Fila: 3 Tasti Larghi EDIT/SHIFT, PART, BANK/SEARCH -->
+          <div class="snow-bottom-3btns">
+            <button class="snow-wide-tactile-btn" id="frontBtnEditShift" title="Edit / Parametri synth">
+              <div style="display: flex; align-items: center; justify-content: center; gap: 4px;">
+                <span class="snow-indicator-led active-green" style="width: 5px; height: 5px;"></span>
+                <span>EDIT / SHIFT</span>
+              </div>
+            </button>
+            <button class="snow-wide-tactile-btn" id="frontBtnPartCycle" title="Cicla parte attiva (Part 1 -> 2 -> 3 -> 4)">
+              PART ⟳
+            </button>
+            <button class="snow-wide-tactile-btn" id="frontBtnBankSearch" title="Cerca suoni e banchi (Patch Manager)">
+              BANK / SEARCH 🔍
+            </button>
+          </div>
+        </div>
+
+        <!-- Sezione Sagomata FILTER con CUTOFF e RESONANCE con scala graduata 0..12 -->
+        <div class="snow-filter-module">
+          <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 4px;">
+            <span style="font-size: 9px; font-weight: 900; letter-spacing: 0.12em; color: #333; text-transform: uppercase;">FILTER</span>
+            <span style="font-size: 8px; font-weight: 700; color: #666; letter-spacing: 0.05em;">24dB / ANALOG</span>
+          </div>
+
+          <div class="snow-filter-knobs-row">
+            <!-- CUTOFF Knob con scala graduata 0..12 -->
+            <div class="snow-knob-unit">
+              <span class="snow-knob-top-label" style="font-size: 9.5px; font-weight: 900;">CUTOFF</span>
+              <div class="snow-filter-scale-box">
+                <div class="snow-filter-scale-marks"></div>
+                <div class="chassis-knob-outer snow-front-knob" id="frontKnobCutoff" data-val="64" style="width: 52px; height: 52px; cursor: grab;" title="Cutoff Filtro (CC 40)">
+                  <div class="chassis-knob-inner" style="width: 44px; height: 44px;">
+                    <div class="chassis-knob-top" style="width: 33px; height: 33px;">
+                      <div class="chassis-knob-indicator-container" id="frontKnobCutoffInd" style="transform: rotate(0deg);">
+                        <div class="chassis-knob-indicator" style="height: 10px; width: 2.5px; top: 1px;"></div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
+              <span class="snow-knob-sub-label">FILTER ENVELOPE</span>
+              <span id="frontValCutoff" class="snow-front-val">64</span>
             </div>
-            <span class="chassis-knob-label" style="font-size: 10px; font-weight: 900; margin-top: 4px; letter-spacing: 0.1em;">CUTOFF</span>
-            <span id="frontValCutoff" class="snow-front-val">64</span>
-          </div>
 
-          <!-- RESONANCE Knob -->
-          <div class="chassis-knob-container">
-            <div class="knob-tick-dial">
-              <div class="chassis-knob-outer snow-front-knob" id="frontKnobResonance" data-val="0" style="width: 44px; height: 44px; cursor: grab;" title="Trascina per regolare Risonanza Filtro 1 (CC 42)">
-                <div class="chassis-knob-inner" style="width: 38px; height: 38px;">
-                  <div class="chassis-knob-top" style="width: 30px; height: 30px;">
-                    <div class="chassis-knob-indicator-container" id="frontKnobResonanceInd" style="transform: rotate(-135deg);">
-                      <div class="chassis-knob-indicator" style="height: 9px; width: 2px; top: 2px;"></div>
+            <!-- RESONANCE Knob con scala graduata 0..12 -->
+            <div class="snow-knob-unit">
+              <span class="snow-knob-top-label" style="font-size: 9px; font-weight: 900;">RESONANCE</span>
+              <div class="snow-filter-scale-box">
+                <div class="snow-filter-scale-marks"></div>
+                <div class="chassis-knob-outer snow-front-knob" id="frontKnobResonance" data-val="0" style="width: 46px; height: 46px; cursor: grab;" title="Risonanza Filtro (CC 42)">
+                  <div class="chassis-knob-inner" style="width: 40px; height: 40px;">
+                    <div class="chassis-knob-top" style="width: 30px; height: 30px;">
+                      <div class="chassis-knob-indicator-container" id="frontKnobResonanceInd" style="transform: rotate(-135deg);">
+                        <div class="chassis-knob-indicator" style="height: 9px; width: 2px; top: 1px;"></div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
-            </div>
-            <span class="chassis-knob-label" style="font-size: 9px; font-weight: 800; margin-top: 4px;">RESONANCE</span>
-            <span id="frontValResonance" class="snow-front-val">0</span>
-          </div>
-        </div>
-
-        <!-- Part Navigation Box -->
-        <div class="snow-front-part-box">
-          <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 9.5px; font-weight: 900; letter-spacing: 0.12em; color: #333;">PART SELECT</span>
-            <div style="display: flex; gap: 4px;">
-              <button id="frontBtnPartPrev" class="snow-tactile-btn" style="padding: 3px 8px; font-size: 10px;" title="Parte precedente">◄</button>
-              <button id="frontBtnPartNext" class="snow-tactile-btn" style="padding: 3px 8px; font-size: 10px;" title="Parte successiva">►</button>
+              <span class="snow-knob-sub-label">AMP ENVELOPE</span>
+              <span id="frontValResonance" class="snow-front-val">0</span>
             </div>
           </div>
-          <!-- 4 Part Button/LEDs -->
-          <div class="snow-part-strip">
-            <button class="front-part-pill active" data-part="0" id="frontPartBtn0" title="Seleziona Parte 1">
-              <span class="front-part-led" id="frontPartLed0" style="background: #ff9900; box-shadow: 0 0 6px #ff9900;"></span>
-              <span>1</span>
-            </button>
-            <button class="front-part-pill" data-part="1" id="frontPartBtn1" title="Seleziona Parte 2">
-              <span class="front-part-led" id="frontPartLed1"></span>
-              <span>2</span>
-            </button>
-            <button class="front-part-pill" data-part="2" id="frontPartBtn2" title="Seleziona Parte 3">
-              <span class="front-part-led" id="frontPartLed2"></span>
-              <span>3</span>
-            </button>
-            <button class="front-part-pill" data-part="3" id="frontPartBtn3" title="Seleziona Parte 4">
-              <span class="front-part-led" id="frontPartLed3"></span>
-              <span>4</span>
-            </button>
-          </div>
-        </div>
-
-        <!-- Hardware Pushbuttons: MODE, EDIT, SEARCH, STORE -->
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 7px;">
-          <button id="frontBtnMode" class="snow-tactile-btn" style="display: flex; align-items: center; justify-content: center; gap: 5px;" title="Commuta modalità SINGLE / MULTI">
-            <span id="frontModeLed" style="width: 5px; height: 5px; border-radius: 50%; background: #48bb78; box-shadow: 0 0 4px #48bb78;"></span>
-            MODE
-          </button>
-          <button id="frontBtnEdit" class="snow-tactile-btn" title="Modifica tutti i parametri (vista Single)">
-            EDIT ⚙
-          </button>
-          <button id="frontBtnSearch" class="snow-tactile-btn" title="Cerca suoni nel Patch Manager">
-            SEARCH 🔍
-          </button>
-          <button id="frontBtnStore" class="snow-tactile-btn" style="color: #c53030;" title="Salva suono (STORE)">
-            STORE 💾
-          </button>
         </div>
       </div>
     </div>
@@ -2403,14 +2586,14 @@
       <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
         <span style="font-size: 10px; font-weight: 900; letter-spacing: 0.08em; color: #444;">BANCO / SUONO:</span>
         <select id="frontBankSelect" class="snow-select"></select>
-        <button id="frontPatchPrev" class="snow-tactile-btn" style="padding: 3px 8px; font-size: 10px;" title="Patch precedente">◀</button>
+        <button id="frontPatchPrev" class="snow-matrix-btn" style="padding: 4px 10px; font-size: 10px;" title="Patch precedente">◀</button>
         <select id="frontPatchSelect" class="snow-select" style="min-width: 220px; font-family: monospace; font-size: 11px;"></select>
-        <button id="frontPatchNext" class="snow-tactile-btn" style="padding: 3px 8px; font-size: 10px;" title="Patch successiva">▶</button>
+        <button id="frontPatchNext" class="snow-matrix-btn" style="padding: 4px 10px; font-size: 10px;" title="Patch successiva">▶</button>
       </div>
 
       <div style="display: flex; gap: 8px;">
-        <button id="frontBtnGoMulti" class="snow-tactile-btn" style="font-size: 10.5px; padding: 5px 12px; font-weight: bold;">🎛 MULTI MIXER (4 PARTI)</button>
-        <button id="frontBtnGoSingle" class="snow-tactile-btn" style="font-size: 10.5px; padding: 5px 12px; font-weight: bold;">🎚 SYNTH EDITOR (PARAMETRI)</button>
+        <button id="frontBtnGoMulti" class="snow-wide-tactile-btn" style="font-size: 10px; padding: 5px 12px; font-weight: bold;">🎛 MULTI MIXER (4 PARTI)</button>
+        <button id="frontBtnGoSingle" class="snow-wide-tactile-btn" style="font-size: 10px; padding: 5px 12px; font-weight: bold;">🎚 SYNTH EDITOR (PARAMETRI)</button>
       </div>
     </div>
 
@@ -6782,22 +6965,34 @@ function exportCurrentPatchSyx() {
 
   function updateVirusSnowFrontPanel(activePartIdx = 0) {
     const pIdx = Math.max(0, Math.min(NUM_PARTS - 1, activePartIdx));
+    currentPartIndex = pIdx;
+    window.activeSinglePartIndex = pIdx;
     const part = multiParts[pIdx];
     if (!part) return;
 
-    // Aggiorna i 4 tasti e LED delle Parti sul frontale (1..4)
-    for (let i = 0; i < 4; i++) {
-      const btn = document.getElementById('frontPartBtn' + i);
-      const led = document.getElementById('frontPartLed' + i);
-      if (btn) btn.classList.toggle('active', i === pIdx);
-      if (led) {
-        if (i === pIdx) {
-          led.style.background = '#ff9900';
-          led.style.boxShadow = '0 0 7px #ff9900';
+    // Aggiorna i LED RAM/PART della seconda fila (I LED 1-4 indicano quale parte è attiva)
+    for (let i = 0; i < 8; i++) {
+      const ramLed = document.getElementById('frontRamLed' + i);
+      if (ramLed) {
+        if (i < 4) {
+          if (i === pIdx) {
+            ramLed.className = 'snow-indicator-led active-amber';
+          } else {
+            ramLed.className = 'snow-indicator-led';
+          }
         } else {
-          led.style.background = '#444';
-          led.style.boxShadow = 'none';
+          ramLed.className = 'snow-indicator-led';
         }
+      }
+    }
+
+    // Aggiorna i LED ROM della prima fila
+    for (let i = 0; i < 8; i++) {
+      const romLed = document.getElementById('frontRomLed' + i);
+      if (romLed) {
+        const isRom = part.values.bank >= 4;
+        const romNum = part.values.bank - 4;
+        romLed.className = (isRom && romNum === i) ? 'snow-indicator-led active-amber' : 'snow-indicator-led';
       }
     }
 
@@ -6825,6 +7020,18 @@ function exportCurrentPatchSyx() {
       patchNameEl.textContent = name.toUpperCase();
     }
 
+    // Aggiorna parametri soft nel footer dell'LCD
+    const soft1El = document.getElementById('frontLcdSoft1');
+    const soft2El = document.getElementById('frontLcdSoft2');
+    const soft3El = document.getElementById('frontLcdSoft3');
+    if (soft1El) soft1El.textContent = `Transp: ${part.values.transpose || 0}`;
+    if (soft2El) {
+      const pan = (part.values.pan !== undefined) ? part.values.pan : 64;
+      const panTxt = pan === 64 ? 'C' : (pan < 64 ? `L${64 - pan}` : `R${pan - 64}`);
+      soft2El.textContent = `Pan: ${panTxt}`;
+    }
+    if (soft3El) soft3El.textContent = `Assign: ${part.values.fx_send ?? 20}`;
+
     // Sincronizza i selettori veloci banco e patch
     const bankSel = document.getElementById('frontBankSelect');
     const patchSel = document.getElementById('frontPatchSelect');
@@ -6847,11 +7054,24 @@ function exportCurrentPatchSyx() {
       patchSel.value = String(part.values.program);
     }
 
-    // Sincronizza i potenziometri Cutoff e Resonance del frontale
+    // Sincronizza le 4 manopole orizzontali del frontale
+    const volVal = (typeof part.values.volume !== 'undefined') ? part.values.volume : 100;
+    const transVal = (typeof part.values.transpose !== 'undefined') ? (part.values.transpose + 64) : 64;
+    const panVal = (typeof part.values.pan !== 'undefined') ? part.values.pan : 64;
+    const assignVal = (typeof part.values.fx_send !== 'undefined') ? part.values.fx_send : 20;
+
+    setFrontKnob('frontKnobVolume', 'frontKnobVolumeInd', 'frontValVolume', volVal);
+    setFrontKnob('frontKnobValue1', 'frontKnobValue1Ind', 'frontValValue1', transVal);
+    setFrontKnob('frontKnobValue2', 'frontKnobValue2Ind', 'frontValValue2', panVal);
+    setFrontKnob('frontKnobValue3', 'frontKnobValue3Ind', 'frontValValue3', assignVal);
+
+    // Sincronizza le 2 manopole del Filtro (Cutoff & Resonance)
     const cutVal = (typeof part.values.f1_cutoff !== 'undefined') ? part.values.f1_cutoff : (state.values.f1_cutoff ?? 64);
     const resVal = (typeof part.values.f1_resonance !== 'undefined') ? part.values.f1_resonance : (state.values.f1_resonance ?? 0);
     setFrontKnob('frontKnobCutoff', 'frontKnobCutoffInd', 'frontValCutoff', cutVal);
     setFrontKnob('frontKnobResonance', 'frontKnobResonanceInd', 'frontValResonance', resVal);
+
+    updateKeyboardPartDisplay();
   }
 
   function buildSnowFrontView() {
@@ -6876,6 +7096,7 @@ function exportCurrentPatchSyx() {
       if (frontPatchSel) frontPatchSel.value = String(newProg);
       const newName = getBankPatchName(part.values.bank, newProg);
       if (newName) part.name = newName;
+      updateVirusSnowFrontPanel(pIdx);
       updateVirusSnowMasterDisplay(pIdx);
       updatePartDropdownSelection(pIdx, part.values.bank, newProg);
       sendMultiPartParam(pIdx, 31, part.values.bank);
@@ -6899,6 +7120,7 @@ function exportCurrentPatchSyx() {
         }
         const newName = getBankPatchName(newBank, part.values.program);
         if (newName) part.name = newName;
+        updateVirusSnowFrontPanel(pIdx);
         updateVirusSnowMasterDisplay(pIdx);
         updatePartDropdownSelection(pIdx, newBank, part.values.program);
         sendMultiPartParam(pIdx, 33, part.values.program);
@@ -6930,49 +7152,136 @@ function exportCurrentPatchSyx() {
       applyFrontSoundChange((part.values.program + 1) % 128);
     });
 
-    // 2. Part Navigation (◄, ►, 1, 2, 3, 4)
-    document.getElementById('frontBtnPartPrev')?.addEventListener('click', () => {
-      currentPartIndex = (currentPartIndex - 1 + NUM_PARTS) % NUM_PARTS;
-      updateVirusSnowMasterDisplay(currentPartIndex);
-    });
+    // 2. Hardware Button: AUDITION 🎵 (Suona la nota di prova sul canale della parte attiva)
+    const btnAudition = document.getElementById('frontBtnAudition');
+    let isAuditioning = false;
 
-    document.getElementById('frontBtnPartNext')?.addEventListener('click', () => {
-      currentPartIndex = (currentPartIndex + 1) % NUM_PARTS;
-      updateVirusSnowMasterDisplay(currentPartIndex);
-    });
+    const startAuditionSound = () => {
+      if (isAuditioning) return;
+      isAuditioning = true;
+      if (btnAudition) btnAudition.classList.add('audition-active');
+      const pIdx = currentPartIndex || 0;
+      const part = multiParts[pIdx];
+      const ch = part ? (part.channel !== undefined ? part.channel : pIdx) : 0;
+      playNote(60, 100);
+      setLastAction(`♪ Audition P${pIdx + 1} (ch ${ch + 1})`);
+    };
 
-    for (let i = 0; i < NUM_PARTS; i++) {
-      document.getElementById('frontPartBtn' + i)?.addEventListener('click', () => {
-        currentPartIndex = i;
-        updateVirusSnowMasterDisplay(currentPartIndex);
+    const stopAuditionSound = () => {
+      if (!isAuditioning) return;
+      isAuditioning = false;
+      if (btnAudition) btnAudition.classList.remove('audition-active');
+      stopNote(60);
+    };
+
+    if (btnAudition) {
+      btnAudition.addEventListener('mousedown', (e) => {
+        e.preventDefault();
+        startAuditionSound();
+      });
+      window.addEventListener('mouseup', () => {
+        if (isAuditioning) stopAuditionSound();
+      });
+      btnAudition.addEventListener('touchstart', (e) => {
+        e.preventDefault();
+        startAuditionSound();
+      }, { passive: false });
+      btnAudition.addEventListener('touchend', (e) => {
+        e.preventDefault();
+        stopAuditionSound();
       });
     }
 
-    // 3. Hardware Pushbuttons: MODE, EDIT, SEARCH, STORE, GO TO MULTI, GO TO SINGLE
-    document.getElementById('frontBtnMode')?.addEventListener('click', () => {
+    // 3. Tasti di navigazione rapida patch: VALUE - e VALUE +
+    document.getElementById('frontBtnValMinus')?.addEventListener('click', () => {
+      const pIdx = currentPartIndex || 0;
+      const part = multiParts[pIdx];
+      if (!part) return;
+      applyFrontSoundChange((part.values.program - 1 + 128) % 128);
+    });
+
+    document.getElementById('frontBtnValPlus')?.addEventListener('click', () => {
+      const pIdx = currentPartIndex || 0;
+      const part = multiParts[pIdx];
+      if (!part) return;
+      applyFrontSoundChange((part.values.program + 1) % 128);
+    });
+
+    // 4. Tasto PART ⟳: Cicla tra le 4 parti del Multi
+    document.getElementById('frontBtnPartCycle')?.addEventListener('click', () => {
+      currentPartIndex = (currentPartIndex + 1) % NUM_PARTS;
+      updateVirusSnowFrontPanel(currentPartIndex);
+      updateVirusSnowMasterDisplay(currentPartIndex);
+      setLastAction(`Part Select: P${currentPartIndex + 1}`);
+    });
+
+    // 5. Tasto TAP TEMPO / PANIC (Sinistra)
+    let tapTimes = [];
+    document.getElementById('frontBtnTapPanic')?.addEventListener('click', () => {
+      // Panic immediato
+      if (selectedOutput) {
+        for (let ch = 0; ch < 16; ch++) {
+          try {
+            selectedOutput.send(new Uint8Array([0xB0 | ch, 120, 0])); // All Sound Off
+            selectedOutput.send(new Uint8Array([0xB0 | ch, 123, 0])); // All Notes Off
+          } catch(e) {}
+        }
+      }
+      activeNotes.clear();
+      activeAudioVoices.forEach((v, k) => stopWebAudioNote(k));
+      activeAudioVoices.clear();
+
+      // Tap Tempo calculation
+      const now = Date.now();
+      tapTimes.push(now);
+      if (tapTimes.length > 4) tapTimes.shift();
+      if (tapTimes.length >= 2) {
+        const diffs = [];
+        for (let i = 1; i < tapTimes.length; i++) diffs.push(tapTimes[i] - tapTimes[i - 1]);
+        const avg = diffs.reduce((a, b) => a + b, 0) / diffs.length;
+        const bpm = Math.round(60000 / avg);
+        if (bpm >= 40 && bpm <= 240) {
+          setLastAction(`Tap BPM: ${bpm}`);
+        }
+      } else {
+        setLastAction('PANIC: ALL SOUNDS OFF');
+      }
+    });
+
+    // 6. Tasto EXIT / MODE (Sinistra)
+    document.getElementById('frontBtnExitMode')?.addEventListener('click', () => {
       const modeBadge = document.getElementById('frontLcdModeBadge');
       const isMulti = modeBadge && modeBadge.textContent === 'MULTI';
       if (isMulti) {
         if (modeBadge) modeBadge.textContent = 'SINGLE';
-        const modeLed = document.getElementById('frontModeLed');
-        if (modeLed) { modeLed.style.background = '#e59500'; modeLed.style.boxShadow = '0 0 4px #e59500'; }
         setLastAction('Mode: SINGLE');
       } else {
         if (modeBadge) modeBadge.textContent = 'MULTI';
-        const modeLed = document.getElementById('frontModeLed');
-        if (modeLed) { modeLed.style.background = '#48bb78'; modeLed.style.boxShadow = '0 0 4px #48bb78'; }
         setLastAction('Mode: MULTI');
       }
     });
 
-    document.getElementById('frontBtnEdit')?.addEventListener('click', () => {
+    // 7. Tasti Matrice Fila Superiore (OSC 1, OSC 2, FILTERS, MOD, ENV, EFFECTS, ARP, COMMON)
+    const openSynthSection = (selector) => {
       document.getElementById('btnTabSynth')?.click();
-    });
+      setTimeout(() => {
+        const target = selector ? document.querySelector(selector) : null;
+        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }, 100);
+    };
 
-    document.getElementById('frontBtnSearch')?.addEventListener('click', () => {
-      document.getElementById('btnTabPatchManager')?.click();
-    });
+    document.getElementById('frontBtnOsc1')?.addEventListener('click', () => openSynthSection('#osc1_shape, .section-osc1'));
+    document.getElementById('frontBtnOsc2')?.addEventListener('click', () => openSynthSection('#osc2_shape, .section-osc2'));
+    document.getElementById('frontBtnFilters')?.addEventListener('click', () => openSynthSection('#f1_mode, .section-filter'));
+    document.getElementById('frontBtnMod')?.addEventListener('click', () => openSynthSection('.section-lfo, .section-mod'));
+    document.getElementById('frontBtnEnv')?.addEventListener('click', () => openSynthSection('.section-env'));
+    document.getElementById('frontBtnEffects')?.addEventListener('click', () => openSynthSection('.section-fx'));
+    document.getElementById('frontBtnArp')?.addEventListener('click', () => document.getElementById('btnTabArp')?.click());
+    document.getElementById('frontBtnCommon')?.addEventListener('click', () => openSynthSection('.section-common'));
 
+    // 8. Tasti Matrice Seconda & Terza Fila (MULTI, CONFIG, STORE, EDIT/SHIFT, BANK/SEARCH)
+    document.getElementById('frontBtnMulti')?.addEventListener('click', () => document.getElementById('btnTabMultipart')?.click());
+    document.getElementById('frontBtnConfig')?.addEventListener('click', () => document.getElementById('btnSettings')?.click());
     document.getElementById('frontBtnStore')?.addEventListener('click', () => {
       document.getElementById('btnTabPatchManager')?.click();
       setTimeout(() => {
@@ -6980,28 +7289,63 @@ function exportCurrentPatchSyx() {
         if (pInput) { pInput.focus(); pInput.select(); }
       }, 100);
     });
-
-    document.getElementById('frontBtnGoMulti')?.addEventListener('click', () => {
-      document.getElementById('btnTabMultipart')?.click();
+    document.getElementById('frontBtnEditShift')?.addEventListener('click', () => document.getElementById('btnTabSynth')?.click());
+    document.getElementById('frontBtnBankSearch')?.addEventListener('click', () => {
+      document.getElementById('btnTabPatchManager')?.click();
+      setTimeout(() => {
+        const sInput = document.getElementById('libSearchInput');
+        if (sInput) { sInput.focus(); sInput.select(); }
+      }, 100);
     });
 
-    document.getElementById('frontBtnGoSingle')?.addEventListener('click', () => {
-      document.getElementById('btnTabSynth')?.click();
-    });
+    document.getElementById('frontBtnGoMulti')?.addEventListener('click', () => document.getElementById('btnTabMultipart')?.click());
+    document.getElementById('frontBtnGoSingle')?.addEventListener('click', () => document.getElementById('btnTabSynth')?.click());
 
-    // 4. Knobs: Master Vol, Cutoff, Resonance, Soft 1, Soft 2, Soft 3
-    setupFrontKnob('frontKnobMasterVol', 'frontKnobMasterVolInd', 'frontValMasterVol', 100, (v) => {
+    // 9. Configurazione delle 4 Manopole Orizzontali Reali
+    setupFrontKnob('frontKnobVolume', 'frontKnobVolumeInd', 'frontValVolume', 100, (v) => {
       const part = multiParts[currentPartIndex || 0];
-      const ch = part ? part.channel : 1;
+      if (part) part.values.volume = v;
+      const ch = part ? (part.channel !== undefined ? part.channel : currentPartIndex) : 0;
       sendCC(ch, 7, v);
-      setLastAction(`Master Vol: ${v}`);
+      setLastAction(`P${(currentPartIndex || 0) + 1} Vol: ${v}`);
     });
 
+    setupFrontKnob('frontKnobValue1', 'frontKnobValue1Ind', 'frontValValue1', 64, (v) => {
+      const part = multiParts[currentPartIndex || 0];
+      const trans = v - 64;
+      if (part) part.values.transpose = trans;
+      const soft1El = document.getElementById('frontLcdSoft1');
+      if (soft1El) soft1El.textContent = `Transp: ${trans}`;
+      setLastAction(`P${(currentPartIndex || 0) + 1} Transpose: ${trans}`);
+    });
+
+    setupFrontKnob('frontKnobValue2', 'frontKnobValue2Ind', 'frontValValue2', 64, (v) => {
+      const part = multiParts[currentPartIndex || 0];
+      if (part) part.values.pan = v;
+      const ch = part ? (part.channel !== undefined ? part.channel : currentPartIndex) : 0;
+      sendCC(ch, 10, v);
+      const panTxt = v === 64 ? 'C' : (v < 64 ? `L${64 - v}` : `R${v - 64}`);
+      const soft2El = document.getElementById('frontLcdSoft2');
+      if (soft2El) soft2El.textContent = `Pan: ${panTxt}`;
+      setLastAction(`P${(currentPartIndex || 0) + 1} Pan: ${panTxt}`);
+    });
+
+    setupFrontKnob('frontKnobValue3', 'frontKnobValue3Ind', 'frontValValue3', 20, (v) => {
+      const part = multiParts[currentPartIndex || 0];
+      if (part) part.values.fx_send = v;
+      const ch = part ? (part.channel !== undefined ? part.channel : currentPartIndex) : 0;
+      sendCC(ch, 91, v);
+      const soft3El = document.getElementById('frontLcdSoft3');
+      if (soft3El) soft3El.textContent = `Assign: ${v}`;
+      setLastAction(`P${(currentPartIndex || 0) + 1} Assign: ${v}`);
+    });
+
+    // 10. Configurazione delle 2 Manopole del Filtro (CUTOFF & RESONANCE)
     setupFrontKnob('frontKnobCutoff', 'frontKnobCutoffInd', 'frontValCutoff', 64, (v) => {
       const part = multiParts[currentPartIndex || 0];
       if (part) part.values.f1_cutoff = v;
       state.values.f1_cutoff = v;
-      const ch = part ? part.channel : 1;
+      const ch = part ? (part.channel !== undefined ? part.channel : currentPartIndex) : 0;
       sendCC(ch, 40, v);
       const macroKnobs = window.macroRefs;
       if (macroKnobs && macroKnobs[0] && macroKnobs[0]._updateKnob) macroKnobs[0]._updateKnob(v);
@@ -7012,38 +7356,11 @@ function exportCurrentPatchSyx() {
       const part = multiParts[currentPartIndex || 0];
       if (part) part.values.f1_resonance = v;
       state.values.f1_resonance = v;
-      const ch = part ? part.channel : 1;
+      const ch = part ? (part.channel !== undefined ? part.channel : currentPartIndex) : 0;
       sendCC(ch, 42, v);
       const macroKnobs = window.macroRefs;
       if (macroKnobs && macroKnobs[1] && macroKnobs[1]._updateKnob) macroKnobs[1]._updateKnob(v);
       setLastAction(`Resonance: ${v}`);
-    });
-
-    setupFrontKnob('frontKnobSoft1', 'frontKnobSoft1Ind', 'frontValSoft1', 0, (v) => {
-      const part = multiParts[currentPartIndex || 0];
-      const ch = part ? part.channel : 1;
-      sendCC(ch, 1, v);
-      const softEl = document.getElementById('frontLcdSoft1');
-      if (softEl) softEl.textContent = `Mod: ${v}`;
-      setLastAction(`Soft 1 (Mod): ${v}`);
-    });
-
-    setupFrontKnob('frontKnobSoft2', 'frontKnobSoft2Ind', 'frontValSoft2', 64, (v) => {
-      const part = multiParts[currentPartIndex || 0];
-      const ch = part ? part.channel : 1;
-      sendCC(ch, 21, v);
-      const softEl = document.getElementById('frontLcdSoft2');
-      if (softEl) softEl.textContent = `Energy: ${v}`;
-      setLastAction(`Soft 2 (Energy): ${v}`);
-    });
-
-    setupFrontKnob('frontKnobSoft3', 'frontKnobSoft3Ind', 'frontValSoft3', 20, (v) => {
-      const part = multiParts[currentPartIndex || 0];
-      const ch = part ? part.channel : 1;
-      sendCC(ch, 91, v);
-      const softEl = document.getElementById('frontLcdSoft3');
-      if (softEl) softEl.textContent = `FX: ${v}`;
-      setLastAction(`Soft 3 (FX): ${v}`);
     });
 
     updateVirusSnowFrontPanel(currentPartIndex || 0);
@@ -7226,7 +7543,7 @@ function exportCurrentPatchSyx() {
       if (AudioContextClass) audioCtx = new AudioContextClass();
     }
     if (audioCtx && audioCtx.state === 'suspended') {
-      audioCtx.resume();
+      audioCtx.resume().catch(() => {});
     }
     return audioCtx;
   }
@@ -7235,6 +7552,9 @@ function exportCurrentPatchSyx() {
     if (!webAudioEnabled) return;
     const ctx = getAudioContext();
     if (!ctx) return;
+    if (ctx.state === 'suspended') {
+      ctx.resume().catch(() => {});
+    }
 
     if (activeAudioVoices.has(noteNumber)) {
       stopWebAudioNote(noteNumber);
@@ -7243,18 +7563,27 @@ function exportCurrentPatchSyx() {
     const freq = 440 * Math.pow(2, (noteNumber - 69) / 12);
     const now = ctx.currentTime;
 
+    const pIdx = (typeof currentPartIndex !== 'undefined') ? currentPartIndex : 0;
+    const curPart = (typeof multiParts !== 'undefined' && multiParts) ? multiParts[pIdx] : null;
+
     const gainNode = ctx.createGain();
-    const velScale = Math.max(0.1, velocity / 127);
+    const partVol = (curPart && curPart.values && curPart.values.volume !== undefined) ? (curPart.values.volume / 127) : 0.85;
+    const velScale = Math.max(0.12, velocity / 127) * partVol;
     gainNode.gain.setValueAtTime(0.0001, now);
-    gainNode.gain.linearRampToValueAtTime(0.18 * velScale, now + 0.012);
-    gainNode.gain.exponentialRampToValueAtTime(0.11 * velScale, now + 0.25);
+    gainNode.gain.linearRampToValueAtTime(0.24 * velScale, now + 0.012);
+    gainNode.gain.exponentialRampToValueAtTime(0.15 * velScale, now + 0.28);
 
     const filter = ctx.createBiquadFilter();
     filter.type = 'lowpass';
-    const rawCutoff = (typeof patch !== 'undefined' && patch && patch.f1_cutoff !== undefined) ? patch.f1_cutoff : 80;
-    const cutoffHz = Math.min(18000, 220 + Math.pow(rawCutoff / 127, 2.2) * 12000);
+    const rawCutoff = (curPart && curPart.values && curPart.values.f1_cutoff !== undefined)
+      ? curPart.values.f1_cutoff
+      : (state.values.f1_cutoff ?? 72);
+    const cutoffHz = Math.min(18000, 160 + Math.pow(rawCutoff / 127, 2.2) * 14000);
     filter.frequency.setValueAtTime(cutoffHz, now);
-    filter.Q.setValueAtTime(2.2, now);
+    const rawRes = (curPart && curPart.values && curPart.values.f1_resonance !== undefined)
+      ? curPart.values.f1_resonance
+      : (state.values.f1_resonance ?? 0);
+    filter.Q.setValueAtTime(1.5 + (rawRes / 127) * 7.5, now);
 
     const osc1 = ctx.createOscillator();
     osc1.type = 'sawtooth';
@@ -7297,8 +7626,11 @@ function exportCurrentPatchSyx() {
   }
 
   function getActiveMidiChannel() {
-    if (typeof multiParts !== 'undefined' && multiParts && multiParts[window.activeSinglePartIndex]) {
-      return multiParts[window.activeSinglePartIndex].values.channel & 0x0F;
+    const pIdx = (typeof currentPartIndex !== 'undefined')
+      ? currentPartIndex
+      : ((typeof window.activeSinglePartIndex !== 'undefined') ? window.activeSinglePartIndex : 0);
+    if (typeof multiParts !== 'undefined' && multiParts && multiParts[pIdx] && multiParts[pIdx].values) {
+      return multiParts[pIdx].values.channel & 0x0F;
     }
     const chEl = document.getElementById('midiChannel');
     return chEl ? (parseInt(chEl.value, 10) - 1) & 0x0F : 0;
@@ -7502,9 +7834,7 @@ function exportCurrentPatchSyx() {
   window.addEventListener('keydown', (e) => {
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) return;
     if (e.repeat) return;
-    // Se la tastiera è esclusa/nascosta, non suonare note via tastiera mac
-    const kbdDock = document.getElementById('virtualKeyboardDock');
-    if (!kbdDock || kbdDock.style.display === 'none') return;
+    getAudioContext(); // Attiva AudioContext al primo tocco
 
     if (e.code === 'KeyZ') {
       changeOctave(-1);
@@ -7532,8 +7862,6 @@ function exportCurrentPatchSyx() {
 
   window.addEventListener('keyup', (e) => {
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) return;
-    const kbdDock = document.getElementById('virtualKeyboardDock');
-    if (!kbdDock || kbdDock.style.display === 'none') return;
 
     if (PC_KEY_MAP[e.code] !== undefined) {
       const semitone = PC_KEY_MAP[e.code];
