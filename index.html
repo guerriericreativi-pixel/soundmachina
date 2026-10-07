@@ -1643,6 +1643,12 @@
     <div class="chassis-logo">VIRUS-H PATCH</div>
     <div style="z-index: 1; width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 40px; padding: 0 40px;">
       <div class="section section-lib" style="width: 100%; max-width: 800px; background: rgba(10,10,12,0.85); border: 1px solid var(--border); border-radius: 6px; padding: 24px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.05); color: #fff;">
+  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px;">
+    <h2 style="color: var(--accent); font-family: monospace; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin: 0;">suoni attivi nel multi (p1 - p4)</h2>
+    <button id="btnSyncMultiParts" class="chassis-page-btn" style="color: #fff; font-size: 11px; padding: 4px 10px;">leggi parti dal synth</button>
+  </div>
+  <div id="multiPartsOverview" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-bottom: 28px;"></div>
+
   <h2 style="color: var(--accent); font-family: monospace; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px;">patch library</h2>
   <div class="lib-row">
     <input type="text" id="patchName" placeholder="patch name" style="color: #fff; border-bottom: 1px solid var(--accent); padding: 6px 4px; font-family: monospace;">
@@ -1722,6 +1728,7 @@
     </div>
     <button id="btnMultiLoad">load</button>
     <button id="btnMultiSave">save</button>
+    <button id="btnSyncMultiInView" class="chassis-page-btn" style="color: #fff; margin-left: 8px;">sincronizza parti (P1-P4)</button>
   </div>
 
       <div class="part-list" id="partList" style="width: 100%; max-width: 1000px; background: rgba(0,0,0,0.4); border: 1px solid #111; border-radius: 6px; padding: 20px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.05);"></div>
@@ -1765,6 +1772,7 @@
     const v = document.getElementById('patchManagerContent');
     v.style.display = 'block';
     document.getElementById('btnTabPatchManager').classList.add('active');
+    if (typeof renderMultiPartsOverview === 'function') renderMultiPartsOverview();
     updateControlRoomStatus();
   });
 
@@ -1917,7 +1925,13 @@
     { id:'output',    name:'Output',       short:'out',  cc:41,  kind:'output',  default:0 },
   ];
 
-  const BANK_NAMES = ['a', 'b', 'c', 'd'];
+  const BANK_NAMES = [
+    'RAM-A', 'RAM-B', 'RAM-C', 'RAM-D',
+    'ROM-A', 'ROM-B', 'ROM-C', 'ROM-D', 'ROM-E', 'ROM-F', 'ROM-G', 'ROM-H',
+    'ROM-I', 'ROM-J', 'ROM-K', 'ROM-L', 'ROM-M', 'ROM-N', 'ROM-O', 'ROM-P',
+    'ROM-Q', 'ROM-R', 'ROM-S', 'ROM-T', 'ROM-U', 'ROM-V', 'ROM-W', 'ROM-X',
+    'ROM-Y', 'ROM-Z'
+  ];
   const OUTPUT_NAMES = ['out1 l', 'out1 l+r', 'out1 r', 'out2 l', 'out2 l+r', 'out2 r'];
   const NOTE_NAMES = ['c', 'c#', 'd', 'd#', 'e', 'f', 'f#', 'g', 'g#', 'a', 'a#', 'b'];
 
@@ -1988,7 +2002,7 @@
   for (let i = 0; i < NUM_PARTS; i++){
     const values = {};
     PART_PARAMS.forEach(pp => { values[pp.id] = pp.default; });
-    values.channel = String(i + 1); // Default MIDI channels 1, 2, 3, 4
+    values.channel = i; // Default MIDI channels: P1=ch1, P2=ch2, P3=ch3, P4=ch4 (0-indexed)
     const sound = {};
     PARAMS.forEach(p => { sound[p.id] = p.default; });
     multiParts.push({ enabled: true, name: 'init', values, sound });
@@ -2435,7 +2449,27 @@
           continue;
         }
 
-        // Caso 3: Ricezione Singola Patch (Editor o Librarian)
+        // Caso 3: Ricezione Dump per una specifica Parte Multi (Part 0..3)
+        if (msgBytes[7] === 0x00 && msgBytes[8] >= 0 && msgBytes[8] <= 3) {
+          const pIdx = msgBytes[8];
+          multiParts[pIdx].name = patchName;
+          multiParts[pIdx].dump = Array.from(msgBytes);
+          if (msgBytes.length > 50) {
+            multiParts[pIdx].sound['f1_cutoff'] = msgBytes[49];
+            multiParts[pIdx].sound['f1_resonance'] = msgBytes[50];
+          }
+          if (partDisplays[pIdx] && partDisplays[pIdx]._startReveal) {
+            partDisplays[pIdx]._startReveal();
+          }
+          if (typeof renderMultiPartsOverview === 'function') {
+            renderMultiPartsOverview();
+          }
+          document.getElementById('midi-debug').innerHTML = `<span style="color:#0f0;">🔊 P${pIdx + 1}: Letto dal synth <b>${escapeHtml(patchName)}</b></span>`;
+          setLastAction('read P' + (pIdx + 1) + ': ' + patchName);
+          continue;
+        }
+
+        // Caso 4: Ricezione Singola Patch (Editor o Librarian)
         window.lastReceivedDump = new Uint8Array(msgBytes);
         applyDumpToActivePatch(msgBytes);
 
@@ -3875,6 +3909,97 @@ let hwEncoders = [];
     } catch (e) { console.error('Dump request error', e); }
   }
 
+  function requestPartDump(partIndex) {
+    if (!selectedOutput) {
+      setLastAction('connect midi output first');
+      return;
+    }
+    try {
+      // 0x30 = Single Dump Request: F0 00 20 33 01 <deviceId> 30 00 <partIndex 0..3> F7
+      const bytes = new Uint8Array([
+        ...SYSEX_PREFIX, deviceId(), 0x30, 0x00, partIndex & 0x0F, 0xF7
+      ]);
+      selectedOutput.send(bytes);
+      recordMidiTx('request P' + (partIndex + 1) + ' dump', bytes);
+      document.getElementById('midi-debug').textContent = `🔥 Richiesta suono P${partIndex + 1}...`;
+    } catch (e) { console.error('requestPartDump error', e); }
+  }
+
+  function syncAllMultiParts() {
+    if (!selectedOutput) {
+      alert('MIDI Output non connesso!');
+      return;
+    }
+    document.getElementById('midi-debug').textContent = '🔥 LETTURA PARTI MULTI DAL SYNTH (P1-P4)...';
+    for (let i = 0; i < NUM_PARTS; i++) {
+      setTimeout(() => {
+        requestPartDump(i);
+      }, i * 150);
+    }
+  }
+
+  function renderMultiPartsOverview() {
+    const container = document.getElementById('multiPartsOverview');
+    if (!container) return;
+    container.innerHTML = '';
+
+    for (let i = 0; i < NUM_PARTS; i++) {
+      const part = multiParts[i];
+      const card = document.createElement('div');
+      card.style.cssText = 'background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; font-family: monospace; transition: border-color 0.2s;';
+      card.onmouseenter = () => card.style.borderColor = 'var(--accent)';
+      card.onmouseleave = () => card.style.borderColor = 'rgba(255,255,255,0.1)';
+
+      const topRow = document.createElement('div');
+      topRow.style.cssText = 'display: flex; justify-content: space-between; align-items: center;';
+
+      const badge = document.createElement('span');
+      badge.style.cssText = 'font-weight: 700; color: var(--accent); font-size: 12px;';
+      badge.textContent = `P${i + 1}`;
+
+      const chLabel = document.createElement('span');
+      chLabel.style.cssText = 'color: #888; font-size: 11px;';
+      chLabel.textContent = `ch ${part.values.channel + 1}`;
+
+      topRow.appendChild(badge);
+      topRow.appendChild(chLabel);
+
+      const nameEl = document.createElement('div');
+      nameEl.style.cssText = 'color: #fff; font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 4px 0;';
+      nameEl.textContent = (part.name || 'INIT').toUpperCase();
+      nameEl.title = part.name || 'INIT';
+
+      const btnRow = document.createElement('div');
+      btnRow.style.cssText = 'display: flex; gap: 6px; margin-top: 4px;';
+
+      const btnRead = document.createElement('button');
+      btnRead.className = 'chassis-page-btn';
+      btnRead.style.cssText = 'font-size: 10px; padding: 3px 6px; flex: 1;';
+      btnRead.textContent = 'leggi';
+      btnRead.title = `Leggi il suono di P${i + 1} dal synth`;
+      btnRead.addEventListener('click', () => {
+        requestPartDump(i);
+      });
+
+      const btnEdit = document.createElement('button');
+      btnEdit.className = 'chassis-page-btn';
+      btnEdit.style.cssText = 'font-size: 10px; padding: 3px 6px; flex: 1;';
+      btnEdit.textContent = 'modifica';
+      btnEdit.title = `Apri P${i + 1} nella vista Multi`;
+      btnEdit.addEventListener('click', () => {
+        document.getElementById('btnTabMultipart').click();
+      });
+
+      btnRow.appendChild(btnRead);
+      btnRow.appendChild(btnEdit);
+
+      card.appendChild(topRow);
+      card.appendChild(nameEl);
+      card.appendChild(btnRow);
+      container.appendChild(card);
+    }
+  }
+
   function finishMultiFetch() {
     const lib = loadMultiLibrary();
     const preset = {
@@ -4011,6 +4136,9 @@ let hwEncoders = [];
       multiParts[partIndex].name = patchName;
       if (partDisplays[partIndex] && partDisplays[partIndex]._startReveal) {
         partDisplays[partIndex]._startReveal();
+      }
+      if (typeof renderMultiPartsOverview === 'function') {
+        renderMultiPartsOverview();
       }
 
       document.getElementById('midi-debug').innerHTML = `<span style="color:#0f0;">🔊 P${partIndex + 1}: Caricato <b>${escapeHtml(patchName)}</b></span>`;
@@ -4345,10 +4473,16 @@ let hwEncoders = [];
     }, 3000);
 
     wrap.addEventListener('click', () => {
-      const name = prompt('Part name', multiParts[index].name || 'init');
+      requestPartDump(index);
+    });
+
+    wrap.addEventListener('dblclick', (e) => {
+      e.stopPropagation();
+      const name = prompt('Nome parte:', multiParts[index].name || 'init');
       if (name !== null && name.trim() !== ''){
         multiParts[index].name = name.trim().slice(0, 16);
         startReveal();
+        if (typeof renderMultiPartsOverview === 'function') renderMultiPartsOverview();
       }
     });
 
@@ -4393,12 +4527,23 @@ let hwEncoders = [];
     });
     main.appendChild(enableBtn);
 
+    const readBtn = document.createElement('button');
+    readBtn.className = 'part-enable';
+    readBtn.style.cssText = 'padding: 4px 8px; font-size: 11px; margin-right: 4px; border: 1px solid var(--accent); background: rgba(0,0,0,0.6); color: var(--accent); cursor: pointer;';
+    readBtn.textContent = 'leggi';
+    readBtn.title = `Leggi il suono di P${index + 1} direttamente dal synth`;
+    readBtn.addEventListener('click', () => {
+      requestPartDump(index);
+    });
+    main.appendChild(readBtn);
+
     // MIDI channel
     const channels = [];
     for (let c = 1; c <= 16; c++) channels.push(String(c));
     main.appendChild(createSelectField('ch', channels, part.values.channel, (v) => {
       part.values.channel = v;
       sendMultiPartParam(index, 34, v);
+      if (typeof renderMultiPartsOverview === 'function') renderMultiPartsOverview();
     }));
 
     // volume knob
@@ -4410,6 +4555,8 @@ let hwEncoders = [];
     main.appendChild(createSelectField('bank', BANK_NAMES, part.values.bank, (v) => {
       part.values.bank = v;
       sendMultiPartParam(index, 31, v);
+      clearTimeout(part._dumpTimer);
+      part._dumpTimer = setTimeout(() => requestPartDump(index), 150);
     }));
 
     // program change number input
@@ -4427,6 +4574,8 @@ let hwEncoders = [];
       progInput.value = String(v);
       part.values.program = v;
       sendMultiPartParam(index, 33, v);
+      clearTimeout(part._dumpTimer);
+      part._dumpTimer = setTimeout(() => requestPartDump(index), 150);
     });
     progField.appendChild(progLabel);
     progField.appendChild(progInput);
@@ -4657,6 +4806,9 @@ let hwEncoders = [];
   document.getElementById('btnFetchBank').addEventListener('click', () => {
     startBankOperation('capture');
   });
+
+  document.getElementById('btnSyncMultiInView')?.addEventListener('click', syncAllMultiParts);
+  document.getElementById('btnSyncMultiParts')?.addEventListener('click', syncAllMultiParts);
 
   function buildArpView() {
     const root = document.getElementById('arpContent');
@@ -5389,6 +5541,7 @@ let hwEncoders = [];
 
   renderLibrary();
   renderMultiLibrary();
+  renderMultiPartsOverview();
 
   buildSingleView();
 
