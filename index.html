@@ -529,22 +529,29 @@
     overflow-y: auto;
   }
   .part-row{
-    border: 1px solid var(--border);
-    background: #141418;
-    border-left-width: 5px;
+    border: 1px solid #c0c3c9;
+    background: linear-gradient(180deg, #fbfcfd 0%, #eceef2 100%);
+    border-left-width: 6px;
     border-left-style: solid;
-    padding: 10px 16px;
+    padding: 12px 18px;
     border-radius: 6px;
-    box-shadow: 0 3px 12px rgba(0,0,0,0.35);
+    box-shadow: 0 4px 14px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.9);
     transition: opacity 200ms ease, background-color 200ms ease, border-color 200ms ease;
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    gap: 12px;
+    gap: 16px;
     flex: 0 0 auto;
     box-sizing: border-box;
     flex-wrap: wrap;
+    color: #222;
+  }
+  html[data-skin="elektron"] .part-row{
+    border-color: #333338;
+    background: #18181c;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
+    color: #eee;
   }
   .part-row.disabled{
     opacity: 0.45;
@@ -1419,44 +1426,61 @@
 
   /* CHASSIS */
 
-  /* CHASSIS */
+  /* CHASSIS - Authentic Access Virus TI Snow Hardware Finish */
   .hardware-chassis {
-    background: linear-gradient(135deg, #383838 0%, #2a2a2a 100%);
+    background: linear-gradient(175deg, #f7f8fa 0%, #e9ebef 55%, #dde0e6 100%);
     border-radius: 8px;
-    padding: 60px 40px 40px 40px; /* Più spazio in alto per i loghi */
-    border: 1px solid #1a1a1a;
+    padding: 50px 36px 36px 36px;
+    border: 1px solid #c2c5cb;
     box-shadow:
-      inset 0 2px 0 rgba(255,255,255,0.1),
-      inset 0 -2px 0 rgba(0,0,0,0.5),
-      0 15px 40px rgba(0,0,0,0.6);
-    display: flex; flex-direction: column; gap: 40px; align-items: center;
-    max-width: 1200px; margin: 32px auto 24px auto; width: 95%;
+      inset 0 1px 0 rgba(255,255,255,0.9),
+      inset 0 -2px 0 rgba(0,0,0,0.12),
+      0 14px 40px rgba(0,0,0,0.18),
+      -10px 0 0 #c8955d, 10px 0 0 #c8955d; /* Fianchetti in legno Virus TI */
+    display: flex; flex-direction: column; gap: 20px; align-items: center;
+    max-width: 1200px; margin: 24px auto; width: 96%;
     position: relative;
     overflow: hidden;
+    color: #222;
   }
 
   html[data-skin="elektron"] .hardware-chassis {
     background: linear-gradient(135deg, #252528 0%, #1a1a1c 100%);
+    border: 1px solid #1a1a1a;
+    box-shadow:
+      inset 0 2px 0 rgba(255,255,255,0.1),
+      inset 0 -2px 0 rgba(0,0,0,0.5),
+      0 15px 40px rgba(0,0,0,0.6),
+      -10px 0 0 #4a3018, 10px 0 0 #4a3018;
+    color: #eee;
   }
 
   .chassis-screw {
     position: absolute;
-    width: 12px; height: 12px;
-    background: #444;
+    width: 13px; height: 13px;
+    background: radial-gradient(circle at 35% 35%, #d8dadf 0%, #8c9098 100%);
     border-radius: 50%;
-    box-shadow: inset 0 1px 2px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.1);
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.9), 0 1px 3px rgba(0,0,0,0.3);
+    border: 1px solid #666a72;
+    z-index: 5;
   }
   .chassis-screw::after {
     content: '';
     position: absolute;
-    top: 50%; left: 10%; width: 80%; height: 2px;
-    background: rgba(0,0,0,0.6);
-    transform: translateY(-50%) rotate(45deg);
+    top: 50%; left: 50%; width: 5px; height: 5px;
+    background: #33363c;
+    transform: translate(-50%, -50%);
+    clip-path: polygon(50% 0%, 100% 25%, 100% 75%, 50% 100%, 0% 75%, 0% 25%);
   }
   .screw-tl { top: 15px; left: 15px; }
   .screw-tr { top: 15px; right: 15px; }
   .screw-bl { bottom: 15px; left: 15px; }
   .screw-br { bottom: 15px; right: 15px; }
+
+  html[data-skin="elektron"] .chassis-screw {
+    background: #444;
+    border-color: #222;
+  }
 
   .chassis-screen-recess {
     background: #000;
@@ -1469,24 +1493,28 @@
   .chassis-wood-strip {
     position: absolute;
     bottom: 0; left: 0; right: 0;
-    height: 18px;
+    height: 16px;
+    background: linear-gradient(to right, #b4804a, #d4a373, #b4804a);
+    border-top: 1px solid #8f5f2e;
+    box-shadow: inset 0 1px 2px rgba(255,255,255,0.2);
+  }
+  html[data-skin="elektron"] .chassis-wood-strip {
     background: linear-gradient(to right, #4a3018, #6b4423, #4a3018);
     border-top: 1px solid #2a1b0d;
-    box-shadow: inset 0 2px 4px rgba(255,255,255,0.1);
   }
 
   .chassis-knob-container {
-    display: flex; flex-direction: column; align-items: center; gap: 8px;
+    display: flex; flex-direction: column; align-items: center; gap: 6px;
   }
 
   .chassis-knob-outer {
     position: relative;
-    width: 50px; height: 50px;
+    width: 46px; height: 46px;
     border-radius: 50%;
-    background: #2a2a2a;
+    background: linear-gradient(145deg, #a4a7ad 0%, #767980 100%);
     box-shadow:
-      0 5px 10px rgba(0,0,0,0.5),
-      inset 0 1px 1px rgba(255,255,255,0.1);
+      0 4px 8px rgba(0,0,0,0.25),
+      inset 0 1px 1px rgba(255,255,255,0.5);
     display: flex; align-items: center; justify-content: center;
     cursor: pointer;
     touch-action: none;
@@ -1502,19 +1530,19 @@
 
   .chassis-knob-inner {
     position: relative;
-    width: 44px; height: 44px;
+    width: 40px; height: 40px;
     border-radius: 50%;
-    background: repeating-conic-gradient(#555 0% 2%, #444 2% 4%);
-    box-shadow: inset 0 0 10px rgba(0,0,0,0.5), 0 2px 4px rgba(0,0,0,0.5);
+    background: repeating-conic-gradient(#8f9298 0% 2.5%, #767980 2.5% 5%);
+    box-shadow: inset 0 0 4px rgba(0,0,0,0.4), 0 2px 4px rgba(0,0,0,0.25);
     z-index: 1;
     display: flex; align-items: center; justify-content: center;
   }
 
   .chassis-knob-top {
-    width: 34px; height: 34px;
+    width: 30px; height: 30px;
     border-radius: 50%;
-    background: radial-gradient(circle at 30% 30%, #666 0%, #333 100%);
-    box-shadow: inset 0 1px 1px rgba(255,255,255,0.3);
+    background: radial-gradient(circle at 35% 35%, #9da0a7 0%, #6e7178 100%);
+    box-shadow: inset 0 1px 2px rgba(255,255,255,0.6);
     position: relative;
   }
 
@@ -1527,43 +1555,74 @@
 
   .chassis-knob-indicator {
     position: absolute;
-    top: 4px; left: 50%;
-    width: 4px; height: 4px;
-    background: var(--accent);
-    border-radius: 50%;
+    top: 2px; left: 50%;
+    width: 2.5px; height: 9px;
+    background: #ffffff;
+    border-radius: 1px;
     transform: translateX(-50%);
-    box-shadow: 0 0 6px var(--accent);
+    box-shadow: 0 0 2px rgba(0,0,0,0.6);
   }
 
   .chassis-knob-label {
-    font-size: 10px;
+    font-size: 9px;
     font-weight: 700;
-    letter-spacing: 0.1em;
-    color: #999;
+    letter-spacing: 0.08em;
+    color: #444;
     text-transform: uppercase;
+    font-family: var(--font-ui);
+  }
+
+  html[data-skin="elektron"] .chassis-knob-outer {
+    background: #2a2a2a;
+    box-shadow: 0 5px 10px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,255,255,0.1);
+  }
+  html[data-skin="elektron"] .chassis-knob-inner {
+    background: repeating-conic-gradient(#555 0% 2%, #444 2% 4%);
+  }
+  html[data-skin="elektron"] .chassis-knob-top {
+    background: radial-gradient(circle at 30% 30%, #666 0%, #333 100%);
+  }
+  html[data-skin="elektron"] .chassis-knob-label {
+    color: #999;
   }
 
   .chassis-page-btn {
-    background: linear-gradient(to bottom, #333, #222);
-    border: 1px solid #111;
+    background: linear-gradient(to bottom, #f2f3f6, #dcdfe4);
+    border: 1px solid #b2b5bc;
     border-radius: 4px;
-    color: #aaa;
+    color: #222;
     font-family: var(--font-ui);
     font-size: 11px;
-    font-weight: 600;
-    padding: 6px 12px;
+    font-weight: 700;
+    padding: 5px 12px;
     cursor: pointer;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.8);
     transition: all 0.1s;
   }
 
   .chassis-page-btn:active {
-    background: #1a1a1a;
-    box-shadow: inset 0 2px 4px rgba(0,0,0,0.6);
+    background: #c8cbd2;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.25);
     transform: translateY(1px);
   }
 
   .chassis-page-btn.active {
+    color: #000;
+    background: var(--accent);
+    border-color: var(--accent);
+    box-shadow: 0 0 8px var(--accent), inset 0 1px 0 rgba(255,255,255,0.5);
+  }
+
+  html[data-skin="elektron"] .chassis-page-btn {
+    background: linear-gradient(to bottom, #333, #222);
+    border: 1px solid #111;
+    color: #aaa;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.1);
+  }
+  html[data-skin="elektron"] .chassis-page-btn:active {
+    background: #1a1a1a;
+  }
+  html[data-skin="elektron"] .chassis-page-btn.active {
     color: #fff;
     background: #2a2a2a;
     border-color: var(--accent);
@@ -1572,12 +1631,16 @@
 
   .chassis-logo {
     position: absolute;
-    top: 20px; left: 40px;
+    top: 16px; left: 36px;
     font-family: 'Inter', sans-serif;
     font-weight: 800;
-    font-size: 24px;
-    color: rgba(255,255,255,0.8);
-    letter-spacing: 0.2em;
+    font-size: 20px;
+    color: #222;
+    letter-spacing: 0.15em;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.8);
+  }
+  html[data-skin="elektron"] .chassis-logo {
+    color: rgba(255,255,255,0.85);
     text-shadow: 0 1px 2px rgba(0,0,0,0.8);
   }
 
@@ -1804,29 +1867,84 @@
     <div class="chassis-screw screw-tr"></div>
     <div class="chassis-screw screw-bl"></div>
     <div class="chassis-screw screw-br"></div>
-    <div class="chassis-logo">VIRUS-H MULTI</div>
-    <div style="z-index: 1; width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 25px; padding: 0 20px;">
-      <!-- Barra comandi MULTI essenziale e pulita -->
-      <div style="width: 100%; max-width: 1050px; background: rgba(0,0,0,0.5); border: 1px solid var(--border); border-radius: 6px; padding: 10px 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; font-family: monospace;">
-        <div style="display: flex; align-items: center; gap: 10px;">
-          <span style="color: var(--accent); font-weight: 800; font-size: 13px; letter-spacing: 0.05em;">🎛️ MULTI (4 PARTI)</span>
-          <span style="font-size: 11px; color: #888;">— Scegli banco e suono reale da tendina per ogni parte</span>
-        </div>
-        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
-          <div style="display: flex; align-items: center; gap: 6px;">
-            <span style="font-size: 11px; color: #aaa;">BANCO:</span>
-            <select id="quickBankScanSelect" style="padding: 4px 8px; font-size: 11px; font-weight: bold; background: #18181e; color: #fff; border: 1px solid var(--border); border-radius: 3px; cursor: pointer;"></select>
-            <button id="btnQuickScanBank" class="chassis-page-btn" style="color: var(--accent); border-color: var(--accent); font-weight: bold; padding: 4px 10px; font-size: 11px;" title="Interroga il Virus via SysEx per leggere e memorizzare tutti i 128 nomi di questo banco">📥 SCANSIONA 128 NOMI</button>
-            <button id="btnScanAllRam" class="chassis-page-btn" style="color: #61afef; border-color: #61afef; font-weight: bold; padding: 4px 10px; font-size: 11px;" title="Scansiona in sequenza tutti i banchi RAM (A, B, C, D) memorizzando 512 patch">⚡ SCANSIONA RAM A-D</button>
-            <button id="btnOpenBankNamesModal" class="chassis-page-btn" style="padding: 4px 10px; font-size: 11px;" title="Visualizza, copia o incolla l'elenco dei 128 nomi per questo banco">📋 ELENCO NOMI</button>
-            <span id="quickScanStatus" style="font-size: 11px; color: #aaa;"></span>
+    <div class="chassis-logo">VIRUS | TI SNOW <span style="font-size: 12px; font-weight: 400; opacity: 0.6; letter-spacing: 0.05em; margin-left: 8px;">MULTI MODE</span></div>
+    <div class="chassis-access-logo" style="position: absolute; top: 16px; right: 36px; font-weight: 800; font-size: 16px; letter-spacing: 0.1em; color: #444; display: flex; align-items: center; gap: 6px; font-family: 'Inter', sans-serif;">
+      <span style="font-size: 18px; color: #333;">❖</span> access
+    </div>
+
+    <div style="z-index: 1; width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 15px; padding: 0 10px; gap: 16px;">
+      <!-- Master Access Virus TI Snow LCD Display Unit (come da foto hardware) -->
+      <div class="virus-snow-display-panel" style="width: 100%; max-width: 1050px; background: rgba(0,0,0,0.03); border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 18px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); position: relative;">
+        <!-- Acrylic Glass Frame con 4 viti a brugola -->
+        <div style="background: rgba(255,255,255,0.7); border: 2px solid #b8bac2; border-radius: 8px; padding: 12px 18px; box-shadow: 0 4px 14px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.95); position: relative; min-width: 420px; flex: 1 1 420px;">
+          <div class="chassis-screw" style="top: 6px; left: 6px; width: 9px; height: 9px;"></div>
+          <div class="chassis-screw" style="top: 6px; right: 6px; width: 9px; height: 9px;"></div>
+          <div class="chassis-screw" style="bottom: 6px; left: 6px; width: 9px; height: 9px;"></div>
+          <div class="chassis-screw" style="bottom: 6px; right: 6px; width: 9px; height: 9px;"></div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; padding: 0 8px;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span id="snowLcdBpmLed" style="width: 7px; height: 7px; border-radius: 50%; background: #e06c75; box-shadow: 0 0 6px #e06c75; display: inline-block;"></span>
+              <span style="font-size: 8.5px; font-weight: 800; letter-spacing: 0.1em; color: #555;">BPM / LFO</span>
+            </div>
+            <div style="font-weight: 900; font-size: 13px; letter-spacing: 0.15em; color: #222; font-family: 'Inter', sans-serif;">
+              VIRUS <span style="font-weight: 300; opacity: 0.5;">|</span> TI SNOW
+            </div>
           </div>
-          <button id="btnSyncMultiInView" class="chassis-page-btn" style="padding: 4px 12px; font-size: 11px; font-weight: bold;" title="Interroga le 4 parti attive del Virus">🔄 LEGGI 4 PARTI</button>
+
+          <!-- LCD Backlit Screen identico alla foto del Virus TI Snow -->
+          <div id="virusSnowLcdScreen" style="background: #080d12; border: 2px solid #1c222a; border-radius: 4px; padding: 8px 12px; box-shadow: inset 0 3px 12px rgba(0,0,0,0.95); font-family: monospace; color: var(--accent); position: relative; overflow: hidden;">
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: bold; border-bottom: 1px solid rgba(86, 182, 194, 0.25); padding-bottom: 4px; margin-bottom: 6px;">
+              <span style="background: var(--accent); color: #080d12; padding: 1px 6px; border-radius: 2px; font-weight: 900; letter-spacing: 0.08em;">MULTI</span>
+              <span id="snowLcdCategory" style="letter-spacing: 0.05em; color: #88c0d0;">AlienArp</span>
+              <span style="display: flex; align-items: center; gap: 4px;">
+                <span>🔒</span>
+                <span id="snowLcdMultiPrg" style="font-weight: 900;">02</span>
+              </span>
+            </div>
+            <div style="display: flex; align-items: baseline; gap: 14px; margin: 8px 0;">
+              <span id="snowLcdBankProg" style="font-size: 16px; font-weight: 900; color: #fff; letter-spacing: 0.05em; min-width: 65px;">7-8</span>
+              <span id="snowLcdPatchName" style="font-size: 19px; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); text-shadow: 0 0 10px rgba(86,182,194,0.6);">SavePrayer</span>
+            </div>
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 10px; color: #8899aa; border-top: 1px solid rgba(86, 182, 194, 0.2); padding-top: 4px; margin-top: 4px;">
+              <span id="snowLcdSoft1" style="flex: 1; text-align: left;">&lt;global&gt;</span>
+              <span id="snowLcdSoft2" style="flex: 1; text-align: center; color: #fff; font-weight: bold;">Energy</span>
+              <span id="snowLcdSoft3" style="flex: 1; text-align: right;">&lt;global&gt;</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Strumenti Globali Multi & Scanner Banchi -->
+        <div style="display: flex; flex-direction: column; gap: 10px; min-width: 300px; flex: 1 1 300px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.03); border: 1px solid var(--border); border-radius: 4px; padding: 6px 12px;">
+            <span style="font-weight: 800; font-size: 11px; letter-spacing: 0.05em; color: #444;">MULTI PRG:</span>
+            <div style="display: flex; align-items: center; gap: 4px;">
+              <button id="btnMultiPrgDown" class="chassis-page-btn" style="padding: 2px 7px;">-</button>
+              <input type="number" id="multiProgramInput" min="0" max="127" value="1" style="width: 44px; text-align: center; font-weight: bold; font-size: 13px; background: #fff; color: #111; border: 1px solid var(--border); border-radius: 3px; padding: 3px 0;">
+              <button id="btnMultiPrgUp" class="chassis-page-btn" style="padding: 2px 7px;">+</button>
+            </div>
+            <div style="display: flex; gap: 4px;">
+              <button id="btnMultiLoad" class="chassis-page-btn" style="padding: 3px 8px; font-size: 10px;">CARICA</button>
+              <button id="btnMultiSave" class="chassis-page-btn" style="padding: 3px 8px; font-size: 10px;">SALVA</button>
+            </div>
+          </div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="font-size: 11px; font-weight: 700; color: #555;">BANCO:</span>
+              <select id="quickBankScanSelect" style="padding: 4px 8px; font-size: 11px; font-weight: bold; background: #fff; color: #111; border: 1px solid var(--border); border-radius: 3px; cursor: pointer;"></select>
+              <button id="btnQuickScanBank" class="chassis-page-btn" style="color: #2b7a8a; border-color: #2b7a8a; font-weight: bold; padding: 4px 10px; font-size: 11px;" title="Interroga il Virus via SysEx per leggere e memorizzare tutti i 128 nomi">📥 SCANSIONA 128</button>
+              <button id="btnScanAllRam" class="chassis-page-btn" style="color: #1e6091; border-color: #1e6091; font-weight: bold; padding: 4px 10px; font-size: 11px;">⚡ RAM A-D</button>
+              <button id="btnOpenBankNamesModal" class="chassis-page-btn" style="padding: 4px 9px; font-size: 11px;">📋 NOMI</button>
+            </div>
+            <button id="btnSyncMultiInView" class="chassis-page-btn" style="padding: 5px 12px; font-size: 11px; font-weight: bold; color: #111; border-color: var(--accent); background: linear-gradient(to bottom, #fff, #e2e4e8);" title="Interroga le 4 parti attive del Virus">🔄 LEGGI 4 PARTI</button>
+          </div>
+          <div id="quickScanStatus" style="font-size: 11px; color: #666; font-family: monospace; min-height: 16px;"></div>
         </div>
       </div>
 
-      <!-- Lista pulita delle 4 parti -->
-      <div class="part-list" id="partList" style="width: 100%; max-width: 1050px; display: flex; flex-direction: column; gap: 10px;"></div>
+      <!-- Le 4 Parti Multi in Skin Virus TI Snow -->
+      <div class="part-list" id="partList" style="width: 100%; max-width: 1050px; display: flex; flex-direction: column; gap: 12px;"></div>
     </div>
     <div class="chassis-wood-strip"></div>
   </div>
@@ -1897,7 +2015,7 @@
     const rail = document.querySelector('.control-room-rail');
     const strip = document.querySelector('.command-strip');
     const diag = document.getElementById('midiDiagnostics');
-    const show = (view === 'single');
+    const show = (view === 'single' || view === 'multi');
     if (rail) rail.style.display = show ? 'grid' : 'none';
     if (strip) strip.style.display = show ? 'flex' : 'none';
     if (!show && diag) diag.classList.add('hidden');
@@ -1929,6 +2047,10 @@
     const v = document.getElementById('multiView');
     v.style.display = 'block';
     document.getElementById('btnTabMultipart').classList.add('active');
+    if (typeof updateVirusSnowMasterDisplay === 'function') updateVirusSnowMasterDisplay(currentPartIndex || 0);
+    if (typeof partDisplays !== 'undefined' && Array.isArray(partDisplays)) {
+      partDisplays.forEach(d => { if (d && d._render) d._render(); });
+    }
     updateControlRoomStatus();
   });
 
@@ -2694,6 +2816,9 @@
           }
           if (partDisplays[pIdx] && partDisplays[pIdx]._startReveal) {
             partDisplays[pIdx]._startReveal();
+          }
+          if (typeof updateVirusSnowMasterDisplay === 'function') {
+            updateVirusSnowMasterDisplay(pIdx);
           }
           if (typeof renderMultiPartsOverview === 'function') {
             renderMultiPartsOverview();
@@ -5598,22 +5723,64 @@ function exportCurrentPatchSyx() {
     }
   }
 
+  function updateVirusSnowMasterDisplay(activePartIdx = 0) {
+    const pIdx = Math.max(0, Math.min(NUM_PARTS - 1, activePartIdx));
+    const part = multiParts[pIdx];
+    if (!part) return;
+
+    const catEl = document.getElementById('snowLcdCategory');
+    const prgEl = document.getElementById('snowLcdMultiPrg');
+    const bankProgEl = document.getElementById('snowLcdBankProg');
+    const patchNameEl = document.getElementById('snowLcdPatchName');
+    const multiInput = document.getElementById('multiProgramInput');
+
+    if (catEl) {
+      const bankName = BANK_NAMES[part.values.bank] || 'RAM-A';
+      catEl.textContent = `P${pIdx + 1} • ${bankName}`;
+    }
+    if (prgEl) {
+      const multiNum = multiInput ? parseInt(multiInput.value, 10) || (pIdx + 1) : (pIdx + 1);
+      prgEl.textContent = String(multiNum).padStart(2, '0');
+    }
+    if (bankProgEl) {
+      const bLetter = (BANK_NAMES[part.values.bank] || 'A').replace('RAM-', '').replace('ROM-', '');
+      bankProgEl.textContent = `${bLetter}-${String(part.values.program + 1).padStart(2, '0')}`;
+    }
+    if (patchNameEl) {
+      const name = (part.name && part.name !== 'init' && !isDummyPatchName(part.name))
+        ? part.name
+        : (getBankPatchName(part.values.bank, part.values.program) || 'INIT');
+      patchNameEl.textContent = name.toUpperCase();
+    }
+  }
+
   function createPartRow(index){
     const part = multiParts[index];
     const partColor = PART_COLORS[index];
+
+    // Se non ha un nome reale assegnato, impostalo dal banco/programma di fabbrica o cache
+    if (!part.name || part.name === 'init' || isDummyPatchName(part.name)) {
+      part.name = getBankPatchName(part.values.bank, part.values.program);
+    }
 
     const row = document.createElement('div');
     row.className = 'part-row part-' + index;
     if (!part.enabled) row.classList.add('disabled');
     row.style.borderLeftColor = partColor;
 
-    // 1. BADGE PARTE + ON/OFF + MUTE + SOLO
+    row.addEventListener('click', () => {
+      currentPartIndex = index;
+      updateVirusSnowMasterDisplay(index);
+    });
+
+    // 1. HARDWARE MATRIX & CHANNEL: BADGE + ON/OFF + MUTE + SOLO + MIDI CH
     const leftGroup = document.createElement('div');
-    leftGroup.style.cssText = 'display: flex; align-items: center; gap: 6px; flex-shrink: 0;';
+    leftGroup.style.cssText = 'display: flex; align-items: center; gap: 6px; flex-shrink: 0; flex-wrap: wrap;';
 
     const badge = document.createElement('div');
-    badge.style.cssText = `background: ${partColor}; color: #000; font-weight: 800; font-size: 13px; padding: 4px 10px; border-radius: 4px; font-family: monospace; letter-spacing: 0.05em; min-width: 28px; text-align: center;`;
+    badge.style.cssText = `background: ${partColor}; color: #000; font-weight: 900; font-size: 13px; padding: 5px 11px; border-radius: 4px; font-family: monospace; letter-spacing: 0.05em; min-width: 28px; text-align: center; box-shadow: 0 0 10px ${partColor}55;`;
     badge.textContent = 'P' + (index + 1);
+    badge.title = `Access Virus TI Snow Part ${index + 1}`;
     leftGroup.appendChild(badge);
 
     const enableBtn = document.createElement('button');
@@ -5621,10 +5788,12 @@ function exportCurrentPatchSyx() {
     enableBtn.style.cssText = 'padding: 4px 8px; font-size: 11px; font-weight: bold;';
     enableBtn.classList.toggle('active', part.enabled);
     enableBtn.textContent = part.enabled ? 'ON' : 'OFF';
-    enableBtn.addEventListener('click', () => {
+    enableBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
       part.enabled = !part.enabled;
       enableBtn.textContent = part.enabled ? 'ON' : 'OFF';
       enableBtn.classList.toggle('active', part.enabled);
+      row.classList.toggle('disabled', !part.enabled);
       applyPartMuteSoloState();
     });
     leftGroup.appendChild(enableBtn);
@@ -5633,30 +5802,54 @@ function exportCurrentPatchSyx() {
     muteBtn.className = 'chassis-page-btn btn-part-mute';
     muteBtn.style.cssText = 'padding: 4px 8px; font-size: 11px; font-weight: bold;';
     muteBtn.textContent = 'M';
-    muteBtn.title = `Muta P${index + 1}`;
-    muteBtn.addEventListener('click', () => togglePartMute(index));
+    muteBtn.title = `Muta Parte ${index + 1}`;
+    muteBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      togglePartMute(index);
+    });
     leftGroup.appendChild(muteBtn);
 
     const soloBtn = document.createElement('button');
     soloBtn.className = 'chassis-page-btn btn-part-solo';
     soloBtn.style.cssText = 'padding: 4px 8px; font-size: 11px; font-weight: bold;';
     soloBtn.textContent = 'S';
-    soloBtn.title = `Solo P${index + 1}`;
-    soloBtn.addEventListener('click', () => togglePartSolo(index));
+    soloBtn.title = `Solo Parte ${index + 1}`;
+    soloBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      togglePartSolo(index);
+    });
     leftGroup.appendChild(soloBtn);
+
+    const channels = [];
+    for (let c = 1; c <= 16; c++) channels.push(String(c));
+    const chField = createSelectField('ch', channels, part.values.channel, (v) => {
+      part.values.channel = v;
+      sendMultiPartParam(index, 34, v);
+      if (typeof renderMultiPartsOverview === 'function') renderMultiPartsOverview();
+      if (typeof updateKeyboardPartDisplay === 'function') updateKeyboardPartDisplay();
+    });
+    chField.style.margin = '0';
+    chField.style.flexShrink = '0';
+    leftGroup.appendChild(chField);
 
     row.appendChild(leftGroup);
 
-    // 2. SELEZIONE BANCO
-    const bankWrap = document.createElement('div');
-    bankWrap.className = 'field';
-    bankWrap.style.cssText = 'margin: 0; min-width: 110px; flex-shrink: 0;';
-    const bankLbl = document.createElement('label');
-    bankLbl.textContent = 'BANCO';
-    const bankRow = document.createElement('div');
-    bankRow.style.cssText = 'display: flex; align-items: center; gap: 3px;';
+    // 2. LCD DOT-MATRIX DISPLAY + PATCH SELECTOR SECTION
+    const centerGroup = document.createElement('div');
+    centerGroup.style.cssText = 'display: flex; flex-direction: column; gap: 6px; flex: 1 1 360px; min-width: 260px;';
+
+    // Dot-Matrix Canvas Display unit
+    const display = createPartDisplay(index);
+    partDisplays[index] = display;
+    centerGroup.appendChild(display);
+
+    // Selettore Banco + Steppers + Tendina 128 Patch
+    const soundControlsRow = document.createElement('div');
+    soundControlsRow.style.cssText = 'display: flex; align-items: center; gap: 5px; width: 100%; flex-wrap: wrap;';
+
+    // Banco
     const bankSelect = document.createElement('select');
-    bankSelect.style.cssText = 'font-size: 11px; font-weight: bold; font-family: monospace; background: #1a1a22; color: #fff; border: 1px solid var(--border); border-radius: 3px; padding: 5px 6px; cursor: pointer; flex: 1;';
+    bankSelect.style.cssText = 'font-size: 11px; font-weight: bold; font-family: monospace; background: #1a1a22; color: #fff; border: 1px solid var(--border); border-radius: 3px; padding: 4px 6px; cursor: pointer; max-width: 95px;';
     BANK_NAMES.forEach((bName, bIdx) => {
       const opt = document.createElement('option');
       opt.value = String(bIdx);
@@ -5664,30 +5857,17 @@ function exportCurrentPatchSyx() {
       if (bIdx === part.values.bank) opt.selected = true;
       bankSelect.appendChild(opt);
     });
+
     const btnSyncPartBank = document.createElement('button');
     btnSyncPartBank.className = 'chassis-page-btn';
-    btnSyncPartBank.style.cssText = 'padding: 5px 7px; font-size: 10px; color: var(--accent); border-color: var(--border); cursor: pointer;';
+    btnSyncPartBank.style.cssText = 'padding: 4px 6px; font-size: 10px; color: var(--accent); border-color: var(--border); cursor: pointer;';
     btnSyncPartBank.textContent = '📥';
-    btnSyncPartBank.title = 'Scansiona i 128 nomi di questo banco dal Virus TI';
-    btnSyncPartBank.addEventListener('click', () => {
+    btnSyncPartBank.title = 'Scansiona via SysEx i 128 nomi di questo banco dal Virus TI';
+    btnSyncPartBank.addEventListener('click', (e) => {
+      e.stopPropagation();
       const bIdx = parseInt(bankSelect.value, 10) || 0;
       startQuickBankScan(bIdx);
     });
-    bankRow.appendChild(bankSelect);
-    bankRow.appendChild(btnSyncPartBank);
-    bankWrap.appendChild(bankLbl);
-    bankWrap.appendChild(bankRow);
-    row.appendChild(bankWrap);
-
-    // 3. TENDINA SUONO 128 PATCH (HERO ELEMENT)
-    const patchWrap = document.createElement('div');
-    patchWrap.className = 'field';
-    patchWrap.style.cssText = 'margin: 0; flex: 1 1 300px; min-width: 240px;';
-    const patchLbl = document.createElement('label');
-    patchLbl.textContent = 'SUONO (TENDINA 128 PATCH)';
-
-    const patchRow = document.createElement('div');
-    patchRow.style.cssText = 'display: flex; align-items: center; gap: 4px; width: 100%;';
 
     const btnPrev = document.createElement('button');
     btnPrev.className = 'part-stepper-btn';
@@ -5696,7 +5876,7 @@ function exportCurrentPatchSyx() {
 
     const patchSelect = document.createElement('select');
     patchSelect.className = 'part-patch-dropdown';
-    patchSelect.style.cssText = 'flex: 1; font-size: 12px; font-weight: bold; font-family: monospace; background: #181820; color: #fff; border: 1px solid var(--border); border-radius: 3px; padding: 5px 8px; cursor: pointer; max-width: none;';
+    patchSelect.style.cssText = 'flex: 1 1 180px; min-width: 140px; font-size: 12px; font-weight: bold; font-family: monospace; background: #181820; color: #fff; border: 1px solid var(--border); border-radius: 3px; padding: 4px 8px; cursor: pointer;';
     populatePartPatchDropdown(patchSelect, part.values.bank, part.values.program);
 
     const btnNext = document.createElement('button');
@@ -5708,87 +5888,118 @@ function exportCurrentPatchSyx() {
       newProg = clamp7(newProg);
       part.values.program = newProg;
       patchSelect.value = String(newProg);
+      const newName = getBankPatchName(part.values.bank, newProg);
+      if (newName) {
+        part.name = newName;
+        if (display && display._startReveal) display._startReveal();
+      }
+      updateVirusSnowMasterDisplay(index);
       sendMultiPartParam(index, 31, part.values.bank);
       sendMultiPartParam(index, 33, newProg);
       clearTimeout(part._dumpTimer);
       part._dumpTimer = setTimeout(() => requestPartDump(index), 120);
     };
 
-    patchSelect.addEventListener('change', () => {
+    patchSelect.addEventListener('change', (e) => {
+      e.stopPropagation();
       applySoundChange(parseInt(patchSelect.value, 10) || 0);
     });
 
-    btnPrev.addEventListener('click', () => {
+    btnPrev.addEventListener('click', (e) => {
+      e.stopPropagation();
       const cur = parseInt(patchSelect.value, 10) || 0;
       applySoundChange((cur - 1 + 128) % 128);
     });
 
-    btnNext.addEventListener('click', () => {
+    btnNext.addEventListener('click', (e) => {
+      e.stopPropagation();
       const cur = parseInt(patchSelect.value, 10) || 0;
       applySoundChange((cur + 1) % 128);
     });
 
-    bankSelect.addEventListener('change', () => {
+    bankSelect.addEventListener('change', (e) => {
+      e.stopPropagation();
       const newBank = parseInt(bankSelect.value, 10);
       part.values.bank = newBank;
       sendMultiPartParam(index, 31, newBank);
       populatePartPatchDropdown(patchSelect, newBank, part.values.program);
+      const newName = getBankPatchName(newBank, part.values.program);
+      if (newName) {
+        part.name = newName;
+        if (display && display._startReveal) display._startReveal();
+      }
+      updateVirusSnowMasterDisplay(index);
       sendMultiPartParam(index, 33, part.values.program);
       clearTimeout(part._dumpTimer);
       part._dumpTimer = setTimeout(() => requestPartDump(index), 150);
     });
 
-    patchRow.appendChild(btnPrev);
-    patchRow.appendChild(patchSelect);
-    patchRow.appendChild(btnNext);
-    patchWrap.appendChild(patchLbl);
-    patchWrap.appendChild(patchRow);
-    row.appendChild(patchWrap);
+    soundControlsRow.appendChild(bankSelect);
+    soundControlsRow.appendChild(btnSyncPartBank);
+    soundControlsRow.appendChild(btnPrev);
+    soundControlsRow.appendChild(patchSelect);
+    soundControlsRow.appendChild(btnNext);
+    centerGroup.appendChild(soundControlsRow);
 
-    // 4. CANALE MIDI
-    const channels = [];
-    for (let c = 1; c <= 16; c++) channels.push(String(c));
-    const chField = createSelectField('ch', channels, part.values.channel, (v) => {
-      part.values.channel = v;
-      sendMultiPartParam(index, 34, v);
-      if (typeof renderMultiPartsOverview === 'function') renderMultiPartsOverview();
-      if (typeof updateKeyboardPartDisplay === 'function') updateKeyboardPartDisplay();
-    });
-    chField.style.margin = '0';
-    chField.style.flexShrink = '0';
-    row.appendChild(chField);
+    row.appendChild(centerGroup);
 
-    // 5. VOLUME KNOB
-    const volKnob = createPartKnob(index, PART_PARAMS.find(p => p.id === 'volume'));
+    // 3. HARDWARE ROTARY KNOBS: VOL, PAN, TRSP, CUTOFF, RESONANCE
+    const knobsGroup = document.createElement('div');
+    knobsGroup.className = 'part-knobs-group';
+    knobsGroup.style.cssText = 'display: flex; align-items: center; gap: 8px; flex-shrink: 0; flex-wrap: wrap; justify-content: center;';
+
+    const volParam = PART_PARAMS.find(p => p.id === 'volume');
+    const volKnob = createPartKnob(index, volParam);
     volKnob.classList.add('vol-knob');
     volKnob.style.margin = '0';
-    volKnob.style.flexShrink = '0';
-    row.appendChild(volKnob);
+    knobsGroup.appendChild(volKnob);
 
-    // 6. PAN KNOB
-    const panKnob = createPartKnob(index, PART_PARAMS.find(p => p.id === 'pan'));
+    const panParam = PART_PARAMS.find(p => p.id === 'pan');
+    const panKnob = createPartKnob(index, panParam);
     panKnob.style.margin = '0';
-    panKnob.style.flexShrink = '0';
-    row.appendChild(panKnob);
+    knobsGroup.appendChild(panKnob);
 
-    // 7. AZIONI IMMEDIATE: ASCOLTA + EDIT IN SINGLE
+    const trspParam = PART_PARAMS.find(p => p.id === 'transpose');
+    const trspKnob = createPartKnob(index, trspParam);
+    trspKnob.style.margin = '0';
+    knobsGroup.appendChild(trspKnob);
+
+    const cutParam = PARAMS.find(p => p.id === 'f1_cutoff') || { id: 'f1_cutoff', name: 'Cutoff', short: 'CUT', cc: 40, default: 127 };
+    const cutKnob = createPartSoundKnob(index, cutParam);
+    cutKnob.style.margin = '0';
+    knobsGroup.appendChild(cutKnob);
+
+    const resParam = PARAMS.find(p => p.id === 'f1_resonance') || { id: 'f1_resonance', name: 'Resonance', short: 'RES', cc: 42, default: 0 };
+    const resKnob = createPartSoundKnob(index, resParam);
+    resKnob.style.margin = '0';
+    knobsGroup.appendChild(resKnob);
+
+    row.appendChild(knobsGroup);
+
+    // 4. ACTION BUTTONS: PROVA (AUDITION) + SINGLE EDIT
     const actionsGroup = document.createElement('div');
-    actionsGroup.style.cssText = 'display: flex; align-items: center; gap: 6px; flex-shrink: 0;';
+    actionsGroup.style.cssText = 'display: flex; flex-direction: column; gap: 5px; flex-shrink: 0; justify-content: center;';
 
     const audBtn = document.createElement('button');
     audBtn.className = 'chassis-page-btn';
-    audBtn.style.cssText = 'padding: 5px 12px; font-size: 11px; font-weight: bold; color: var(--accent); border-color: var(--accent);';
+    audBtn.style.cssText = 'padding: 5px 12px; font-size: 11px; font-weight: bold; color: var(--accent); border-color: var(--accent); white-space: nowrap;';
     audBtn.textContent = '▶ PROVA';
     audBtn.title = `Suona una nota di prova su P${index + 1}`;
-    audBtn.addEventListener('click', () => auditionPart(index));
+    audBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      auditionPart(index);
+    });
     actionsGroup.appendChild(audBtn);
 
     const editBtn = document.createElement('button');
     editBtn.className = 'chassis-page-btn';
-    editBtn.style.cssText = `padding: 5px 10px; font-size: 11px; font-weight: bold; color: ${partColor}; border-color: ${partColor}; background: rgba(0,0,0,0.4);`;
+    editBtn.style.cssText = `padding: 5px 10px; font-size: 11px; font-weight: bold; color: ${partColor}; border-color: ${partColor}; background: rgba(0,0,0,0.3); white-space: nowrap;`;
     editBtn.textContent = '✏️ SINGLE';
     editBtn.title = `Apri P${index + 1} nell'editor Single per scolpirne tutti i dettagli`;
-    editBtn.addEventListener('click', () => editPartInSingleView(index));
+    editBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      editPartInSingleView(index);
+    });
     actionsGroup.appendChild(editBtn);
 
     row.appendChild(actionsGroup);
@@ -5815,6 +6026,8 @@ function exportCurrentPatchSyx() {
         quickScanSel.appendChild(opt);
       });
     }
+
+    updateVirusSnowMasterDisplay(currentPartIndex || 0);
   }
 
   // Quick Bank Scanner wiring
