@@ -1664,6 +1664,215 @@
     text-shadow: 0 1px 2px rgba(0,0,0,0.8);
   }
 
+  /* FRONTALE HARDWARE ACCESS VIRUS TI SNOW */
+  .snow-hardware-front {
+    padding: 44px 32px 32px 32px !important;
+    max-width: 1050px !important;
+    margin: 16px auto !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.95),
+      inset 0 -2px 0 rgba(0,0,0,0.15),
+      0 16px 45px rgba(0,0,0,0.22),
+      -14px 0 0 #c8955d, 14px 0 0 #c8955d !important;
+  }
+  .snow-front-grid {
+    z-index: 1;
+    width: 100%;
+    display: grid;
+    grid-template-columns: 130px minmax(360px, 480px) minmax(260px, 320px);
+    gap: 16px;
+    justify-content: center;
+    align-items: start;
+    margin-top: 10px;
+  }
+  @media (max-width: 920px) {
+    .snow-front-grid {
+      grid-template-columns: 1fr;
+    }
+  }
+  .snow-front-col {
+    background: rgba(0,0,0,0.02);
+    border-radius: 6px;
+    border: 1px solid rgba(0,0,0,0.06);
+    padding: 10px;
+  }
+  .snow-front-left {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: space-between;
+    height: 100%;
+    box-sizing: border-box;
+  }
+  .snow-front-center {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+  }
+  .snow-front-right {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+  }
+  .snow-front-acrylic-window {
+    background: rgba(255,255,255,0.85);
+    border: 2.5px solid #b2b6c0;
+    border-radius: 6px;
+    padding: 8px 12px;
+    box-shadow: 0 3px 12px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.95);
+    position: relative;
+    width: 100%;
+    box-sizing: border-box;
+  }
+  .virus-snow-lcd-front {
+    background: linear-gradient(180deg, #e4eff8 0%, #d0e4f2 100%);
+    border: 3px solid #1c252e;
+    border-radius: 4px;
+    padding: 8px 12px;
+    box-shadow: inset 0 2px 7px rgba(0,0,0,0.4);
+    font-family: monospace;
+    color: #1c2a38;
+    position: relative;
+    overflow: hidden;
+    min-height: 82px;
+  }
+  .lcd-header-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 10px;
+    font-weight: bold;
+    background: #223446;
+    color: #d7e9f5;
+    padding: 2px 8px;
+    border-radius: 2px;
+    margin-bottom: 6px;
+  }
+  .lcd-badge {
+    background: #d7e9f5;
+    color: #223446;
+    padding: 0 5px;
+    border-radius: 2px;
+    font-weight: 900;
+    letter-spacing: 0.05em;
+  }
+  .lcd-bank-prog {
+    font-size: 16px;
+    font-weight: 900;
+    color: #1c2a38;
+    letter-spacing: 0.05em;
+    min-width: 55px;
+  }
+  .lcd-patch-name {
+    font-size: 18px;
+    font-weight: 900;
+    letter-spacing: 0.06em;
+    text-transform: uppercase;
+    color: #1a2836;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.7);
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  .lcd-footer-bar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 9.5px;
+    font-weight: 700;
+    color: #3d5065;
+    border-top: 1px dotted rgba(35, 52, 70, 0.35);
+    padding-top: 4px;
+    margin-top: 4px;
+  }
+  .snow-front-soft-knobs {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding: 0 18px;
+    box-sizing: border-box;
+  }
+  .snow-front-label {
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    color: #555;
+    text-transform: uppercase;
+  }
+  .snow-front-val {
+    font-size: 10.5px;
+    font-family: monospace;
+    font-weight: bold;
+    color: #222;
+    margin-top: 2px;
+  }
+  .snow-front-part-box {
+    background: rgba(0,0,0,0.03);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    padding: 6px 8px;
+    display: flex;
+    flex-direction: column;
+    gap: 6px;
+  }
+  .front-part-pill {
+    flex: 1;
+    padding: 4px 2px;
+    font-size: 10px;
+    font-weight: 900;
+    font-family: monospace;
+    border-radius: 3px;
+    border: 1px solid #ccc;
+    background: #eee;
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 2px;
+    transition: all 0.1s;
+  }
+  .front-part-pill.active {
+    background: #fff;
+    border-color: #888;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+  }
+  .front-part-led {
+    width: 6px;
+    height: 6px;
+    border-radius: 50%;
+    background: #444;
+    display: inline-block;
+  }
+  .snow-front-bottom-bar {
+    z-index: 1;
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 14px;
+    padding-top: 10px;
+    border-top: 1px solid rgba(0,0,0,0.08);
+  }
+  .snow-select {
+    padding: 3px 8px;
+    font-size: 11px;
+    font-weight: bold;
+    background: #fff;
+    color: #111;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  @keyframes pulseBpm {
+    0%, 100% { opacity: 0.35; box-shadow: 0 0 3px #e06c75; }
+    50% { opacity: 1; box-shadow: 0 0 8px #ff4d5a; }
+  }
+  .pulse-bpm {
+    animation: pulseBpm 0.5s infinite ease-in-out;
+  }
 
 </style>
 </head>
@@ -1676,12 +1885,13 @@
       <h1 style="margin: 0; font-size: 24px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap;">VIRUS-H</h1>
     </div>
     <div class="segmented-control" id="partTabs">
+      <button class="segmented-tab active" id="btnTabSnow">TI-SNOW</button>
       <button class="segmented-tab" id="btnTabMultipart">MULTI</button>
       <button class="segmented-tab" id="btnTabPatchManager">PATCH</button>
       <button class="segmented-tab" id="btnTabArp">ARP</button>
       <button class="segmented-tab" id="btnTabSequencer">SEQ</button>
       <button class="segmented-tab" id="btnTabSong">SONG</button>
-      <button class="segmented-tab active" id="btnTabSynth">SINGLE</button>
+      <button class="segmented-tab" id="btnTabSynth">SINGLE</button>
     </div>
   </div>
 
@@ -1879,7 +2089,245 @@
 </div>
 <div id="songContent" class="main-content" style="display: none;"></div>
 
-<div id="singleView" class="main-content single-view" style="display: block;"></div>
+<!-- FRONTALE HARDWARE ACCESS VIRUS TI SNOW -->
+<div id="snowFrontView" class="main-content" style="display: block;">
+  <div class="hardware-chassis snow-hardware-front">
+    <div class="chassis-screw screw-tl"></div>
+    <div class="chassis-screw screw-tr"></div>
+    <div class="chassis-screw screw-bl"></div>
+    <div class="chassis-screw screw-br"></div>
+
+    <div class="chassis-logo" style="top: 14px; left: 32px; font-size: 19px; letter-spacing: 0.12em;">VIRUS | TI SNOW</div>
+    <div class="chassis-access-logo" style="position: absolute; top: 14px; right: 32px; font-weight: 800; font-size: 15px; letter-spacing: 0.1em; color: #444; display: flex; align-items: center; gap: 6px; font-family: 'Inter', sans-serif;">
+      <span style="font-size: 18px; color: #333;">❖</span> access
+    </div>
+
+    <!-- Front Panel Grid matching hardware photo -->
+    <div class="snow-front-grid">
+      <!-- 1. LEFT: MASTER VOL & AUDIO -->
+      <div class="snow-front-col snow-front-left">
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
+          <div class="snow-front-label">MASTER VOL</div>
+          <div class="chassis-knob-outer snow-front-knob" id="frontKnobMasterVol" data-val="100" style="width: 50px; height: 50px; cursor: grab;" title="Trascina su/giù per regolare Master Volume (CC 7)">
+            <div class="chassis-knob-inner" style="width: 44px; height: 44px;">
+              <div class="chassis-knob-top" style="width: 34px; height: 34px;">
+                <div class="chassis-knob-indicator-container" id="frontKnobMasterVolInd" style="transform: rotate(50deg);">
+                  <div class="chassis-knob-indicator" style="height: 10px; width: 2.5px; top: 2px;"></div>
+                </div>
+              </div>
+            </div>
+          </div>
+          <span id="frontValMasterVol" class="snow-front-val">100</span>
+        </div>
+
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 18px;">
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span id="frontInputLed" style="width: 7px; height: 7px; border-radius: 50%; background: #48bb78; box-shadow: 0 0 5px #48bb78; display: inline-block;"></span>
+            <span style="font-size: 8px; font-weight: 800; letter-spacing: 0.1em; color: #555;">INPUT</span>
+          </div>
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 2px; color: #666;">
+            <span style="font-size: 15px;">🎧</span>
+            <span style="font-size: 8px; font-weight: 800; letter-spacing: 0.08em;">PHONES</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 2. CENTER: ACRYLIC DISPLAY WINDOW & 3 SOFT KNOBS -->
+      <div class="snow-front-col snow-front-center">
+        <!-- Acrylic Glass Frame -->
+        <div class="snow-front-acrylic-window">
+          <div class="chassis-screw" style="top: 5px; left: 5px; width: 7px; height: 7px;"></div>
+          <div class="chassis-screw" style="top: 5px; right: 5px; width: 7px; height: 7px;"></div>
+          <div class="chassis-screw" style="bottom: 5px; left: 5px; width: 7px; height: 7px;"></div>
+          <div class="chassis-screw" style="bottom: 5px; right: 5px; width: 7px; height: 7px;"></div>
+
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; padding: 0 4px;">
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span class="pulse-bpm" style="width: 7px; height: 7px; border-radius: 50%; background: #e06c75; box-shadow: 0 0 6px #e06c75; display: inline-block;"></span>
+              <span style="font-size: 8px; font-weight: 800; letter-spacing: 0.1em; color: #555;">BPM / LFO</span>
+            </div>
+            <div style="font-weight: 900; font-size: 11px; letter-spacing: 0.12em; color: #222; font-family: 'Inter', sans-serif;">
+              VIRUS <span style="font-weight: 300; opacity: 0.5;">|</span> TI SNOW
+            </div>
+          </div>
+
+          <!-- LCD Backlit Screen identico alla foto reale: fondo chiaro, testi e icone grigie -->
+          <div id="frontLcdScreen" class="virus-snow-lcd-front">
+            <div class="lcd-header-bar">
+              <span id="frontLcdModeBadge" class="lcd-badge">MULTI</span>
+              <span id="frontLcdCategory" style="letter-spacing: 0.05em; color: #eaf3fa; font-weight: 800;">P1 • RAM-A</span>
+              <span style="display: flex; align-items: center; gap: 4px; color: #d7e9f5;">
+                <span style="font-size: 9px;">▤</span>
+                <span>🔒</span>
+                <span id="frontLcdMultiPrg" style="font-weight: 900;">02</span>
+              </span>
+            </div>
+            <div style="display: flex; align-items: baseline; gap: 12px; margin: 6px 0;">
+              <span id="frontLcdBankProg" class="lcd-bank-prog">A-01</span>
+              <span id="frontLcdPatchName" class="lcd-patch-name">SAVEPRAYER</span>
+            </div>
+            <div class="lcd-footer-bar">
+              <span id="frontLcdSoft1" style="flex: 1; text-align: left;">&lt;global&gt;</span>
+              <span id="frontLcdSoft2" style="flex: 1; text-align: center; color: #1c2a38; font-weight: 800;">Energy</span>
+              <span id="frontLcdSoft3" style="flex: 1; text-align: right;">&lt;global&gt;</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- 3 Knurled Soft Knobs directly beneath screen -->
+        <div class="snow-front-soft-knobs">
+          <!-- SOFT 1 -->
+          <div class="chassis-knob-container">
+            <div class="chassis-knob-outer snow-front-knob" id="frontKnobSoft1" data-val="0" style="width: 42px; height: 42px; cursor: grab;" title="Trascina per regolare Soft 1 (CC 1 / Mod)">
+              <div class="chassis-knob-inner" style="width: 36px; height: 36px;">
+                <div class="chassis-knob-top" style="width: 28px; height: 28px;">
+                  <div class="chassis-knob-indicator-container" id="frontKnobSoft1Ind" style="transform: rotate(-135deg);">
+                    <div class="chassis-knob-indicator" style="height: 8px; width: 2px;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <span class="chassis-knob-label">SOFT 1</span>
+            <span id="frontValSoft1" class="snow-front-val">0</span>
+          </div>
+
+          <!-- SOFT 2 -->
+          <div class="chassis-knob-container">
+            <div class="chassis-knob-outer snow-front-knob" id="frontKnobSoft2" data-val="64" style="width: 42px; height: 42px; cursor: grab;" title="Trascina per regolare Soft 2 (Energy / Filter Env)">
+              <div class="chassis-knob-inner" style="width: 36px; height: 36px;">
+                <div class="chassis-knob-top" style="width: 28px; height: 28px;">
+                  <div class="chassis-knob-indicator-container" id="frontKnobSoft2Ind" style="transform: rotate(0deg);">
+                    <div class="chassis-knob-indicator" style="height: 8px; width: 2px;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <span class="chassis-knob-label">SOFT 2</span>
+            <span id="frontValSoft2" class="snow-front-val">64</span>
+          </div>
+
+          <!-- SOFT 3 -->
+          <div class="chassis-knob-container">
+            <div class="chassis-knob-outer snow-front-knob" id="frontKnobSoft3" data-val="20" style="width: 42px; height: 42px; cursor: grab;" title="Trascina per regolare Soft 3 (FX Send / CC 91)">
+              <div class="chassis-knob-inner" style="width: 36px; height: 36px;">
+                <div class="chassis-knob-top" style="width: 28px; height: 28px;">
+                  <div class="chassis-knob-indicator-container" id="frontKnobSoft3Ind" style="transform: rotate(-80deg);">
+                    <div class="chassis-knob-indicator" style="height: 8px; width: 2px;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <span class="chassis-knob-label">SOFT 3</span>
+            <span id="frontValSoft3" class="snow-front-val">20</span>
+          </div>
+        </div>
+      </div>
+
+      <!-- 3. RIGHT: FILTER & MATRIX NAVIGATION -->
+      <div class="snow-front-col snow-front-right">
+        <!-- Filter Knobs -->
+        <div style="display: flex; justify-content: space-around; align-items: center; width: 100%;">
+          <!-- CUTOFF -->
+          <div class="chassis-knob-container">
+            <div class="chassis-knob-outer snow-front-knob" id="frontKnobCutoff" data-val="64" style="width: 50px; height: 50px; cursor: grab;" title="Trascina per regolare Cutoff Filtro 1 (CC 40)">
+              <div class="chassis-knob-inner" style="width: 44px; height: 44px;">
+                <div class="chassis-knob-top" style="width: 34px; height: 34px;">
+                  <div class="chassis-knob-indicator-container" id="frontKnobCutoffInd" style="transform: rotate(0deg);">
+                    <div class="chassis-knob-indicator" style="height: 10px; width: 2.5px; top: 2px;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <span class="chassis-knob-label" style="font-size: 9px; font-weight: 800;">CUTOFF</span>
+            <span id="frontValCutoff" class="snow-front-val">64</span>
+          </div>
+
+          <!-- RESONANCE -->
+          <div class="chassis-knob-container">
+            <div class="chassis-knob-outer snow-front-knob" id="frontKnobResonance" data-val="0" style="width: 44px; height: 44px; cursor: grab;" title="Trascina per regolare Risonanza Filtro 1 (CC 42)">
+              <div class="chassis-knob-inner" style="width: 38px; height: 38px;">
+                <div class="chassis-knob-top" style="width: 30px; height: 30px;">
+                  <div class="chassis-knob-indicator-container" id="frontKnobResonanceInd" style="transform: rotate(-135deg);">
+                    <div class="chassis-knob-indicator" style="height: 9px; width: 2px; top: 2px;"></div>
+                  </div>
+                </div>
+              </div>
+            </div>
+            <span class="chassis-knob-label" style="font-size: 8.5px; font-weight: 800;">RESONANCE</span>
+            <span id="frontValResonance" class="snow-front-val">0</span>
+          </div>
+        </div>
+
+        <!-- Part Navigation Box -->
+        <div class="snow-front-part-box">
+          <div style="display: flex; justify-content: space-between; align-items: center;">
+            <span style="font-size: 9px; font-weight: 800; letter-spacing: 0.1em; color: #444;">PART SELECT</span>
+            <div style="display: flex; gap: 4px;">
+              <button id="frontBtnPartPrev" class="chassis-page-btn" style="padding: 2px 7px; font-size: 10px;" title="Parte precedente">◄</button>
+              <button id="frontBtnPartNext" class="chassis-page-btn" style="padding: 2px 7px; font-size: 10px;" title="Parte successiva">►</button>
+            </div>
+          </div>
+          <!-- 4 Part Button/LEDs -->
+          <div style="display: flex; justify-content: space-between; gap: 4px;">
+            <button class="front-part-pill active" data-part="0" id="frontPartBtn0" title="Seleziona Parte 1">
+              <span class="front-part-led" id="frontPartLed0" style="background: #ff9900; box-shadow: 0 0 6px #ff9900;"></span>
+              <span>1</span>
+            </button>
+            <button class="front-part-pill" data-part="1" id="frontPartBtn1" title="Seleziona Parte 2">
+              <span class="front-part-led" id="frontPartLed1"></span>
+              <span>2</span>
+            </button>
+            <button class="front-part-pill" data-part="2" id="frontPartBtn2" title="Seleziona Parte 3">
+              <span class="front-part-led" id="frontPartLed2"></span>
+              <span>3</span>
+            </button>
+            <button class="front-part-pill" data-part="3" id="frontPartBtn3" title="Seleziona Parte 4">
+              <span class="front-part-led" id="frontPartLed3"></span>
+              <span>4</span>
+            </button>
+          </div>
+        </div>
+
+        <!-- Hardware Pushbuttons -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
+          <button id="frontBtnMode" class="chassis-page-btn" style="font-size: 9.5px; padding: 5px 6px; display: flex; align-items: center; justify-content: center; gap: 4px;" title="Commuta modalità SINGLE / MULTI">
+            <span id="frontModeLed" style="width: 5px; height: 5px; border-radius: 50%; background: #48bb78; box-shadow: 0 0 4px #48bb78;"></span>
+            MODE
+          </button>
+          <button id="frontBtnEdit" class="chassis-page-btn" style="font-size: 9.5px; padding: 5px 6px;" title="Modifica tutti i parametri (vista Single)">
+            EDIT ⚙
+          </button>
+          <button id="frontBtnSearch" class="chassis-page-btn" style="font-size: 9.5px; padding: 5px 6px;" title="Cerca suoni nel Patch Manager">
+            SEARCH 🔍
+          </button>
+          <button id="frontBtnStore" class="chassis-page-btn" style="font-size: 9.5px; padding: 5px 6px; color: #9c27b0;" title="Salva suono">
+            STORE 💾
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <!-- Quick Sound Selector Bottom Bar -->
+    <div class="snow-front-bottom-bar">
+      <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+        <span style="font-size: 10px; font-weight: 800; letter-spacing: 0.05em; color: #555;">BANCO / SUONO:</span>
+        <select id="frontBankSelect" class="snow-select"></select>
+        <button id="frontPatchPrev" class="chassis-page-btn" style="padding: 2px 7px; font-size: 10px;" title="Patch precedente">◀</button>
+        <select id="frontPatchSelect" class="snow-select" style="min-width: 180px;"></select>
+        <button id="frontPatchNext" class="chassis-page-btn" style="padding: 2px 7px; font-size: 10px;" title="Patch successiva">▶</button>
+      </div>
+
+      <div style="display: flex; gap: 6px;">
+        <button id="frontBtnGoMulti" class="chassis-page-btn" style="font-size: 10px; padding: 4px 10px; font-weight: bold;">🎛 MULTI MIXER (4 PARTI)</button>
+        <button id="frontBtnGoSingle" class="chassis-page-btn" style="font-size: 10px; padding: 4px 10px; font-weight: bold;">🎚 SYNTH EDITOR (PARAMETRI)</button>
+      </div>
+    </div>
+
+    <div class="chassis-wood-strip"></div>
+  </div>
+</div>
+
+<div id="singleView" class="main-content single-view" style="display: none;"></div>
 
 <div id="multiView" class="main-content multi-view" style="display: none;">
   <div class="hardware-chassis">
@@ -2036,13 +2484,15 @@
     const rail = document.querySelector('.control-room-rail');
     const strip = document.querySelector('.command-strip');
     const diag = document.getElementById('midiDiagnostics');
-    const show = (view === 'single' || view === 'multi');
+    const show = (view === 'single' || view === 'multi' || view === 'snow');
     if (rail) rail.style.display = show ? 'grid' : 'none';
     if (strip) strip.style.display = show ? 'flex' : 'none';
     if (!show && diag) diag.classList.add('hidden');
   }
 
   function hideAllViews() {
+    const snow = document.getElementById('snowFrontView');
+    if (snow) snow.style.display = 'none';
     document.getElementById('singleView').style.display = 'none';
     document.getElementById('multiView').style.display = 'none';
     document.getElementById('patchManagerContent').style.display = 'none';
@@ -2051,6 +2501,21 @@
     document.getElementById('songContent').style.display = 'none';
 
     document.querySelectorAll('.segmented-tab').forEach(btn => btn.classList.remove('active'));
+  }
+
+  const btnTabSnow = document.getElementById('btnTabSnow');
+  if (btnTabSnow) {
+    btnTabSnow.addEventListener('click', () => {
+      hideAllViews();
+      updateTopPanelsVisibility('snow');
+      const v = document.getElementById('snowFrontView');
+      if (v) v.style.display = 'block';
+      btnTabSnow.classList.add('active');
+      if (typeof updateVirusSnowFrontPanel === 'function') {
+        updateVirusSnowFrontPanel(currentPartIndex || 0);
+      }
+      updateControlRoomStatus();
+    });
   }
 
   document.getElementById('btnTabSynth').addEventListener('click', () => {
@@ -2651,6 +3116,17 @@
        document.getElementById('midi-debug').textContent = 'MIDI: ' + hexStr;
        midiStats.last = hexStr;
        updateMidiDiagnostics();
+
+       const fInLed = document.getElementById('frontInputLed');
+       if (fInLed) {
+         fInLed.style.background = '#00ff88';
+         fInLed.style.boxShadow = '0 0 8px #00ff88';
+         clearTimeout(fInLed._t);
+         fInLed._t = setTimeout(() => {
+           fInLed.style.background = '#48bb78';
+           fInLed.style.boxShadow = '0 0 5px #48bb78';
+         }, 90);
+       }
     }
 
     // --- RICEZIONE CC (Control Change) ---
@@ -5790,6 +6266,9 @@ function exportCurrentPatchSyx() {
         : (getBankPatchName(part.values.bank, part.values.program) || 'INIT');
       patchNameEl.textContent = name.toUpperCase();
     }
+    if (typeof updateVirusSnowFrontPanel === 'function') {
+      updateVirusSnowFrontPanel(pIdx);
+    }
   }
 
   function createPartRow(index){
@@ -6143,6 +6622,326 @@ function exportCurrentPatchSyx() {
     }
     setLastAction('saved multi prg ' + v);
   });
+
+  // ---------------------------------------------------------------------
+  // Access Virus TI Snow Hardware Front Panel Logic
+  // ---------------------------------------------------------------------
+  function setFrontKnob(knobId, indId, valId, val) {
+    const knob = document.getElementById(knobId);
+    const ind = document.getElementById(indId);
+    const valEl = document.getElementById(valId);
+    if (!knob) return;
+    knob.dataset.val = String(val);
+    const angle = -135 + (val / 127) * 270;
+    if (ind) ind.style.transform = `rotate(${angle}deg)`;
+    if (valEl) valEl.textContent = String(val);
+  }
+
+  function setupFrontKnob(knobId, indId, valId, initialVal, onChange) {
+    const knob = document.getElementById(knobId);
+    if (!knob) return;
+    setFrontKnob(knobId, indId, valId, initialVal);
+
+    let startY = 0;
+    let startVal = initialVal;
+    let isDragging = false;
+
+    const onPointerMove = (e) => {
+      if (!isDragging) return;
+      const clientY = e.clientY ?? (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+      const deltaY = startY - clientY;
+      let newVal = Math.round(startVal + deltaY * 0.75);
+      newVal = Math.max(0, Math.min(127, newVal));
+      setFrontKnob(knobId, indId, valId, newVal);
+      if (onChange) onChange(newVal);
+    };
+
+    const onPointerUp = () => {
+      if (!isDragging) return;
+      isDragging = false;
+      window.removeEventListener('mousemove', onPointerMove);
+      window.removeEventListener('mouseup', onPointerUp);
+      window.removeEventListener('touchmove', onPointerMove);
+      window.removeEventListener('touchend', onPointerUp);
+    };
+
+    const onPointerDown = (e) => {
+      e.preventDefault();
+      isDragging = true;
+      startY = e.clientY ?? (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+      startVal = parseInt(knob.dataset.val, 10) || 0;
+      window.addEventListener('mousemove', onPointerMove);
+      window.addEventListener('mouseup', onPointerUp);
+      window.addEventListener('touchmove', onPointerMove, { passive: false });
+      window.addEventListener('touchend', onPointerUp);
+    };
+
+    knob.addEventListener('mousedown', onPointerDown);
+    knob.addEventListener('touchstart', onPointerDown, { passive: false });
+
+    knob.addEventListener('wheel', (e) => {
+      e.preventDefault();
+      let cur = parseInt(knob.dataset.val, 10) || 0;
+      const delta = e.deltaY < 0 ? 2 : -2;
+      cur = Math.max(0, Math.min(127, cur + delta));
+      setFrontKnob(knobId, indId, valId, cur);
+      if (onChange) onChange(cur);
+    }, { passive: false });
+  }
+
+  function updateVirusSnowFrontPanel(activePartIdx = 0) {
+    const pIdx = Math.max(0, Math.min(NUM_PARTS - 1, activePartIdx));
+    const part = multiParts[pIdx];
+    if (!part) return;
+
+    // Aggiorna i 4 tasti e LED delle Parti sul frontale (1..4)
+    for (let i = 0; i < 4; i++) {
+      const btn = document.getElementById('frontPartBtn' + i);
+      const led = document.getElementById('frontPartLed' + i);
+      if (btn) btn.classList.toggle('active', i === pIdx);
+      if (led) {
+        if (i === pIdx) {
+          led.style.background = '#ff9900';
+          led.style.boxShadow = '0 0 7px #ff9900';
+        } else {
+          led.style.background = '#444';
+          led.style.boxShadow = 'none';
+        }
+      }
+    }
+
+    // Aggiorna lo schermo LCD del frontale
+    const catEl = document.getElementById('frontLcdCategory');
+    const prgEl = document.getElementById('frontLcdMultiPrg');
+    const bankProgEl = document.getElementById('frontLcdBankProg');
+    const patchNameEl = document.getElementById('frontLcdPatchName');
+    const multiInput = document.getElementById('multiProgramInput');
+
+    const bankName = BANK_NAMES[part.values.bank] || 'RAM-A';
+    if (catEl) catEl.textContent = `P${pIdx + 1} • ${bankName}`;
+    if (prgEl) {
+      const multiNum = multiInput ? parseInt(multiInput.value, 10) || (pIdx + 1) : (pIdx + 1);
+      prgEl.textContent = String(multiNum).padStart(2, '0');
+    }
+    if (bankProgEl) {
+      const bLetter = (BANK_NAMES[part.values.bank] || 'A').replace('RAM-', '').replace('ROM-', '');
+      bankProgEl.textContent = `${bLetter}-${String(part.values.program + 1).padStart(2, '0')}`;
+    }
+    if (patchNameEl) {
+      const name = (part.name && part.name !== 'init' && !isDummyPatchName(part.name))
+        ? part.name
+        : (getBankPatchName(part.values.bank, part.values.program) || 'INIT');
+      patchNameEl.textContent = name.toUpperCase();
+    }
+
+    // Sincronizza i selettori veloci banco e patch
+    const bankSel = document.getElementById('frontBankSelect');
+    const patchSel = document.getElementById('frontPatchSelect');
+    if (bankSel && bankSel.value !== String(part.values.bank)) {
+      bankSel.value = String(part.values.bank);
+      if (patchSel) populatePartPatchDropdown(patchSel, part.values.bank, part.values.program);
+    } else if (patchSel && patchSel.value !== String(part.values.program)) {
+      patchSel.value = String(part.values.program);
+    }
+
+    // Sincronizza i potenziometri Cutoff e Resonance del frontale
+    const cutVal = (typeof part.values.f1_cutoff !== 'undefined') ? part.values.f1_cutoff : (state.values.f1_cutoff ?? 64);
+    const resVal = (typeof part.values.f1_resonance !== 'undefined') ? part.values.f1_resonance : (state.values.f1_resonance ?? 0);
+    setFrontKnob('frontKnobCutoff', 'frontKnobCutoffInd', 'frontValCutoff', cutVal);
+    setFrontKnob('frontKnobResonance', 'frontKnobResonanceInd', 'frontValResonance', resVal);
+  }
+
+  function buildSnowFrontView() {
+    // 1. Inizializza i selettori Banco e Patch veloci del frontale
+    const frontBankSel = document.getElementById('frontBankSelect');
+    const frontPatchSel = document.getElementById('frontPatchSelect');
+    if (frontBankSel && frontBankSel.options.length === 0) {
+      BANK_NAMES.forEach((bName, idx) => {
+        const opt = document.createElement('option');
+        opt.value = String(idx);
+        opt.textContent = bName;
+        frontBankSel.appendChild(opt);
+      });
+    }
+
+    const applyFrontSoundChange = (newProg) => {
+      const pIdx = currentPartIndex || 0;
+      const part = multiParts[pIdx];
+      if (!part) return;
+      newProg = clamp7(newProg);
+      part.values.program = newProg;
+      if (frontPatchSel) frontPatchSel.value = String(newProg);
+      const newName = getBankPatchName(part.values.bank, newProg);
+      if (newName) part.name = newName;
+      updateVirusSnowMasterDisplay(pIdx);
+      updatePartDropdownSelection(pIdx, part.values.bank, newProg);
+      sendMultiPartParam(pIdx, 31, part.values.bank);
+      sendMultiPartParam(pIdx, 33, newProg);
+      clearTimeout(part._dumpTimer);
+      part._dumpTimer = setTimeout(() => requestPartDump(pIdx), 120);
+    };
+
+    if (frontBankSel) {
+      frontBankSel.addEventListener('change', (e) => {
+        e.stopPropagation();
+        const pIdx = currentPartIndex || 0;
+        const part = multiParts[pIdx];
+        if (!part) return;
+        const newBank = parseInt(frontBankSel.value, 10);
+        part.values.bank = newBank;
+        sendMultiPartParam(pIdx, 31, newBank);
+        if (frontPatchSel) populatePartPatchDropdown(frontPatchSel, newBank, part.values.program);
+        const newName = getBankPatchName(newBank, part.values.program);
+        if (newName) part.name = newName;
+        updateVirusSnowMasterDisplay(pIdx);
+        updatePartDropdownSelection(pIdx, newBank, part.values.program);
+        sendMultiPartParam(pIdx, 33, part.values.program);
+        clearTimeout(part._dumpTimer);
+        part._dumpTimer = setTimeout(() => requestPartDump(pIdx), 150);
+      });
+    }
+
+    if (frontPatchSel) {
+      frontPatchSel.addEventListener('change', (e) => {
+        e.stopPropagation();
+        applyFrontSoundChange(parseInt(frontPatchSel.value, 10) || 0);
+      });
+    }
+
+    document.getElementById('frontPatchPrev')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const pIdx = currentPartIndex || 0;
+      const part = multiParts[pIdx];
+      if (!part) return;
+      applyFrontSoundChange((part.values.program - 1 + 128) % 128);
+    });
+
+    document.getElementById('frontPatchNext')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const pIdx = currentPartIndex || 0;
+      const part = multiParts[pIdx];
+      if (!part) return;
+      applyFrontSoundChange((part.values.program + 1) % 128);
+    });
+
+    // 2. Part Navigation (◄, ►, 1, 2, 3, 4)
+    document.getElementById('frontBtnPartPrev')?.addEventListener('click', () => {
+      currentPartIndex = (currentPartIndex - 1 + NUM_PARTS) % NUM_PARTS;
+      updateVirusSnowMasterDisplay(currentPartIndex);
+    });
+
+    document.getElementById('frontBtnPartNext')?.addEventListener('click', () => {
+      currentPartIndex = (currentPartIndex + 1) % NUM_PARTS;
+      updateVirusSnowMasterDisplay(currentPartIndex);
+    });
+
+    for (let i = 0; i < NUM_PARTS; i++) {
+      document.getElementById('frontPartBtn' + i)?.addEventListener('click', () => {
+        currentPartIndex = i;
+        updateVirusSnowMasterDisplay(currentPartIndex);
+      });
+    }
+
+    // 3. Hardware Pushbuttons: MODE, EDIT, SEARCH, STORE, GO TO MULTI, GO TO SINGLE
+    document.getElementById('frontBtnMode')?.addEventListener('click', () => {
+      const modeBadge = document.getElementById('frontLcdModeBadge');
+      const isMulti = modeBadge && modeBadge.textContent === 'MULTI';
+      if (isMulti) {
+        if (modeBadge) modeBadge.textContent = 'SINGLE';
+        const modeLed = document.getElementById('frontModeLed');
+        if (modeLed) { modeLed.style.background = '#e59500'; modeLed.style.boxShadow = '0 0 4px #e59500'; }
+        setLastAction('Mode: SINGLE');
+      } else {
+        if (modeBadge) modeBadge.textContent = 'MULTI';
+        const modeLed = document.getElementById('frontModeLed');
+        if (modeLed) { modeLed.style.background = '#48bb78'; modeLed.style.boxShadow = '0 0 4px #48bb78'; }
+        setLastAction('Mode: MULTI');
+      }
+    });
+
+    document.getElementById('frontBtnEdit')?.addEventListener('click', () => {
+      document.getElementById('btnTabSynth')?.click();
+    });
+
+    document.getElementById('frontBtnSearch')?.addEventListener('click', () => {
+      document.getElementById('btnTabPatchManager')?.click();
+    });
+
+    document.getElementById('frontBtnStore')?.addEventListener('click', () => {
+      document.getElementById('btnTabPatchManager')?.click();
+      setTimeout(() => {
+        const pInput = document.getElementById('patchName');
+        if (pInput) { pInput.focus(); pInput.select(); }
+      }, 100);
+    });
+
+    document.getElementById('frontBtnGoMulti')?.addEventListener('click', () => {
+      document.getElementById('btnTabMultipart')?.click();
+    });
+
+    document.getElementById('frontBtnGoSingle')?.addEventListener('click', () => {
+      document.getElementById('btnTabSynth')?.click();
+    });
+
+    // 4. Knobs: Master Vol, Cutoff, Resonance, Soft 1, Soft 2, Soft 3
+    setupFrontKnob('frontKnobMasterVol', 'frontKnobMasterVolInd', 'frontValMasterVol', 100, (v) => {
+      const part = multiParts[currentPartIndex || 0];
+      const ch = part ? part.channel : 1;
+      sendCC(ch, 7, v);
+      setLastAction(`Master Vol: ${v}`);
+    });
+
+    setupFrontKnob('frontKnobCutoff', 'frontKnobCutoffInd', 'frontValCutoff', 64, (v) => {
+      const part = multiParts[currentPartIndex || 0];
+      if (part) part.values.f1_cutoff = v;
+      state.values.f1_cutoff = v;
+      const ch = part ? part.channel : 1;
+      sendCC(ch, 40, v);
+      const macroKnobs = window.macroRefs;
+      if (macroKnobs && macroKnobs[0] && macroKnobs[0]._updateKnob) macroKnobs[0]._updateKnob(v);
+      setLastAction(`Cutoff: ${v}`);
+    });
+
+    setupFrontKnob('frontKnobResonance', 'frontKnobResonanceInd', 'frontValResonance', 0, (v) => {
+      const part = multiParts[currentPartIndex || 0];
+      if (part) part.values.f1_resonance = v;
+      state.values.f1_resonance = v;
+      const ch = part ? part.channel : 1;
+      sendCC(ch, 42, v);
+      const macroKnobs = window.macroRefs;
+      if (macroKnobs && macroKnobs[1] && macroKnobs[1]._updateKnob) macroKnobs[1]._updateKnob(v);
+      setLastAction(`Resonance: ${v}`);
+    });
+
+    setupFrontKnob('frontKnobSoft1', 'frontKnobSoft1Ind', 'frontValSoft1', 0, (v) => {
+      const part = multiParts[currentPartIndex || 0];
+      const ch = part ? part.channel : 1;
+      sendCC(ch, 1, v);
+      const softEl = document.getElementById('frontLcdSoft1');
+      if (softEl) softEl.textContent = `Mod: ${v}`;
+      setLastAction(`Soft 1 (Mod): ${v}`);
+    });
+
+    setupFrontKnob('frontKnobSoft2', 'frontKnobSoft2Ind', 'frontValSoft2', 64, (v) => {
+      const part = multiParts[currentPartIndex || 0];
+      const ch = part ? part.channel : 1;
+      sendCC(ch, 21, v);
+      const softEl = document.getElementById('frontLcdSoft2');
+      if (softEl) softEl.textContent = `Energy: ${v}`;
+      setLastAction(`Soft 2 (Energy): ${v}`);
+    });
+
+    setupFrontKnob('frontKnobSoft3', 'frontKnobSoft3Ind', 'frontValSoft3', 20, (v) => {
+      const part = multiParts[currentPartIndex || 0];
+      const ch = part ? part.channel : 1;
+      sendCC(ch, 91, v);
+      const softEl = document.getElementById('frontLcdSoft3');
+      if (softEl) softEl.textContent = `FX: ${v}`;
+      setLastAction(`Soft 3 (FX): ${v}`);
+    });
+
+    updateVirusSnowFrontPanel(currentPartIndex || 0);
+  }
 
   // ---------------------------------------------------------------------
   // Init
@@ -7456,6 +8255,7 @@ function exportCurrentPatchSyx() {
     }
   }
 
+  buildSnowFrontView();
   buildMultiView();
   buildArpView();
   buildSeqView();
@@ -7463,6 +8263,7 @@ function exportCurrentPatchSyx() {
 
   renderPianoKeys();
   updateKeyboardPartDisplay();
+  updateTopPanelsVisibility('snow');
 })();
 
 </script>
