@@ -3054,13 +3054,18 @@
 
   // multiParts[i] = { enabled, values: {per-part mixer params}, sound: {per-part PARAMS} }
   const multiParts = [];
+  const DEFAULT_INITIAL_PROGRAMS = [0, 3, 5, 14]; // P1: SuperSaw, P2: Sub Bass, P3: Dark Pad, P4: Glass Bell
   for (let i = 0; i < NUM_PARTS; i++){
     const values = {};
     PART_PARAMS.forEach(pp => { values[pp.id] = pp.default; });
     values.channel = i; // Default MIDI channels: P1=ch1, P2=ch2, P3=ch3, P4=ch4 (0-indexed)
+    values.program = DEFAULT_INITIAL_PROGRAMS[i] || i;
     const sound = {};
     PARAMS.forEach(p => { sound[p.id] = p.default; });
-    multiParts.push({ enabled: true, name: 'init', values, sound });
+    const initName = (typeof VIRUS_FACTORY_BANKS !== 'undefined' && VIRUS_FACTORY_BANKS[0] && VIRUS_FACTORY_BANKS[0][values.program])
+      ? VIRUS_FACTORY_BANKS[0][values.program]
+      : (values.program === 0 ? 'SuperSaw' : (values.program === 3 ? 'Sub Bass' : (values.program === 5 ? 'Dark Pad' : 'Glass Bell')));
+    multiParts.push({ enabled: true, name: initName, values, sound });
   }
 
   // Define patch as a Proxy so that code modifying `patch.filter1_cutoff` updates the CURRENT part's sound.
@@ -6350,6 +6355,175 @@ function exportCurrentPatchSyx() {
     }
   }
 
+  function computeSoundProfile(name, bank, prog) {
+    const n = (name || '').toLowerCase();
+    
+    // Profili sonori distinti basati sul timbro/categoria:
+    if (n.includes('bass') || n.includes('sub') || n.includes('303') || n.includes('reese') || n.includes('kick')) {
+      return {
+        type: 'bass',
+        osc1: 'sawtooth',
+        osc2: 'square',
+        octaveOffset: -1,
+        detune: 4,
+        cutoff: 48,
+        resonance: 45,
+        attack: 0.005,
+        decay: 0.22,
+        sustain: 0.35,
+        release: 0.15,
+        filterEnvAmount: 0.6
+      };
+    }
+    if (n.includes('pad') || n.includes('ambient') || n.includes('velvet') || n.includes('dark') || n.includes('sweep') || n.includes('choir') || n.includes('vox') || n.includes('drone') || n.includes('swirl')) {
+      return {
+        type: 'pad',
+        osc1: 'sine',
+        osc2: 'sawtooth',
+        octaveOffset: 0,
+        detune: 8,
+        cutoff: 68,
+        resonance: 15,
+        attack: 0.16,
+        decay: 0.45,
+        sustain: 0.75,
+        release: 0.55,
+        filterEnvAmount: 0.3
+      };
+    }
+    if (n.includes('pluck') || n.includes('bell') || n.includes('glass') || n.includes('tine') || n.includes('piano') || n.includes('stab')) {
+      return {
+        type: 'pluck',
+        osc1: 'triangle',
+        osc2: 'square',
+        octaveOffset: 0,
+        detune: 2,
+        cutoff: 90,
+        resonance: 30,
+        attack: 0.002,
+        decay: 0.15,
+        sustain: 0.12,
+        release: 0.18,
+        filterEnvAmount: 0.8
+      };
+    }
+    if (n.includes('lead') || n.includes('saw') || n.includes('supersaw') || n.includes('club') || n.includes('trance') || n.includes('flare') || n.includes('sync')) {
+      return {
+        type: 'lead',
+        osc1: 'sawtooth',
+        osc2: 'sawtooth',
+        octaveOffset: 0,
+        detune: 14,
+        cutoff: 105,
+        resonance: 40,
+        attack: 0.008,
+        decay: 0.32,
+        sustain: 0.65,
+        release: 0.25,
+        filterEnvAmount: 0.5
+      };
+    }
+    if (n.includes('arp') || n.includes('chords') || n.includes('euro') || n.includes('pulse')) {
+      return {
+        type: 'arp',
+        osc1: 'square',
+        osc2: 'sawtooth',
+        octaveOffset: 0,
+        detune: 6,
+        cutoff: 82,
+        resonance: 35,
+        attack: 0.004,
+        decay: 0.18,
+        sustain: 0.4,
+        release: 0.18,
+        filterEnvAmount: 0.7
+      };
+    }
+
+    // Variazione deterministica se nome generico
+    const modes = [
+      { type: 'lead', osc1: 'sawtooth', osc2: 'sawtooth', octaveOffset: 0, detune: 12, cutoff: 95, resonance: 35, attack: 0.008, decay: 0.3, sustain: 0.6, release: 0.22, filterEnvAmount: 0.5 },
+      { type: 'bass', osc1: 'sawtooth', osc2: 'square', octaveOffset: -1, detune: 3, cutoff: 46, resonance: 40, attack: 0.005, decay: 0.22, sustain: 0.3, release: 0.14, filterEnvAmount: 0.6 },
+      { type: 'pad', osc1: 'sine', osc2: 'sawtooth', octaveOffset: 0, detune: 8, cutoff: 65, resonance: 15, attack: 0.15, decay: 0.45, sustain: 0.75, release: 0.5, filterEnvAmount: 0.3 },
+      { type: 'pluck', osc1: 'triangle', osc2: 'square', octaveOffset: 0, detune: 2, cutoff: 88, resonance: 25, attack: 0.002, decay: 0.16, sustain: 0.15, release: 0.18, filterEnvAmount: 0.75 },
+      { type: 'poly', osc1: 'square', osc2: 'square', octaveOffset: 0, detune: 7, cutoff: 78, resonance: 20, attack: 0.012, decay: 0.28, sustain: 0.5, release: 0.25, filterEnvAmount: 0.4 }
+    ];
+    return modes[Math.abs(prog) % modes.length];
+  }
+
+  function changePartSound(partIndex, bankIndex, programIndex, emitMidi = true) {
+    const pIdx = Math.max(0, Math.min(NUM_PARTS - 1, partIndex || 0));
+    const part = multiParts[pIdx];
+    if (!part) return;
+
+    const bank = clamp7(bankIndex);
+    const prog = clamp7(programIndex);
+    part.values.bank = bank;
+    part.values.program = prog;
+
+    // 1. Assegna il nome reale della patch
+    const patchName = getBankPatchName(bank, prog) || `Patch ${prog + 1}`;
+    part.name = patchName;
+
+    // 2. Calcola e applica il profilo timbrico Web Audio per questa patch
+    const soundProfile = computeSoundProfile(patchName, bank, prog);
+    part.soundProfile = soundProfile;
+    if (soundProfile.cutoff !== undefined) {
+      part.values.f1_cutoff = soundProfile.cutoff;
+      if (pIdx === currentPartIndex) state.values.f1_cutoff = soundProfile.cutoff;
+    }
+    if (soundProfile.resonance !== undefined) {
+      part.values.f1_resonance = soundProfile.resonance;
+      if (pIdx === currentPartIndex) state.values.f1_resonance = soundProfile.resonance;
+    }
+
+    // 3. Invia comandi MIDI al sintetizzatore hardware Virus TI Snow
+    if (emitMidi) {
+      const ch = (part.values && part.values.channel !== undefined) ? (part.values.channel & 0x0F) : (pIdx & 0x0F);
+      // SysEx Multi Part Param (Bank = 31, Program = 33)
+      sendMultiPartParam(pIdx, 31, bank);
+      sendMultiPartParam(pIdx, 33, prog);
+
+      // MIDI Bank Select (CC 0 MSB, CC 32 LSB) e Program Change (0xC0 | ch, prog)
+      if (selectedOutput) {
+        try {
+          selectedOutput.send(new Uint8Array([0xB0 | ch, 0, 0])); // Bank MSB
+          selectedOutput.send(new Uint8Array([0xB0 | ch, 32, bank & 0x7F])); // Bank LSB
+          selectedOutput.send(new Uint8Array([0xC0 | ch, prog & 0x7F])); // Program Change
+          recordMidiTx(`P${pIdx + 1} Program Change: Bank ${bank} Prog ${prog} (${patchName})`, [0xC0 | ch, prog]);
+        } catch(e) { console.error('MIDI Program Change error', e); }
+      }
+
+      clearTimeout(part._dumpTimer);
+      part._dumpTimer = setTimeout(() => requestPartDump(pIdx), 150);
+    }
+
+    // 4. Aggiorna interfaccia visiva (Frontale Snow, LCD, Multi Mixer e Dropdown)
+    updateVirusSnowFrontPanel(pIdx);
+    updateVirusSnowMasterDisplay(pIdx);
+    updatePartDropdownSelection(pIdx, bank, prog);
+
+    const frontBankSel = document.getElementById('frontBankSelect');
+    const frontPatchSel = document.getElementById('frontPatchSelect');
+    if (pIdx === currentPartIndex) {
+      if (frontBankSel && frontBankSel.value !== String(bank)) frontBankSel.value = String(bank);
+      if (frontPatchSel) {
+        if (frontPatchSel.dataset.loadedBank !== String(bank)) {
+          populatePartPatchDropdown(frontPatchSel, bank, prog);
+          frontPatchSel.dataset.loadedBank = String(bank);
+        }
+        frontPatchSel.value = String(prog);
+      }
+    }
+
+    // Notifica di stato per l'utente
+    setLastAction(`Sound: P${pIdx + 1} [${BANK_NAMES[bank] || 'B' + bank}] #${prog + 1} ${patchName}`);
+    const dbg = document.getElementById('midi-debug');
+    if (dbg) {
+      dbg.innerHTML = `<span style="color:#00ffcc;">🎵 P${pIdx + 1}: <b>${escapeHtml(patchName)}</b> (${BANK_NAMES[bank] || 'B' + bank} #${prog + 1})</span>`;
+    }
+  }
+
   function startQuickBankScan(bankIndex, onComplete) {
     if (!selectedOutput) {
       alert('Collega prima una porta MIDI Output nelle impostazioni in alto per scansionare il Virus!');
@@ -6679,18 +6853,9 @@ function exportCurrentPatchSyx() {
 
     const applySoundChange = (newProg) => {
       newProg = clamp7(newProg);
-      part.values.program = newProg;
+      changePartSound(index, part.values.bank, newProg, true);
       patchSelect.value = String(newProg);
-      const newName = getBankPatchName(part.values.bank, newProg);
-      if (newName) {
-        part.name = newName;
-        if (display && display._startReveal) display._startReveal();
-      }
-      updateVirusSnowMasterDisplay(index);
-      sendMultiPartParam(index, 31, part.values.bank);
-      sendMultiPartParam(index, 33, newProg);
-      clearTimeout(part._dumpTimer);
-      part._dumpTimer = setTimeout(() => requestPartDump(index), 120);
+      if (display && display._startReveal) display._startReveal();
     };
 
     patchSelect.addEventListener('change', (e) => {
@@ -6713,18 +6878,9 @@ function exportCurrentPatchSyx() {
     bankSelect.addEventListener('change', (e) => {
       e.stopPropagation();
       const newBank = parseInt(bankSelect.value, 10);
-      part.values.bank = newBank;
-      sendMultiPartParam(index, 31, newBank);
+      changePartSound(index, newBank, part.values.program, true);
       populatePartPatchDropdown(patchSelect, newBank, part.values.program);
-      const newName = getBankPatchName(newBank, part.values.program);
-      if (newName) {
-        part.name = newName;
-        if (display && display._startReveal) display._startReveal();
-      }
-      updateVirusSnowMasterDisplay(index);
-      sendMultiPartParam(index, 33, part.values.program);
-      clearTimeout(part._dumpTimer);
-      part._dumpTimer = setTimeout(() => requestPartDump(index), 150);
+      if (display && display._startReveal) display._startReveal();
     });
 
     soundControlsRow.appendChild(bankSelect);
@@ -7095,17 +7251,7 @@ function exportCurrentPatchSyx() {
       const part = multiParts[pIdx];
       if (!part) return;
       newProg = clamp7(newProg);
-      part.values.program = newProg;
-      if (frontPatchSel) frontPatchSel.value = String(newProg);
-      const newName = getBankPatchName(part.values.bank, newProg);
-      if (newName) part.name = newName;
-      updateVirusSnowFrontPanel(pIdx);
-      updateVirusSnowMasterDisplay(pIdx);
-      updatePartDropdownSelection(pIdx, part.values.bank, newProg);
-      sendMultiPartParam(pIdx, 31, part.values.bank);
-      sendMultiPartParam(pIdx, 33, newProg);
-      clearTimeout(part._dumpTimer);
-      part._dumpTimer = setTimeout(() => requestPartDump(pIdx), 120);
+      changePartSound(pIdx, part.values.bank, newProg, true);
     };
 
     if (frontBankSel) {
@@ -7115,20 +7261,11 @@ function exportCurrentPatchSyx() {
         const part = multiParts[pIdx];
         if (!part) return;
         const newBank = parseInt(frontBankSel.value, 10);
-        part.values.bank = newBank;
-        sendMultiPartParam(pIdx, 31, newBank);
+        changePartSound(pIdx, newBank, part.values.program, true);
         if (frontPatchSel) {
           frontPatchSel.dataset.loadedBank = String(newBank);
           populatePartPatchDropdown(frontPatchSel, newBank, part.values.program);
         }
-        const newName = getBankPatchName(newBank, part.values.program);
-        if (newName) part.name = newName;
-        updateVirusSnowFrontPanel(pIdx);
-        updateVirusSnowMasterDisplay(pIdx);
-        updatePartDropdownSelection(pIdx, newBank, part.values.program);
-        sendMultiPartParam(pIdx, 33, part.values.program);
-        clearTimeout(part._dumpTimer);
-        part._dumpTimer = setTimeout(() => requestPartDump(pIdx), 150);
       });
     }
 
@@ -7210,13 +7347,28 @@ function exportCurrentPatchSyx() {
       applyFrontSoundChange((part.values.program + 1) % 128);
     });
 
-    // 4. Tasto PART ⟳: Cicla tra le 4 parti del Multi
-    document.getElementById('frontBtnPartCycle')?.addEventListener('click', () => {
-      currentPartIndex = (currentPartIndex + 1) % NUM_PARTS;
+    // 4. Tasto PART ⟳: Cicla tra le 4 parti del Multi + Click sui LED 1-4
+    const selectPart = (idx) => {
+      currentPartIndex = Math.max(0, Math.min(NUM_PARTS - 1, idx));
+      window.activeSinglePartIndex = currentPartIndex;
       updateVirusSnowFrontPanel(currentPartIndex);
       updateVirusSnowMasterDisplay(currentPartIndex);
+      updateKeyboardPartDisplay();
       setLastAction(`Part Select: P${currentPartIndex + 1}`);
+    };
+
+    document.getElementById('frontBtnPartCycle')?.addEventListener('click', () => {
+      selectPart((currentPartIndex + 1) % NUM_PARTS);
     });
+
+    for (let p = 0; p < 4; p++) {
+      const led = document.getElementById('frontRamLed' + p);
+      if (led) {
+        led.style.cursor = 'pointer';
+        led.title = `Clicca per selezionare Parte ${p + 1}`;
+        led.addEventListener('click', () => selectPart(p));
+      }
+    }
 
     // 5. Tasto TAP TEMPO / PANIC (Sinistra)
     let tapTimes = [];
@@ -7574,40 +7726,60 @@ function exportCurrentPatchSyx() {
       stopWebAudioNote(noteNumber);
     }
 
-    const freq = 440 * Math.pow(2, (noteNumber - 69) / 12);
-    const now = ctx.currentTime;
-
     const pIdx = (typeof currentPartIndex !== 'undefined') ? currentPartIndex : 0;
     const curPart = (typeof multiParts !== 'undefined' && multiParts) ? multiParts[pIdx] : null;
+    const profile = (curPart && curPart.soundProfile)
+      ? curPart.soundProfile
+      : computeSoundProfile(curPart ? curPart.name : '', curPart ? curPart.values.bank : 0, curPart ? curPart.values.program : 0);
+
+    const octShift = (profile.octaveOffset || 0) * 12;
+    const transShift = (curPart && curPart.values && curPart.values.transpose !== undefined) ? curPart.values.transpose : 0;
+    const finalNote = Math.max(12, Math.min(127, noteNumber + octShift + transShift));
+    const freq = 440 * Math.pow(2, (finalNote - 69) / 12);
+    const now = ctx.currentTime;
 
     const gainNode = ctx.createGain();
     const rawVol = (curPart && curPart.values && curPart.values.volume !== undefined) ? curPart.values.volume : 100;
     const partVol = Math.max(0.4, rawVol / 127);
     const velScale = Math.max(0.2, (velocity || 100) / 127) * partVol;
-    gainNode.gain.setValueAtTime(0.0001, now);
-    gainNode.gain.linearRampToValueAtTime(0.25 * velScale, now + 0.012);
-    gainNode.gain.exponentialRampToValueAtTime(0.18 * velScale, now + 0.28);
 
+    const att = Math.max(0.002, profile.attack || 0.01);
+    const dec = Math.max(0.05, profile.decay || 0.25);
+    const susLevel = Math.max(0.04, (profile.sustain || 0.5) * velScale * 0.25);
+    const peakLevel = Math.max(susLevel, 0.3 * velScale);
+
+    gainNode.gain.setValueAtTime(0.0001, now);
+    gainNode.gain.linearRampToValueAtTime(peakLevel, now + att);
+    gainNode.gain.exponentialRampToValueAtTime(susLevel, now + att + dec);
+
+    // Filtro dinamico con sweep di cutoff guidato dal tipo di patch
     const filter = ctx.createBiquadFilter();
     filter.type = 'lowpass';
     const rawCutoff = (curPart && curPart.values && curPart.values.f1_cutoff !== undefined)
       ? curPart.values.f1_cutoff
-      : ((typeof state !== 'undefined' && state.values && state.values.f1_cutoff !== undefined) ? state.values.f1_cutoff : 85);
-    const safeCutoff = Math.max(28, rawCutoff);
-    const cutoffHz = Math.max(600, Math.min(18000, 300 + Math.pow(safeCutoff / 127, 2.0) * 15000));
-    filter.frequency.setValueAtTime(cutoffHz, now);
+      : (profile.cutoff || 75);
+    const safeCutoff = Math.max(25, rawCutoff);
+    const baseCutoffHz = Math.max(300, Math.min(17000, 200 + Math.pow(safeCutoff / 127, 2.0) * 15000));
+    const envMult = 1 + (profile.filterEnvAmount || 0.5) * 1.6;
+    const peakCutoffHz = Math.min(18500, baseCutoffHz * envMult);
+
+    filter.frequency.setValueAtTime(baseCutoffHz, now);
+    filter.frequency.linearRampToValueAtTime(peakCutoffHz, now + att);
+    filter.frequency.exponentialRampToValueAtTime(baseCutoffHz, now + att + dec);
+
     const rawRes = (curPart && curPart.values && curPart.values.f1_resonance !== undefined)
       ? curPart.values.f1_resonance
-      : ((typeof state !== 'undefined' && state.values && state.values.f1_resonance !== undefined) ? state.values.f1_resonance : 0);
-    filter.Q.setValueAtTime(1.2 + (rawRes / 127) * 6.5, now);
+      : (profile.resonance || 25);
+    filter.Q.setValueAtTime(1.2 + (rawRes / 127) * 7.0, now);
 
     const osc1 = ctx.createOscillator();
-    osc1.type = 'sawtooth';
+    osc1.type = profile.osc1 || 'sawtooth';
     osc1.frequency.setValueAtTime(freq, now);
 
     const osc2 = ctx.createOscillator();
-    osc2.type = 'square';
-    osc2.frequency.setValueAtTime(freq * 1.0025, now);
+    osc2.type = profile.osc2 || 'square';
+    const detuneHz = (profile.detune || 5) * 0.35;
+    osc2.frequency.setValueAtTime(freq + detuneHz, now);
 
     osc1.connect(filter);
     osc2.connect(filter);
@@ -7617,7 +7789,7 @@ function exportCurrentPatchSyx() {
     osc1.start(now);
     osc2.start(now);
 
-    activeAudioVoices.set(noteNumber, { osc1, osc2, gainNode, ctx });
+    activeAudioVoices.set(noteNumber, { osc1, osc2, gainNode, ctx, profile });
   }
 
   function stopWebAudioNote(noteNumber) {
@@ -7625,10 +7797,11 @@ function exportCurrentPatchSyx() {
     if (!voice) return;
     activeAudioVoices.delete(noteNumber);
     const now = voice.ctx.currentTime;
+    const rel = Math.max(0.08, (voice.profile && voice.profile.release) ? voice.profile.release : 0.18);
     try {
       voice.gainNode.gain.cancelScheduledValues(now);
       voice.gainNode.gain.setValueAtTime(voice.gainNode.gain.value, now);
-      voice.gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
+      voice.gainNode.gain.exponentialRampToValueAtTime(0.0001, now + rel);
       setTimeout(() => {
         try {
           voice.osc1.stop();
@@ -7637,7 +7810,7 @@ function exportCurrentPatchSyx() {
           voice.osc2.disconnect();
           voice.gainNode.disconnect();
         } catch(e) {}
-      }, 150);
+      }, Math.round((rel + 0.05) * 1000));
     } catch(e) {}
   }
 
@@ -7655,11 +7828,15 @@ function exportCurrentPatchSyx() {
   function updateKeyboardPartDisplay() {
     const el = document.getElementById('activeKbdPartDisplay');
     if (!el) return;
-    const pIdx = (window.activeSinglePartIndex !== undefined) ? window.activeSinglePartIndex : 0;
-    const ch = (typeof multiParts !== 'undefined' && multiParts && multiParts[pIdx] && multiParts[pIdx].values)
-      ? (multiParts[pIdx].values.channel + 1)
+    const pIdx = (typeof currentPartIndex !== 'undefined') ? currentPartIndex : 0;
+    const part = (typeof multiParts !== 'undefined' && multiParts && multiParts[pIdx]) ? multiParts[pIdx] : null;
+    const ch = (part && part.values && part.values.channel !== undefined)
+      ? (part.values.channel + 1)
       : (pIdx + 1);
-    el.textContent = `P${pIdx + 1} (ch ${ch})`;
+    const pName = (part && part.name && part.name !== 'init' && !isDummyPatchName(part.name))
+      ? part.name
+      : (part ? getBankPatchName(part.values.bank, part.values.program) : `Patch ${pIdx + 1}`);
+    el.textContent = `P${pIdx + 1}: ${pName} (ch ${ch})`;
   }
 
   function playNote(noteNumber, velocity = currentVelocity) {
@@ -8734,6 +8911,13 @@ function exportCurrentPatchSyx() {
   buildArpView();
   buildSeqView();
   buildSongView();
+
+  // Inizializza i profili sonori di tutte le 4 parti
+  for (let i = 0; i < NUM_PARTS; i++) {
+    if (multiParts[i]) {
+      changePartSound(i, multiParts[i].values.bank, multiParts[i].values.program, false);
+    }
+  }
 
   renderPianoKeys();
   updateKeyboardPartDisplay();
