@@ -531,26 +531,26 @@
   .part-row{
     border: 1px solid #c0c3c9;
     background: linear-gradient(180deg, #fbfcfd 0%, #eceef2 100%);
-    border-left-width: 6px;
+    border-left-width: 5px;
     border-left-style: solid;
-    padding: 12px 18px;
-    border-radius: 6px;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.08), inset 0 1px 0 rgba(255,255,255,0.9);
+    padding: 5px 10px;
+    border-radius: 5px;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.06), inset 0 1px 0 rgba(255,255,255,0.95);
     transition: opacity 200ms ease, background-color 200ms ease, border-color 200ms ease;
     display: flex;
     flex-direction: row;
     align-items: center;
-    justify-content: space-between;
-    gap: 16px;
+    justify-content: flex-start;
+    gap: 8px;
     flex: 0 0 auto;
     box-sizing: border-box;
-    flex-wrap: wrap;
+    flex-wrap: nowrap;
     color: #222;
   }
   html[data-skin="elektron"] .part-row{
     border-color: #333338;
     background: #18181c;
-    box-shadow: 0 4px 12px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
+    box-shadow: 0 2px 6px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.05);
     color: #eee;
   }
   .part-row.disabled{
@@ -773,32 +773,52 @@
     box-sizing: border-box;
   }
   .part-display{
-    order: 1;
-    flex: 1 1 360px;
-    min-width: 260px;
-    height: 60px;
-    align-self: center;
+    flex: 0 0 32px !important;
+    min-height: 32px !important;
+    max-height: 32px !important;
+    height: 32px !important;
+    width: 100%;
+    align-self: stretch;
     display: flex;
     align-items: stretch;
-    background: #050505;
-    border: 1px solid color-mix(in srgb, var(--accent) 40%, #222222);
-    padding: 4px 8px;
+    background: #d4e7f5;
+    border: 1px solid #9cb7cb;
+    border-radius: 3px;
+    padding: 0;
     cursor: pointer;
     box-sizing: border-box;
     overflow: hidden;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.18);
   }
   .part-display canvas{
     display: block;
     width: 100%;
     height: 100%;
   }
-  @media (max-width: 1023px){
-    .part-display{
-      order: 1;
-      flex-basis: 100%;
-      min-width: 0;
-      margin-top: 0;
-    }
+  html[data-skin="elektron"] .part-display{
+    background: #0f141a;
+    border-color: #24303d;
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.8);
+  }
+  .part-knobs-group .chassis-knob-container {
+    width: 38px;
+  }
+  .part-knobs-group .chassis-knob-inner {
+    width: 30px;
+    height: 30px;
+  }
+  .part-knobs-group .chassis-knob-top {
+    width: 22px;
+    height: 22px;
+  }
+  .part-knobs-group .chassis-knob-indicator {
+    height: 7px;
+    width: 2px;
+  }
+  .part-knobs-group .chassis-knob-label {
+    font-size: 7.5px;
+    margin-top: 2px;
+    letter-spacing: 0.04em;
   }
   input[type="number"]{
     background: transparent;
@@ -1872,79 +1892,80 @@
       <span style="font-size: 18px; color: #333;">❖</span> access
     </div>
 
-    <div style="z-index: 1; width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 15px; padding: 0 10px; gap: 16px;">
-      <!-- Master Access Virus TI Snow LCD Display Unit (come da foto hardware) -->
-      <div class="virus-snow-display-panel" style="width: 100%; max-width: 1050px; background: rgba(0,0,0,0.03); border: 1px solid var(--border); border-radius: 8px; padding: 14px 18px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 18px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.05); position: relative;">
+    <div style="z-index: 1; width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 6px; padding: 0 8px; gap: 8px;">
+      <!-- Master Access Virus TI Snow LCD Display Unit (Fondo chiaro con testi e icone grigie come hardware) -->
+      <div class="virus-snow-display-panel" style="width: 100%; max-width: 1050px; background: rgba(0,0,0,0.02); border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.04); position: relative;">
         <!-- Acrylic Glass Frame con 4 viti a brugola -->
-        <div style="background: rgba(255,255,255,0.7); border: 2px solid #b8bac2; border-radius: 8px; padding: 12px 18px; box-shadow: 0 4px 14px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.95); position: relative; min-width: 420px; flex: 1 1 420px;">
-          <div class="chassis-screw" style="top: 6px; left: 6px; width: 9px; height: 9px;"></div>
-          <div class="chassis-screw" style="top: 6px; right: 6px; width: 9px; height: 9px;"></div>
-          <div class="chassis-screw" style="bottom: 6px; left: 6px; width: 9px; height: 9px;"></div>
-          <div class="chassis-screw" style="bottom: 6px; right: 6px; width: 9px; height: 9px;"></div>
+        <div style="background: rgba(255,255,255,0.78); border: 2px solid #b8bac2; border-radius: 6px; padding: 6px 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.95); position: relative; min-width: 320px; flex: 1 1 360px;">
+          <div class="chassis-screw" style="top: 5px; left: 5px; width: 8px; height: 8px;"></div>
+          <div class="chassis-screw" style="top: 5px; right: 5px; width: 8px; height: 8px;"></div>
+          <div class="chassis-screw" style="bottom: 5px; left: 5px; width: 8px; height: 8px;"></div>
+          <div class="chassis-screw" style="bottom: 5px; right: 5px; width: 8px; height: 8px;"></div>
 
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; padding: 0 8px;">
-            <div style="display: flex; align-items: center; gap: 6px;">
-              <span id="snowLcdBpmLed" style="width: 7px; height: 7px; border-radius: 50%; background: #e06c75; box-shadow: 0 0 6px #e06c75; display: inline-block;"></span>
-              <span style="font-size: 8.5px; font-weight: 800; letter-spacing: 0.1em; color: #555;">BPM / LFO</span>
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; padding: 0 4px;">
+            <div style="display: flex; align-items: center; gap: 5px;">
+              <span id="snowLcdBpmLed" style="width: 6px; height: 6px; border-radius: 50%; background: #e06c75; box-shadow: 0 0 5px #e06c75; display: inline-block;"></span>
+              <span style="font-size: 8px; font-weight: 800; letter-spacing: 0.1em; color: #555;">BPM / LFO</span>
             </div>
-            <div style="font-weight: 900; font-size: 13px; letter-spacing: 0.15em; color: #222; font-family: 'Inter', sans-serif;">
+            <div style="font-weight: 900; font-size: 11px; letter-spacing: 0.12em; color: #222; font-family: 'Inter', sans-serif;">
               VIRUS <span style="font-weight: 300; opacity: 0.5;">|</span> TI SNOW
             </div>
           </div>
 
-          <!-- LCD Backlit Screen identico alla foto del Virus TI Snow -->
-          <div id="virusSnowLcdScreen" style="background: #080d12; border: 2px solid #1c222a; border-radius: 4px; padding: 8px 12px; box-shadow: inset 0 3px 12px rgba(0,0,0,0.95); font-family: monospace; color: var(--accent); position: relative; overflow: hidden;">
-            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: bold; border-bottom: 1px solid rgba(86, 182, 194, 0.25); padding-bottom: 4px; margin-bottom: 6px;">
-              <span style="background: var(--accent); color: #080d12; padding: 1px 6px; border-radius: 2px; font-weight: 900; letter-spacing: 0.08em;">MULTI</span>
-              <span id="snowLcdCategory" style="letter-spacing: 0.05em; color: #88c0d0;">AlienArp</span>
-              <span style="display: flex; align-items: center; gap: 4px;">
+          <!-- LCD Backlit Screen identico alla foto reale del Virus TI Snow: fondo chiaro, testi e icone grigie -->
+          <div id="virusSnowLcdScreen" style="background: linear-gradient(180deg, #e4eff8 0%, #d0e4f2 100%); border: 3px solid #1c252e; border-radius: 4px; padding: 6px 10px; box-shadow: inset 0 2px 6px rgba(0,0,0,0.35); font-family: monospace; color: #1c2a38; position: relative; overflow: hidden;">
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 10px; font-weight: bold; background: #223446; color: #d7e9f5; padding: 2px 6px; border-radius: 2px; margin-bottom: 4px;">
+              <span style="background: #d7e9f5; color: #223446; padding: 0 4px; border-radius: 2px; font-weight: 900; letter-spacing: 0.05em;">MULTI</span>
+              <span id="snowLcdCategory" style="letter-spacing: 0.05em; color: #eaf3fa; font-weight: 800;">AlienArp</span>
+              <span style="display: flex; align-items: center; gap: 4px; color: #d7e9f5;">
+                <span style="font-size: 9px;">▤</span>
                 <span>🔒</span>
                 <span id="snowLcdMultiPrg" style="font-weight: 900;">02</span>
               </span>
             </div>
-            <div style="display: flex; align-items: baseline; gap: 14px; margin: 8px 0;">
-              <span id="snowLcdBankProg" style="font-size: 16px; font-weight: 900; color: #fff; letter-spacing: 0.05em; min-width: 65px;">7-8</span>
-              <span id="snowLcdPatchName" style="font-size: 19px; font-weight: 900; letter-spacing: 0.08em; text-transform: uppercase; color: var(--accent); text-shadow: 0 0 10px rgba(86,182,194,0.6);">SavePrayer</span>
+            <div style="display: flex; align-items: baseline; gap: 10px; margin: 4px 0 3px 0;">
+              <span id="snowLcdBankProg" style="font-size: 15px; font-weight: 900; color: #1c2a38; letter-spacing: 0.05em; min-width: 50px;">7-8</span>
+              <span id="snowLcdPatchName" style="font-size: 16px; font-weight: 900; letter-spacing: 0.06em; text-transform: uppercase; color: #1a2836; text-shadow: 0 1px 0 rgba(255,255,255,0.7);">SavePrayer</span>
             </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 10px; color: #8899aa; border-top: 1px solid rgba(86, 182, 194, 0.2); padding-top: 4px; margin-top: 4px;">
+            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 9px; font-weight: 700; color: #3d5065; border-top: 1px dotted rgba(35, 52, 70, 0.35); padding-top: 2px; margin-top: 2px;">
               <span id="snowLcdSoft1" style="flex: 1; text-align: left;">&lt;global&gt;</span>
-              <span id="snowLcdSoft2" style="flex: 1; text-align: center; color: #fff; font-weight: bold;">Energy</span>
+              <span id="snowLcdSoft2" style="flex: 1; text-align: center; color: #1c2a38; font-weight: 800;">Energy</span>
               <span id="snowLcdSoft3" style="flex: 1; text-align: right;">&lt;global&gt;</span>
             </div>
           </div>
         </div>
 
         <!-- Strumenti Globali Multi & Scanner Banchi -->
-        <div style="display: flex; flex-direction: column; gap: 10px; min-width: 300px; flex: 1 1 300px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.03); border: 1px solid var(--border); border-radius: 4px; padding: 6px 12px;">
-            <span style="font-weight: 800; font-size: 11px; letter-spacing: 0.05em; color: #444;">MULTI PRG:</span>
-            <div style="display: flex; align-items: center; gap: 4px;">
-              <button id="btnMultiPrgDown" class="chassis-page-btn" style="padding: 2px 7px;">-</button>
-              <input type="number" id="multiProgramInput" min="0" max="127" value="1" style="width: 44px; text-align: center; font-weight: bold; font-size: 13px; background: #fff; color: #111; border: 1px solid var(--border); border-radius: 3px; padding: 3px 0;">
-              <button id="btnMultiPrgUp" class="chassis-page-btn" style="padding: 2px 7px;">+</button>
+        <div style="display: flex; flex-direction: column; gap: 6px; min-width: 280px; flex: 1 1 300px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.03); border: 1px solid var(--border); border-radius: 4px; padding: 4px 8px;">
+            <span style="font-weight: 800; font-size: 10px; letter-spacing: 0.05em; color: #444;">MULTI PRG:</span>
+            <div style="display: flex; align-items: center; gap: 3px;">
+              <button id="btnMultiPrgDown" class="chassis-page-btn" style="padding: 1px 6px; font-size: 10px;">-</button>
+              <input type="number" id="multiProgramInput" min="0" max="127" value="1" style="width: 38px; text-align: center; font-weight: bold; font-size: 12px; background: #fff; color: #111; border: 1px solid var(--border); border-radius: 3px; padding: 1px 0;">
+              <button id="btnMultiPrgUp" class="chassis-page-btn" style="padding: 1px 6px; font-size: 10px;">+</button>
             </div>
-            <div style="display: flex; gap: 4px;">
-              <button id="btnMultiLoad" class="chassis-page-btn" style="padding: 3px 8px; font-size: 10px;">CARICA</button>
-              <button id="btnMultiSave" class="chassis-page-btn" style="padding: 3px 8px; font-size: 10px;">SALVA</button>
+            <div style="display: flex; gap: 3px;">
+              <button id="btnMultiLoad" class="chassis-page-btn" style="padding: 2px 7px; font-size: 9.5px;">CARICA</button>
+              <button id="btnMultiSave" class="chassis-page-btn" style="padding: 2px 7px; font-size: 9.5px;">SALVA</button>
             </div>
           </div>
 
-          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;">
-            <div style="display: flex; align-items: center; gap: 6px;">
-              <span style="font-size: 11px; font-weight: 700; color: #555;">BANCO:</span>
-              <select id="quickBankScanSelect" style="padding: 4px 8px; font-size: 11px; font-weight: bold; background: #fff; color: #111; border: 1px solid var(--border); border-radius: 3px; cursor: pointer;"></select>
-              <button id="btnQuickScanBank" class="chassis-page-btn" style="color: #2b7a8a; border-color: #2b7a8a; font-weight: bold; padding: 4px 10px; font-size: 11px;" title="Interroga il Virus via SysEx per leggere e memorizzare tutti i 128 nomi">📥 SCANSIONA 128</button>
-              <button id="btnScanAllRam" class="chassis-page-btn" style="color: #1e6091; border-color: #1e6091; font-weight: bold; padding: 4px 10px; font-size: 11px;">⚡ RAM A-D</button>
-              <button id="btnOpenBankNamesModal" class="chassis-page-btn" style="padding: 4px 9px; font-size: 11px;">📋 NOMI</button>
+          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px;">
+            <div style="display: flex; align-items: center; gap: 4px;">
+              <span style="font-size: 10px; font-weight: 700; color: #555;">BANCO:</span>
+              <select id="quickBankScanSelect" style="padding: 3px 6px; font-size: 10px; font-weight: bold; background: #fff; color: #111; border: 1px solid var(--border); border-radius: 3px; cursor: pointer;"></select>
+              <button id="btnQuickScanBank" class="chassis-page-btn" style="color: #2b7a8a; border-color: #2b7a8a; font-weight: bold; padding: 3px 8px; font-size: 10px;" title="Interroga il Virus via SysEx per leggere e memorizzare tutti i 128 nomi">📥 SCANSIONA 128</button>
+              <button id="btnScanAllRam" class="chassis-page-btn" style="color: #1e6091; border-color: #1e6091; font-weight: bold; padding: 3px 8px; font-size: 10px;">⚡ RAM A-D</button>
+              <button id="btnOpenBankNamesModal" class="chassis-page-btn" style="padding: 3px 7px; font-size: 10px;">📋 NOMI</button>
             </div>
-            <button id="btnSyncMultiInView" class="chassis-page-btn" style="padding: 5px 12px; font-size: 11px; font-weight: bold; color: #111; border-color: var(--accent); background: linear-gradient(to bottom, #fff, #e2e4e8);" title="Interroga le 4 parti attive del Virus">🔄 LEGGI 4 PARTI</button>
+            <button id="btnSyncMultiInView" class="chassis-page-btn" style="padding: 4px 10px; font-size: 10px; font-weight: bold; color: #111; border-color: var(--accent); background: linear-gradient(to bottom, #fff, #e2e4e8);" title="Interroga le 4 parti attive del Virus">🔄 LEGGI 4 PARTI</button>
           </div>
-          <div id="quickScanStatus" style="font-size: 11px; color: #666; font-family: monospace; min-height: 16px;"></div>
+          <div id="quickScanStatus" style="font-size: 10px; color: #666; font-family: monospace; min-height: 14px;"></div>
         </div>
       </div>
 
       <!-- Le 4 Parti Multi in Skin Virus TI Snow -->
-      <div class="part-list" id="partList" style="width: 100%; max-width: 1050px; display: flex; flex-direction: column; gap: 12px;"></div>
+      <div class="part-list" id="partList" style="width: 100%; max-width: 1050px; display: flex; flex-direction: column; gap: 6px;"></div>
     </div>
     <div class="chassis-wood-strip"></div>
   </div>
@@ -5093,8 +5114,8 @@ function exportCurrentPatchSyx() {
     wrap.appendChild(canvas);
     const ctx = canvas.getContext('2d');
 
-    const DOT = 4, GAP = 1, CELL = DOT + GAP;
-    const PRG_DOT = 2, PRG_GAP = 1, PRG_CELL = PRG_DOT + PRG_GAP;
+    const DOT = 2, GAP = 1, CELL = DOT + GAP;
+    const PRG_DOT = 1.5, PRG_GAP = 1, PRG_CELL = PRG_DOT + PRG_GAP;
 
     let w = 0, h = 0, dpr = 1;
     let revealCols = 0;
@@ -5116,22 +5137,39 @@ function exportCurrentPatchSyx() {
     function render(){
       if (w <= 0 || h <= 0) return;
       ctx.clearRect(0, 0, w, h);
-      const colors = { active: currentAccent, inactive: '#666' };
 
-      // background dot grid
+      // Light backlit LCD palette matching the physical Virus TI Snow LCD:
+      // Fondo chiaro, testi e icone grigie
+      const isElektron = document.documentElement.getAttribute('data-skin') === 'elektron';
+      const colors = isElektron ? {
+        bg: '#0f141a',
+        grid: '#1b2633',
+        active: '#88c0d0',
+        inactive: '#4b6580'
+      } : {
+        bg: '#d4e7f5',
+        grid: '#c6d9e7',
+        active: '#1c2a38',
+        inactive: '#4b5e70'
+      };
+
+      // Background fill & subtle LCD grid dots
+      ctx.fillStyle = colors.bg;
+      ctx.fillRect(0, 0, w, h);
+
       const cols = Math.floor((w + GAP) / CELL);
       const rows = Math.floor((h + GAP) / CELL);
-      ctx.fillStyle = '#1a1a1a';
+      ctx.fillStyle = colors.grid;
       for (let r = 0; r < rows; r++){
         for (let c = 0; c < cols; c++){
           ctx.fillRect(c * CELL, r * CELL, DOT, DOT);
         }
       }
 
-      // tiny "PRG nnn" label, top-left
+      // "PRG nnn" badge on the left in dark slate-grey
       const prgText = 'PRG ' + String(multiParts[index].values.program).padStart(3, '0');
       ctx.fillStyle = colors.inactive;
-      let px = 2, py = 2;
+      let px = 5, py = 5;
       for (const ch of prgText){
         const glyph = glyphFor(ch);
         for (let row = 0; row < FONT_ROWS; row++){
@@ -5144,11 +5182,11 @@ function exportCurrentPatchSyx() {
         px += (FONT_COLS + 1) * PRG_CELL;
       }
 
-      // main patch name, centered, revealed column by column
+      // Main patch name right beside it, revealed column by column
       const text = getName();
-      const textH = FONT_ROWS * CELL - GAP;
-      const ox = 10;
-      const oy = Math.max(20, Math.floor((h - textH) / 2) + 10);
+      const textH = FONT_ROWS * CELL - GAP; // 7 * 3 - 1 = 20px
+      const ox = px + 12;
+      const oy = Math.max(3, Math.floor((h - textH) / 2));
 
       ctx.fillStyle = colors.active;
       let gcol = 0;
@@ -5167,7 +5205,7 @@ function exportCurrentPatchSyx() {
         gcol++; // gap column between characters
       }
 
-      // idle flicker dots
+      // Idle flicker dots
       const t = now();
       flickerDots = flickerDots.filter(d => d.until > t);
       ctx.fillStyle = colors.active;
@@ -5775,17 +5813,17 @@ function exportCurrentPatchSyx() {
 
     // 1. HARDWARE MATRIX & CHANNEL: BADGE + ON/OFF + MUTE + SOLO + MIDI CH
     const leftGroup = document.createElement('div');
-    leftGroup.style.cssText = 'display: flex; align-items: center; gap: 6px; flex-shrink: 0; flex-wrap: wrap;';
+    leftGroup.style.cssText = 'display: flex; align-items: center; gap: 3px; flex-shrink: 0;';
 
     const badge = document.createElement('div');
-    badge.style.cssText = `background: ${partColor}; color: #000; font-weight: 900; font-size: 13px; padding: 5px 11px; border-radius: 4px; font-family: monospace; letter-spacing: 0.05em; min-width: 28px; text-align: center; box-shadow: 0 0 10px ${partColor}55;`;
+    badge.style.cssText = `background: ${partColor}; color: #000; font-weight: 900; font-size: 11px; padding: 3px 6px; border-radius: 3px; font-family: monospace; letter-spacing: 0.05em; min-width: 20px; text-align: center; box-shadow: 0 0 6px ${partColor}55;`;
     badge.textContent = 'P' + (index + 1);
     badge.title = `Access Virus TI Snow Part ${index + 1}`;
     leftGroup.appendChild(badge);
 
     const enableBtn = document.createElement('button');
     enableBtn.className = 'chassis-page-btn';
-    enableBtn.style.cssText = 'padding: 4px 8px; font-size: 11px; font-weight: bold;';
+    enableBtn.style.cssText = 'padding: 2px 5px; font-size: 10px; font-weight: bold; height: 22px; min-width: 28px;';
     enableBtn.classList.toggle('active', part.enabled);
     enableBtn.textContent = part.enabled ? 'ON' : 'OFF';
     enableBtn.addEventListener('click', (e) => {
@@ -5800,7 +5838,7 @@ function exportCurrentPatchSyx() {
 
     const muteBtn = document.createElement('button');
     muteBtn.className = 'chassis-page-btn btn-part-mute';
-    muteBtn.style.cssText = 'padding: 4px 8px; font-size: 11px; font-weight: bold;';
+    muteBtn.style.cssText = 'padding: 2px 5px; font-size: 10px; font-weight: bold; height: 22px; width: 22px;';
     muteBtn.textContent = 'M';
     muteBtn.title = `Muta Parte ${index + 1}`;
     muteBtn.addEventListener('click', (e) => {
@@ -5811,7 +5849,7 @@ function exportCurrentPatchSyx() {
 
     const soloBtn = document.createElement('button');
     soloBtn.className = 'chassis-page-btn btn-part-solo';
-    soloBtn.style.cssText = 'padding: 4px 8px; font-size: 11px; font-weight: bold;';
+    soloBtn.style.cssText = 'padding: 2px 5px; font-size: 10px; font-weight: bold; height: 22px; width: 22px;';
     soloBtn.textContent = 'S';
     soloBtn.title = `Solo Parte ${index + 1}`;
     soloBtn.addEventListener('click', (e) => {
@@ -5830,26 +5868,23 @@ function exportCurrentPatchSyx() {
     });
     chField.style.margin = '0';
     chField.style.flexShrink = '0';
+    const chSel = chField.querySelector('select');
+    if (chSel) chSel.style.cssText = 'font-size: 10px; padding: 1px 3px; height: 22px; min-width: 40px;';
     leftGroup.appendChild(chField);
 
     row.appendChild(leftGroup);
 
     // 2. LCD DOT-MATRIX DISPLAY + PATCH SELECTOR SECTION
     const centerGroup = document.createElement('div');
-    centerGroup.style.cssText = 'display: flex; flex-direction: column; gap: 6px; flex: 1 1 360px; min-width: 260px;';
+    centerGroup.style.cssText = 'display: flex; flex-direction: column; gap: 3px; flex: 1 1 340px; max-width: 440px; justify-content: center;';
 
-    // Dot-Matrix Canvas Display unit
-    const display = createPartDisplay(index);
-    partDisplays[index] = display;
-    centerGroup.appendChild(display);
-
-    // Selettore Banco + Steppers + Tendina 128 Patch
+    // Selettore Banco + Steppers + Tendina 128 Patch (Sopra al display, compatto con fondo chiaro)
     const soundControlsRow = document.createElement('div');
-    soundControlsRow.style.cssText = 'display: flex; align-items: center; gap: 5px; width: 100%; flex-wrap: wrap;';
+    soundControlsRow.style.cssText = 'display: flex; align-items: center; gap: 3px; width: 100%;';
 
     // Banco
     const bankSelect = document.createElement('select');
-    bankSelect.style.cssText = 'font-size: 11px; font-weight: bold; font-family: monospace; background: #1a1a22; color: #fff; border: 1px solid var(--border); border-radius: 3px; padding: 4px 6px; cursor: pointer; max-width: 95px;';
+    bankSelect.style.cssText = 'font-size: 10.5px; font-weight: bold; font-family: monospace; background: #fff; color: #1a2228; border: 1px solid #b8bac2; border-radius: 3px; padding: 2px 4px; height: 22px; cursor: pointer; max-width: 78px;';
     BANK_NAMES.forEach((bName, bIdx) => {
       const opt = document.createElement('option');
       opt.value = String(bIdx);
@@ -5860,7 +5895,7 @@ function exportCurrentPatchSyx() {
 
     const btnSyncPartBank = document.createElement('button');
     btnSyncPartBank.className = 'chassis-page-btn';
-    btnSyncPartBank.style.cssText = 'padding: 4px 6px; font-size: 10px; color: var(--accent); border-color: var(--border); cursor: pointer;';
+    btnSyncPartBank.style.cssText = 'padding: 2px 5px; height: 22px; font-size: 9px; color: #1e6091; border-color: #b8bac2; cursor: pointer;';
     btnSyncPartBank.textContent = '📥';
     btnSyncPartBank.title = 'Scansiona via SysEx i 128 nomi di questo banco dal Virus TI';
     btnSyncPartBank.addEventListener('click', (e) => {
@@ -5871,16 +5906,18 @@ function exportCurrentPatchSyx() {
 
     const btnPrev = document.createElement('button');
     btnPrev.className = 'part-stepper-btn';
+    btnPrev.style.cssText = 'padding: 2px 5px; height: 22px; font-size: 9px; min-width: 18px;';
     btnPrev.textContent = '◀';
     btnPrev.title = 'Patch precedente (Program -1)';
 
     const patchSelect = document.createElement('select');
     patchSelect.className = 'part-patch-dropdown';
-    patchSelect.style.cssText = 'flex: 1 1 180px; min-width: 140px; font-size: 12px; font-weight: bold; font-family: monospace; background: #181820; color: #fff; border: 1px solid var(--border); border-radius: 3px; padding: 4px 8px; cursor: pointer;';
+    patchSelect.style.cssText = 'flex: 1; min-width: 130px; font-size: 11px; font-weight: bold; font-family: monospace; background: #fff; color: #1a2228; border: 1px solid #b8bac2; border-radius: 3px; padding: 2px 5px; height: 22px; cursor: pointer;';
     populatePartPatchDropdown(patchSelect, part.values.bank, part.values.program);
 
     const btnNext = document.createElement('button');
     btnNext.className = 'part-stepper-btn';
+    btnNext.style.cssText = 'padding: 2px 5px; height: 22px; font-size: 9px; min-width: 18px;';
     btnNext.textContent = '▶';
     btnNext.title = 'Patch successiva (Program +1)';
 
@@ -5941,12 +5978,17 @@ function exportCurrentPatchSyx() {
     soundControlsRow.appendChild(btnNext);
     centerGroup.appendChild(soundControlsRow);
 
+    // Dot-Matrix Canvas Display unit (Sotto, fondo chiaro, testi grigi)
+    const display = createPartDisplay(index);
+    partDisplays[index] = display;
+    centerGroup.appendChild(display);
+
     row.appendChild(centerGroup);
 
     // 3. HARDWARE ROTARY KNOBS: VOL, PAN, TRSP, CUTOFF, RESONANCE
     const knobsGroup = document.createElement('div');
     knobsGroup.className = 'part-knobs-group';
-    knobsGroup.style.cssText = 'display: flex; align-items: center; gap: 8px; flex-shrink: 0; flex-wrap: wrap; justify-content: center;';
+    knobsGroup.style.cssText = 'display: flex; align-items: center; gap: 4px; flex-shrink: 0; margin-left: auto;';
 
     const volParam = PART_PARAMS.find(p => p.id === 'volume');
     const volKnob = createPartKnob(index, volParam);
@@ -5978,11 +6020,11 @@ function exportCurrentPatchSyx() {
 
     // 4. ACTION BUTTONS: PROVA (AUDITION) + SINGLE EDIT
     const actionsGroup = document.createElement('div');
-    actionsGroup.style.cssText = 'display: flex; flex-direction: column; gap: 5px; flex-shrink: 0; justify-content: center;';
+    actionsGroup.style.cssText = 'display: flex; flex-direction: column; gap: 3px; flex-shrink: 0; justify-content: center;';
 
     const audBtn = document.createElement('button');
     audBtn.className = 'chassis-page-btn';
-    audBtn.style.cssText = 'padding: 5px 12px; font-size: 11px; font-weight: bold; color: var(--accent); border-color: var(--accent); white-space: nowrap;';
+    audBtn.style.cssText = 'padding: 2px 7px; font-size: 9.5px; height: 22px; font-weight: bold; color: var(--accent); border-color: var(--accent); white-space: nowrap;';
     audBtn.textContent = '▶ PROVA';
     audBtn.title = `Suona una nota di prova su P${index + 1}`;
     audBtn.addEventListener('click', (e) => {
@@ -5993,7 +6035,7 @@ function exportCurrentPatchSyx() {
 
     const editBtn = document.createElement('button');
     editBtn.className = 'chassis-page-btn';
-    editBtn.style.cssText = `padding: 5px 10px; font-size: 11px; font-weight: bold; color: ${partColor}; border-color: ${partColor}; background: rgba(0,0,0,0.3); white-space: nowrap;`;
+    editBtn.style.cssText = `padding: 2px 7px; font-size: 9.5px; height: 22px; font-weight: bold; color: ${partColor}; border-color: ${partColor}; background: rgba(0,0,0,0.05); white-space: nowrap;`;
     editBtn.textContent = '✏️ SINGLE';
     editBtn.title = `Apri P${index + 1} nell'editor Single per scolpirne tutti i dettagli`;
     editBtn.addEventListener('click', (e) => {
