@@ -530,42 +530,70 @@
   }
   .part-row{
     border: 1px solid var(--border);
-    border-bottom: none;
-    background: var(--section-bg);
-    border-left-width: 3px;
+    background: #141418;
+    border-left-width: 5px;
     border-left-style: solid;
-    padding-left: 16px;
-    overflow: hidden;
+    padding: 10px 14px;
+    border-radius: 6px;
+    box-shadow: 0 4px 14px rgba(0,0,0,0.4);
     transition: opacity 200ms ease, background-color 200ms ease, border-color 200ms ease;
-    flex: 0 0 auto;
-  }
-  .part-list .part-row:last-child{
-    border-bottom: 1px solid var(--border);
-  }
-  .part-row.disabled{
-    opacity: 0.4;
-  }
-  .part-0{ border-left-color: #ffffff; }
-  .part-1{ border-left-color: #aaaaaa; }
-  .part-2{ border-left-color: #555555; }
-  .part-3{ border-left-color: #dddddd; }
-  html[data-skin="elektron"] .part-0{ border-left-color: #ffffff; }
-  html[data-skin="elektron"] .part-1{ border-left-color: #999999; }
-  html[data-skin="elektron"] .part-2{ border-left-color: #555555; }
-  html[data-skin="elektron"] .part-3{ border-left-color: #cccccc; }
-  .part-main{
     display: flex;
-    align-items: center;
-    align-content: center;
+    flex-direction: column;
     gap: 8px;
-    flex-wrap: wrap;
-    padding: 8px;
-    height: auto;
-    min-height: 80px;
+    flex: 0 0 auto;
     box-sizing: border-box;
   }
-  .part-main > :not(.part-badge):not(.part-enable):not(.part-display){
-    order: 2;
+  .part-row.disabled{
+    opacity: 0.45;
+  }
+  .part-row.muted{
+    opacity: 0.4;
+  }
+  .part-0{ border-left-color: #56b6c2; }
+  .part-1{ border-left-color: #e59500; }
+  .part-2{ border-left-color: #c678dd; }
+  .part-3{ border-left-color: #74c476; }
+  html[data-skin="elektron"] .part-0{ border-left-color: #56b6c2; }
+  html[data-skin="elektron"] .part-1{ border-left-color: #e59500; }
+  html[data-skin="elektron"] .part-2{ border-left-color: #c678dd; }
+  html[data-skin="elektron"] .part-3{ border-left-color: #74c476; }
+  .part-header-bar{
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    padding-bottom: 8px;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .part-header-left{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  .part-header-right{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .part-main{
+    display: flex;
+    align-items: stretch;
+    gap: 10px;
+    flex-wrap: wrap;
+    padding: 2px 0 0 0;
+    box-sizing: border-box;
+  }
+  .part-cluster{
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.05);
+    border-radius: 4px;
+    padding: 6px 10px;
+    flex-wrap: wrap;
   }
   .part-main .field{
     gap: 0;
@@ -1730,24 +1758,44 @@
     <div class="chassis-screw screw-br"></div>
     <div class="chassis-logo">VIRUS-H MULTI</div>
     <div style="z-index: 1; width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 40px; padding: 0 40px;">
-      <div class="multi-global" style="width: 100%; max-width: 1000px; background: rgba(0,0,0,0.4); border: 1px solid #111; border-radius: 6px; padding: 20px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.05); margin-bottom: 20px;">
-    <div class="field">
-      <label>play mode</label>
-      <select id="playModeSelect">
-        <option value="0">single</option>
-        <option value="1">multi</option>
-      </select>
-    </div>
-    <div class="field">
-      <label>multi program</label>
-      <input type="number" id="multiProgramInput" min="0" max="127" value="0">
-    </div>
-    <button id="btnMultiLoad">load</button>
-    <button id="btnMultiSave">save</button>
-    <button id="btnSyncMultiInView" class="chassis-page-btn" style="color: #fff; margin-left: 8px;">sincronizza parti (P1-P4)</button>
-  </div>
+      <!-- Toolbar Multi Globale -->
+      <div class="multi-global" style="width: 100%; max-width: 1100px; background: rgba(0,0,0,0.45); border: 1px solid var(--border); border-radius: 6px; padding: 14px 20px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.05); margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
+        <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
+          <div class="field" style="margin: 0;">
+            <label style="font-size: 11px; color: #888;">PLAY MODE</label>
+            <select id="playModeSelect" style="font-size: 12px; font-weight: bold; padding: 4px 8px; background: #1a1a20; color: #fff; border: 1px solid var(--border); border-radius: 3px;">
+              <option value="0">SINGLE</option>
+              <option value="1" selected>MULTI (4 PARTI)</option>
+            </select>
+          </div>
+          <div class="field" style="margin: 0; display: flex; align-items: center; gap: 4px;">
+            <label style="font-size: 11px; color: #888; margin-right: 4px;">MULTI PRG:</label>
+            <button id="btnMultiPrgDown" class="chassis-page-btn" style="padding: 2px 7px; font-size: 11px;">-</button>
+            <input type="number" id="multiProgramInput" min="0" max="127" value="0" style="width: 44px; text-align: center; font-weight: bold; font-size: 13px; background: #141418; color: #fff; border: 1px solid var(--border); border-radius: 3px; padding: 3px 0;">
+            <button id="btnMultiPrgUp" class="chassis-page-btn" style="padding: 2px 7px; font-size: 11px;">+</button>
+          </div>
+          <div style="display: flex; gap: 6px;">
+            <button id="btnMultiLoad" class="chassis-page-btn" style="padding: 5px 12px; font-size: 11px;">CARICA DUMP</button>
+            <button id="btnMultiSave" class="chassis-page-btn" style="padding: 5px 12px; font-size: 11px;">SALVA DUMP</button>
+          </div>
+        </div>
+        <div style="display: flex; align-items: center; gap: 10px;">
+          <button id="btnSyncMultiInView" class="chassis-page-btn" style="color: var(--accent); border-color: var(--accent); padding: 5px 14px; font-size: 11px; font-weight: bold; background: rgba(0,0,0,0.5);">🔄 SINCRONIZZA TUTTO (P1-P4)</button>
+        </div>
+      </div>
 
-      <div class="part-list" id="partList" style="width: 100%; max-width: 1000px; background: rgba(0,0,0,0.4); border: 1px solid #111; border-radius: 6px; padding: 20px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.05);"></div>
+      <!-- Keyboard Split & Layer Visualizer -->
+      <div id="keyboardSplitVisualizerCard" style="width: 100%; max-width: 1100px; background: rgba(0,0,0,0.5); border: 1px solid var(--border); border-radius: 6px; padding: 12px 18px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.05); margin-bottom: 20px; font-family: monospace;">
+        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+          <span style="color: #aaa; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; display: flex; align-items: center; gap: 6px;">
+            🎹 KEYBOARD SPLIT & LAYER VISUALIZER <span style="font-size: 10px; color: #666; font-weight: normal;">(C-2 → G8, 128 NOTE MIDI)</span>
+          </span>
+          <span style="font-size: 10px; color: #888;">Zone attive delle 4 parti sulla tastiera</span>
+        </div>
+        <div id="splitVisualizerScale" style="position: relative; width: 100%; height: 72px; background: #0c0c10; border: 1px solid #222; border-radius: 4px; overflow: hidden; padding: 2px 0;"></div>
+      </div>
+
+      <div class="part-list" id="partList" style="width: 100%; max-width: 1100px; display: flex; flex-direction: column; gap: 12px;"></div>
     </div>
     <div class="chassis-wood-strip"></div>
   </div>
@@ -1968,6 +2016,7 @@
   const PART_PARAMS = [
     { id:'channel',   name:'MIDI Channel', short:'ch',   cc:34,  kind:'channel', default:0 },
     { id:'volume',    name:'Volume',       short:'vol',  cc:39,  kind:'knob',    default:127 },
+    { id:'pan',       name:'Pan',          short:'pan',  cc:40,  kind:'knob',    default:64, bipolar:true },
     { id:'bank',      name:'Bank',         short:'bank', cc:31,  kind:'bank',    default:0 },
     { id:'program',   name:'Program',      short:'prg',  cc:33,  kind:'program', default:0 },
     { id:'lowkey',    name:'Low Key',      short:'low',  cc:35,  kind:'key',     default:0 },
@@ -4717,6 +4766,28 @@ function exportCurrentPatchSyx() {
     });
   }
 
+  function parseNoteInput(str, defaultVal) {
+    if (!str) return defaultVal;
+    str = String(str).trim();
+    const num = parseInt(str, 10);
+    if (!isNaN(num) && String(num) === str) {
+      return clamp7(num);
+    }
+    const match = str.match(/^([a-gA-G])([#bB]?)(-?\d+)$/);
+    if (match) {
+      const noteLetter = match[1].toLowerCase();
+      const accidental = match[2];
+      const oct = parseInt(match[3], 10);
+      const semitones = { 'c': 0, 'd': 2, 'e': 4, 'f': 5, 'g': 7, 'a': 9, 'b': 11 };
+      let semi = semitones[noteLetter] || 0;
+      if (accidental === '#' || accidental === 'B') semi += 1;
+      else if (accidental === 'b') semi -= 1;
+      const note = (oct + 1) * 12 + semi;
+      return clamp7(note);
+    }
+    return defaultVal;
+  }
+
   function createKeyField(partIndex, pp){
     const field = document.createElement('div');
     field.className = 'field field-' + pp.id;
@@ -4724,17 +4795,19 @@ function exportCurrentPatchSyx() {
     label.textContent = pp.short || pp.name;
     const display = document.createElement('div');
     display.className = 'key-display';
+    display.style.cssText = 'background: rgba(0,0,0,0.5); border: 1px solid var(--border); border-radius: 3px; padding: 2px 5px; font-size: 11px; cursor: pointer; text-align: center; min-width: 32px; font-weight: bold; color: var(--fg);';
     display.textContent = noteName(multiParts[partIndex].values[pp.id]);
+    display.title = 'Clicca per modificare (es. C-2, C3, G8 o numero 0-127)';
     display.addEventListener('click', () => {
       const current = multiParts[partIndex].values[pp.id];
-      const input = prompt('value (0-127):', current);
+      const currentStr = noteName(current);
+      const input = prompt(`Nota ${pp.name} (es. C-2, C3, G8 o numero 0-127):`, currentStr);
       if (input === null) return;
-      const num = parseInt(input, 10);
-      if (isNaN(num)) return;
-      const value = clamp7(num);
+      const value = parseNoteInput(input, current);
       multiParts[partIndex].values[pp.id] = value;
       display.textContent = noteName(value);
       sendMultiPartParam(partIndex, pp.cc, value);
+      if (typeof renderKeyboardSplitVisualizer === 'function') renderKeyboardSplitVisualizer();
     });
     field.appendChild(label);
     field.appendChild(display);
@@ -4920,116 +4993,365 @@ function exportCurrentPatchSyx() {
     return wrap;
   }
 
+  // ---------------------------------------------------------------------
+  // Multi-Mode Enhanced Controller (P1-P4 Rack Strips & Visualizer)
+  // ---------------------------------------------------------------------
+  const PART_COLORS = ['#56b6c2', '#e59500', '#c678dd', '#74c476'];
+  const partMuteState = [false, false, false, false];
+  let activeSoloPart = -1;
+
+  function renderKeyboardSplitVisualizer() {
+    const container = document.getElementById('splitVisualizerScale');
+    if (!container) return;
+    container.innerHTML = '';
+
+    // Scala ottave di fondo (C-2..G8)
+    const octWrapper = document.createElement('div');
+    octWrapper.style.cssText = 'position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none;';
+    for (let oct = 0; oct < 11; oct++) {
+      const line = document.createElement('div');
+      const leftPct = (oct * 12 / 127) * 100;
+      line.style.cssText = `position: absolute; left: ${leftPct}%; top: 0; bottom: 0; border-left: 1px solid rgba(255,255,255,0.08); font-size: 8px; color: #555; padding-left: 2px; line-height: 10px;`;
+      line.textContent = `C${oct - 2}`;
+      octWrapper.appendChild(line);
+    }
+    container.appendChild(octWrapper);
+
+    // 4 corsie orizzontali colorate (P1, P2, P3, P4)
+    for (let i = 0; i < NUM_PARTS; i++) {
+      const part = multiParts[i];
+      const low = Math.min(part.values.lowkey, part.values.highkey);
+      const high = Math.max(part.values.lowkey, part.values.highkey);
+      const isMuted = partMuteState[i] || !part.enabled || (activeSoloPart !== -1 && activeSoloPart !== i);
+
+      const lane = document.createElement('div');
+      lane.style.cssText = `position: absolute; top: ${3 + i * 16}px; height: 14px; left: 0; right: 0; display: flex; align-items: center;`;
+
+      const bar = document.createElement('div');
+      const leftPct = (low / 127) * 100;
+      const widthPct = Math.max(1.8, ((high - low + 1) / 128) * 100);
+
+      bar.style.cssText = `position: absolute; left: ${leftPct}%; width: ${widthPct}%; height: 100%; background: ${PART_COLORS[i]}; opacity: ${isMuted ? '0.22' : '0.88'}; border-radius: 2px; display: flex; align-items: center; padding: 0 4px; box-sizing: border-box; overflow: hidden; white-space: nowrap; font-size: 8.5px; font-weight: bold; color: #000; box-shadow: 0 1px 3px rgba(0,0,0,0.5); cursor: pointer; transition: opacity 0.15s;`;
+      bar.title = `P${i + 1}: ${noteName(low)} → ${noteName(high)} [${part.name || 'init'}]${isMuted ? ' (MUTED)' : ''} - Clicca per editare in Single`;
+      bar.textContent = `P${i + 1}: ${noteName(low)}..${noteName(high)} ${part.name ? '• ' + part.name : ''}`;
+
+      bar.addEventListener('click', () => {
+        editPartInSingleView(i);
+      });
+
+      lane.appendChild(bar);
+      container.appendChild(lane);
+    }
+
+    // Indicatori nota attiva in tempo reale
+    if (typeof activeNotes !== 'undefined' && activeNotes.size > 0) {
+      activeNotes.forEach(note => {
+        const marker = document.createElement('div');
+        marker.style.cssText = `position: absolute; left: ${(note / 127) * 100}%; top: 0; bottom: 0; width: 2px; background: #fff; box-shadow: 0 0 6px #fff; z-index: 10; pointer-events: none;`;
+        container.appendChild(marker);
+      });
+    }
+  }
+
+  function applyPartMuteSoloState() {
+    for (let i = 0; i < NUM_PARTS; i++) {
+      const rowEl = document.querySelector(`.part-row.part-${i}`);
+      const muteBtn = rowEl?.querySelector('.btn-part-mute');
+      const soloBtn = rowEl?.querySelector('.btn-part-solo');
+      const isEffectivelyMuted = partMuteState[i] || !multiParts[i].enabled || (activeSoloPart !== -1 && activeSoloPart !== i);
+
+      if (muteBtn) {
+        muteBtn.classList.toggle('active', partMuteState[i]);
+        muteBtn.style.background = partMuteState[i] ? '#e06c75' : 'rgba(255,255,255,0.06)';
+        muteBtn.style.color = partMuteState[i] ? '#000' : '#aaa';
+      }
+      if (soloBtn) {
+        const isSolo = (activeSoloPart === i);
+        soloBtn.classList.toggle('active', isSolo);
+        soloBtn.style.background = isSolo ? '#e59500' : 'rgba(255,255,255,0.06)';
+        soloBtn.style.color = isSolo ? '#000' : '#aaa';
+      }
+      if (rowEl) {
+        rowEl.classList.toggle('muted', isEffectivelyMuted);
+        rowEl.style.opacity = isEffectivelyMuted ? '0.42' : '1.0';
+      }
+
+      sendMultiPartParam(i, PART_ENABLE_PARAM, isEffectivelyMuted ? 0 : 1);
+    }
+    renderKeyboardSplitVisualizer();
+  }
+
+  function togglePartMute(index) {
+    partMuteState[index] = !partMuteState[index];
+    applyPartMuteSoloState();
+    setLastAction(`P${index + 1} mute: ${partMuteState[index] ? 'ON' : 'OFF'}`);
+  }
+
+  function togglePartSolo(index) {
+    if (activeSoloPart === index) {
+      activeSoloPart = -1;
+      setLastAction(`P${index + 1} solo: OFF`);
+    } else {
+      activeSoloPart = index;
+      setLastAction(`P${index + 1} solo: ON`);
+    }
+    applyPartMuteSoloState();
+  }
+
+  function auditionPart(index) {
+    const part = multiParts[index];
+    const ch = part.values.channel & 0x0F;
+    const note = 60; // C3
+    const vel = 100;
+
+    if (selectedOutput) {
+      try {
+        selectedOutput.send(new Uint8Array([0x90 | ch, note, vel]));
+        recordMidiTx('audition P' + (index + 1), [0x90 | ch, note, vel]);
+        setTimeout(() => {
+          try { selectedOutput.send(new Uint8Array([0x80 | ch, note, 0])); } catch(e) {}
+        }, 450);
+      } catch(e) {}
+    }
+
+    if (typeof playWebAudioNote === 'function' && webAudioEnabled) {
+      playWebAudioNote(note, vel);
+      setTimeout(() => {
+        if (typeof stopWebAudioNote === 'function') stopWebAudioNote(note);
+      }, 450);
+    }
+    setLastAction(`audition P${index + 1} (ch ${ch + 1})`);
+  }
+
+  function editPartInSingleView(index) {
+    setSingleEditingPart(index);
+    const tab = document.getElementById('btnTabSynth');
+    if (tab) tab.click();
+    setLastAction(`editing P${index + 1} in single synth view`);
+  }
+
   function createPartRow(index){
     const part = multiParts[index];
+    const partColor = PART_COLORS[index];
 
     const row = document.createElement('div');
     row.className = 'part-row part-' + index;
     if (!part.enabled) row.classList.add('disabled');
+    row.style.borderLeftColor = partColor;
 
+    // --- SUB-HEADER DELLA PARTE (BADGE, ON/OFF, MUTE, SOLO, AUDITION, LEGGI, EDIT) ---
+    const headerBar = document.createElement('div');
+    headerBar.className = 'part-header-bar';
+
+    const headerLeft = document.createElement('div');
+    headerLeft.className = 'part-header-left';
+
+    const badge = document.createElement('div');
+    badge.style.cssText = `background: ${partColor}; color: #000; font-weight: 800; font-size: 12px; padding: 2px 9px; border-radius: 3px; font-family: monospace; letter-spacing: 0.05em;`;
+    badge.textContent = 'P' + (index + 1);
+    headerLeft.appendChild(badge);
+
+    const enableBtn = document.createElement('button');
+    enableBtn.className = 'chassis-page-btn';
+    enableBtn.style.cssText = 'padding: 3px 8px; font-size: 11px;';
+    enableBtn.classList.toggle('active', part.enabled);
+    enableBtn.textContent = part.enabled ? 'ON' : 'OFF';
+    enableBtn.addEventListener('click', () => {
+      part.enabled = !part.enabled;
+      enableBtn.textContent = part.enabled ? 'ON' : 'OFF';
+      enableBtn.classList.toggle('active', part.enabled);
+      applyPartMuteSoloState();
+    });
+    headerLeft.appendChild(enableBtn);
+
+    const muteBtn = document.createElement('button');
+    muteBtn.className = 'chassis-page-btn btn-part-mute';
+    muteBtn.style.cssText = 'padding: 3px 8px; font-size: 11px; font-weight: bold;';
+    muteBtn.textContent = 'M';
+    muteBtn.title = `Muta P${index + 1}`;
+    muteBtn.addEventListener('click', () => togglePartMute(index));
+    headerLeft.appendChild(muteBtn);
+
+    const soloBtn = document.createElement('button');
+    soloBtn.className = 'chassis-page-btn btn-part-solo';
+    soloBtn.style.cssText = 'padding: 3px 8px; font-size: 11px; font-weight: bold;';
+    soloBtn.textContent = 'S';
+    soloBtn.title = `Solo P${index + 1}`;
+    soloBtn.addEventListener('click', () => togglePartSolo(index));
+    headerLeft.appendChild(soloBtn);
+
+    const audBtn = document.createElement('button');
+    audBtn.className = 'chassis-page-btn';
+    audBtn.style.cssText = 'padding: 3px 8px; font-size: 11px; color: var(--accent);';
+    audBtn.textContent = '▶ PROVA';
+    audBtn.title = `Suona una nota di prova su P${index + 1}`;
+    audBtn.addEventListener('click', () => auditionPart(index));
+    headerLeft.appendChild(audBtn);
+
+    headerBar.appendChild(headerLeft);
+
+    const headerRight = document.createElement('div');
+    headerRight.className = 'part-header-right';
+
+    const readBtn = document.createElement('button');
+    readBtn.className = 'chassis-page-btn';
+    readBtn.style.cssText = 'padding: 3px 8px; font-size: 11px;';
+    readBtn.textContent = 'LEGGI DUMP';
+    readBtn.title = `Leggi la patch di P${index + 1} dal synth`;
+    readBtn.addEventListener('click', () => requestPartDump(index));
+    headerRight.appendChild(readBtn);
+
+    const editBtn = document.createElement('button');
+    editBtn.className = 'chassis-page-btn';
+    editBtn.style.cssText = `padding: 3px 10px; font-size: 11px; font-weight: bold; color: ${partColor}; border-color: ${partColor}; background: rgba(0,0,0,0.5);`;
+    editBtn.textContent = 'MODIFICA IN SINGLE ➔';
+    editBtn.title = `Apri P${index + 1} nell'editor Single per scolpirne tutti i 150+ parametri`;
+    editBtn.addEventListener('click', () => editPartInSingleView(index));
+    headerRight.appendChild(editBtn);
+
+    headerBar.appendChild(headerRight);
+    row.appendChild(headerBar);
+
+    // --- CORPO CONTROLLI DELLA PARTE (CLUSTER ORGANIZZATI) ---
     const main = document.createElement('div');
     main.className = 'part-main';
 
-    const badge = document.createElement('div');
-    badge.className = 'part-badge';
-    badge.textContent = 'p' + (index + 1);
-    main.appendChild(badge);
-
-    const enableBtn = document.createElement('button');
-    enableBtn.className = 'part-enable';
-    enableBtn.classList.toggle('active', part.enabled);
-    enableBtn.textContent = part.enabled ? 'on' : 'off';
-    enableBtn.addEventListener('click', () => {
-      part.enabled = !part.enabled;
-      enableBtn.textContent = part.enabled ? 'on' : 'off';
-      enableBtn.classList.toggle('active', part.enabled);
-      row.classList.toggle('disabled', !part.enabled);
-      sendMultiPartParam(index, PART_ENABLE_PARAM, part.enabled ? 1 : 0);
-    });
-    main.appendChild(enableBtn);
-
-    const readBtn = document.createElement('button');
-    readBtn.className = 'part-enable';
-    readBtn.style.cssText = 'padding: 4px 8px; font-size: 11px; margin-right: 4px; border: 1px solid var(--accent); background: rgba(0,0,0,0.6); color: var(--accent); cursor: pointer;';
-    readBtn.textContent = 'leggi';
-    readBtn.title = `Leggi il suono di P${index + 1} direttamente dal synth`;
-    readBtn.addEventListener('click', () => {
-      requestPartDump(index);
-    });
-    main.appendChild(readBtn);
+    // CLUSTER 1: MIDI & SELEZIONE PATCH
+    const c1 = document.createElement('div');
+    c1.className = 'part-cluster';
 
     // MIDI channel
     const channels = [];
     for (let c = 1; c <= 16; c++) channels.push(String(c));
-    main.appendChild(createSelectField('ch', channels, part.values.channel, (v) => {
+    c1.appendChild(createSelectField('ch', channels, part.values.channel, (v) => {
       part.values.channel = v;
       sendMultiPartParam(index, 34, v);
       if (typeof renderMultiPartsOverview === 'function') renderMultiPartsOverview();
+      if (typeof updateKeyboardPartDisplay === 'function') updateKeyboardPartDisplay();
     }));
 
-    // volume knob
-    const volKnob = createPartKnob(index, PART_PARAMS.find(p => p.id === 'volume'));
-    volKnob.classList.add('vol-knob');
-    main.appendChild(volKnob);
-
-    // bank select
-    main.appendChild(createSelectField('bank', BANK_NAMES, part.values.bank, (v) => {
+    // Bank select
+    c1.appendChild(createSelectField('bank', BANK_NAMES, part.values.bank, (v) => {
       part.values.bank = v;
       sendMultiPartParam(index, 31, v);
       clearTimeout(part._dumpTimer);
       part._dumpTimer = setTimeout(() => requestPartDump(index), 150);
     }));
 
-    // program change number input
+    // Program change number input + step buttons
     const progField = document.createElement('div');
     progField.className = 'field field-prg';
     const progLabel = document.createElement('label');
     progLabel.textContent = 'prg';
+    const progInputWrapper = document.createElement('div');
+    progInputWrapper.style.cssText = 'display: flex; align-items: center; gap: 2px;';
+
     const progInput = document.createElement('input');
     progInput.type = 'number';
     progInput.min = '0';
     progInput.max = '127';
     progInput.value = String(part.values.program);
-    progInput.addEventListener('change', () => {
-      const v = clamp7(parseInt(progInput.value, 10) || 0);
+    progInput.style.width = '38px';
+
+    const updatePrg = (v) => {
+      v = clamp7(v);
       progInput.value = String(v);
       part.values.program = v;
       sendMultiPartParam(index, 33, v);
       clearTimeout(part._dumpTimer);
       part._dumpTimer = setTimeout(() => requestPartDump(index), 150);
+    };
+
+    progInput.addEventListener('change', () => {
+      updatePrg(parseInt(progInput.value, 10) || 0);
     });
+
+    progInputWrapper.appendChild(progInput);
     progField.appendChild(progLabel);
-    progField.appendChild(progInput);
-    main.appendChild(progField);
+    progField.appendChild(progInputWrapper);
+    c1.appendChild(progField);
 
-    // low / high key
-    main.appendChild(createKeyField(index, PART_PARAMS.find(p => p.id === 'lowkey')));
-    main.appendChild(createKeyField(index, PART_PARAMS.find(p => p.id === 'highkey')));
+    // Quick Patch Selector dropdown (sfogliatore per nome)
+    const patchField = document.createElement('div');
+    patchField.className = 'field';
+    const patchLabel = document.createElement('label');
+    patchLabel.textContent = 'suono salvato';
+    const patchSelect = document.createElement('select');
+    patchSelect.style.cssText = 'font-size: 11px; max-width: 140px;';
 
-    // transpose / detune knobs
+    function refreshPatchSelectOptions() {
+      patchSelect.innerHTML = '';
+      const defOpt = document.createElement('option');
+      defOpt.value = '';
+      defOpt.textContent = '-- Scegli suono --';
+      patchSelect.appendChild(defOpt);
+
+      const lib = loadLibrary();
+      const names = Object.keys(lib).sort();
+      names.forEach(name => {
+        const opt = document.createElement('option');
+        opt.value = name;
+        opt.textContent = name;
+        patchSelect.appendChild(opt);
+      });
+    }
+    refreshPatchSelectOptions();
+
+    patchSelect.addEventListener('change', () => {
+      const chosenName = patchSelect.value;
+      if (!chosenName) return;
+      const lib = loadLibrary();
+      if (lib[chosenName]) {
+        loadPatchToPart(lib[chosenName], index);
+      }
+    });
+
+    patchField.appendChild(patchLabel);
+    patchField.appendChild(patchSelect);
+    c1.appendChild(patchField);
+    main.appendChild(c1);
+
+    // CLUSTER 2: RANGE SPLIT & TUNE
+    const c2 = document.createElement('div');
+    c2.className = 'part-cluster';
+    c2.appendChild(createKeyField(index, PART_PARAMS.find(p => p.id === 'lowkey')));
+    c2.appendChild(createKeyField(index, PART_PARAMS.find(p => p.id === 'highkey')));
+
     const trspKnob = createPartKnob(index, PART_PARAMS.find(p => p.id === 'transpose'));
     trspKnob.classList.add('trsp-knob');
-    main.appendChild(trspKnob);
+    c2.appendChild(trspKnob);
+
     const dtunKnob = createPartKnob(index, PART_PARAMS.find(p => p.id === 'detune'));
     dtunKnob.classList.add('dtun-knob');
-    main.appendChild(dtunKnob);
+    c2.appendChild(dtunKnob);
+    main.appendChild(c2);
 
-    // output select
-    main.appendChild(createSelectField('out', OUTPUT_NAMES, part.values.output, (v) => {
+    // CLUSTER 3: MIXER STEREO & FILTRI
+    const c3 = document.createElement('div');
+    c3.className = 'part-cluster';
+
+    const volKnob = createPartKnob(index, PART_PARAMS.find(p => p.id === 'volume'));
+    volKnob.classList.add('vol-knob');
+    c3.appendChild(volKnob);
+
+    const panKnob = createPartKnob(index, PART_PARAMS.find(p => p.id === 'pan'));
+    c3.appendChild(panKnob);
+
+    const cutKnob = createPartSoundKnob(index, PARAMS.find(p => p.id === 'f1_cutoff'));
+    cutKnob.classList.add('cut-knob');
+    c3.appendChild(cutKnob);
+
+    const resKnob = createPartSoundKnob(index, PARAMS.find(p => p.id === 'f1_resonance'));
+    resKnob.classList.add('res-knob');
+    c3.appendChild(resKnob);
+
+    c3.appendChild(createSelectField('out', OUTPUT_NAMES, part.values.output, (v) => {
       part.values.output = v;
       sendMultiPartParam(index, 41, v);
     }));
+    main.appendChild(c3);
 
-    // cutoff knob
-    const cutKnob = createPartSoundKnob(index, PARAMS.find(p => p.id === 'f1_cutoff'));
-    cutKnob.classList.add('cut-knob');
-    main.appendChild(cutKnob);
-
-    // resonance knob
-    const resKnob = createPartSoundKnob(index, PARAMS.find(p => p.id === 'f1_resonance'));
-    resKnob.classList.add('res-knob');
-    main.appendChild(resKnob);
-
+    // CLUSTER 4: DISPLAY RETRO VINTAGE
     const display = createPartDisplay(index);
     main.appendChild(display);
     partDisplays.push(display);
@@ -5040,16 +5362,18 @@ function exportCurrentPatchSyx() {
 
   function buildMultiView(){
     const partList = document.getElementById('partList');
+    if (!partList) return;
     partList.innerHTML = '';
     partDisplays = [];
     for (let i = 0; i < NUM_PARTS; i++){
       partList.appendChild(createPartRow(i));
     }
+    renderKeyboardSplitVisualizer();
   }
 
-  // global multi controls
+  // Controlli Multi Globali
   const playModeSelect = document.getElementById('playModeSelect');
-  playModeSelect.addEventListener('change', () => {
+  playModeSelect?.addEventListener('change', () => {
     const v = parseInt(playModeSelect.value, 10);
     if (selectedOutput){
       try{ selectedOutput.send(buildSysEx(122, v)); } catch(e){ console.error('MIDI send error', e); }
@@ -5057,14 +5381,35 @@ function exportCurrentPatchSyx() {
   });
 
   const multiProgramInput = document.getElementById('multiProgramInput');
-  document.getElementById('btnMultiLoad').addEventListener('click', () => {
+  document.getElementById('btnMultiPrgDown')?.addEventListener('click', () => {
+    if (!multiProgramInput) return;
+    const v = clamp7((parseInt(multiProgramInput.value, 10) || 0) - 1);
+    multiProgramInput.value = String(v);
+    if (selectedOutput) {
+      try { selectedOutput.send(buildSysEx(105, v)); } catch(e) {}
+    }
+  });
+  document.getElementById('btnMultiPrgUp')?.addEventListener('click', () => {
+    if (!multiProgramInput) return;
+    const v = clamp7((parseInt(multiProgramInput.value, 10) || 0) + 1);
+    multiProgramInput.value = String(v);
+    if (selectedOutput) {
+      try { selectedOutput.send(buildSysEx(105, v)); } catch(e) {}
+    }
+  });
+
+  document.getElementById('btnMultiLoad')?.addEventListener('click', () => {
+    if (!multiProgramInput) return;
     const v = clamp7(parseInt(multiProgramInput.value, 10) || 0);
     multiProgramInput.value = String(v);
     if (selectedOutput){
       try{ selectedOutput.send(buildSysEx(105, v)); } catch(e){ console.error('MIDI send error', e); }
     }
+    setLastAction('loaded multi prg ' + v);
   });
-  document.getElementById('btnMultiSave').addEventListener('click', () => {
+
+  document.getElementById('btnMultiSave')?.addEventListener('click', () => {
+    if (!multiProgramInput) return;
     const v = clamp7(parseInt(multiProgramInput.value, 10) || 0);
     multiProgramInput.value = String(v);
     if (selectedOutput){
@@ -5072,6 +5417,7 @@ function exportCurrentPatchSyx() {
         selectedOutput.send(new Uint8Array([...SYSEX_PREFIX, deviceId(), SYSEX_CMD_STORE, v & 0x7F, 0xF7]));
       } catch(e){ console.error('MIDI send error', e); }
     }
+    setLastAction('saved multi prg ' + v);
   });
 
   // ---------------------------------------------------------------------
@@ -5356,6 +5702,7 @@ function exportCurrentPatchSyx() {
     }
 
     highlightPianoKey(noteNumber, true);
+    if (typeof renderKeyboardSplitVisualizer === 'function') renderKeyboardSplitVisualizer();
   }
 
   function stopNote(noteNumber) {
@@ -5374,6 +5721,7 @@ function exportCurrentPatchSyx() {
     }
 
     highlightPianoKey(noteNumber, false);
+    if (typeof renderKeyboardSplitVisualizer === 'function') renderKeyboardSplitVisualizer();
   }
 
   function highlightPianoKey(noteNumber, isOn) {
