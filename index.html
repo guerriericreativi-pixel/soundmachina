@@ -2632,36 +2632,55 @@
         }
 
         // Caso 2b: Quick Bank Scan dei nomi per la sezione Multi
-        if (window.quickBankScanState && window.quickBankScanState.active) {
+        // NOTA: Ignora msgBytes[7] === 0 (questi sono gli Edit Buffer delle parti Multi o Single!)
+        if (window.quickBankScanState && window.quickBankScanState.active && msgBytes[7] !== 0x00) {
           const qState = window.quickBankScanState;
+          const rBank = msgBytes[7] - 1;
           let patchNum = (msgBytes.length >= 9 && msgBytes[8] >= 0 && msgBytes[8] < 128)
             ? msgBytes[8]
             : qState.currentIndex;
 
-          qState.names[patchNum] = patchName;
-          if (typeof saveBankSoundCache === 'function') {
-            saveBankSoundCache(qState.bankIndex, qState.names);
-          }
-          if (typeof updateAllPartDropdownsForBank === 'function') {
-            updateAllPartDropdownsForBank(qState.bankIndex);
-          }
+          if (rBank === qState.bankIndex || qState.sysexBank === msgBytes[7]) {
+            if (typeof isDummyPatchName === 'function' ? !isDummyPatchName(patchName) : (patchName && !/^(\d{1,3}[:\-\s]+)?patch\s*\d*$/i.test(patchName))) {
+              qState.names[patchNum] = patchName;
+            }
+            qState.receivedCount = (qState.receivedCount || 0) + 1;
+            if (typeof saveBankSoundCache === 'function') {
+              saveBankSoundCache(qState.bankIndex, qState.names);
+            }
+            if (typeof updateAllPartDropdownsForBank === 'function') {
+              updateAllPartDropdownsForBank(qState.bankIndex);
+            }
 
-          const bName = (typeof BANK_NAMES !== 'undefined' && BANK_NAMES[qState.bankIndex]) ? BANK_NAMES[qState.bankIndex] : 'Banco';
-          const statusEl = document.getElementById('quickScanStatus');
-          if (statusEl) {
-            statusEl.style.color = '#80c090';
-            statusEl.innerHTML = `Lettura ${bName}: <b>${patchNum + 1}/128</b> (${escapeHtml(patchName)})`;
-          }
-          document.getElementById('midi-debug').textContent = `🔥 QUICK SCAN: Letto ${bName}-${patchNum.toString().padStart(3,'0')} ${patchName}`;
+            const bName = (typeof BANK_NAMES !== 'undefined' && BANK_NAMES[qState.bankIndex]) ? BANK_NAMES[qState.bankIndex] : 'Banco';
+            const statusEl = document.getElementById('quickScanStatus');
+            if (statusEl) {
+              statusEl.style.color = '#80c090';
+              statusEl.innerHTML = `Lettura ${bName}: <b>${patchNum + 1}/128</b> (${escapeHtml(patchName)})`;
+            }
+            document.getElementById('midi-debug').textContent = `🔥 QUICK SCAN: Letto ${bName}-${patchNum.toString().padStart(3,'0')} ${patchName}`;
 
-          if (qState.timer) clearTimeout(qState.timer);
-          qState.currentIndex = patchNum + 1;
-          if (qState.currentIndex < 128) {
-            setTimeout(() => { requestNextQuickScanPatch(); }, 25);
-          } else {
-            finishQuickBankScan();
+            if (qState.timer) clearTimeout(qState.timer);
+
+            if (qState.sequentialMode) {
+              qState.currentIndex = patchNum + 1;
+              if (qState.currentIndex < 128) {
+                setTimeout(() => { requestNextQuickScanPatch(); }, 25);
+              } else {
+                finishQuickBankScan();
+              }
+            } else {
+              // Modalità bulk stream (0x32)
+              if (qState.receivedCount >= 128) {
+                finishQuickBankScan();
+              } else {
+                qState.timer = setTimeout(() => {
+                  finishQuickBankScan();
+                }, 1600);
+              }
+            }
+            continue;
           }
-          continue;
         }
 
         // Caso 3: Ricezione Dump per una specifica Parte Multi (Part 0..3)
@@ -5240,7 +5259,70 @@ function exportCurrentPatchSyx() {
   // ---------------------------------------------------------------------
   // Multi-Mode Sound Cache & Dropdown Management
   // ---------------------------------------------------------------------
-  const VIRUS_FACTORY_BANKS = [["x init", "x supersaw", "x acid 303", "x sub bass", "x hyperpluck", "x dark pad", "x moog lead", "x trance arp", "x reese bass", "x modular lead", "x vocodex", "x ambient vox", "x punch kick", "x neuro bass", "x glass bell", "x detuned saw", "x velvet pad", "x modern pluck", "x club lead", "x deep drone", "x fm bass 1", "x euro trance", "x soft cello", "x pulse width", "x resonance ld", "x electro stab", "x dub chords", "x dirty saw", "x solar flare", "x hard sync", "x sub punch", "x choir sweep", "x morphing ld", "x acid line", "x tech pluck", "x cosmic arp", "x fat lead", "x brassy synth", "x 80s poly", "x sub shaker", "x liquid pad", "x screech ld", "x warm strings", "x wide unison", "x fm pluck", "x filter sweep", "x arena lead", "x dark space", "x glide synth", "x rave stabs", "x sub drop", "x hollow lead", "x future bass", "x atmospheric", "x metallic fm", "x tape warmth", "x dirty acid", "x trance gate", "x slow attack", "x epic brass", "x drive bass", "x bell chime", "x voco choir", "x razor lead", "x retro 1", "x punch arp", "x analog low", "x modern saw", "x poly brass", "x cinema sweep", "x dream pluck", "x bassline 01", "x vintage synth", "x deep pulse", "x anthem lead", "x shimmer pad", "x sub growl", "x sharp pluck", "x space station", "x big mono", "x dynamic arp", "x slow filter", "x fat boy", "x stereo saw", "x liquid metal", "x pure sine", "x classic brass", "x cyber punk", "x heavy sync", "x glass keys", "x dark matter", "x saw cascade", "x rubber bass", "x night drive", "x hyper sound", "x crystal ld", "x exhale", "x kid plk", "x jx-3p", "x analog pad", "x supersync", "x rave chord", "x club sub", "x sweep noise", "x neon dreams", "x vocaloid", "x dist organ", "x fm bell 2", "x mono stab", "x retro pulse", "x acid squelch", "x warm analog", "x drive lead", "x deep sea", "x wide stereo", "x pulse arp", "x sub attack", "x future pluck", "x electro bass", "x silver pad", "x modular seq", "x hard punch", "x alien talk", "x cosmic wind", "x tape drift", "x saw army", "x final lead", "x grand outro"], ["HyperSaw BC", "Moog Bass BC", "Trance Lead MS", "Dr.What? HS", "AutoBend BC", "Superstring BC", "Deep Reese MS", "Solar Flare HS", "Acid 303 BC", "Silk Sweep HS", "VeloPluck MS", "BladePad BC", "NeuroBass MS", "FatBoy Lead BC", "GlassArp HS", "SubBoom BC", "SyncScreamer", "Heavenly Pad", "PizzTrance MS", "Modular Lead", "DistBass HS", "Vintage JP8", "CyberDrone HS", "ElectroStab BC", "WideUnison LD", "PWM Strings", "Analog Warmth", "HardSync BC", "FM BellKeys", "TranceGate MS", "ResoBass BC", "LiquidSky HS", "ArenaLead MS", "PolyBrass BC", "PureSquare HS", "ClubPluck MS", "DarkAtmosphere", "FilterSweep HS", "RawSaw BC", "SubPuncher MS", "VocalMorph HS", "LaserLead BC", "CosmicWind HS", "DriveBass MS", "TapeWarmth BC", "AlienSpeech HS", "AnthemSaw MS", "VelvetPad BC", "RaveOrg BC", "PunchArp MS", "GlideSolo HS", "ShimmerStrings", "SubSonic BC", "SharpSync MS", "ModularSeq HS", "BigMono BC", "DynoClav HS", "SlowSweep Pad", "DirtySaw MS", "StereoSaw BC", "LiquidMetal HS", "SineSub BC", "ClassicBrass", "CyberPunk MS", "HeavyLead BC", "GlassKeys HS", "DarkMatter BC", "CascadeSaw MS", "RubberBass HS", "NightDrive BC", "HyperSound MS", "CrystalLD HS", "Retro80s BC", "EchoPluck MS", "MatrixPad HS", "AnalogPluck BC", "SuperSync MS", "RaveChords BC", "SubOctave HS", "NoiseSweep BC", "NeonPulse MS", "VocoderLead", "DistOrgan BC", "FMBell2 HS", "MonoStab MS", "RetroPulse BC", "AcidSquelch HS", "WarmAnalog BC", "DriveSolo MS", "DeepSpace HS", "WideStereo BC", "PulseArp MS", "SubThump BC", "FuturePluck HS", "ElectroBass MS", "SilverPad BC", "ModularArp HS", "HardHit BC", "AlienDrone HS", "CosmicDust BC", "TapeDrift HS", "SawStorm MS", "FinalLead BC", "OutroBell HS", "Init Sound", "Raw Sawtooth", "Pure Pulse", "Sync Source", "FM Carrier", "RingMod Base", "Wavetable 01", "Wavetable 02", "Formant Lead", "Grain Cloud", "Noise Flute", "Comb Strings", "Feedback LD", "Vowel Bass", "Spectral Pad", "Virus TI Master", "Solo Cello", "Epic Horns", "Analog Clav", "Rhodes TI", "Whistle Solo", "Harpsichord", "Church Organ", "Rotary Speaker"], ["Ethereal Pad", "Deep Forest", "Solar Winds", "Blade Runner", "Warm Horizons", "Abyss Drone", "Glass Ocean", "Nebula Cloud", "Cello Ensemble", "Vocal Whispers", "Slow Motion", "Aurora Borealis", "Analog String1", "Analog String2", "Dark Sector", "Celestial Chime", "Morphing Skies", "Frozen Lake", "Time Warp", "Stardust Pad", "Ambient Pulse", "Tape Echoes", "Submerged", "Lost City", "Dream Sequence", "Lush Unison", "Hollow Winds", "Crystal Cave", "Vintage Strings", "Solar Rain", "Endless Space", "Velvet Air", "Cinematic Boom", "Tension Drone", "SciFi Horizon", "Organic Breath", "Soft Resonance", "Ether Flute", "Distant Sun", "Cloud Nine", "Memory Lane", "Ghost Voices", "Cosmic Ocean", "After Hours", "Quiet Storm", "Silk Ribbon", "Horizon Glow", "Past Reflections", "Parallel Worlds", "Zero Gravity", "Lunar Eclipse", "Solar Eclipse", "Inner Peace", "Golden Hour", "Silver Horizon", "Northern Lights", "Deep Blue", "Echoes of Time", "Silent Hill", "Astral Travel", "Event Horizon", "Subtle Sweep", "Gentle Breeze", "Infinite Drone", "Mirage Pad", "Twilight Sky", "Dark Nebula", "Starry Night", "Oceanic Depth", "Atmosphere 01", "Atmosphere 02", "Atmosphere 03", "Vintage Pad 1", "Vintage Pad 2", "Vintage Pad 3", "Vintage Pad 4", "Air Glow", "Ambient Waves", "Chamber Strings", "Dark Horizon", "Deep Resonance", "Evolving Void", "Far Away", "Gentle Flow", "Harmonic Rain", "Immersion", "Journey Home", "Kaleidoscope", "Luminous", "Melancholia", "Nightfall", "Open Sky", "Pure Emotion", "Quiet Meadow", "Reflections", "Satori Calm", "Timeless", "Universal", "Vast Expanse", "Whispering Wind", "Xenon Glow", "Yearning", "Zen Garden", "Ambient TI", "Cinema Hit 1", "Cinema Hit 2", "Cinema Hit 3", "Cinema Hit 4", "Suspense 1", "Suspense 2", "Suspense 3", "Suspense 4", "Space Drone 1", "Space Drone 2", "Space Drone 3", "Space Drone 4", "Riser 01", "Riser 02", "Riser 03", "Riser 04", "Dark Cavern", "Wind Chimes", "Sunken Ship", "Cosmic Ray", "Galactic Dust", "Outer Rim", "Deep Meditation", "Cosmic OM"], ["Acid Machine", "Trance Arp 01", "Trance Arp 02", "Modular Clock", "Berlin School", "Analog Seq 01", "Analog Seq 02", "Pizzicato Arp", "Clockwork HS", "Syncopated", "Minor Arp BC", "Euphoria Plk", "Dark Sequence", "Psy Bass Arp", "Tech Groove", "Retro Runner", "Kalimba Arp", "Woodblock Perc", "Stab Machine", "Gate Keeper", "Chop Chord", "Bass & Lead", "Hypnotic Arp", "Pulse Engine", "Matrix Runner", "Square Arp", "Filter Step", "Random S&H", "Poly Arpeggio", "Double Time", "Eighth Notes", "Sixteenth Run", "Triplet Flow", "Offbeat Pluck", "Octave Jumper", "Bouncing Ball", "Clock Divider", "Rhythm Saw", "Percussive Plk", "Clicky Attack", "Glitch Pattern", "Electro Bounce", "Sync Step 01", "Sync Step 02", "Velocity Step", "Decay Arp", "Pluck Cascade", "Staccato Poly", "Short Pluck 1", "Short Pluck 2", "Short Pluck 3", "Short Pluck 4", "Rubber Arp", "Sub Arpeggio", "High Pitch Run", "Bassline Arp", "Trance Energy", "Club Arpeggio", "Progressive Plk", "Uplifting Arp", "Euro Arp 01", "Euro Arp 02", "Euro Arp 03", "Euro Arp 04", "Dream Seq 1", "Dream Seq 2", "Dream Seq 3", "Dream Seq 4", "Fast Fingers", "Melodic Run", "Chords in Arp", "Broken Chords", "Minimal Arp", "Deep Tech Seq", "Acidic Line", "Reso Squelcher", "Drive Pattern", "Overdrive Seq", "Sub Ping", "Ping Pong Plk", "Brite Pluck", "Muted Pluck", "Harp Synth", "Nylon Synth", "Koto Pattern", "Marimba Elec", "Xylophone TI", "Gamelan Bell", "Steel Drum Syn", "Music Box Plk", "Glass Chime", "Clock Tower", "Toy Piano Syn", "Tubular Synth", "FM Percussion", "Hihat Arp", "Snare Roll Syn", "Kick Arp FX", "Noise Seq 01", "Noise Seq 02", "Laser Seq", "Zap Pattern", "Chaos Arp", "Random Walk", "Fibonacci Seq", "Prime Steps", "Euclidean 01", "Euclidean 02", "Euclidean 03", "Euclidean 04", "Swing 16th", "Shuffle Arp", "Late 90s Arp", "Early 2000s", "Modern Punch", "Future Arp", "Cybernetic Plk", "Neuro Arp", "Complex Matrix", "Virus Arp King", "Techno Riff", "Industrial Arp", "Electro Groove", "House Chord Arp", "Filter Rhythm", "Accent Steps", "Reso Rhythm", "Arp Velocity"]];
+  const VIRUS_FACTORY_BANKS = [
+    [
+      "Init", "SuperSaw", "Acid 303", "Sub Bass", "SwirlTine", "Dark Pad", "Moog Lead", "Trance Arp",
+      "Reese Bass", "Modular Lead", "Vocodex", "Ambient Vox", "Punch Kick", "Neuro Bass", "Glass Bell", "Detuned Saw",
+      "Velvet Pad", "Modern Pluck", "Club Lead", "Deep Drone", "FM Bass 1", "Euro Trance", "Soft Cello", "Pulse Width",
+      "Resonance Ld", "Electro Stab", "Dub Chords", "Dirty Saw", "Solar Flare", "Hard Sync", "Sub Punch", "Choir Sweep",
+      "Morphing Ld", "Acid Line", "Tech Pluck", "Cosmic Arp", "Fat Lead", "Brassy Synth", "80s Poly", "Sub Shaker",
+      "Liquid Pad", "Screech Ld", "Warm Strings", "Wide Unison", "FM Pluck", "Filter Sweep", "Arena Lead", "Dark Space",
+      "Glide Synth", "Rave Stabs", "Sub Drop", "Hollow Lead", "Future Bass", "Atmospheric", "Metallic FM", "Tape Warmth",
+      "Dirty Acid", "Trance Gate", "Slow Attack", "Epic Brass", "Drive Bass", "Bell Chime", "Voco Choir", "Razor Lead",
+      "Retro 1", "Punch Arp", "Analog Low", "Modern Saw", "Poly Brass", "Cinema Sweep", "Dream Pluck", "Bassline 01",
+      "Vintage Synth", "Deep Pulse", "Anthem Lead", "Shimmer Pad", "Sub Growl", "Sharp Pluck", "Space Station", "Big Mono",
+      "Dynamic Arp", "Slow Filter", "Fat Boy", "Stereo Saw", "Liquid Metal", "Pure Sine", "Classic Brass", "Cyber Punk",
+      "Heavy Sync", "Glass Keys", "Dark Matter", "Saw Cascade", "Rubber Bass", "Night Drive", "Hyper Sound", "Crystal Ld",
+      "Exhale", "Kid Plk", "JX-3P", "Analog Pad", "SuperSync", "Rave Chord", "Club Sub", "Sweep Noise",
+      "Neon Dreams", "Vocaloid", "Dist Organ", "FM Bell 2", "Mono Stab", "Retro Pulse", "Acid Squelch", "Warm Analog",
+      "Drive Lead", "Deep Sea", "Wide Stereo", "Pulse Arp", "Sub Attack", "Future Pluck", "Electro Bass", "Silver Pad",
+      "Modular Seq", "Hard Punch", "Alien Talk", "Cosmic Wind", "Tape Drift", "Saw Army", "Final Lead", "Grand Outro"
+    ],
+    ["HyperSaw BC", "Moog Bass BC", "Trance Lead MS", "Dr.What? HS", "AutoBend BC", "Superstring BC", "Deep Reese MS", "Solar Flare HS", "Acid 303 BC", "Silk Sweep HS", "VeloPluck MS", "BladePad BC", "NeuroBass MS", "FatBoy Lead BC", "GlassArp HS", "SubBoom BC", "SyncScreamer", "Heavenly Pad", "PizzTrance MS", "Modular Lead", "DistBass HS", "Vintage JP8", "CyberDrone HS", "ElectroStab BC", "WideUnison LD", "PWM Strings", "Analog Warmth", "HardSync BC", "FM BellKeys", "TranceGate MS", "ResoBass BC", "LiquidSky HS", "ArenaLead MS", "PolyBrass BC", "PureSquare HS", "ClubPluck MS", "DarkAtmosphere", "FilterSweep HS", "RawSaw BC", "SubPuncher MS", "VocalMorph HS", "LaserLead BC", "CosmicWind HS", "DriveBass MS", "TapeWarmth BC", "AlienSpeech HS", "AnthemSaw MS", "VelvetPad BC", "RaveOrg BC", "PunchArp MS", "GlideSolo HS", "ShimmerStrings", "SubSonic BC", "SharpSync MS", "ModularSeq HS", "BigMono BC", "DynoClav HS", "SlowSweep Pad", "DirtySaw MS", "StereoSaw BC", "LiquidMetal HS", "SineSub BC", "ClassicBrass", "CyberPunk MS", "HeavyLead BC", "GlassKeys HS", "DarkMatter BC", "CascadeSaw MS", "RubberBass HS", "NightDrive BC", "HyperSound MS", "CrystalLD HS", "Retro80s BC", "EchoPluck MS", "MatrixPad HS", "AnalogPluck BC", "SuperSync MS", "RaveChords BC", "SubOctave HS", "NoiseSweep BC", "NeonPulse MS", "VocoderLead", "DistOrgan BC", "FMBell2 HS", "MonoStab MS", "RetroPulse BC", "AcidSquelch HS", "WarmAnalog BC", "DriveSolo MS", "DeepSpace HS", "WideStereo BC", "PulseArp MS", "SubThump BC", "FuturePluck HS", "ElectroBass MS", "SilverPad BC", "ModularArp HS", "HardHit BC", "AlienDrone HS", "CosmicDust BC", "TapeDrift HS", "SawStorm MS", "FinalLead BC", "OutroBell HS", "Init Sound", "Raw Sawtooth", "Pure Pulse", "Sync Source", "FM Carrier", "RingMod Base", "Wavetable 01", "Wavetable 02", "Formant Lead", "Grain Cloud", "Noise Flute", "Comb Strings", "Feedback LD", "Vowel Bass", "Spectral Pad", "Virus TI Master", "Solo Cello", "Epic Horns", "Analog Clav", "Rhodes TI", "Whistle Solo", "Harpsichord", "Church Organ", "Rotary Speaker"],
+    ["Ethereal Pad", "Deep Forest", "Solar Winds", "Blade Runner", "Warm Horizons", "Abyss Drone", "Glass Ocean", "Nebula Cloud", "Cello Ensemble", "Vocal Whispers", "Slow Motion", "Aurora Borealis", "Analog String1", "Analog String2", "Dark Sector", "Celestial Chime", "Morphing Skies", "Frozen Lake", "Time Warp", "Stardust Pad", "Ambient Pulse", "Tape Echoes", "Submerged", "Lost City", "Dream Sequence", "Lush Unison", "Hollow Winds", "Crystal Cave", "Vintage Strings", "Solar Rain", "Endless Space", "Velvet Air", "Cinematic Boom", "Tension Drone", "SciFi Horizon", "Organic Breath", "Soft Resonance", "Ether Flute", "Distant Sun", "Cloud Nine", "Memory Lane", "Ghost Voices", "Cosmic Ocean", "After Hours", "Quiet Storm", "Silk Ribbon", "Horizon Glow", "Past Reflections", "Parallel Worlds", "Zero Gravity", "Lunar Eclipse", "Solar Eclipse", "Inner Peace", "Golden Hour", "Silver Horizon", "Northern Lights", "Deep Blue", "Echoes of Time", "Silent Hill", "Astral Travel", "Event Horizon", "Subtle Sweep", "Gentle Breeze", "Infinite Drone", "Mirage Pad", "Twilight Sky", "Dark Nebula", "Starry Night", "Oceanic Depth", "Atmosphere 01", "Atmosphere 02", "Atmosphere 03", "Vintage Pad 1", "Vintage Pad 2", "Vintage Pad 3", "Vintage Pad 4", "Air Glow", "Ambient Waves", "Chamber Strings", "Dark Horizon", "Deep Resonance", "Evolving Void", "Far Away", "Gentle Flow", "Harmonic Rain", "Immersion", "Journey Home", "Kaleidoscope", "Luminous", "Melancholia", "Nightfall", "Open Sky", "Pure Emotion", "Quiet Meadow", "Reflections", "Satori Calm", "Timeless", "Universal", "Vast Expanse", "Whispering Wind", "Xenon Glow", "Yearning", "Zen Garden", "Ambient TI", "Cinema Hit 1", "Cinema Hit 2", "Cinema Hit 3", "Cinema Hit 4", "Suspense 1", "Suspense 2", "Suspense 3", "Suspense 4", "Space Drone 1", "Space Drone 2", "Space Drone 3", "Space Drone 4", "Riser 01", "Riser 02", "Riser 03", "Riser 04", "Dark Cavern", "Wind Chimes", "Sunken Ship", "Cosmic Ray", "Galactic Dust", "Outer Rim", "Deep Meditation", "Cosmic OM"],
+    ["Acid Machine", "Trance Arp 01", "Trance Arp 02", "Modular Clock", "Berlin School", "Analog Seq 01", "Analog Seq 02", "Pizzicato Arp", "Clockwork HS", "Syncopated", "Minor Arp BC", "Euphoria Plk", "Dark Sequence", "Psy Bass Arp", "Tech Groove", "Retro Runner", "Kalimba Arp", "Woodblock Perc", "Stab Machine", "Gate Keeper", "Chop Chord", "Bass & Lead", "Hypnotic Arp", "Pulse Engine", "Matrix Runner", "Square Arp", "Filter Step", "Random S&H", "Poly Arpeggio", "Double Time", "Eighth Notes", "Sixteenth Run", "Triplet Flow", "Offbeat Pluck", "Octave Jumper", "Bouncing Ball", "Clock Divider", "Rhythm Saw", "Percussive Plk", "Clicky Attack", "Glitch Pattern", "Electro Bounce", "Sync Step 01", "Sync Step 02", "Velocity Step", "Decay Arp", "Pluck Cascade", "Staccato Poly", "Short Pluck 1", "Short Pluck 2", "Short Pluck 3", "Short Pluck 4", "Rubber Arp", "Sub Arpeggio", "High Pitch Run", "Bassline Arp", "Trance Energy", "Club Arpeggio", "Progressive Plk", "Uplifting Arp", "Euro Arp 01", "Euro Arp 02", "Euro Arp 03", "Euro Arp 04", "Dream Seq 1", "Dream Seq 2", "Dream Seq 3", "Dream Seq 4", "Fast Fingers", "Melodic Run", "Chords in Arp", "Broken Chords", "Minimal Arp", "Deep Tech Seq", "Acidic Line", "Reso Squelcher", "Drive Pattern", "Overdrive Seq", "Sub Ping", "Ping Pong Plk", "Brite Pluck", "Muted Pluck", "Harp Synth", "Nylon Synth", "Koto Pattern", "Marimba Elec", "Xylophone TI", "Gamelan Bell", "Steel Drum Syn", "Music Box Plk", "Glass Chime", "Clock Tower", "Toy Piano Syn", "Tubular Synth", "FM Percussion", "Hihat Arp", "Snare Roll Syn", "Kick Arp FX", "Noise Seq 01", "Noise Seq 02", "Laser Seq", "Zap Pattern", "Chaos Arp", "Random Walk", "Fibonacci Seq", "Prime Steps", "Euclidean 01", "Euclidean 02", "Euclidean 03", "Euclidean 04", "Swing 16th", "Shuffle Arp", "Late 90s Arp", "Early 2000s", "Modern Punch", "Future Arp", "Cybernetic Plk", "Neuro Arp", "Complex Matrix", "Virus Arp King", "Techno Riff", "Industrial Arp", "Electro Groove", "House Chord Arp", "Filter Rhythm", "Accent Steps", "Reso Rhythm", "Arp Velocity"]
+  ];
+
+  function isDummyPatchName(str) {
+    if (!str || typeof str !== 'string') return true;
+    const s = str.trim();
+    if (!s) return true;
+    if (/^(\d{1,3}[:\-\s]+)?patch\s*\d*$/i.test(s)) return true;
+    if (/^(\d{1,3}[:\-\s]+)?preset\s*\d*$/i.test(s)) return true;
+    if (/^(\d{1,3}[:\-\s]+)?prog\s*\d*$/i.test(s)) return true;
+    return false;
+  }
+
+  // Sanifica immediatamente qualsiasi vecchio cache inquinato da placeholder tipo "patch 012"
+  (function sanitizeStoredBankCaches() {
+    try {
+      for (let b = 0; b < 16; b++) {
+        const key = `virusTiSnow_bank_${b}`;
+        const raw = localStorage.getItem(key);
+        if (!raw) continue;
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed)) {
+          let dirty = false;
+          let realCount = 0;
+          const cleaned = parsed.map((item, idx) => {
+            if (isDummyPatchName(item)) {
+              dirty = true;
+              return (VIRUS_FACTORY_BANKS[b] && VIRUS_FACTORY_BANKS[b][idx]) ? VIRUS_FACTORY_BANKS[b][idx] : null;
+            }
+            realCount++;
+            return item;
+          });
+          if (dirty) {
+            if (realCount === 0) {
+              localStorage.removeItem(key);
+            } else {
+              localStorage.setItem(key, JSON.stringify(cleaned));
+            }
+          }
+        }
+      }
+    } catch(e) {}
+  })();
 
   const SYNTH_CATEGORIES = [
     ['Bass', ['Sub Bass', 'Moog Bass', 'Acid 303', 'FM Bass', 'Reese Low', 'Analog Sub', 'Growl Bass', 'Deep 808', 'Distort Bass', 'Fat Saw Bass', 'Pizz Bass', 'Slap Bass', 'Punch Sub', 'Sub Octave', 'Reso Bass', 'Vintage Bass']],
@@ -5267,7 +5349,18 @@ function exportCurrentPatchSyx() {
       const raw = localStorage.getItem(`virusTiSnow_bank_${bankIndex}`);
       if (raw) {
         const parsed = JSON.parse(raw);
-        if (Array.isArray(parsed) && parsed.length >= 128) return parsed;
+        if (Array.isArray(parsed) && parsed.length >= 128) {
+          const hasValid = parsed.some(item => item && !isDummyPatchName(item));
+          if (!hasValid) return null;
+          return parsed.map((item, idx) => {
+            if (isDummyPatchName(item)) {
+              return (VIRUS_FACTORY_BANKS[bankIndex] && VIRUS_FACTORY_BANKS[bankIndex][idx])
+                ? VIRUS_FACTORY_BANKS[bankIndex][idx]
+                : null;
+            }
+            return item;
+          });
+        }
       }
     } catch(e) {}
     return null;
@@ -5280,6 +5373,7 @@ function exportCurrentPatchSyx() {
   }
 
   function saveBankSoundName(bankIndex, patchIndex, name) {
+    if (isDummyPatchName(name)) return;
     let cache = getBankSoundCache(bankIndex);
     if (!cache) {
       cache = (VIRUS_FACTORY_BANKS[bankIndex] ? [...VIRUS_FACTORY_BANKS[bankIndex]] : new Array(128).fill(null));
@@ -5291,7 +5385,7 @@ function exportCurrentPatchSyx() {
 
   function getBankPatchName(bankIndex, patchIndex) {
     const cache = getBankSoundCache(bankIndex);
-    if (cache && cache[patchIndex] && typeof cache[patchIndex] === 'string' && cache[patchIndex].trim()) {
+    if (cache && cache[patchIndex] && typeof cache[patchIndex] === 'string' && !isDummyPatchName(cache[patchIndex])) {
       return cache[patchIndex].trim();
     }
     const bName = BANK_NAMES[bankIndex] || `B${bankIndex}`;
@@ -5300,7 +5394,7 @@ function exportCurrentPatchSyx() {
     for (const k of Object.keys(lib)) {
       if (k.startsWith(prefix)) {
         const clean = k.slice(prefix.length).trim();
-        if (clean) return clean;
+        if (clean && !isDummyPatchName(clean)) return clean;
       }
     }
     if (VIRUS_FACTORY_BANKS && VIRUS_FACTORY_BANKS[bankIndex] && VIRUS_FACTORY_BANKS[bankIndex][patchIndex]) {
@@ -5312,11 +5406,10 @@ function exportCurrentPatchSyx() {
   function populatePartPatchDropdown(selectEl, bankIndex, selectedProgram) {
     if (!selectEl) return;
     selectEl.innerHTML = '';
-    const cache = getBankSoundCache(bankIndex);
     for (let i = 0; i < 128; i++) {
       const opt = document.createElement('option');
       opt.value = String(i);
-      const pName = (cache && cache[i] && cache[i].trim()) ? cache[i].trim() : getBankPatchName(bankIndex, i);
+      const pName = getBankPatchName(bankIndex, i);
       opt.textContent = `${i.toString().padStart(3, '0')}: ${pName}`;
       if (i === selectedProgram) opt.selected = true;
       selectEl.appendChild(opt);
@@ -5359,6 +5452,8 @@ function exportCurrentPatchSyx() {
       bankIndex: bankIndex,
       sysexBank: bankIndex + 1, // Bank 1 = RAM-A, Bank 2 = RAM-B, ecc.
       currentIndex: 0,
+      receivedCount: 0,
+      sequentialMode: true,
       names: getBankSoundCache(bankIndex) || (VIRUS_FACTORY_BANKS[bankIndex] ? [...VIRUS_FACTORY_BANKS[bankIndex]] : new Array(128).fill(null)),
       timer: null,
       onComplete: onComplete
@@ -5388,7 +5483,7 @@ function exportCurrentPatchSyx() {
     // Timeout di sicurezza rapido per singola patch: 140ms
     qState.timer = setTimeout(() => {
       const qs = window.quickBankScanState;
-      if (qs && qs.active) {
+      if (qs && qs.active && qs.sequentialMode) {
         qs.currentIndex++;
         requestNextQuickScanPatch();
       }
