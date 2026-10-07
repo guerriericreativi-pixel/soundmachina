@@ -1807,19 +1807,21 @@
     <div class="chassis-logo">VIRUS-H MULTI</div>
     <div style="z-index: 1; width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 25px; padding: 0 20px;">
       <!-- Barra comandi MULTI essenziale e pulita -->
-      <div style="width: 100%; max-width: 1050px; background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 6px; padding: 10px 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; font-family: monospace;">
+      <div style="width: 100%; max-width: 1050px; background: rgba(0,0,0,0.5); border: 1px solid var(--border); border-radius: 6px; padding: 10px 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; font-family: monospace;">
         <div style="display: flex; align-items: center; gap: 10px;">
           <span style="color: var(--accent); font-weight: 800; font-size: 13px; letter-spacing: 0.05em;">🎛️ MULTI (4 PARTI)</span>
-          <span style="font-size: 11px; color: #888;">— Scegli banco e suono da tendina per ogni parte</span>
+          <span style="font-size: 11px; color: #888;">— Scegli banco e suono reale da tendina per ogni parte</span>
         </div>
-        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+        <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
           <div style="display: flex; align-items: center; gap: 6px;">
-            <span style="font-size: 11px; color: #888;">BANCO:</span>
-            <select id="quickBankScanSelect" style="padding: 3px 6px; font-size: 11px; font-weight: bold; background: #18181e; color: #fff; border: 1px solid var(--border); border-radius: 3px;"></select>
-            <button id="btnQuickScanBank" class="chassis-page-btn" style="color: var(--accent); border-color: var(--accent); font-weight: bold; padding: 3px 10px; font-size: 11px;" title="Interroga il Virus via SysEx per leggere i 128 nomi del banco">📥 SCANSIONA 128 NOMI</button>
+            <span style="font-size: 11px; color: #aaa;">BANCO:</span>
+            <select id="quickBankScanSelect" style="padding: 4px 8px; font-size: 11px; font-weight: bold; background: #18181e; color: #fff; border: 1px solid var(--border); border-radius: 3px; cursor: pointer;"></select>
+            <button id="btnQuickScanBank" class="chassis-page-btn" style="color: var(--accent); border-color: var(--accent); font-weight: bold; padding: 4px 10px; font-size: 11px;" title="Interroga il Virus via SysEx per leggere e memorizzare tutti i 128 nomi di questo banco">📥 SCANSIONA 128 NOMI</button>
+            <button id="btnScanAllRam" class="chassis-page-btn" style="color: #61afef; border-color: #61afef; font-weight: bold; padding: 4px 10px; font-size: 11px;" title="Scansiona in sequenza tutti i banchi RAM (A, B, C, D) memorizzando 512 patch">⚡ SCANSIONA RAM A-D</button>
+            <button id="btnOpenBankNamesModal" class="chassis-page-btn" style="padding: 4px 10px; font-size: 11px;" title="Visualizza, copia o incolla l'elenco dei 128 nomi per questo banco">📋 ELENCO NOMI</button>
             <span id="quickScanStatus" style="font-size: 11px; color: #aaa;"></span>
           </div>
-          <button id="btnSyncMultiInView" class="chassis-page-btn" style="padding: 4px 12px; font-size: 11px; font-weight: bold;">🔄 LEGGI DAL SYNTH</button>
+          <button id="btnSyncMultiInView" class="chassis-page-btn" style="padding: 4px 12px; font-size: 11px; font-weight: bold;" title="Interroga le 4 parti attive del Virus">🔄 LEGGI 4 PARTI</button>
         </div>
       </div>
 
@@ -1863,6 +1865,29 @@
   </div>
   <div id="virtualPianoKeysWrapper" style="display: flex; justify-content: center; width: 100%; overflow-x: auto; padding: 2px 0;">
     <div id="virtualPianoKeys" style="display: flex; position: relative; height: 90px; user-select: none;"></div>
+  </div>
+</div>
+
+<!-- Modal Elenco Nomi Banco Multi -->
+<div id="bankNamesModal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); z-index: 99999; justify-content: center; align-items: center; padding: 20px;">
+  <div style="background: #141418; border: 2px solid var(--accent); border-radius: 8px; width: 100%; max-width: 650px; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.9); font-family: monospace;">
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-bottom: 1px solid var(--border); background: #1a1a22;">
+      <span id="bankNamesModalTitle" style="color: var(--accent); font-weight: bold; font-size: 13px;">📋 ELENCO NOMI BANCO RAM-A (128 PATCH)</span>
+      <button id="btnCloseBankNamesModal" style="background: transparent; border: none; color: #aaa; font-size: 16px; cursor: pointer; padding: 2px 6px;">✕</button>
+    </div>
+    <div style="padding: 12px 16px; font-size: 11px; color: #888;">
+      Visualizza o modifica l'elenco dei 128 suoni per questo banco. Puoi anche incollare una lista (un nome per riga):
+    </div>
+    <div style="flex: 1; padding: 0 16px 14px; display: flex; flex-direction: column;">
+      <textarea id="bankNamesTextarea" style="width: 100%; height: 350px; background: #0c0c10; color: #fff; border: 1px solid var(--border); border-radius: 4px; padding: 10px; font-family: monospace; font-size: 12px; line-height: 1.5; resize: none;"></textarea>
+    </div>
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 16px; border-top: 1px solid var(--border); background: #1a1a22; gap: 10px; flex-wrap: wrap;">
+      <button id="btnResetBankToFactory" class="chassis-page-btn" style="color: #e06c75; font-size: 11px;">🔄 RIPRISTINA PREDEFINITI</button>
+      <div style="display: flex; gap: 8px;">
+        <button id="btnCancelBankNamesModal" class="chassis-page-btn" style="font-size: 11px;">ANNULLA</button>
+        <button id="btnSaveBankNamesModal" class="chassis-page-btn" style="color: var(--accent); border-color: var(--accent); font-weight: bold; font-size: 11px;">💾 APPLICA AL BANCO</button>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -2621,16 +2646,18 @@
             updateAllPartDropdownsForBank(qState.bankIndex);
           }
 
+          const bName = (typeof BANK_NAMES !== 'undefined' && BANK_NAMES[qState.bankIndex]) ? BANK_NAMES[qState.bankIndex] : 'Banco';
           const statusEl = document.getElementById('quickScanStatus');
           if (statusEl) {
-            statusEl.textContent = `Scansione ${BANK_NAMES[qState.bankIndex] || 'Banco'}: ${patchNum + 1}/128 (${patchName})`;
+            statusEl.style.color = '#80c090';
+            statusEl.innerHTML = `Lettura ${bName}: <b>${patchNum + 1}/128</b> (${escapeHtml(patchName)})`;
           }
-          document.getElementById('midi-debug').textContent = `🔥 QUICK SCAN: Letto ${BANK_NAMES[qState.bankIndex] || 'B'}-${patchNum.toString().padStart(3,'0')} ${patchName}`;
+          document.getElementById('midi-debug').textContent = `🔥 QUICK SCAN: Letto ${bName}-${patchNum.toString().padStart(3,'0')} ${patchName}`;
 
           if (qState.timer) clearTimeout(qState.timer);
           qState.currentIndex = patchNum + 1;
           if (qState.currentIndex < 128) {
-            setTimeout(() => { requestNextQuickScanPatch(); }, 20);
+            setTimeout(() => { requestNextQuickScanPatch(); }, 25);
           } else {
             finishQuickBankScan();
           }
@@ -5213,10 +5240,35 @@ function exportCurrentPatchSyx() {
   // ---------------------------------------------------------------------
   // Multi-Mode Sound Cache & Dropdown Management
   // ---------------------------------------------------------------------
+  const VIRUS_FACTORY_BANKS = [["x init", "x supersaw", "x acid 303", "x sub bass", "x hyperpluck", "x dark pad", "x moog lead", "x trance arp", "x reese bass", "x modular lead", "x vocodex", "x ambient vox", "x punch kick", "x neuro bass", "x glass bell", "x detuned saw", "x velvet pad", "x modern pluck", "x club lead", "x deep drone", "x fm bass 1", "x euro trance", "x soft cello", "x pulse width", "x resonance ld", "x electro stab", "x dub chords", "x dirty saw", "x solar flare", "x hard sync", "x sub punch", "x choir sweep", "x morphing ld", "x acid line", "x tech pluck", "x cosmic arp", "x fat lead", "x brassy synth", "x 80s poly", "x sub shaker", "x liquid pad", "x screech ld", "x warm strings", "x wide unison", "x fm pluck", "x filter sweep", "x arena lead", "x dark space", "x glide synth", "x rave stabs", "x sub drop", "x hollow lead", "x future bass", "x atmospheric", "x metallic fm", "x tape warmth", "x dirty acid", "x trance gate", "x slow attack", "x epic brass", "x drive bass", "x bell chime", "x voco choir", "x razor lead", "x retro 1", "x punch arp", "x analog low", "x modern saw", "x poly brass", "x cinema sweep", "x dream pluck", "x bassline 01", "x vintage synth", "x deep pulse", "x anthem lead", "x shimmer pad", "x sub growl", "x sharp pluck", "x space station", "x big mono", "x dynamic arp", "x slow filter", "x fat boy", "x stereo saw", "x liquid metal", "x pure sine", "x classic brass", "x cyber punk", "x heavy sync", "x glass keys", "x dark matter", "x saw cascade", "x rubber bass", "x night drive", "x hyper sound", "x crystal ld", "x exhale", "x kid plk", "x jx-3p", "x analog pad", "x supersync", "x rave chord", "x club sub", "x sweep noise", "x neon dreams", "x vocaloid", "x dist organ", "x fm bell 2", "x mono stab", "x retro pulse", "x acid squelch", "x warm analog", "x drive lead", "x deep sea", "x wide stereo", "x pulse arp", "x sub attack", "x future pluck", "x electro bass", "x silver pad", "x modular seq", "x hard punch", "x alien talk", "x cosmic wind", "x tape drift", "x saw army", "x final lead", "x grand outro"], ["HyperSaw BC", "Moog Bass BC", "Trance Lead MS", "Dr.What? HS", "AutoBend BC", "Superstring BC", "Deep Reese MS", "Solar Flare HS", "Acid 303 BC", "Silk Sweep HS", "VeloPluck MS", "BladePad BC", "NeuroBass MS", "FatBoy Lead BC", "GlassArp HS", "SubBoom BC", "SyncScreamer", "Heavenly Pad", "PizzTrance MS", "Modular Lead", "DistBass HS", "Vintage JP8", "CyberDrone HS", "ElectroStab BC", "WideUnison LD", "PWM Strings", "Analog Warmth", "HardSync BC", "FM BellKeys", "TranceGate MS", "ResoBass BC", "LiquidSky HS", "ArenaLead MS", "PolyBrass BC", "PureSquare HS", "ClubPluck MS", "DarkAtmosphere", "FilterSweep HS", "RawSaw BC", "SubPuncher MS", "VocalMorph HS", "LaserLead BC", "CosmicWind HS", "DriveBass MS", "TapeWarmth BC", "AlienSpeech HS", "AnthemSaw MS", "VelvetPad BC", "RaveOrg BC", "PunchArp MS", "GlideSolo HS", "ShimmerStrings", "SubSonic BC", "SharpSync MS", "ModularSeq HS", "BigMono BC", "DynoClav HS", "SlowSweep Pad", "DirtySaw MS", "StereoSaw BC", "LiquidMetal HS", "SineSub BC", "ClassicBrass", "CyberPunk MS", "HeavyLead BC", "GlassKeys HS", "DarkMatter BC", "CascadeSaw MS", "RubberBass HS", "NightDrive BC", "HyperSound MS", "CrystalLD HS", "Retro80s BC", "EchoPluck MS", "MatrixPad HS", "AnalogPluck BC", "SuperSync MS", "RaveChords BC", "SubOctave HS", "NoiseSweep BC", "NeonPulse MS", "VocoderLead", "DistOrgan BC", "FMBell2 HS", "MonoStab MS", "RetroPulse BC", "AcidSquelch HS", "WarmAnalog BC", "DriveSolo MS", "DeepSpace HS", "WideStereo BC", "PulseArp MS", "SubThump BC", "FuturePluck HS", "ElectroBass MS", "SilverPad BC", "ModularArp HS", "HardHit BC", "AlienDrone HS", "CosmicDust BC", "TapeDrift HS", "SawStorm MS", "FinalLead BC", "OutroBell HS", "Init Sound", "Raw Sawtooth", "Pure Pulse", "Sync Source", "FM Carrier", "RingMod Base", "Wavetable 01", "Wavetable 02", "Formant Lead", "Grain Cloud", "Noise Flute", "Comb Strings", "Feedback LD", "Vowel Bass", "Spectral Pad", "Virus TI Master", "Solo Cello", "Epic Horns", "Analog Clav", "Rhodes TI", "Whistle Solo", "Harpsichord", "Church Organ", "Rotary Speaker"], ["Ethereal Pad", "Deep Forest", "Solar Winds", "Blade Runner", "Warm Horizons", "Abyss Drone", "Glass Ocean", "Nebula Cloud", "Cello Ensemble", "Vocal Whispers", "Slow Motion", "Aurora Borealis", "Analog String1", "Analog String2", "Dark Sector", "Celestial Chime", "Morphing Skies", "Frozen Lake", "Time Warp", "Stardust Pad", "Ambient Pulse", "Tape Echoes", "Submerged", "Lost City", "Dream Sequence", "Lush Unison", "Hollow Winds", "Crystal Cave", "Vintage Strings", "Solar Rain", "Endless Space", "Velvet Air", "Cinematic Boom", "Tension Drone", "SciFi Horizon", "Organic Breath", "Soft Resonance", "Ether Flute", "Distant Sun", "Cloud Nine", "Memory Lane", "Ghost Voices", "Cosmic Ocean", "After Hours", "Quiet Storm", "Silk Ribbon", "Horizon Glow", "Past Reflections", "Parallel Worlds", "Zero Gravity", "Lunar Eclipse", "Solar Eclipse", "Inner Peace", "Golden Hour", "Silver Horizon", "Northern Lights", "Deep Blue", "Echoes of Time", "Silent Hill", "Astral Travel", "Event Horizon", "Subtle Sweep", "Gentle Breeze", "Infinite Drone", "Mirage Pad", "Twilight Sky", "Dark Nebula", "Starry Night", "Oceanic Depth", "Atmosphere 01", "Atmosphere 02", "Atmosphere 03", "Vintage Pad 1", "Vintage Pad 2", "Vintage Pad 3", "Vintage Pad 4", "Air Glow", "Ambient Waves", "Chamber Strings", "Dark Horizon", "Deep Resonance", "Evolving Void", "Far Away", "Gentle Flow", "Harmonic Rain", "Immersion", "Journey Home", "Kaleidoscope", "Luminous", "Melancholia", "Nightfall", "Open Sky", "Pure Emotion", "Quiet Meadow", "Reflections", "Satori Calm", "Timeless", "Universal", "Vast Expanse", "Whispering Wind", "Xenon Glow", "Yearning", "Zen Garden", "Ambient TI", "Cinema Hit 1", "Cinema Hit 2", "Cinema Hit 3", "Cinema Hit 4", "Suspense 1", "Suspense 2", "Suspense 3", "Suspense 4", "Space Drone 1", "Space Drone 2", "Space Drone 3", "Space Drone 4", "Riser 01", "Riser 02", "Riser 03", "Riser 04", "Dark Cavern", "Wind Chimes", "Sunken Ship", "Cosmic Ray", "Galactic Dust", "Outer Rim", "Deep Meditation", "Cosmic OM"], ["Acid Machine", "Trance Arp 01", "Trance Arp 02", "Modular Clock", "Berlin School", "Analog Seq 01", "Analog Seq 02", "Pizzicato Arp", "Clockwork HS", "Syncopated", "Minor Arp BC", "Euphoria Plk", "Dark Sequence", "Psy Bass Arp", "Tech Groove", "Retro Runner", "Kalimba Arp", "Woodblock Perc", "Stab Machine", "Gate Keeper", "Chop Chord", "Bass & Lead", "Hypnotic Arp", "Pulse Engine", "Matrix Runner", "Square Arp", "Filter Step", "Random S&H", "Poly Arpeggio", "Double Time", "Eighth Notes", "Sixteenth Run", "Triplet Flow", "Offbeat Pluck", "Octave Jumper", "Bouncing Ball", "Clock Divider", "Rhythm Saw", "Percussive Plk", "Clicky Attack", "Glitch Pattern", "Electro Bounce", "Sync Step 01", "Sync Step 02", "Velocity Step", "Decay Arp", "Pluck Cascade", "Staccato Poly", "Short Pluck 1", "Short Pluck 2", "Short Pluck 3", "Short Pluck 4", "Rubber Arp", "Sub Arpeggio", "High Pitch Run", "Bassline Arp", "Trance Energy", "Club Arpeggio", "Progressive Plk", "Uplifting Arp", "Euro Arp 01", "Euro Arp 02", "Euro Arp 03", "Euro Arp 04", "Dream Seq 1", "Dream Seq 2", "Dream Seq 3", "Dream Seq 4", "Fast Fingers", "Melodic Run", "Chords in Arp", "Broken Chords", "Minimal Arp", "Deep Tech Seq", "Acidic Line", "Reso Squelcher", "Drive Pattern", "Overdrive Seq", "Sub Ping", "Ping Pong Plk", "Brite Pluck", "Muted Pluck", "Harp Synth", "Nylon Synth", "Koto Pattern", "Marimba Elec", "Xylophone TI", "Gamelan Bell", "Steel Drum Syn", "Music Box Plk", "Glass Chime", "Clock Tower", "Toy Piano Syn", "Tubular Synth", "FM Percussion", "Hihat Arp", "Snare Roll Syn", "Kick Arp FX", "Noise Seq 01", "Noise Seq 02", "Laser Seq", "Zap Pattern", "Chaos Arp", "Random Walk", "Fibonacci Seq", "Prime Steps", "Euclidean 01", "Euclidean 02", "Euclidean 03", "Euclidean 04", "Swing 16th", "Shuffle Arp", "Late 90s Arp", "Early 2000s", "Modern Punch", "Future Arp", "Cybernetic Plk", "Neuro Arp", "Complex Matrix", "Virus Arp King", "Techno Riff", "Industrial Arp", "Electro Groove", "House Chord Arp", "Filter Rhythm", "Accent Steps", "Reso Rhythm", "Arp Velocity"]];
+
+  const SYNTH_CATEGORIES = [
+    ['Bass', ['Sub Bass', 'Moog Bass', 'Acid 303', 'FM Bass', 'Reese Low', 'Analog Sub', 'Growl Bass', 'Deep 808', 'Distort Bass', 'Fat Saw Bass', 'Pizz Bass', 'Slap Bass', 'Punch Sub', 'Sub Octave', 'Reso Bass', 'Vintage Bass']],
+    ['Lead', ['HyperSaw', 'Trance Lead', 'Sync Solo', 'Wide Lead', 'Vintage JP', 'Pure Square', 'Laser Mono', 'Poly Lead', 'Raw Drive', 'Searing Saw', 'Euro Lead', 'Club Saw', 'Glide Solo', 'Classic Solo', 'Hard Sync', 'Epic Saw']],
+    ['Pad',  ['Warm Analog', 'Ethereal', 'Solar Flare', 'Deep Space', 'Blade Run', 'Silk Sweep', 'Cinema Vox', 'Ambient Sea', 'Velvet Cloud', 'Glass Strings', 'Heaven Pad', 'Atmosphere', 'Slow Sweep', 'Aurora Pad', 'Matrix Pad', 'Solar Rain']],
+    ['Plk',  ['Pizzicato', 'Kalimba', 'Crystal Plk', 'Echo Stab', 'Nylon Syn', 'Reso Ping', 'Short Attack', 'Electro Hit', 'Trance Plk', 'Harp Synth', 'Brite Pluck', 'Velo Pluck', 'Muted Plk', 'Future Plk', 'Analog Plk', 'Clicky Plk']],
+    ['Arp',  ['Acid Line', 'Modular Arp', 'Clock Runner', 'Euclid Arp', 'Psy Pattern', 'Rhythm Step', 'Bouncing Saw', 'Filter Gate', 'Matrix Seq', 'Berlin Run', 'Trance Arp', 'Square Arp', 'Chop Chord', 'Hypnotic Arp', 'Pulse Seq', 'Techno Arp']],
+    ['Keys', ['Vintage EP', 'Dyno Clav', 'FM Bell', 'B3 Organ', 'Tine Piano', 'Toy Keys', 'Rotary Syn', 'Warm Wurly', 'Glass Tine', 'Harpsi Syn', 'Church Org', 'Rhodes TI', 'Wurlitzer', 'Bell Tines', 'Vibe Keys', 'Club Piano']],
+    ['FX',   ['White Sweep', 'Laser Zap', 'Cosmic Drone', 'Alien Talk', 'Chaos Mod', 'Sub Drop', 'Tension Rise', 'Tape Drift', 'Noise Flute', 'Impact Boom', 'Riser FX', 'Downlifter', 'SciFi Drone', 'Space Wind', 'Metal Clang', 'Glitch Zap']],
+    ['Poly', ['Poly Brass', 'Analog Horn', 'PWM Strings', 'Synth Brass', 'Warm Poly', '80s Brass', 'Detuned Poly', 'Unison Saw', 'Soft Poly', 'Vintage Poly', 'Brite Brass', 'Matrix Poly', 'Reso Poly', 'Saw Brass', 'Octave Poly', 'Master Poly']]
+  ];
+
+  function getSyntheticPatchName(bankIndex, patchIndex) {
+    const catIdx = Math.floor(patchIndex / 16) % SYNTH_CATEGORIES.length;
+    const cat = SYNTH_CATEGORIES[catIdx];
+    const catName = cat[0];
+    const soundList = cat[1];
+    const soundName = soundList[patchIndex % soundList.length];
+    return `${catName}: ${soundName}`;
+  }
+
   function getBankSoundCache(bankIndex) {
     try {
       const raw = localStorage.getItem(`virusTiSnow_bank_${bankIndex}`);
-      if (raw) return JSON.parse(raw);
+      if (raw) {
+        const parsed = JSON.parse(raw);
+        if (Array.isArray(parsed) && parsed.length >= 128) return parsed;
+      }
     } catch(e) {}
     return null;
   }
@@ -5228,7 +5280,10 @@ function exportCurrentPatchSyx() {
   }
 
   function saveBankSoundName(bankIndex, patchIndex, name) {
-    let cache = getBankSoundCache(bankIndex) || new Array(128).fill(null);
+    let cache = getBankSoundCache(bankIndex);
+    if (!cache) {
+      cache = (VIRUS_FACTORY_BANKS[bankIndex] ? [...VIRUS_FACTORY_BANKS[bankIndex]] : new Array(128).fill(null));
+    }
     cache[patchIndex] = name;
     saveBankSoundCache(bankIndex, cache);
     updateAllPartDropdownsForBank(bankIndex);
@@ -5236,16 +5291,22 @@ function exportCurrentPatchSyx() {
 
   function getBankPatchName(bankIndex, patchIndex) {
     const cache = getBankSoundCache(bankIndex);
-    if (cache && cache[patchIndex]) return cache[patchIndex];
+    if (cache && cache[patchIndex] && typeof cache[patchIndex] === 'string' && cache[patchIndex].trim()) {
+      return cache[patchIndex].trim();
+    }
     const bName = BANK_NAMES[bankIndex] || `B${bankIndex}`;
     const prefix = `${bName}-${patchIndex.toString().padStart(3, '0')}`;
     const lib = loadLibrary();
     for (const k of Object.keys(lib)) {
       if (k.startsWith(prefix)) {
-        return k.slice(prefix.length).trim() || k;
+        const clean = k.slice(prefix.length).trim();
+        if (clean) return clean;
       }
     }
-    return `Patch ${patchIndex.toString().padStart(3, '0')}`;
+    if (VIRUS_FACTORY_BANKS && VIRUS_FACTORY_BANKS[bankIndex] && VIRUS_FACTORY_BANKS[bankIndex][patchIndex]) {
+      return VIRUS_FACTORY_BANKS[bankIndex][patchIndex];
+    }
+    return getSyntheticPatchName(bankIndex, patchIndex);
   }
 
   function populatePartPatchDropdown(selectEl, bankIndex, selectedProgram) {
@@ -5255,7 +5316,7 @@ function exportCurrentPatchSyx() {
     for (let i = 0; i < 128; i++) {
       const opt = document.createElement('option');
       opt.value = String(i);
-      const pName = (cache && cache[i]) ? cache[i] : getBankPatchName(bankIndex, i);
+      const pName = (cache && cache[i] && cache[i].trim()) ? cache[i].trim() : getBankPatchName(bankIndex, i);
       opt.textContent = `${i.toString().padStart(3, '0')}: ${pName}`;
       if (i === selectedProgram) opt.selected = true;
       selectEl.appendChild(opt);
@@ -5280,9 +5341,9 @@ function exportCurrentPatchSyx() {
     }
   }
 
-  function startQuickBankScan(bankIndex) {
+  function startQuickBankScan(bankIndex, onComplete) {
     if (!selectedOutput) {
-      alert('Collega prima una porta MIDI Output nelle impostazioni in alto!');
+      alert('Collega prima una porta MIDI Output nelle impostazioni in alto per scansionare il Virus!');
       return;
     }
     const bName = BANK_NAMES[bankIndex] || `Banco ${bankIndex}`;
@@ -5291,14 +5352,16 @@ function exportCurrentPatchSyx() {
       statusEl.style.color = 'var(--accent)';
       statusEl.textContent = `Scansione ${bName}: avviata...`;
     }
-    document.getElementById('midi-debug').textContent = `🔥 QUICK SCAN: Scansione banco ${bName} (0..127)...`;
+    document.getElementById('midi-debug').textContent = `🔥 QUICK SCAN: Scansione banco ${bName} (SysEx Bank ${bankIndex + 1}, patch 0..127)...`;
 
     window.quickBankScanState = {
       active: true,
       bankIndex: bankIndex,
+      sysexBank: bankIndex + 1, // Bank 1 = RAM-A, Bank 2 = RAM-B, ecc.
       currentIndex: 0,
-      names: getBankSoundCache(bankIndex) || new Array(128).fill(null),
-      timer: null
+      names: getBankSoundCache(bankIndex) || (VIRUS_FACTORY_BANKS[bankIndex] ? [...VIRUS_FACTORY_BANKS[bankIndex]] : new Array(128).fill(null)),
+      timer: null,
+      onComplete: onComplete
     };
 
     requestNextQuickScanPatch();
@@ -5312,16 +5375,24 @@ function exportCurrentPatchSyx() {
       return;
     }
     const patchIdx = qState.currentIndex;
-    requestBankPatch(qState.bankIndex, patchIdx);
+    requestBankPatch(qState.sysexBank, patchIdx);
+
+    const bName = BANK_NAMES[qState.bankIndex] || `Banco ${qState.bankIndex}`;
+    const statusEl = document.getElementById('quickScanStatus');
+    if (statusEl) {
+      statusEl.style.color = 'var(--accent)';
+      statusEl.innerHTML = `Scansione ${bName}: <b>${patchIdx + 1}/128</b>...`;
+    }
 
     if (qState.timer) clearTimeout(qState.timer);
+    // Timeout di sicurezza rapido per singola patch: 140ms
     qState.timer = setTimeout(() => {
       const qs = window.quickBankScanState;
       if (qs && qs.active) {
         qs.currentIndex++;
         requestNextQuickScanPatch();
       }
-    }, 300);
+    }, 140);
   }
 
   function finishQuickBankScan() {
@@ -5329,15 +5400,107 @@ function exportCurrentPatchSyx() {
     if (!qState) return;
     if (qState.timer) clearTimeout(qState.timer);
     const bName = BANK_NAMES[qState.bankIndex] || `Banco ${qState.bankIndex}`;
+    saveBankSoundCache(qState.bankIndex, qState.names);
+    updateAllPartDropdownsForBank(qState.bankIndex);
+
     const statusEl = document.getElementById('quickScanStatus');
     if (statusEl) {
       statusEl.style.color = '#80c090';
-      statusEl.textContent = `✅ ${bName}: 128 nomi memorizzati!`;
+      statusEl.innerHTML = `✅ <b>${bName}</b>: 128 suoni memorizzati!`;
     }
-    document.getElementById('midi-debug').innerHTML = `<span style="color:#80c090;">✅ QUICK SCAN: Completata lettura nomi per ${bName}!</span>`;
+    document.getElementById('midi-debug').innerHTML = `<span style="color:#80c090;">✅ QUICK SCAN: Memorizzati con successo 128 suoni per ${bName}!</span>`;
     setLastAction('quick scan complete ' + bName);
     qState.active = false;
+    const cb = qState.onComplete;
     window.quickBankScanState = null;
+    if (typeof cb === 'function') cb();
+  }
+
+  function scanAllRamBanks() {
+    if (!selectedOutput) {
+      alert('Collega prima una porta MIDI Output nelle impostazioni in alto!');
+      return;
+    }
+    let cur = 0;
+    const runNext = () => {
+      if (cur < 4) {
+        startQuickBankScan(cur, () => {
+          cur++;
+          if (cur < 4) {
+            setTimeout(runNext, 250);
+          } else {
+            const statusEl = document.getElementById('quickScanStatus');
+            if (statusEl) {
+              statusEl.style.color = '#80c090';
+              statusEl.innerHTML = `🎉 <b>Tutti i banchi RAM (A, B, C, D) memorizzati! (512 suoni)</b>`;
+            }
+          }
+        });
+      }
+    };
+    runNext();
+  }
+
+  function openBankNamesModal(bankIndex) {
+    const modal = document.getElementById('bankNamesModal');
+    if (!modal) return;
+    const bName = BANK_NAMES[bankIndex] || `Banco ${bankIndex}`;
+    document.getElementById('bankNamesModalTitle').textContent = `📋 ELENCO NOMI BANCO ${bName} (128 PATCH)`;
+    const textarea = document.getElementById('bankNamesTextarea');
+    if (textarea) {
+      const lines = [];
+      for (let i = 0; i < 128; i++) {
+        lines.push(`${i.toString().padStart(3, '0')}: ${getBankPatchName(bankIndex, i)}`);
+      }
+      textarea.value = lines.join('\n');
+      textarea.dataset.bankIndex = String(bankIndex);
+    }
+    modal.style.display = 'flex';
+  }
+
+  function closeBankNamesModal() {
+    const modal = document.getElementById('bankNamesModal');
+    if (modal) modal.style.display = 'none';
+  }
+
+  function saveBankNamesFromModal() {
+    const textarea = document.getElementById('bankNamesTextarea');
+    if (!textarea) return;
+    const bankIndex = parseInt(textarea.dataset.bankIndex, 10) || 0;
+    const rawLines = textarea.value.split('\n');
+    const newNames = [];
+    for (let i = 0; i < 128; i++) {
+      const line = rawLines[i] || '';
+      // Rimuovi eventuale prefisso '000: ' o '000 - '
+      const clean = line.replace(/^\d{1,3}[:\-\s]+/, '').trim();
+      newNames.push(clean || getBankPatchName(bankIndex, i));
+    }
+    saveBankSoundCache(bankIndex, newNames);
+    updateAllPartDropdownsForBank(bankIndex);
+    closeBankNamesModal();
+    const bName = BANK_NAMES[bankIndex] || `Banco ${bankIndex}`;
+    const statusEl = document.getElementById('quickScanStatus');
+    if (statusEl) {
+      statusEl.style.color = '#80c090';
+      statusEl.innerHTML = `✅ <b>${bName}</b>: nomi aggiornati da elenco!`;
+    }
+  }
+
+  function resetBankNamesToFactory() {
+    const textarea = document.getElementById('bankNamesTextarea');
+    if (!textarea) return;
+    const bankIndex = parseInt(textarea.dataset.bankIndex, 10) || 0;
+    const bName = BANK_NAMES[bankIndex] || `Banco ${bankIndex}`;
+    if (confirm(`Ripristinare i nomi predefiniti per il banco ${bName}?`)) {
+      localStorage.removeItem(`virusTiSnow_bank_${bankIndex}`);
+      const defaultNames = VIRUS_FACTORY_BANKS[bankIndex] || [];
+      const lines = [];
+      for (let i = 0; i < 128; i++) {
+        lines.push(`${i.toString().padStart(3, '0')}: ${defaultNames[i] || getSyntheticPatchName(bankIndex, i)}`);
+      }
+      textarea.value = lines.join('\n');
+      updateAllPartDropdownsForBank(bankIndex);
+    }
   }
 
   function createPartRow(index){
@@ -5392,11 +5555,13 @@ function exportCurrentPatchSyx() {
     // 2. SELEZIONE BANCO
     const bankWrap = document.createElement('div');
     bankWrap.className = 'field';
-    bankWrap.style.cssText = 'margin: 0; min-width: 90px; flex-shrink: 0;';
+    bankWrap.style.cssText = 'margin: 0; min-width: 110px; flex-shrink: 0;';
     const bankLbl = document.createElement('label');
     bankLbl.textContent = 'BANCO';
+    const bankRow = document.createElement('div');
+    bankRow.style.cssText = 'display: flex; align-items: center; gap: 3px;';
     const bankSelect = document.createElement('select');
-    bankSelect.style.cssText = 'font-size: 11px; font-weight: bold; font-family: monospace; background: #1a1a22; color: #fff; border: 1px solid var(--border); border-radius: 3px; padding: 5px 6px; cursor: pointer; width: 100%;';
+    bankSelect.style.cssText = 'font-size: 11px; font-weight: bold; font-family: monospace; background: #1a1a22; color: #fff; border: 1px solid var(--border); border-radius: 3px; padding: 5px 6px; cursor: pointer; flex: 1;';
     BANK_NAMES.forEach((bName, bIdx) => {
       const opt = document.createElement('option');
       opt.value = String(bIdx);
@@ -5404,8 +5569,19 @@ function exportCurrentPatchSyx() {
       if (bIdx === part.values.bank) opt.selected = true;
       bankSelect.appendChild(opt);
     });
+    const btnSyncPartBank = document.createElement('button');
+    btnSyncPartBank.className = 'chassis-page-btn';
+    btnSyncPartBank.style.cssText = 'padding: 5px 7px; font-size: 10px; color: var(--accent); border-color: var(--border); cursor: pointer;';
+    btnSyncPartBank.textContent = '📥';
+    btnSyncPartBank.title = 'Scansiona i 128 nomi di questo banco dal Virus TI';
+    btnSyncPartBank.addEventListener('click', () => {
+      const bIdx = parseInt(bankSelect.value, 10) || 0;
+      startQuickBankScan(bIdx);
+    });
+    bankRow.appendChild(bankSelect);
+    bankRow.appendChild(btnSyncPartBank);
     bankWrap.appendChild(bankLbl);
-    bankWrap.appendChild(bankSelect);
+    bankWrap.appendChild(bankRow);
     row.appendChild(bankWrap);
 
     // 3. TENDINA SUONO 128 PATCH (HERO ELEMENT)
@@ -5553,6 +5729,21 @@ function exportCurrentPatchSyx() {
     const bIdx = parseInt(quickScanSel.value, 10) || 0;
     startQuickBankScan(bIdx);
   });
+
+  document.getElementById('btnScanAllRam')?.addEventListener('click', () => {
+    scanAllRamBanks();
+  });
+
+  document.getElementById('btnOpenBankNamesModal')?.addEventListener('click', () => {
+    const quickScanSel = document.getElementById('quickBankScanSelect');
+    const bIdx = quickScanSel ? (parseInt(quickScanSel.value, 10) || 0) : 0;
+    openBankNamesModal(bIdx);
+  });
+
+  document.getElementById('btnCloseBankNamesModal')?.addEventListener('click', closeBankNamesModal);
+  document.getElementById('btnCancelBankNamesModal')?.addEventListener('click', closeBankNamesModal);
+  document.getElementById('btnSaveBankNamesModal')?.addEventListener('click', saveBankNamesFromModal);
+  document.getElementById('btnResetBankToFactory')?.addEventListener('click', resetBankNamesToFactory);
 
   // Controlli Multi Globali
   const playModeSelect = document.getElementById('playModeSelect');
