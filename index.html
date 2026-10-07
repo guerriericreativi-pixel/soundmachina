@@ -3062,11 +3062,13 @@
     values.program = DEFAULT_INITIAL_PROGRAMS[i] || i;
     const sound = {};
     PARAMS.forEach(p => { sound[p.id] = p.default; });
-    const initName = (typeof VIRUS_FACTORY_BANKS !== 'undefined' && VIRUS_FACTORY_BANKS[0] && VIRUS_FACTORY_BANKS[0][values.program])
-      ? VIRUS_FACTORY_BANKS[0][values.program]
-      : (values.program === 0 ? 'SuperSaw' : (values.program === 3 ? 'Sub Bass' : (values.program === 5 ? 'Dark Pad' : 'Glass Bell')));
+    const INIT_NAMES = { 0: 'Init', 3: 'Sub Bass', 5: 'Dark Pad', 14: 'Glass Bell' };
+    const initName = INIT_NAMES[values.program] || 'Init';
     multiParts.push({ enabled: true, name: initName, values, sound });
   }
+
+  // Stato globale minimo per i parametri filtro condivisi (usato dal motore Web Audio)
+  const state = { values: { f1_cutoff: 85, f1_resonance: 0 } };
 
   // Define patch as a Proxy so that code modifying `patch.filter1_cutoff` updates the CURRENT part's sound.
   const patch = new Proxy({}, {
@@ -3102,6 +3104,18 @@
   const MIDI_IN_KEY = 'virusTiSnow_midiInName';
 
   // ---------------------------------------------------------------------
+  // Light limiter & Glow helpers (necessari prima di initElektronLcd e applyTheme)
+  // ---------------------------------------------------------------------
+  const LIGHT_LIMIT_KEY = 'virusTiSnow_lightLimit';
+  let currentLightLimit = parseFloat(localStorage.getItem(LIGHT_LIMIT_KEY) || '0.65');
+
+  function limitedGlow(base){
+    return Math.max(0, base * (currentLightLimit || 0.65));
+  }
+
+  let appReady = false;
+
+  // ---------------------------------------------------------------------
   // Theme toggle (persisted in localStorage)
   // ---------------------------------------------------------------------
   const themeToggle = document.getElementById('themeToggle');
@@ -3114,7 +3128,9 @@
       document.documentElement.setAttribute('data-skin', 'te');
       themeToggle.textContent = '○';
     }
-    if (typeof initElektronLcd === 'function') initElektronLcd();
+    if (appReady && typeof initElektronLcd === 'function') {
+      initElektronLcd();
+    }
   }
 
   let currentTheme = localStorage.getItem(THEME_KEY) || 'te';
@@ -3131,12 +3147,10 @@
   // Accent color picker (persisted in localStorage)
   // ---------------------------------------------------------------------
   const ACCENT_KEY = 'virusTiSnow_accent';
-  const LIGHT_LIMIT_KEY = 'virusTiSnow_lightLimit';
   const accentPicker = document.getElementById('accentPicker');
   const accentDots = Array.from(accentPicker.children);
   const lightLimiter = document.getElementById('lightLimiter');
   const lightLimitSteps = lightLimiter ? Array.from(lightLimiter.querySelectorAll('.light-limit-step')) : [];
-  let currentLightLimit = parseFloat(localStorage.getItem(LIGHT_LIMIT_KEY) || '0.65');
 
   function applyLightLimit(limit){
     currentLightLimit = Math.max(0.25, Math.min(1, Number(limit) || 0.65));
@@ -4747,6 +4761,7 @@ function exportCurrentPatchSyx() {
   }
 
   function initElektronLcd() {
+    if (!appReady) return;
     const canvas = document.getElementById('elektronLcd');
     if (!canvas) return;
     const ctx = canvas.getContext('2d');
@@ -8918,6 +8933,9 @@ function exportCurrentPatchSyx() {
       changePartSound(i, multiParts[i].values.bank, multiParts[i].values.program, false);
     }
   }
+
+  appReady = true;
+  if (typeof initElektronLcd === 'function') initElektronLcd();
 
   renderPianoKeys();
   updateKeyboardPartDisplay();
