@@ -1664,37 +1664,61 @@
     text-shadow: 0 1px 2px rgba(0,0,0,0.8);
   }
 
-  /* FRONTALE HARDWARE ACCESS VIRUS TI SNOW */
+  /* FRONTALE HARDWARE ACCESS VIRUS TI SNOW - FOTOREALISTICO */
   .snow-hardware-front {
-    padding: 44px 32px 32px 32px !important;
-    max-width: 1050px !important;
-    margin: 16px auto !important;
+    padding: 36px 28px 24px 28px !important;
+    max-width: 1060px !important;
+    margin: 14px auto !important;
+    background: linear-gradient(180deg, #fafbfc 0%, #eceff4 45%, #e1e4ea 100%) !important;
+    border: 1px solid #b6bac2 !important;
+    border-radius: 6px !important;
     box-shadow:
       inset 0 1px 0 rgba(255,255,255,0.95),
-      inset 0 -2px 0 rgba(0,0,0,0.15),
-      0 16px 45px rgba(0,0,0,0.22),
-      -14px 0 0 #c8955d, 14px 0 0 #c8955d !important;
+      inset 0 -2px 0 rgba(0,0,0,0.12),
+      0 20px 50px rgba(0,0,0,0.28),
+      -18px 0 0 #c8955d, -20px 0 0 #9c6e39,
+      18px 0 0 #c8955d, 20px 0 0 #9c6e39 !important;
+    position: relative;
+    user-select: none;
+  }
+  .snow-hardware-front::before {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0; left: -20px; width: 20px;
+    background: linear-gradient(90deg, #7c4f1e 0%, #b8844b 35%, #deaa72 75%, #a6723b 100%);
+    border-radius: 6px 0 0 6px;
+    box-shadow: inset 2px 0 4px rgba(0,0,0,0.35), inset -1px 0 2px rgba(255,255,255,0.4);
+    pointer-events: none;
+  }
+  .snow-hardware-front::after {
+    content: '';
+    position: absolute;
+    top: 0; bottom: 0; right: -20px; width: 20px;
+    background: linear-gradient(90deg, #a6723b 0%, #deaa72 25%, #b8844b 65%, #7c4f1e 100%);
+    border-radius: 0 6px 6px 0;
+    box-shadow: inset -2px 0 4px rgba(0,0,0,0.35), inset 1px 0 2px rgba(255,255,255,0.4);
+    pointer-events: none;
   }
   .snow-front-grid {
     z-index: 1;
     width: 100%;
     display: grid;
-    grid-template-columns: 130px minmax(360px, 480px) minmax(260px, 320px);
-    gap: 16px;
+    grid-template-columns: 140px minmax(430px, 510px) minmax(290px, 340px);
+    gap: 20px;
     justify-content: center;
-    align-items: start;
-    margin-top: 10px;
+    align-items: center;
+    margin-top: 6px;
   }
-  @media (max-width: 920px) {
+  @media (max-width: 960px) {
     .snow-front-grid {
       grid-template-columns: 1fr;
     }
   }
   .snow-front-col {
-    background: rgba(0,0,0,0.02);
-    border-radius: 6px;
-    border: 1px solid rgba(0,0,0,0.06);
-    padding: 10px;
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+    padding: 0 !important;
   }
   .snow-front-left {
     display: flex;
@@ -1703,36 +1727,42 @@
     justify-content: space-between;
     height: 100%;
     box-sizing: border-box;
+    padding: 10px 0 !important;
   }
   .snow-front-center {
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 12px;
+    gap: 14px;
   }
   .snow-front-right {
     display: flex;
     flex-direction: column;
-    gap: 12px;
+    gap: 14px;
   }
+
+  /* Finestra Acrilica Scura Smoked Glossy (Access Virus Originale) */
   .snow-front-acrylic-window {
-    background: rgba(255,255,255,0.85);
-    border: 2.5px solid #b2b6c0;
-    border-radius: 6px;
-    padding: 8px 12px;
-    box-shadow: 0 3px 12px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.95);
+    background: linear-gradient(180deg, #2b303b 0%, #171a22 100%) !important;
+    border: 2px solid #3c4250 !important;
+    border-radius: 8px !important;
+    padding: 10px 14px !important;
+    box-shadow:
+      0 6px 20px rgba(0,0,0,0.38),
+      inset 0 1px 1px rgba(255,255,255,0.4),
+      inset 0 -1px 2px rgba(0,0,0,0.6) !important;
     position: relative;
     width: 100%;
     box-sizing: border-box;
   }
   .virus-snow-lcd-front {
-    background: linear-gradient(180deg, #e4eff8 0%, #d0e4f2 100%);
-    border: 3px solid #1c252e;
-    border-radius: 4px;
-    padding: 8px 12px;
-    box-shadow: inset 0 2px 7px rgba(0,0,0,0.4);
+    background: linear-gradient(180deg, #e3eff9 0%, #cde3f3 100%) !important;
+    border: 3px solid #12161f !important;
+    border-radius: 4px !important;
+    padding: 7px 12px !important;
+    box-shadow: inset 0 3px 8px rgba(0,0,0,0.5), 0 1px 1px rgba(255,255,255,0.15) !important;
     font-family: monospace;
-    color: #1c2a38;
+    color: #1a2938;
     position: relative;
     overflow: hidden;
     min-height: 82px;
@@ -1743,7 +1773,7 @@
     align-items: center;
     font-size: 10px;
     font-weight: bold;
-    background: #223446;
+    background: #203142;
     color: #d7e9f5;
     padding: 2px 8px;
     border-radius: 2px;
@@ -1751,7 +1781,7 @@
   }
   .lcd-badge {
     background: #d7e9f5;
-    color: #223446;
+    color: #203142;
     padding: 0 5px;
     border-radius: 2px;
     font-weight: 900;
@@ -1794,81 +1824,130 @@
     box-sizing: border-box;
   }
   .snow-front-label {
-    font-size: 9px;
-    font-weight: 800;
+    font-size: 9.5px;
+    font-weight: 900;
     letter-spacing: 0.12em;
-    color: #555;
+    color: #333;
     text-transform: uppercase;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.8);
   }
   .snow-front-val {
-    font-size: 10.5px;
+    font-size: 11px;
     font-family: monospace;
     font-weight: bold;
     color: #222;
     margin-top: 2px;
   }
+
+  /* Dial con tacche radiali per potenziometri hardware */
+  .knob-tick-dial {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .knob-tick-dial::before {
+    content: '';
+    position: absolute;
+    width: calc(100% + 14px);
+    height: calc(100% + 14px);
+    border-radius: 50%;
+    border: 1.5px dotted rgba(50, 60, 75, 0.35);
+    pointer-events: none;
+    z-index: 0;
+  }
+
+  /* Pulsanti Tattili Hardware */
+  .snow-tactile-btn {
+    background: linear-gradient(180deg, #ffffff 0%, #e3e6ec 100%);
+    border: 1px solid #afb3bd;
+    border-radius: 4px;
+    color: #222;
+    font-size: 10px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    padding: 6px 10px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.9);
+    cursor: pointer;
+    transition: all 0.08s ease;
+  }
+  .snow-tactile-btn:active {
+    background: #d4d7df;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.25);
+    transform: translateY(1px);
+  }
+
+  /* Part Selector Matrix */
   .snow-front-part-box {
-    background: rgba(0,0,0,0.03);
-    border: 1px solid var(--border);
-    border-radius: 5px;
-    padding: 6px 8px;
+    background: rgba(0,0,0,0.04);
+    border: 1px solid rgba(0,0,0,0.12);
+    border-radius: 6px;
+    padding: 8px 10px;
     display: flex;
     flex-direction: column;
-    gap: 6px;
+    gap: 7px;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.06);
   }
   .front-part-pill {
     flex: 1;
-    padding: 4px 2px;
-    font-size: 10px;
+    padding: 5px 2px;
+    font-size: 11px;
     font-weight: 900;
     font-family: monospace;
-    border-radius: 3px;
-    border: 1px solid #ccc;
-    background: #eee;
+    border-radius: 4px;
+    border: 1px solid #b8bac2;
+    background: linear-gradient(180deg, #f8f9fb 0%, #e3e6ec 100%);
     cursor: pointer;
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 2px;
+    gap: 3px;
     transition: all 0.1s;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.9);
   }
   .front-part-pill.active {
     background: #fff;
-    border-color: #888;
-    box-shadow: 0 1px 3px rgba(0,0,0,0.15);
+    border-color: #777;
+    box-shadow: 0 1px 4px rgba(0,0,0,0.2), inset 0 1px 0 rgba(255,255,255,0.95);
   }
   .front-part-led {
     width: 6px;
     height: 6px;
     border-radius: 50%;
-    background: #444;
+    background: #3a3d44;
     display: inline-block;
   }
-  .snow-front-bottom-bar {
+
+  /* Dock inferiore integrato */
+  .snow-front-dock {
     z-index: 1;
     width: 100%;
     display: flex;
     justify-content: space-between;
     align-items: center;
     flex-wrap: wrap;
-    gap: 8px;
-    margin-top: 14px;
-    padding-top: 10px;
-    border-top: 1px solid rgba(0,0,0,0.08);
+    gap: 10px;
+    margin-top: 16px;
+    padding: 9px 14px;
+    background: linear-gradient(180deg, rgba(0,0,0,0.03) 0%, rgba(0,0,0,0.07) 100%);
+    border: 1px solid rgba(0,0,0,0.12);
+    border-radius: 6px;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.06), 0 1px 0 rgba(255,255,255,0.7);
   }
   .snow-select {
-    padding: 3px 8px;
+    padding: 4px 8px;
     font-size: 11px;
     font-weight: bold;
     background: #fff;
     color: #111;
-    border: 1px solid var(--border);
-    border-radius: 3px;
+    border: 1px solid #b2b6bf;
+    border-radius: 4px;
     cursor: pointer;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.08);
   }
   @keyframes pulseBpm {
-    0%, 100% { opacity: 0.35; box-shadow: 0 0 3px #e06c75; }
-    50% { opacity: 1; box-shadow: 0 0 8px #ff4d5a; }
+    0%, 100% { opacity: 0.3; box-shadow: 0 0 3px #e06c75; transform: scale(0.95); }
+    50% { opacity: 1; box-shadow: 0 0 10px #ff3b4b; transform: scale(1.08); }
   }
   .pulse-bpm {
     animation: pulseBpm 0.5s infinite ease-in-out;
@@ -2097,22 +2176,24 @@
     <div class="chassis-screw screw-bl"></div>
     <div class="chassis-screw screw-br"></div>
 
-    <div class="chassis-logo" style="top: 14px; left: 32px; font-size: 19px; letter-spacing: 0.12em;">VIRUS | TI SNOW</div>
-    <div class="chassis-access-logo" style="position: absolute; top: 14px; right: 32px; font-weight: 800; font-size: 15px; letter-spacing: 0.1em; color: #444; display: flex; align-items: center; gap: 6px; font-family: 'Inter', sans-serif;">
-      <span style="font-size: 18px; color: #333;">❖</span> access
+    <div class="chassis-logo" style="top: 13px; left: 32px; font-size: 19px; letter-spacing: 0.12em; font-weight: 900;">VIRUS | TI SNOW</div>
+    <div class="chassis-access-logo" style="position: absolute; top: 13px; right: 32px; font-weight: 800; font-size: 15px; letter-spacing: 0.1em; color: #333; display: flex; align-items: center; gap: 6px; font-family: 'Inter', sans-serif;">
+      <span style="font-size: 18px; color: #222;">❖</span> access
     </div>
 
-    <!-- Front Panel Grid matching hardware photo -->
+    <!-- Front Panel Grid matching physical hardware unit -->
     <div class="snow-front-grid">
       <!-- 1. LEFT: MASTER VOL & AUDIO -->
       <div class="snow-front-col snow-front-left">
-        <div style="display: flex; flex-direction: column; align-items: center; gap: 5px;">
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 6px;">
           <div class="snow-front-label">MASTER VOL</div>
-          <div class="chassis-knob-outer snow-front-knob" id="frontKnobMasterVol" data-val="100" style="width: 50px; height: 50px; cursor: grab;" title="Trascina su/giù per regolare Master Volume (CC 7)">
-            <div class="chassis-knob-inner" style="width: 44px; height: 44px;">
-              <div class="chassis-knob-top" style="width: 34px; height: 34px;">
-                <div class="chassis-knob-indicator-container" id="frontKnobMasterVolInd" style="transform: rotate(50deg);">
-                  <div class="chassis-knob-indicator" style="height: 10px; width: 2.5px; top: 2px;"></div>
+          <div class="knob-tick-dial">
+            <div class="chassis-knob-outer snow-front-knob" id="frontKnobMasterVol" data-val="100" style="width: 50px; height: 50px; cursor: grab;" title="Trascina su/giù per regolare Master Volume (CC 7)">
+              <div class="chassis-knob-inner" style="width: 44px; height: 44px;">
+                <div class="chassis-knob-top" style="width: 34px; height: 34px;">
+                  <div class="chassis-knob-indicator-container" id="frontKnobMasterVolInd" style="transform: rotate(50deg);">
+                    <div class="chassis-knob-indicator" style="height: 11px; width: 2.5px; top: 1px;"></div>
+                  </div>
                 </div>
               </div>
             </div>
@@ -2120,34 +2201,34 @@
           <span id="frontValMasterVol" class="snow-front-val">100</span>
         </div>
 
-        <div style="display: flex; flex-direction: column; align-items: center; gap: 10px; margin-top: 18px;">
+        <div style="display: flex; flex-direction: column; align-items: center; gap: 12px; margin-top: 22px;">
           <div style="display: flex; align-items: center; gap: 6px;">
             <span id="frontInputLed" style="width: 7px; height: 7px; border-radius: 50%; background: #48bb78; box-shadow: 0 0 5px #48bb78; display: inline-block;"></span>
-            <span style="font-size: 8px; font-weight: 800; letter-spacing: 0.1em; color: #555;">INPUT</span>
+            <span style="font-size: 8.5px; font-weight: 900; letter-spacing: 0.12em; color: #444;">INPUT</span>
           </div>
-          <div style="display: flex; flex-direction: column; align-items: center; gap: 2px; color: #666;">
+          <div style="display: flex; flex-direction: column; align-items: center; gap: 2px; color: #555;">
             <span style="font-size: 15px;">🎧</span>
-            <span style="font-size: 8px; font-weight: 800; letter-spacing: 0.08em;">PHONES</span>
+            <span style="font-size: 8px; font-weight: 900; letter-spacing: 0.1em; color: #444;">PHONES</span>
           </div>
         </div>
       </div>
 
       <!-- 2. CENTER: ACRYLIC DISPLAY WINDOW & 3 SOFT KNOBS -->
       <div class="snow-front-col snow-front-center">
-        <!-- Acrylic Glass Frame -->
+        <!-- Acrylic Glass Frame Scura Smoked Glossy con 4 viti -->
         <div class="snow-front-acrylic-window">
           <div class="chassis-screw" style="top: 5px; left: 5px; width: 7px; height: 7px;"></div>
           <div class="chassis-screw" style="top: 5px; right: 5px; width: 7px; height: 7px;"></div>
           <div class="chassis-screw" style="bottom: 5px; left: 5px; width: 7px; height: 7px;"></div>
           <div class="chassis-screw" style="bottom: 5px; right: 5px; width: 7px; height: 7px;"></div>
 
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; padding: 0 4px;">
+          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px; padding: 0 6px;">
             <div style="display: flex; align-items: center; gap: 6px;">
-              <span class="pulse-bpm" style="width: 7px; height: 7px; border-radius: 50%; background: #e06c75; box-shadow: 0 0 6px #e06c75; display: inline-block;"></span>
-              <span style="font-size: 8px; font-weight: 800; letter-spacing: 0.1em; color: #555;">BPM / LFO</span>
+              <span class="pulse-bpm" style="width: 7px; height: 7px; border-radius: 50%; background: #ff3b4b; box-shadow: 0 0 7px #ff3b4b; display: inline-block;"></span>
+              <span style="font-size: 8.5px; font-weight: 800; letter-spacing: 0.12em; color: #cbd5e1;">BPM / LFO</span>
             </div>
-            <div style="font-weight: 900; font-size: 11px; letter-spacing: 0.12em; color: #222; font-family: 'Inter', sans-serif;">
-              VIRUS <span style="font-weight: 300; opacity: 0.5;">|</span> TI SNOW
+            <div style="font-weight: 900; font-size: 11px; letter-spacing: 0.14em; color: #f1f5f9; font-family: 'Inter', sans-serif;">
+              VIRUS <span style="font-weight: 300; opacity: 0.6;">|</span> TI SNOW
             </div>
           </div>
 
@@ -2178,46 +2259,52 @@
         <div class="snow-front-soft-knobs">
           <!-- SOFT 1 -->
           <div class="chassis-knob-container">
-            <div class="chassis-knob-outer snow-front-knob" id="frontKnobSoft1" data-val="0" style="width: 42px; height: 42px; cursor: grab;" title="Trascina per regolare Soft 1 (CC 1 / Mod)">
-              <div class="chassis-knob-inner" style="width: 36px; height: 36px;">
-                <div class="chassis-knob-top" style="width: 28px; height: 28px;">
-                  <div class="chassis-knob-indicator-container" id="frontKnobSoft1Ind" style="transform: rotate(-135deg);">
-                    <div class="chassis-knob-indicator" style="height: 8px; width: 2px;"></div>
+            <div class="knob-tick-dial">
+              <div class="chassis-knob-outer snow-front-knob" id="frontKnobSoft1" data-val="0" style="width: 42px; height: 42px; cursor: grab;" title="Trascina per regolare Soft 1 (CC 1 / Mod)">
+                <div class="chassis-knob-inner" style="width: 36px; height: 36px;">
+                  <div class="chassis-knob-top" style="width: 28px; height: 28px;">
+                    <div class="chassis-knob-indicator-container" id="frontKnobSoft1Ind" style="transform: rotate(-135deg);">
+                      <div class="chassis-knob-indicator" style="height: 9px; width: 2px;"></div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-            <span class="chassis-knob-label">SOFT 1</span>
+            <span class="chassis-knob-label" style="margin-top: 3px;">SOFT 1</span>
             <span id="frontValSoft1" class="snow-front-val">0</span>
           </div>
 
           <!-- SOFT 2 -->
           <div class="chassis-knob-container">
-            <div class="chassis-knob-outer snow-front-knob" id="frontKnobSoft2" data-val="64" style="width: 42px; height: 42px; cursor: grab;" title="Trascina per regolare Soft 2 (Energy / Filter Env)">
-              <div class="chassis-knob-inner" style="width: 36px; height: 36px;">
-                <div class="chassis-knob-top" style="width: 28px; height: 28px;">
-                  <div class="chassis-knob-indicator-container" id="frontKnobSoft2Ind" style="transform: rotate(0deg);">
-                    <div class="chassis-knob-indicator" style="height: 8px; width: 2px;"></div>
+            <div class="knob-tick-dial">
+              <div class="chassis-knob-outer snow-front-knob" id="frontKnobSoft2" data-val="64" style="width: 42px; height: 42px; cursor: grab;" title="Trascina per regolare Soft 2 (Energy / Filter Env)">
+                <div class="chassis-knob-inner" style="width: 36px; height: 36px;">
+                  <div class="chassis-knob-top" style="width: 28px; height: 28px;">
+                    <div class="chassis-knob-indicator-container" id="frontKnobSoft2Ind" style="transform: rotate(0deg);">
+                      <div class="chassis-knob-indicator" style="height: 9px; width: 2px;"></div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-            <span class="chassis-knob-label">SOFT 2</span>
+            <span class="chassis-knob-label" style="margin-top: 3px;">SOFT 2</span>
             <span id="frontValSoft2" class="snow-front-val">64</span>
           </div>
 
           <!-- SOFT 3 -->
           <div class="chassis-knob-container">
-            <div class="chassis-knob-outer snow-front-knob" id="frontKnobSoft3" data-val="20" style="width: 42px; height: 42px; cursor: grab;" title="Trascina per regolare Soft 3 (FX Send / CC 91)">
-              <div class="chassis-knob-inner" style="width: 36px; height: 36px;">
-                <div class="chassis-knob-top" style="width: 28px; height: 28px;">
-                  <div class="chassis-knob-indicator-container" id="frontKnobSoft3Ind" style="transform: rotate(-80deg);">
-                    <div class="chassis-knob-indicator" style="height: 8px; width: 2px;"></div>
+            <div class="knob-tick-dial">
+              <div class="chassis-knob-outer snow-front-knob" id="frontKnobSoft3" data-val="20" style="width: 42px; height: 42px; cursor: grab;" title="Trascina per regolare Soft 3 (FX Send / CC 91)">
+                <div class="chassis-knob-inner" style="width: 36px; height: 36px;">
+                  <div class="chassis-knob-top" style="width: 28px; height: 28px;">
+                    <div class="chassis-knob-indicator-container" id="frontKnobSoft3Ind" style="transform: rotate(-80deg);">
+                      <div class="chassis-knob-indicator" style="height: 9px; width: 2px;"></div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-            <span class="chassis-knob-label">SOFT 3</span>
+            <span class="chassis-knob-label" style="margin-top: 3px;">SOFT 3</span>
             <span id="frontValSoft3" class="snow-front-val">20</span>
           </div>
         </div>
@@ -2226,34 +2313,38 @@
       <!-- 3. RIGHT: FILTER & MATRIX NAVIGATION -->
       <div class="snow-front-col snow-front-right">
         <!-- Filter Knobs -->
-        <div style="display: flex; justify-content: space-around; align-items: center; width: 100%;">
-          <!-- CUTOFF -->
+        <div style="display: flex; justify-content: space-around; align-items: flex-end; width: 100%;">
+          <!-- Hero CUTOFF Knob (Larger, more prominent) -->
           <div class="chassis-knob-container">
-            <div class="chassis-knob-outer snow-front-knob" id="frontKnobCutoff" data-val="64" style="width: 50px; height: 50px; cursor: grab;" title="Trascina per regolare Cutoff Filtro 1 (CC 40)">
-              <div class="chassis-knob-inner" style="width: 44px; height: 44px;">
-                <div class="chassis-knob-top" style="width: 34px; height: 34px;">
-                  <div class="chassis-knob-indicator-container" id="frontKnobCutoffInd" style="transform: rotate(0deg);">
-                    <div class="chassis-knob-indicator" style="height: 10px; width: 2.5px; top: 2px;"></div>
+            <div class="knob-tick-dial">
+              <div class="chassis-knob-outer snow-front-knob" id="frontKnobCutoff" data-val="64" style="width: 58px; height: 58px; cursor: grab;" title="Trascina per regolare Cutoff Filtro 1 (CC 40)">
+                <div class="chassis-knob-inner" style="width: 50px; height: 50px;">
+                  <div class="chassis-knob-top" style="width: 38px; height: 38px;">
+                    <div class="chassis-knob-indicator-container" id="frontKnobCutoffInd" style="transform: rotate(0deg);">
+                      <div class="chassis-knob-indicator" style="height: 12px; width: 3px; top: 1px;"></div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-            <span class="chassis-knob-label" style="font-size: 9px; font-weight: 800;">CUTOFF</span>
+            <span class="chassis-knob-label" style="font-size: 10px; font-weight: 900; margin-top: 4px; letter-spacing: 0.1em;">CUTOFF</span>
             <span id="frontValCutoff" class="snow-front-val">64</span>
           </div>
 
-          <!-- RESONANCE -->
+          <!-- RESONANCE Knob -->
           <div class="chassis-knob-container">
-            <div class="chassis-knob-outer snow-front-knob" id="frontKnobResonance" data-val="0" style="width: 44px; height: 44px; cursor: grab;" title="Trascina per regolare Risonanza Filtro 1 (CC 42)">
-              <div class="chassis-knob-inner" style="width: 38px; height: 38px;">
-                <div class="chassis-knob-top" style="width: 30px; height: 30px;">
-                  <div class="chassis-knob-indicator-container" id="frontKnobResonanceInd" style="transform: rotate(-135deg);">
-                    <div class="chassis-knob-indicator" style="height: 9px; width: 2px; top: 2px;"></div>
+            <div class="knob-tick-dial">
+              <div class="chassis-knob-outer snow-front-knob" id="frontKnobResonance" data-val="0" style="width: 44px; height: 44px; cursor: grab;" title="Trascina per regolare Risonanza Filtro 1 (CC 42)">
+                <div class="chassis-knob-inner" style="width: 38px; height: 38px;">
+                  <div class="chassis-knob-top" style="width: 30px; height: 30px;">
+                    <div class="chassis-knob-indicator-container" id="frontKnobResonanceInd" style="transform: rotate(-135deg);">
+                      <div class="chassis-knob-indicator" style="height: 9px; width: 2px; top: 2px;"></div>
+                    </div>
                   </div>
                 </div>
               </div>
             </div>
-            <span class="chassis-knob-label" style="font-size: 8.5px; font-weight: 800;">RESONANCE</span>
+            <span class="chassis-knob-label" style="font-size: 9px; font-weight: 800; margin-top: 4px;">RESONANCE</span>
             <span id="frontValResonance" class="snow-front-val">0</span>
           </div>
         </div>
@@ -2261,14 +2352,14 @@
         <!-- Part Navigation Box -->
         <div class="snow-front-part-box">
           <div style="display: flex; justify-content: space-between; align-items: center;">
-            <span style="font-size: 9px; font-weight: 800; letter-spacing: 0.1em; color: #444;">PART SELECT</span>
+            <span style="font-size: 9.5px; font-weight: 900; letter-spacing: 0.12em; color: #333;">PART SELECT</span>
             <div style="display: flex; gap: 4px;">
-              <button id="frontBtnPartPrev" class="chassis-page-btn" style="padding: 2px 7px; font-size: 10px;" title="Parte precedente">◄</button>
-              <button id="frontBtnPartNext" class="chassis-page-btn" style="padding: 2px 7px; font-size: 10px;" title="Parte successiva">►</button>
+              <button id="frontBtnPartPrev" class="snow-tactile-btn" style="padding: 3px 8px; font-size: 10px;" title="Parte precedente">◄</button>
+              <button id="frontBtnPartNext" class="snow-tactile-btn" style="padding: 3px 8px; font-size: 10px;" title="Parte successiva">►</button>
             </div>
           </div>
           <!-- 4 Part Button/LEDs -->
-          <div style="display: flex; justify-content: space-between; gap: 4px;">
+          <div class="snow-part-strip">
             <button class="front-part-pill active" data-part="0" id="frontPartBtn0" title="Seleziona Parte 1">
               <span class="front-part-led" id="frontPartLed0" style="background: #ff9900; box-shadow: 0 0 6px #ff9900;"></span>
               <span>1</span>
@@ -2288,38 +2379,38 @@
           </div>
         </div>
 
-        <!-- Hardware Pushbuttons -->
-        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 6px;">
-          <button id="frontBtnMode" class="chassis-page-btn" style="font-size: 9.5px; padding: 5px 6px; display: flex; align-items: center; justify-content: center; gap: 4px;" title="Commuta modalità SINGLE / MULTI">
+        <!-- Hardware Pushbuttons: MODE, EDIT, SEARCH, STORE -->
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 7px;">
+          <button id="frontBtnMode" class="snow-tactile-btn" style="display: flex; align-items: center; justify-content: center; gap: 5px;" title="Commuta modalità SINGLE / MULTI">
             <span id="frontModeLed" style="width: 5px; height: 5px; border-radius: 50%; background: #48bb78; box-shadow: 0 0 4px #48bb78;"></span>
             MODE
           </button>
-          <button id="frontBtnEdit" class="chassis-page-btn" style="font-size: 9.5px; padding: 5px 6px;" title="Modifica tutti i parametri (vista Single)">
+          <button id="frontBtnEdit" class="snow-tactile-btn" title="Modifica tutti i parametri (vista Single)">
             EDIT ⚙
           </button>
-          <button id="frontBtnSearch" class="chassis-page-btn" style="font-size: 9.5px; padding: 5px 6px;" title="Cerca suoni nel Patch Manager">
+          <button id="frontBtnSearch" class="snow-tactile-btn" title="Cerca suoni nel Patch Manager">
             SEARCH 🔍
           </button>
-          <button id="frontBtnStore" class="chassis-page-btn" style="font-size: 9.5px; padding: 5px 6px; color: #9c27b0;" title="Salva suono">
+          <button id="frontBtnStore" class="snow-tactile-btn" style="color: #c53030;" title="Salva suono (STORE)">
             STORE 💾
           </button>
         </div>
       </div>
     </div>
 
-    <!-- Quick Sound Selector Bottom Bar -->
-    <div class="snow-front-bottom-bar">
-      <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-        <span style="font-size: 10px; font-weight: 800; letter-spacing: 0.05em; color: #555;">BANCO / SUONO:</span>
+    <!-- Integrated Bottom Ribbon Dock -->
+    <div class="snow-front-dock">
+      <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
+        <span style="font-size: 10px; font-weight: 900; letter-spacing: 0.08em; color: #444;">BANCO / SUONO:</span>
         <select id="frontBankSelect" class="snow-select"></select>
-        <button id="frontPatchPrev" class="chassis-page-btn" style="padding: 2px 7px; font-size: 10px;" title="Patch precedente">◀</button>
-        <select id="frontPatchSelect" class="snow-select" style="min-width: 180px;"></select>
-        <button id="frontPatchNext" class="chassis-page-btn" style="padding: 2px 7px; font-size: 10px;" title="Patch successiva">▶</button>
+        <button id="frontPatchPrev" class="snow-tactile-btn" style="padding: 3px 8px; font-size: 10px;" title="Patch precedente">◀</button>
+        <select id="frontPatchSelect" class="snow-select" style="min-width: 220px; font-family: monospace; font-size: 11px;"></select>
+        <button id="frontPatchNext" class="snow-tactile-btn" style="padding: 3px 8px; font-size: 10px;" title="Patch successiva">▶</button>
       </div>
 
-      <div style="display: flex; gap: 6px;">
-        <button id="frontBtnGoMulti" class="chassis-page-btn" style="font-size: 10px; padding: 4px 10px; font-weight: bold;">🎛 MULTI MIXER (4 PARTI)</button>
-        <button id="frontBtnGoSingle" class="chassis-page-btn" style="font-size: 10px; padding: 4px 10px; font-weight: bold;">🎚 SYNTH EDITOR (PARAMETRI)</button>
+      <div style="display: flex; gap: 8px;">
+        <button id="frontBtnGoMulti" class="snow-tactile-btn" style="font-size: 10.5px; padding: 5px 12px; font-weight: bold;">🎛 MULTI MIXER (4 PARTI)</button>
+        <button id="frontBtnGoSingle" class="snow-tactile-btn" style="font-size: 10.5px; padding: 5px 12px; font-weight: bold;">🎚 SYNTH EDITOR (PARAMETRI)</button>
       </div>
     </div>
 
@@ -6737,10 +6828,22 @@ function exportCurrentPatchSyx() {
     // Sincronizza i selettori veloci banco e patch
     const bankSel = document.getElementById('frontBankSelect');
     const patchSel = document.getElementById('frontPatchSelect');
-    if (bankSel && bankSel.value !== String(part.values.bank)) {
+    if (bankSel) {
+      if (bankSel.options.length === 0) {
+        BANK_NAMES.forEach((bName, idx) => {
+          const opt = document.createElement('option');
+          opt.value = String(idx);
+          opt.textContent = bName;
+          bankSel.appendChild(opt);
+        });
+      }
       bankSel.value = String(part.values.bank);
-      if (patchSel) populatePartPatchDropdown(patchSel, part.values.bank, part.values.program);
-    } else if (patchSel && patchSel.value !== String(part.values.program)) {
+    }
+    if (patchSel) {
+      if (patchSel.options.length === 0 || patchSel.dataset.loadedBank !== String(part.values.bank)) {
+        populatePartPatchDropdown(patchSel, part.values.bank, part.values.program);
+        patchSel.dataset.loadedBank = String(part.values.bank);
+      }
       patchSel.value = String(part.values.program);
     }
 
@@ -6790,7 +6893,10 @@ function exportCurrentPatchSyx() {
         const newBank = parseInt(frontBankSel.value, 10);
         part.values.bank = newBank;
         sendMultiPartParam(pIdx, 31, newBank);
-        if (frontPatchSel) populatePartPatchDropdown(frontPatchSel, newBank, part.values.program);
+        if (frontPatchSel) {
+          frontPatchSel.dataset.loadedBank = String(newBank);
+          populatePartPatchDropdown(frontPatchSel, newBank, part.values.program);
+        }
         const newName = getBankPatchName(newBank, part.values.program);
         if (newName) part.name = newName;
         updateVirusSnowMasterDisplay(pIdx);
