@@ -3736,20 +3736,31 @@ let hwEncoders = [];
 
       const btns = document.createElement('div');
       btns.className = 'btns';
-      btns.style.cssText = 'display: flex; gap: 6px;';
+      btns.style.cssText = 'display: flex; gap: 4px; align-items: center;';
 
       const btnLoad = document.createElement('button');
       btnLoad.textContent = 'carica';
-      btnLoad.title = 'Carica nell\'editor e invia al buffer di ascolto';
+      btnLoad.title = 'Carica nell\'editor singolo e ascolta';
       btnLoad.addEventListener('click', () => {
         const raw = new Uint8Array(p.bytes);
         applyDumpToActivePatch(raw);
-        // Invia al Virus Edit Buffer (bank 0, prog 0x40) per farlo suonare immediatamente
         raw[7] = 0x00;
         raw[8] = 0x40;
         sendMidiBytes(raw, 'load patch ' + p.name);
         document.getElementById('midi-debug').innerHTML = `<span style="color:#0f0;">🔊 CARICATA: <b>${escapeHtml(p.fullName)}</b></span>`;
       });
+      btns.appendChild(btnLoad);
+
+      for (let part = 0; part < 4; part++) {
+        const pBtn = document.createElement('button');
+        pBtn.textContent = 'P' + (part + 1);
+        pBtn.title = `Carica nella Parte ${part + 1} del Multi`;
+        pBtn.style.cssText = 'padding: 2px 6px; font-size: 11px;';
+        pBtn.addEventListener('click', () => {
+          loadPatchToPart(p.bytes, part);
+        });
+        btns.appendChild(pBtn);
+      }
 
       const btnSave = document.createElement('button');
       btnSave.textContent = 'salva';
@@ -3762,8 +3773,6 @@ let hwEncoders = [];
         btnSave.textContent = 'salvata!';
         btnSave.disabled = true;
       });
-
-      btns.appendChild(btnLoad);
       btns.appendChild(btnSave);
 
       row.appendChild(left);
@@ -3960,34 +3969,52 @@ let hwEncoders = [];
   }
 
   function loadPatchToPart(rawBytesArray, partIndex) {
-    if (!selectedOutput) return;
+    if (!selectedOutput) {
+      alert('MIDI Output non connesso!');
+      return;
+    }
     const dump = new Uint8Array(rawBytesArray);
-    // Byte 5 is the Device ID which routes the dump to a specific part!
-    dump[5] = partIndex & 0x7F;
+
+    // Formato Access Virus Single Dump:
+    // dump[5] = Device ID
+    // dump[6] = 0x10 (Single Dump)
+    // dump[7] = Bank (0x00 = Edit Buffer)
+    // dump[8] = Program (0x00..0x03 per Multi Part 1..4, 0x40 per Single Mode Edit Buffer)
+    // dump[9..264] = 256 byte di parametri
+    // dump[265] = Checksum (somma byte 7..264 modulo 128)
+    // dump[266] = 0xF7
+    if (dump.length >= 267) {
+      dump[5] = deviceId();
+      dump[7] = 0x00; // Edit Buffer del synth
+      dump[8] = partIndex & 0x0F; // 0=Part 1, 1=Part 2, 2=Part 3, 3=Part 4
+
+      // Ricalcola il Checksum valido
+      let sum = 0;
+      for (let i = 7; i <= 264; i++) {
+        sum += dump[i];
+      }
+      dump[265] = sum & 0x7F;
+    }
 
     try {
       selectedOutput.send(dump);
+      recordMidiTx('load patch to P' + (partIndex + 1), dump);
 
-      // Update UI Cutoff/Res if available in dump
+      // Aggiorna valori di Cutoff/Resonance per la parte se presenti
       if (dump.length > 50) {
         multiParts[partIndex].sound['f1_cutoff'] = dump[49];
         multiParts[partIndex].sound['f1_resonance'] = dump[50];
-        // Note: The knob rendering updates automatically when rotating,
-        // but to force visual update we'd ideally trigger a render.
       }
 
-      // Update Part Name
-      let patchName = "";
-      for (let i = 249; i <= 258 && i < dump.length; i++) {
-        if (dump[i] >= 32 && dump[i] <= 126) {
-          patchName += String.fromCharCode(dump[i]);
-        }
-      }
-      multiParts[partIndex].name = patchName.trim();
+      // Estrai il nome della patch e aggiorna il display della Parte
+      const patchName = extractPatchName(dump);
+      multiParts[partIndex].name = patchName;
       if (partDisplays[partIndex] && partDisplays[partIndex]._startReveal) {
         partDisplays[partIndex]._startReveal();
       }
 
+      document.getElementById('midi-debug').innerHTML = `<span style="color:#0f0;">🔊 P${partIndex + 1}: Caricato <b>${escapeHtml(patchName)}</b></span>`;
+      setLastAction('loaded P' + (partIndex + 1) + ': ' + patchName);
     } catch(e) {
       console.error('MIDI send dump error', e);
     }
