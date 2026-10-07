@@ -1753,21 +1753,40 @@
   </div>
 </div>
 
-<!-- Virtual Keyboard Dock -->
-<div id="virtualKeyboardDock" style="display: none; width: 100%; background: #141418; border-top: 1px solid var(--border); padding: 8px 16px; flex-direction: column; gap: 6px; z-index: 99; flex-shrink: 0; box-shadow: 0 -4px 16px rgba(0,0,0,0.6);">
-  <div style="display: flex; justify-content: space-between; align-items: center; font-family: monospace; font-size: 11px;">
+<!-- Virtual Keyboard Dock (Ableton Style Mac Keyboard Player) -->
+<div id="virtualKeyboardDock" style="display: flex; width: 100%; background: #111114; border-top: 1px solid var(--border); padding: 8px 16px; flex-direction: column; gap: 8px; z-index: 99; flex-shrink: 0; box-shadow: 0 -4px 20px rgba(0,0,0,0.7);">
+  <div style="display: flex; justify-content: space-between; align-items: center; font-family: monospace; font-size: 11px; flex-wrap: wrap; gap: 8px;">
     <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
-      <span style="color: var(--accent); font-weight: bold; letter-spacing: 0.05em;">🎹 TEST TASTIERA</span>
-      <span>OTTAVA: <button id="btnOctDown" class="chassis-page-btn" style="padding: 1px 6px; font-size: 11px;">-</button> <b id="octaveDisplay" style="color: var(--accent);">3</b> <button id="btnOctUp" class="chassis-page-btn" style="padding: 1px 6px; font-size: 11px;">+</button></span>
-      <span style="color: #888;">(Tasti PC: A S D F G H J K | W E T Y U)</span>
+      <span style="color: var(--accent); font-weight: bold; letter-spacing: 0.08em; display: flex; align-items: center; gap: 4px;">
+        🎹 TASTIERA MAC
+      </span>
+      <div style="display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.08);">
+        <span style="color: #888;">OTTAVA (Z/X):</span>
+        <button id="btnOctDown" class="chassis-page-btn" style="padding: 1px 7px; font-size: 11px;">-</button>
+        <b id="octaveDisplay" style="color: var(--accent); min-width: 14px; text-align: center;">3</b>
+        <button id="btnOctUp" class="chassis-page-btn" style="padding: 1px 7px; font-size: 11px;">+</button>
+      </div>
+      <div style="display: flex; align-items: center; gap: 6px; background: rgba(255,255,255,0.05); padding: 2px 8px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.08);">
+        <span style="color: #888;">VELOCITY (C/V):</span>
+        <button id="btnVelDown" class="chassis-page-btn" style="padding: 1px 7px; font-size: 11px;">-</button>
+        <b id="velocityDisplay" style="color: var(--accent); min-width: 24px; text-align: center;">100</b>
+        <button id="btnVelUp" class="chassis-page-btn" style="padding: 1px 7px; font-size: 11px;">+</button>
+      </div>
+      <div style="display: flex; align-items: center; gap: 6px;">
+        <span style="color: #888;">PARTE:</span>
+        <span id="activeKbdPartDisplay" style="color: #fff; font-weight: bold; background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 3px;">P1 (ch 1)</span>
+      </div>
     </div>
     <div style="display: flex; gap: 6px; align-items: center;">
-      <button id="btnAuditionNote" class="chassis-page-btn" style="font-size: 10px; padding: 2px 8px;">▶ PROVA NOTA</button>
-      <button id="btnAuditionChord" class="chassis-page-btn" style="font-size: 10px; padding: 2px 8px;">▶ PROVA ACCORDO</button>
-      <button id="btnCloseKeyboard" style="background: transparent; border: none; color: #888; cursor: pointer; font-size: 14px; padding: 0 4px;" title="Chiudi tastiera">✕</button>
+      <button id="btnToggleWebAudio" class="chassis-page-btn" style="font-size: 10px; padding: 3px 8px; color: var(--accent);" title="Abilita/disabilita audio diretto dagli altoparlanti del Mac">🔊 AUDIO MAC: ON</button>
+      <button id="btnAuditionNote" class="chassis-page-btn" style="font-size: 10px; padding: 3px 8px;">▶ PROVA NOTA</button>
+      <button id="btnAuditionChord" class="chassis-page-btn" style="font-size: 10px; padding: 3px 8px;">▶ PROVA ACCORDO</button>
+      <button id="btnToggleKeyboardSize" class="chassis-page-btn" style="font-size: 10px; padding: 3px 8px;" title="Riduci/Espandi tastiera">▲ RIDUCI</button>
     </div>
   </div>
-  <div id="virtualPianoKeys" style="display: flex; position: relative; height: 75px; user-select: none; margin: 4px 0; overflow-x: auto; justify-content: center;"></div>
+  <div id="virtualPianoKeysWrapper" style="display: flex; justify-content: center; width: 100%; overflow-x: auto; padding: 2px 0;">
+    <div id="virtualPianoKeys" style="display: flex; position: relative; height: 90px; user-select: none;"></div>
+  </div>
 </div>
 
 <script>
@@ -3064,6 +3083,9 @@ function setSingleEditingPart(partIndex) {
     const chEl = document.getElementById('midiChannel');
     if (chEl) chEl.value = String(ch);
     setLastAction(`editing P${partIndex + 1} (ch ${ch})`);
+  }
+  if (typeof updateKeyboardPartDisplay === 'function') {
+    updateKeyboardPartDisplay();
   }
   requestPartDump(partIndex);
 }
@@ -5210,57 +5232,191 @@ function exportCurrentPatchSyx() {
   document.getElementById('btnSyncMultiParts')?.addEventListener('click', syncAllMultiParts);
 
   // ---------------------------------------------------------------------
-  // Virtual Keyboard & Audition Controller
+  // Virtual Keyboard & Audition Controller (Mac Keyboard Player)
   // ---------------------------------------------------------------------
   let currentOctave = 3;
+  let currentVelocity = 100;
+  let webAudioEnabled = true;
   let activeNotes = new Set();
+  let activeAudioVoices = new Map();
+  let isPianoMouseDown = false;
+  let audioCtx = null;
+
+  window.addEventListener('mousedown', () => { isPianoMouseDown = true; });
+  window.addEventListener('mouseup', () => { isPianoMouseDown = false; });
+
+  function getAudioContext() {
+    if (!audioCtx) {
+      const AudioContextClass = window.AudioContext || window.webkitAudioContext;
+      if (AudioContextClass) audioCtx = new AudioContextClass();
+    }
+    if (audioCtx && audioCtx.state === 'suspended') {
+      audioCtx.resume();
+    }
+    return audioCtx;
+  }
+
+  function playWebAudioNote(noteNumber, velocity = 100) {
+    if (!webAudioEnabled) return;
+    const ctx = getAudioContext();
+    if (!ctx) return;
+
+    if (activeAudioVoices.has(noteNumber)) {
+      stopWebAudioNote(noteNumber);
+    }
+
+    const freq = 440 * Math.pow(2, (noteNumber - 69) / 12);
+    const now = ctx.currentTime;
+
+    const gainNode = ctx.createGain();
+    const velScale = Math.max(0.1, velocity / 127);
+    gainNode.gain.setValueAtTime(0.0001, now);
+    gainNode.gain.linearRampToValueAtTime(0.18 * velScale, now + 0.012);
+    gainNode.gain.exponentialRampToValueAtTime(0.11 * velScale, now + 0.25);
+
+    const filter = ctx.createBiquadFilter();
+    filter.type = 'lowpass';
+    const rawCutoff = (typeof patch !== 'undefined' && patch && patch.f1_cutoff !== undefined) ? patch.f1_cutoff : 80;
+    const cutoffHz = Math.min(18000, 220 + Math.pow(rawCutoff / 127, 2.2) * 12000);
+    filter.frequency.setValueAtTime(cutoffHz, now);
+    filter.Q.setValueAtTime(2.2, now);
+
+    const osc1 = ctx.createOscillator();
+    osc1.type = 'sawtooth';
+    osc1.frequency.setValueAtTime(freq, now);
+
+    const osc2 = ctx.createOscillator();
+    osc2.type = 'square';
+    osc2.frequency.setValueAtTime(freq * 1.0028, now);
+
+    osc1.connect(filter);
+    osc2.connect(filter);
+    filter.connect(gainNode);
+    gainNode.connect(ctx.destination);
+
+    osc1.start(now);
+    osc2.start(now);
+
+    activeAudioVoices.set(noteNumber, { osc1, osc2, gainNode, ctx });
+  }
+
+  function stopWebAudioNote(noteNumber) {
+    const voice = activeAudioVoices.get(noteNumber);
+    if (!voice) return;
+    activeAudioVoices.delete(noteNumber);
+    const now = voice.ctx.currentTime;
+    try {
+      voice.gainNode.gain.cancelScheduledValues(now);
+      voice.gainNode.gain.setValueAtTime(voice.gainNode.gain.value, now);
+      voice.gainNode.gain.exponentialRampToValueAtTime(0.0001, now + 0.12);
+      setTimeout(() => {
+        try {
+          voice.osc1.stop();
+          voice.osc2.stop();
+          voice.osc1.disconnect();
+          voice.osc2.disconnect();
+          voice.gainNode.disconnect();
+        } catch(e) {}
+      }, 150);
+    } catch(e) {}
+  }
 
   function getActiveMidiChannel() {
-    if (multiParts && multiParts[window.activeSinglePartIndex]) {
+    if (typeof multiParts !== 'undefined' && multiParts && multiParts[window.activeSinglePartIndex]) {
       return multiParts[window.activeSinglePartIndex].values.channel & 0x0F;
     }
     const chEl = document.getElementById('midiChannel');
     return chEl ? (parseInt(chEl.value, 10) - 1) & 0x0F : 0;
   }
 
-  function playNote(noteNumber, velocity = 100) {
-    if (!selectedOutput) {
-      setLastAction('connect midi output first');
-      return;
-    }
+  function updateKeyboardPartDisplay() {
+    const el = document.getElementById('activeKbdPartDisplay');
+    if (!el) return;
+    const pIdx = (window.activeSinglePartIndex !== undefined) ? window.activeSinglePartIndex : 0;
+    const ch = (typeof multiParts !== 'undefined' && multiParts && multiParts[pIdx] && multiParts[pIdx].values)
+      ? (multiParts[pIdx].values.channel + 1)
+      : (pIdx + 1);
+    el.textContent = `P${pIdx + 1} (ch ${ch})`;
+  }
+
+  function playNote(noteNumber, velocity = currentVelocity) {
     if (activeNotes.has(noteNumber)) return;
     activeNotes.add(noteNumber);
-    const ch = getActiveMidiChannel();
-    try {
-      selectedOutput.send(new Uint8Array([0x90 | ch, noteNumber & 0x7F, velocity & 0x7F]));
-      recordMidiTx('note on ' + noteNumber, [0x90 | ch, noteNumber, velocity]);
-    } catch(e) { console.error('playNote error', e); }
+
+    if (webAudioEnabled) {
+      playWebAudioNote(noteNumber, velocity);
+    }
+
+    if (selectedOutput) {
+      const ch = getActiveMidiChannel();
+      try {
+        selectedOutput.send(new Uint8Array([0x90 | ch, noteNumber & 0x7F, velocity & 0x7F]));
+        recordMidiTx('note on ' + noteNumber, [0x90 | ch, noteNumber, velocity]);
+      } catch(e) { console.error('playNote error', e); }
+    }
+
     highlightPianoKey(noteNumber, true);
   }
 
   function stopNote(noteNumber) {
-    if (!selectedOutput) return;
     if (!activeNotes.has(noteNumber)) return;
     activeNotes.delete(noteNumber);
-    const ch = getActiveMidiChannel();
-    try {
-      selectedOutput.send(new Uint8Array([0x80 | ch, noteNumber & 0x7F, 0]));
-    } catch(e) { console.error('stopNote error', e); }
+
+    if (webAudioEnabled) {
+      stopWebAudioNote(noteNumber);
+    }
+
+    if (selectedOutput) {
+      const ch = getActiveMidiChannel();
+      try {
+        selectedOutput.send(new Uint8Array([0x80 | ch, noteNumber & 0x7F, 0]));
+      } catch(e) { console.error('stopNote error', e); }
+    }
+
     highlightPianoKey(noteNumber, false);
   }
 
   function highlightPianoKey(noteNumber, isOn) {
     const keyEl = document.querySelector(`.piano-key[data-note="${noteNumber}"]`);
     if (keyEl) {
+      const isBlack = keyEl.getAttribute('data-is-black') === 'true';
       if (isOn) {
         keyEl.classList.add('active');
         keyEl.style.background = 'var(--accent)';
+        keyEl.style.boxShadow = '0 0 12px var(--accent)';
+        const lbl = keyEl.querySelector('.key-badge');
+        if (lbl) {
+          lbl.style.background = '#000';
+          lbl.style.color = '#fff';
+        }
       } else {
         keyEl.classList.remove('active');
-        keyEl.style.background = keyEl.getAttribute('data-is-black') === 'true' ? '#1c1c20' : '#e0e0e0';
+        keyEl.style.background = isBlack ? '#16161a' : '#dcdce2';
+        keyEl.style.boxShadow = 'none';
+        const lbl = keyEl.querySelector('.key-badge');
+        if (lbl) {
+          lbl.style.background = isBlack ? 'rgba(255,255,255,0.08)' : '#222228';
+          lbl.style.color = isBlack ? 'var(--accent)' : '#fff';
+        }
       }
     }
   }
+
+  const PIANO_NOTE_NAMES = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
+  const PC_KEY_MAP = {
+    // Prima ottava
+    'KeyA': 0, 'KeyW': 1, 'KeyS': 2, 'KeyE': 3, 'KeyD': 4,
+    'KeyF': 5, 'KeyT': 6, 'KeyG': 7, 'KeyY': 8, 'KeyH': 9,
+    'KeyU': 10, 'KeyJ': 11,
+    // Seconda ottava
+    'KeyK': 12, 'KeyO': 13, 'KeyL': 14, 'KeyP': 15,
+    'Semicolon': 16, 'Quote': 17, 'BracketLeft': 18, 'BracketRight': 19
+  };
+  const SEMITONE_TO_KEY_LABEL = {
+    0: 'A', 1: 'W', 2: 'S', 3: 'E', 4: 'D', 5: 'F', 6: 'T',
+    7: 'G', 8: 'Y', 9: 'H', 10: 'U', 11: 'J',
+    12: 'K', 13: 'O', 14: 'L', 15: 'P', 16: ';', 17: '\'', 18: '[', 19: ']'
+  };
 
   function renderPianoKeys() {
     const container = document.getElementById('virtualPianoKeys');
@@ -5268,18 +5424,22 @@ function exportCurrentPatchSyx() {
     container.innerHTML = '';
 
     const isBlackMap = [false, true, false, true, false, false, true, false, true, false, true, false];
-    const baseNote = (currentOctave + 1) * 12; // C of current octave
+    const baseNote = (currentOctave + 1) * 12; // C della prima ottava visualizzata
 
     const wrapper = document.createElement('div');
-    wrapper.style.cssText = 'position: relative; display: flex; height: 100%;';
+    wrapper.style.cssText = 'position: relative; display: flex; height: 100%; align-items: flex-start;';
 
     let whiteCount = 0;
     const blackKeys = [];
+    const whiteKeyWidth = 34;
 
     for (let i = 0; i < 25; i++) {
       const semitone = i % 12;
       const noteNum = baseNote + i;
       const isBlack = (i < 24) ? isBlackMap[semitone] : false;
+      const noteName = PIANO_NOTE_NAMES[semitone];
+      const octNum = Math.floor(noteNum / 12) - 1;
+      const keyLabel = SEMITONE_TO_KEY_LABEL[i] || '';
 
       const key = document.createElement('div');
       key.className = 'piano-key';
@@ -5287,37 +5447,63 @@ function exportCurrentPatchSyx() {
       key.setAttribute('data-is-black', isBlack ? 'true' : 'false');
 
       if (!isBlack) {
-        key.style.cssText = 'width: 28px; height: 100%; background: #e0e0e0; border: 1px solid #333; border-radius: 0 0 3px 3px; cursor: pointer; position: relative; z-index: 1; transition: background 0.05s; flex-shrink: 0;';
+        key.style.cssText = `width: ${whiteKeyWidth}px; height: 90px; background: #dcdce2; border: 1px solid #2a2a32; border-radius: 0 0 5px 5px; cursor: pointer; position: relative; z-index: 1; transition: background 0.05s; flex-shrink: 0; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 6px 2px 4px 2px; box-sizing: border-box; box-shadow: 0 2px 4px rgba(0,0,0,0.5);`;
         key.setAttribute('data-white-index', whiteCount);
         whiteCount++;
+
+        const noteLabel = document.createElement('span');
+        noteLabel.style.cssText = 'font-size: 8px; color: #555; font-family: monospace; font-weight: 600; pointer-events: none; margin-top: auto;';
+        noteLabel.textContent = `${noteName}${octNum}`;
+
+        const badge = document.createElement('span');
+        badge.className = 'key-badge';
+        badge.style.cssText = 'font-size: 10px; font-weight: bold; background: #222228; color: #fff; padding: 2px 5px; border-radius: 3px; font-family: monospace; pointer-events: none; margin-top: 2px; box-shadow: 0 1px 2px rgba(0,0,0,0.4); min-width: 12px; text-align: center;';
+        badge.textContent = keyLabel || '-';
+
+        key.appendChild(noteLabel);
+        key.appendChild(badge);
       } else {
-        key.style.cssText = 'width: 18px; height: 60%; background: #1c1c20; border: 1px solid #111; border-radius: 0 0 2px 2px; cursor: pointer; position: absolute; z-index: 3; transition: background 0.05s; flex-shrink: 0;';
+        key.style.cssText = 'width: 22px; height: 56px; background: #16161a; border: 1px solid #08080a; border-radius: 0 0 3px 3px; cursor: pointer; position: absolute; z-index: 3; transition: background 0.05s; flex-shrink: 0; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding: 0 1px 4px 1px; box-sizing: border-box; box-shadow: 0 3px 6px rgba(0,0,0,0.8);';
         key.setAttribute('data-after-white', whiteCount - 1);
+
+        const badge = document.createElement('span');
+        badge.className = 'key-badge';
+        badge.style.cssText = 'font-size: 9px; font-weight: bold; color: var(--accent); background: rgba(255,255,255,0.08); padding: 1px 3px; border-radius: 2px; font-family: monospace; pointer-events: none; margin-bottom: 2px; text-align: center;';
+        badge.textContent = keyLabel;
+
+        const noteLabel = document.createElement('span');
+        noteLabel.style.cssText = 'font-size: 7px; color: #888; font-family: monospace; pointer-events: none;';
+        noteLabel.textContent = noteName;
+
+        key.appendChild(badge);
+        key.appendChild(noteLabel);
         blackKeys.push(key);
       }
 
       key.addEventListener('mousedown', (e) => {
         e.preventDefault();
-        playNote(noteNum);
+        playNote(noteNum, currentVelocity);
+      });
+      key.addEventListener('mouseenter', () => {
+        if (isPianoMouseDown) playNote(noteNum, currentVelocity);
       });
       key.addEventListener('mouseup', () => stopNote(noteNum));
       key.addEventListener('mouseleave', () => stopNote(noteNum));
       key.addEventListener('touchstart', (e) => {
         e.preventDefault();
-        playNote(noteNum);
-      });
+        playNote(noteNum, currentVelocity);
+      }, { passive: false });
       key.addEventListener('touchend', (e) => {
         e.preventDefault();
         stopNote(noteNum);
-      });
+      }, { passive: false });
 
       wrapper.appendChild(key);
     }
 
-    const whiteWidth = 28;
     blackKeys.forEach(bk => {
       const afterWhite = parseInt(bk.getAttribute('data-after-white'), 10);
-      bk.style.left = (afterWhite * whiteWidth + 19) + 'px';
+      bk.style.left = (afterWhite * whiteKeyWidth + 23) + 'px';
     });
 
     container.appendChild(wrapper);
@@ -5330,15 +5516,16 @@ function exportCurrentPatchSyx() {
     renderPianoKeys();
   }
 
-  const PC_KEY_MAP = {
-    'KeyA': 0, 'KeyW': 1, 'KeyS': 2, 'KeyE': 3, 'KeyD': 4,
-    'KeyF': 5, 'KeyT': 6, 'KeyG': 7, 'KeyY': 8, 'KeyH': 9,
-    'KeyU': 10, 'KeyJ': 11, 'KeyK': 12, 'KeyO': 13, 'KeyL': 14
-  };
+  function changeVelocity(delta) {
+    currentVelocity = Math.max(10, Math.min(127, currentVelocity + delta));
+    const disp = document.getElementById('velocityDisplay');
+    if (disp) disp.textContent = String(currentVelocity);
+  }
 
   window.addEventListener('keydown', (e) => {
-    if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) return;
     if (e.repeat) return;
+
     if (e.code === 'KeyZ') {
       changeOctave(-1);
       return;
@@ -5347,15 +5534,24 @@ function exportCurrentPatchSyx() {
       changeOctave(1);
       return;
     }
+    if (e.code === 'KeyC') {
+      changeVelocity(-15);
+      return;
+    }
+    if (e.code === 'KeyV') {
+      changeVelocity(15);
+      return;
+    }
+
     if (PC_KEY_MAP[e.code] !== undefined) {
       const semitone = PC_KEY_MAP[e.code];
       const note = (currentOctave + 1) * 12 + semitone;
-      playNote(note);
+      playNote(note, currentVelocity);
     }
   });
 
   window.addEventListener('keyup', (e) => {
-    if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA') return;
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) return;
     if (PC_KEY_MAP[e.code] !== undefined) {
       const semitone = PC_KEY_MAP[e.code];
       const note = (currentOctave + 1) * 12 + semitone;
@@ -5365,35 +5561,43 @@ function exportCurrentPatchSyx() {
 
   document.getElementById('btnOctDown')?.addEventListener('click', () => changeOctave(-1));
   document.getElementById('btnOctUp')?.addEventListener('click', () => changeOctave(1));
+  document.getElementById('btnVelDown')?.addEventListener('click', () => changeVelocity(-15));
+  document.getElementById('btnVelUp')?.addEventListener('click', () => changeVelocity(15));
+
+  const btnWebAudio = document.getElementById('btnToggleWebAudio');
+  btnWebAudio?.addEventListener('click', () => {
+    webAudioEnabled = !webAudioEnabled;
+    btnWebAudio.textContent = webAudioEnabled ? '🔊 AUDIO MAC: ON' : '🔇 AUDIO MAC: OFF';
+    btnWebAudio.style.color = webAudioEnabled ? 'var(--accent)' : '#777';
+  });
+
+  let kbdCollapsed = false;
+  const btnToggleSize = document.getElementById('btnToggleKeyboardSize');
+  const kbdWrapper = document.getElementById('virtualPianoKeysWrapper');
+  btnToggleSize?.addEventListener('click', () => {
+    kbdCollapsed = !kbdCollapsed;
+    if (kbdWrapper) {
+      kbdWrapper.style.display = kbdCollapsed ? 'none' : 'flex';
+    }
+    btnToggleSize.textContent = kbdCollapsed ? '▼ ESPANDI' : '▲ RIDUCI';
+  });
 
   document.getElementById('btnAuditionNote')?.addEventListener('click', () => {
     const root = (currentOctave + 1) * 12; // C
-    playNote(root);
+    playNote(root, currentVelocity);
     setTimeout(() => stopNote(root), 400);
   });
 
   document.getElementById('btnAuditionChord')?.addEventListener('click', () => {
     const root = (currentOctave + 1) * 12; // C
-    playNote(root);
-    playNote(root + 4); // E
-    playNote(root + 7); // G
+    playNote(root, currentVelocity);
+    playNote(root + 4, currentVelocity); // E
+    playNote(root + 7, currentVelocity); // G
     setTimeout(() => {
       stopNote(root);
       stopNote(root + 4);
       stopNote(root + 7);
     }, 600);
-  });
-
-  const kbdDock = document.getElementById('virtualKeyboardDock');
-  document.getElementById('btnToggleKeyboard')?.addEventListener('click', () => {
-    if (kbdDock) {
-      const isHidden = (kbdDock.style.display === 'none');
-      kbdDock.style.display = isHidden ? 'flex' : 'none';
-      if (isHidden) renderPianoKeys();
-    }
-  });
-  document.getElementById('btnCloseKeyboard')?.addEventListener('click', () => {
-    if (kbdDock) kbdDock.style.display = 'none';
   });
 
   function buildArpView() {
@@ -6150,6 +6354,9 @@ function exportCurrentPatchSyx() {
   buildArpView();
   buildSeqView();
   buildSongView();
+
+  renderPianoKeys();
+  updateKeyboardPartDisplay();
 })();
 
 </script>
