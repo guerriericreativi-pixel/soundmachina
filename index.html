@@ -33,11 +33,11 @@
   }
   html {
     height: 100%;
-    overflow: hidden;
   }
   body {
-    height: 100%;
-    overflow: hidden;
+    min-height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
     display: flex;
     flex-direction: column;
     margin: 0;
@@ -51,6 +51,9 @@
     letter-spacing: 0.05em;
     padding: 16px;
     transition: background-color 200ms ease, color 200ms ease;
+  }
+  body.keyboard-dock-open {
+    padding-bottom: 165px !important;
   }
 
   /* ------------------------------------------------------------------ */
@@ -2694,7 +2697,7 @@
 </div>
 
 <!-- Virtual Keyboard Dock (Ableton Style Mac Keyboard Player) - ESCLUDIBILE -->
-<div id="virtualKeyboardDock" style="display: none !important; width: 100%; background: #111114; border-top: 2px solid var(--accent); padding: 8px 16px; flex-direction: column; gap: 8px; z-index: 999; flex-shrink: 0; box-shadow: 0 -6px 25px rgba(0,0,0,0.85);">
+<div id="virtualKeyboardDock" style="display: none !important; position: fixed !important; bottom: 0 !important; left: 0 !important; right: 0 !important; width: 100% !important; background: #111114 !important; border-top: 2px solid var(--accent) !important; padding: 10px 18px 14px 18px !important; flex-direction: column !important; gap: 8px !important; z-index: 99999 !important; box-shadow: 0 -8px 30px rgba(0,0,0,0.9) !important; box-sizing: border-box !important;">
   <div style="display: flex; justify-content: space-between; align-items: center; font-family: monospace; font-size: 11px; flex-wrap: wrap; gap: 8px;">
     <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
       <span style="color: var(--accent); font-weight: bold; letter-spacing: 0.08em; display: flex; align-items: center; gap: 4px;">
@@ -2724,8 +2727,8 @@
       <button id="btnCloseKeyboard" class="chassis-page-btn" style="font-size: 11px; padding: 4px 14px; font-weight: bold; color: #fff; background: #e06c75; border-color: #e06c75; cursor: pointer;" title="Chiudi e nascondi completamente la tastiera">✕ CHIUDI TASTIERA</button>
     </div>
   </div>
-  <div id="virtualPianoKeysWrapper" style="display: flex; justify-content: center; width: 100%; overflow-x: auto; padding: 2px 0;">
-    <div id="virtualPianoKeys" style="display: flex; position: relative; height: 90px; user-select: none;"></div>
+  <div id="virtualPianoKeysWrapper" style="display: flex; justify-content: center; width: 100%; overflow-x: auto; padding: 4px 0 2px 0; min-height: 96px;">
+    <div id="virtualPianoKeys" style="display: flex; position: relative; height: 92px; user-select: none;"></div>
   </div>
 </div>
 
@@ -7535,7 +7538,18 @@ function exportCurrentPatchSyx() {
   let audioCtx = null;
 
   window.addEventListener('mousedown', () => { isPianoMouseDown = true; });
-  window.addEventListener('mouseup', () => { isPianoMouseDown = false; });
+  window.addEventListener('mouseup', () => {
+    isPianoMouseDown = false;
+    activeNotes.forEach(n => stopNote(n));
+  });
+  window.addEventListener('pointerup', () => {
+    isPianoMouseDown = false;
+    activeNotes.forEach(n => stopNote(n));
+  });
+  window.addEventListener('blur', () => {
+    isPianoMouseDown = false;
+    activeNotes.forEach(n => stopNote(n));
+  });
 
   function getAudioContext() {
     if (!audioCtx) {
@@ -7567,23 +7581,25 @@ function exportCurrentPatchSyx() {
     const curPart = (typeof multiParts !== 'undefined' && multiParts) ? multiParts[pIdx] : null;
 
     const gainNode = ctx.createGain();
-    const partVol = (curPart && curPart.values && curPart.values.volume !== undefined) ? (curPart.values.volume / 127) : 0.85;
-    const velScale = Math.max(0.12, velocity / 127) * partVol;
+    const rawVol = (curPart && curPart.values && curPart.values.volume !== undefined) ? curPart.values.volume : 100;
+    const partVol = Math.max(0.4, rawVol / 127);
+    const velScale = Math.max(0.2, (velocity || 100) / 127) * partVol;
     gainNode.gain.setValueAtTime(0.0001, now);
-    gainNode.gain.linearRampToValueAtTime(0.24 * velScale, now + 0.012);
-    gainNode.gain.exponentialRampToValueAtTime(0.15 * velScale, now + 0.28);
+    gainNode.gain.linearRampToValueAtTime(0.25 * velScale, now + 0.012);
+    gainNode.gain.exponentialRampToValueAtTime(0.18 * velScale, now + 0.28);
 
     const filter = ctx.createBiquadFilter();
     filter.type = 'lowpass';
     const rawCutoff = (curPart && curPart.values && curPart.values.f1_cutoff !== undefined)
       ? curPart.values.f1_cutoff
-      : (state.values.f1_cutoff ?? 72);
-    const cutoffHz = Math.min(18000, 160 + Math.pow(rawCutoff / 127, 2.2) * 14000);
+      : ((typeof state !== 'undefined' && state.values && state.values.f1_cutoff !== undefined) ? state.values.f1_cutoff : 85);
+    const safeCutoff = Math.max(28, rawCutoff);
+    const cutoffHz = Math.max(600, Math.min(18000, 300 + Math.pow(safeCutoff / 127, 2.0) * 15000));
     filter.frequency.setValueAtTime(cutoffHz, now);
     const rawRes = (curPart && curPart.values && curPart.values.f1_resonance !== undefined)
       ? curPart.values.f1_resonance
-      : (state.values.f1_resonance ?? 0);
-    filter.Q.setValueAtTime(1.5 + (rawRes / 127) * 7.5, now);
+      : ((typeof state !== 'undefined' && state.values && state.values.f1_resonance !== undefined) ? state.values.f1_resonance : 0);
+    filter.Q.setValueAtTime(1.2 + (rawRes / 127) * 6.5, now);
 
     const osc1 = ctx.createOscillator();
     osc1.type = 'sawtooth';
@@ -7591,7 +7607,7 @@ function exportCurrentPatchSyx() {
 
     const osc2 = ctx.createOscillator();
     osc2.type = 'square';
-    osc2.frequency.setValueAtTime(freq * 1.0028, now);
+    osc2.frequency.setValueAtTime(freq * 1.0025, now);
 
     osc1.connect(filter);
     osc2.connect(filter);
@@ -7647,7 +7663,10 @@ function exportCurrentPatchSyx() {
   }
 
   function playNote(noteNumber, velocity = currentVelocity) {
-    if (activeNotes.has(noteNumber)) return;
+    getAudioContext();
+    if (activeNotes.has(noteNumber)) {
+      stopNote(noteNumber);
+    }
     activeNotes.add(noteNumber);
 
     if (webAudioEnabled) {
@@ -7692,7 +7711,7 @@ function exportCurrentPatchSyx() {
       if (isOn) {
         keyEl.classList.add('active');
         keyEl.style.background = 'var(--accent)';
-        keyEl.style.boxShadow = '0 0 12px var(--accent)';
+        keyEl.style.boxShadow = '0 0 14px var(--accent)';
         const lbl = keyEl.querySelector('.key-badge');
         if (lbl) {
           lbl.style.background = '#000';
@@ -7701,7 +7720,7 @@ function exportCurrentPatchSyx() {
       } else {
         keyEl.classList.remove('active');
         keyEl.style.background = isBlack ? '#16161a' : '#dcdce2';
-        keyEl.style.boxShadow = 'none';
+        keyEl.style.boxShadow = isBlack ? '0 3px 6px rgba(0,0,0,0.8)' : '0 2px 4px rgba(0,0,0,0.5)';
         const lbl = keyEl.querySelector('.key-badge');
         if (lbl) {
           lbl.style.background = isBlack ? 'rgba(255,255,255,0.08)' : '#222228';
@@ -7756,7 +7775,7 @@ function exportCurrentPatchSyx() {
       key.setAttribute('data-is-black', isBlack ? 'true' : 'false');
 
       if (!isBlack) {
-        key.style.cssText = `width: ${whiteKeyWidth}px; height: 90px; background: #dcdce2; border: 1px solid #2a2a32; border-radius: 0 0 5px 5px; cursor: pointer; position: relative; z-index: 1; transition: background 0.05s; flex-shrink: 0; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 6px 2px 4px 2px; box-sizing: border-box; box-shadow: 0 2px 4px rgba(0,0,0,0.5);`;
+        key.style.cssText = `width: ${whiteKeyWidth}px; height: 86px; background: #dcdce2; border: 1px solid #2a2a32; border-radius: 0 0 5px 5px; cursor: pointer; position: relative; z-index: 1; transition: background 0.05s; flex-shrink: 0; display: flex; flex-direction: column; justify-content: space-between; align-items: center; padding: 4px 2px 4px 2px; box-sizing: border-box; box-shadow: 0 2px 4px rgba(0,0,0,0.5); user-select: none; -webkit-user-select: none; touch-action: none;`;
         key.setAttribute('data-white-index', whiteCount);
         whiteCount++;
 
@@ -7772,7 +7791,7 @@ function exportCurrentPatchSyx() {
         key.appendChild(noteLabel);
         key.appendChild(badge);
       } else {
-        key.style.cssText = 'width: 22px; height: 56px; background: #16161a; border: 1px solid #08080a; border-radius: 0 0 3px 3px; cursor: pointer; position: absolute; z-index: 3; transition: background 0.05s; flex-shrink: 0; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding: 0 1px 4px 1px; box-sizing: border-box; box-shadow: 0 3px 6px rgba(0,0,0,0.8);';
+        key.style.cssText = 'width: 22px; height: 52px; background: #16161a; border: 1px solid #08080a; border-radius: 0 0 3px 3px; cursor: pointer; position: absolute; z-index: 3; transition: background 0.05s; flex-shrink: 0; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; padding: 0 1px 4px 1px; box-sizing: border-box; box-shadow: 0 3px 6px rgba(0,0,0,0.8); user-select: none; -webkit-user-select: none; touch-action: none;';
         key.setAttribute('data-after-white', whiteCount - 1);
 
         const badge = document.createElement('span');
@@ -7789,23 +7808,39 @@ function exportCurrentPatchSyx() {
         blackKeys.push(key);
       }
 
-      key.addEventListener('mousedown', (e) => {
-        e.preventDefault();
+      const onKeyStart = (e) => {
+        if (e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
+        isPianoMouseDown = true;
+        getAudioContext();
         playNote(noteNum, currentVelocity);
-      });
-      key.addEventListener('mouseenter', () => {
-        if (isPianoMouseDown) playNote(noteNum, currentVelocity);
-      });
-      key.addEventListener('mouseup', () => stopNote(noteNum));
-      key.addEventListener('mouseleave', () => stopNote(noteNum));
-      key.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        playNote(noteNum, currentVelocity);
-      }, { passive: false });
-      key.addEventListener('touchend', (e) => {
-        e.preventDefault();
+      };
+
+      const onKeyEnd = (e) => {
+        if (e) {
+          e.preventDefault();
+          e.stopPropagation();
+        }
         stopNote(noteNum);
-      }, { passive: false });
+      };
+
+      key.addEventListener('pointerdown', onKeyStart);
+      key.addEventListener('pointerenter', (e) => {
+        if (isPianoMouseDown) {
+          getAudioContext();
+          playNote(noteNum, currentVelocity);
+        }
+      });
+      key.addEventListener('pointerup', onKeyEnd);
+      key.addEventListener('pointerleave', onKeyEnd);
+      key.addEventListener('pointercancel', onKeyEnd);
+
+      key.addEventListener('mousedown', onKeyStart);
+      key.addEventListener('mouseup', onKeyEnd);
+      key.addEventListener('touchstart', onKeyStart, { passive: false });
+      key.addEventListener('touchend', onKeyEnd, { passive: false });
 
       wrapper.appendChild(key);
     }
@@ -7877,6 +7912,7 @@ function exportCurrentPatchSyx() {
 
   const btnWebAudio = document.getElementById('btnToggleWebAudio');
   btnWebAudio?.addEventListener('click', () => {
+    getAudioContext();
     webAudioEnabled = !webAudioEnabled;
     btnWebAudio.textContent = webAudioEnabled ? '🔊 AUDIO MAC: ON' : '🔇 AUDIO MAC: OFF';
     btnWebAudio.style.color = webAudioEnabled ? 'var(--accent)' : '#777';
@@ -7891,11 +7927,13 @@ function exportCurrentPatchSyx() {
     if (!kbdDock) return;
     if (show) {
       kbdDock.style.setProperty('display', 'flex', 'important');
+      document.body.classList.add('keyboard-dock-open');
+      renderPianoKeys();
     } else {
       kbdDock.style.setProperty('display', 'none', 'important');
+      document.body.classList.remove('keyboard-dock-open');
     }
     if (btnToggleKbd) btnToggleKbd.classList.toggle('active', !!show);
-    if (show) renderPianoKeys();
   }
 
   btnToggleKbd?.addEventListener('click', () => {
@@ -7907,8 +7945,8 @@ function exportCurrentPatchSyx() {
     setKeyboardDockVisible(false);
   });
 
-  // All'avvio la tastiera è SEMPRE chiusa per non coprire lo schermo.
-  setKeyboardDockVisible(false);
+  // All'avvio la tastiera è aperta con rendering garantito dei tasti
+  setKeyboardDockVisible(true);
 
   let kbdCollapsed = false;
   const btnToggleSize = document.getElementById('btnToggleKeyboardSize');
@@ -7922,12 +7960,14 @@ function exportCurrentPatchSyx() {
   });
 
   document.getElementById('btnAuditionNote')?.addEventListener('click', () => {
+    getAudioContext();
     const root = (currentOctave + 1) * 12; // C
     playNote(root, currentVelocity);
     setTimeout(() => stopNote(root), 400);
   });
 
   document.getElementById('btnAuditionChord')?.addEventListener('click', () => {
+    getAudioContext();
     const root = (currentOctave + 1) * 12; // C
     playNote(root, currentVelocity);
     playNote(root + 4, currentVelocity); // E
