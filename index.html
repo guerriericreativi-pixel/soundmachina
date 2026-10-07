@@ -586,14 +586,59 @@
     box-sizing: border-box;
   }
   .part-cluster{
+    position: relative;
     display: flex;
     align-items: center;
     gap: 8px;
-    background: rgba(0,0,0,0.3);
-    border: 1px solid rgba(255,255,255,0.05);
-    border-radius: 4px;
-    padding: 6px 10px;
+    background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 5px;
+    padding: 18px 10px 8px 10px;
     flex-wrap: wrap;
+    box-sizing: border-box;
+  }
+  .part-cluster-badge{
+    position: absolute;
+    top: 3px;
+    left: 8px;
+    font-size: 8.5px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: #777;
+    pointer-events: none;
+    user-select: none;
+  }
+  .part-patch-dropdown{
+    font-size: 11px;
+    font-weight: 600;
+    font-family: monospace;
+    background: #18181e;
+    color: #f0f0f0;
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 4px 6px;
+    max-width: 220px;
+    cursor: pointer;
+  }
+  .part-patch-dropdown:focus{
+    border-color: var(--accent);
+    outline: none;
+  }
+  .part-stepper-btn{
+    padding: 3px 7px;
+    font-size: 11px;
+    font-weight: bold;
+    font-family: monospace;
+    background: rgba(255,255,255,0.05);
+    border: 1px solid var(--border);
+    color: #ddd;
+    border-radius: 3px;
+    cursor: pointer;
+  }
+  .part-stepper-btn:hover{
+    background: rgba(255,255,255,0.12);
+    color: #fff;
   }
   .part-main .field{
     gap: 0;
@@ -1784,8 +1829,25 @@
         </div>
       </div>
 
-      <!-- Keyboard Split & Layer Visualizer -->
-      <div id="keyboardSplitVisualizerCard" style="width: 100%; max-width: 1100px; background: rgba(0,0,0,0.5); border: 1px solid var(--border); border-radius: 6px; padding: 12px 18px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.05); margin-bottom: 20px; font-family: monospace;">
+      <!-- Bar Gestione Banco & Suoni Virus -->
+      <div style="width: 100%; max-width: 1100px; background: rgba(0,0,0,0.45); border: 1px solid var(--border); border-radius: 6px; padding: 12px 18px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; font-family: monospace;">
+        <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
+          <span style="color: var(--accent); font-weight: bold; font-size: 12px; letter-spacing: 0.05em;">📂 SUONI DEL VIRUS:</span>
+          <span style="font-size: 11px; color: #888;">BANCO:</span>
+          <select id="quickBankScanSelect" style="padding: 4px 8px; font-size: 12px; font-weight: bold; background: #18181e; color: #fff; border: 1px solid var(--border); border-radius: 3px;">
+          </select>
+          <button id="btnQuickScanBank" class="chassis-page-btn" style="color: var(--accent); border-color: var(--accent); font-weight: bold; padding: 4px 12px;">
+            📥 SCANSIONA 128 NOMI DAL SYNTH
+          </button>
+          <span id="quickScanStatus" style="font-size: 11px; color: #aaa;"></span>
+        </div>
+        <div style="display: flex; gap: 8px;">
+          <button id="btnToggleSplitVisualizer" class="chassis-page-btn" style="font-size: 11px; padding: 4px 10px;">🎹 VISUALIZZATORE SPLIT</button>
+        </div>
+      </div>
+
+      <!-- Keyboard Split & Layer Visualizer (Collassabile) -->
+      <div id="keyboardSplitVisualizerCard" style="display: none; width: 100%; max-width: 1100px; background: rgba(0,0,0,0.5); border: 1px solid var(--border); border-radius: 6px; padding: 12px 18px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.05); margin-bottom: 20px; font-family: monospace;">
         <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
           <span style="color: #aaa; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; display: flex; align-items: center; gap: 6px;">
             🎹 KEYBOARD SPLIT & LAYER VISUALIZER <span style="font-size: 10px; color: #666; font-weight: normal;">(C-2 → G8, 128 NOTE MIDI)</span>
@@ -1795,14 +1857,14 @@
         <div id="splitVisualizerScale" style="position: relative; width: 100%; height: 72px; background: #0c0c10; border: 1px solid #222; border-radius: 4px; overflow: hidden; padding: 2px 0;"></div>
       </div>
 
-      <div class="part-list" id="partList" style="width: 100%; max-width: 1100px; display: flex; flex-direction: column; gap: 12px;"></div>
+      <div class="part-list" id="partList" style="width: 100%; max-width: 1100px; display: flex; flex-direction: column; gap: 14px;"></div>
     </div>
     <div class="chassis-wood-strip"></div>
   </div>
 </div>
 
-<!-- Virtual Keyboard Dock (Ableton Style Mac Keyboard Player) -->
-<div id="virtualKeyboardDock" style="display: flex; width: 100%; background: #111114; border-top: 1px solid var(--border); padding: 8px 16px; flex-direction: column; gap: 8px; z-index: 99; flex-shrink: 0; box-shadow: 0 -4px 20px rgba(0,0,0,0.7);">
+<!-- Virtual Keyboard Dock (Ableton Style Mac Keyboard Player) - ESCLUDIBILE -->
+<div id="virtualKeyboardDock" style="display: none; width: 100%; background: #111114; border-top: 1px solid var(--border); padding: 8px 16px; flex-direction: column; gap: 8px; z-index: 99; flex-shrink: 0; box-shadow: 0 -4px 20px rgba(0,0,0,0.7);">
   <div style="display: flex; justify-content: space-between; align-items: center; font-family: monospace; font-size: 11px; flex-wrap: wrap; gap: 8px;">
     <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
       <span style="color: var(--accent); font-weight: bold; letter-spacing: 0.08em; display: flex; align-items: center; gap: 4px;">
@@ -1830,6 +1892,7 @@
       <button id="btnAuditionNote" class="chassis-page-btn" style="font-size: 10px; padding: 3px 8px;">▶ PROVA NOTA</button>
       <button id="btnAuditionChord" class="chassis-page-btn" style="font-size: 10px; padding: 3px 8px;">▶ PROVA ACCORDO</button>
       <button id="btnToggleKeyboardSize" class="chassis-page-btn" style="font-size: 10px; padding: 3px 8px;" title="Riduci/Espandi tastiera">▲ RIDUCI</button>
+      <button id="btnCloseKeyboard" class="chassis-page-btn" style="font-size: 10px; padding: 3px 8px; color: #ff6666; border-color: rgba(255,100,100,0.4);" title="Chiudi tastiera">✕ CHIUDI</button>
     </div>
   </div>
   <div id="virtualPianoKeysWrapper" style="display: flex; justify-content: center; width: 100%; overflow-x: auto; padding: 2px 0;">
@@ -2562,6 +2625,37 @@
           continue;
         }
 
+        // Caso 2b: Quick Bank Scan dei nomi per la sezione Multi
+        if (window.quickBankScanState && window.quickBankScanState.active) {
+          const qState = window.quickBankScanState;
+          let patchNum = (msgBytes.length >= 9 && msgBytes[8] >= 0 && msgBytes[8] < 128)
+            ? msgBytes[8]
+            : qState.currentIndex;
+
+          qState.names[patchNum] = patchName;
+          if (typeof saveBankSoundCache === 'function') {
+            saveBankSoundCache(qState.bankIndex, qState.names);
+          }
+          if (typeof updateAllPartDropdownsForBank === 'function') {
+            updateAllPartDropdownsForBank(qState.bankIndex);
+          }
+
+          const statusEl = document.getElementById('quickScanStatus');
+          if (statusEl) {
+            statusEl.textContent = `Scansione ${BANK_NAMES[qState.bankIndex] || 'Banco'}: ${patchNum + 1}/128 (${patchName})`;
+          }
+          document.getElementById('midi-debug').textContent = `🔥 QUICK SCAN: Letto ${BANK_NAMES[qState.bankIndex] || 'B'}-${patchNum.toString().padStart(3,'0')} ${patchName}`;
+
+          if (qState.timer) clearTimeout(qState.timer);
+          qState.currentIndex = patchNum + 1;
+          if (qState.currentIndex < 128) {
+            setTimeout(() => { requestNextQuickScanPatch(); }, 20);
+          } else {
+            finishQuickBankScan();
+          }
+          continue;
+        }
+
         // Caso 3: Ricezione Dump per una specifica Parte Multi (Part 0..3)
         if (msgBytes[7] === 0x00 && msgBytes[8] >= 0 && msgBytes[8] <= 3) {
           const pIdx = msgBytes[8];
@@ -2576,6 +2670,11 @@
           }
           if (typeof renderMultiPartsOverview === 'function') {
             renderMultiPartsOverview();
+          }
+          const curBank = multiParts[pIdx].values.bank;
+          const curProg = multiParts[pIdx].values.program;
+          if (typeof saveBankSoundName === 'function' && curBank !== undefined && curProg !== undefined && patchName) {
+            saveBankSoundName(curBank, curProg, patchName);
           }
           if (window.activeSinglePartIndex === pIdx) {
             window.lastReceivedDump = new Uint8Array(msgBytes);
@@ -5130,6 +5229,136 @@ function exportCurrentPatchSyx() {
     setLastAction(`editing P${index + 1} in single synth view`);
   }
 
+  // ---------------------------------------------------------------------
+  // Multi-Mode Sound Cache & Dropdown Management
+  // ---------------------------------------------------------------------
+  function getBankSoundCache(bankIndex) {
+    try {
+      const raw = localStorage.getItem(`virusTiSnow_bank_${bankIndex}`);
+      if (raw) return JSON.parse(raw);
+    } catch(e) {}
+    return null;
+  }
+
+  function saveBankSoundCache(bankIndex, namesArray) {
+    try {
+      localStorage.setItem(`virusTiSnow_bank_${bankIndex}`, JSON.stringify(namesArray));
+    } catch(e) {}
+  }
+
+  function saveBankSoundName(bankIndex, patchIndex, name) {
+    let cache = getBankSoundCache(bankIndex) || new Array(128).fill(null);
+    cache[patchIndex] = name;
+    saveBankSoundCache(bankIndex, cache);
+    updateAllPartDropdownsForBank(bankIndex);
+  }
+
+  function getBankPatchName(bankIndex, patchIndex) {
+    const cache = getBankSoundCache(bankIndex);
+    if (cache && cache[patchIndex]) return cache[patchIndex];
+    const bName = BANK_NAMES[bankIndex] || `B${bankIndex}`;
+    const prefix = `${bName}-${patchIndex.toString().padStart(3, '0')}`;
+    const lib = loadLibrary();
+    for (const k of Object.keys(lib)) {
+      if (k.startsWith(prefix)) {
+        return k.slice(prefix.length).trim() || k;
+      }
+    }
+    return `Patch ${patchIndex.toString().padStart(3, '0')}`;
+  }
+
+  function populatePartPatchDropdown(selectEl, bankIndex, selectedProgram) {
+    if (!selectEl) return;
+    selectEl.innerHTML = '';
+    const cache = getBankSoundCache(bankIndex);
+    for (let i = 0; i < 128; i++) {
+      const opt = document.createElement('option');
+      opt.value = String(i);
+      const pName = (cache && cache[i]) ? cache[i] : getBankPatchName(bankIndex, i);
+      opt.textContent = `${i.toString().padStart(3, '0')}: ${pName}`;
+      if (i === selectedProgram) opt.selected = true;
+      selectEl.appendChild(opt);
+    }
+    selectEl.value = String(selectedProgram);
+  }
+
+  function updatePartDropdownSelection(partIndex, bankIndex, progIndex) {
+    const row = document.querySelector(`.part-row.part-${partIndex}`);
+    if (!row) return;
+    const drop = row.querySelector('.part-patch-dropdown');
+    if (drop) {
+      populatePartPatchDropdown(drop, bankIndex, progIndex);
+    }
+  }
+
+  function updateAllPartDropdownsForBank(bankIndex) {
+    for (let i = 0; i < NUM_PARTS; i++) {
+      if (multiParts[i] && multiParts[i].values.bank === bankIndex) {
+        updatePartDropdownSelection(i, bankIndex, multiParts[i].values.program);
+      }
+    }
+  }
+
+  function startQuickBankScan(bankIndex) {
+    if (!selectedOutput) {
+      alert('Collega prima una porta MIDI Output nelle impostazioni in alto!');
+      return;
+    }
+    const bName = BANK_NAMES[bankIndex] || `Banco ${bankIndex}`;
+    const statusEl = document.getElementById('quickScanStatus');
+    if (statusEl) {
+      statusEl.style.color = 'var(--accent)';
+      statusEl.textContent = `Scansione ${bName}: avviata...`;
+    }
+    document.getElementById('midi-debug').textContent = `🔥 QUICK SCAN: Scansione banco ${bName} (0..127)...`;
+
+    window.quickBankScanState = {
+      active: true,
+      bankIndex: bankIndex,
+      currentIndex: 0,
+      names: getBankSoundCache(bankIndex) || new Array(128).fill(null),
+      timer: null
+    };
+
+    requestNextQuickScanPatch();
+  }
+
+  function requestNextQuickScanPatch() {
+    const qState = window.quickBankScanState;
+    if (!qState || !qState.active) return;
+    if (qState.currentIndex >= 128) {
+      finishQuickBankScan();
+      return;
+    }
+    const patchIdx = qState.currentIndex;
+    requestBankPatch(qState.bankIndex, patchIdx);
+
+    if (qState.timer) clearTimeout(qState.timer);
+    qState.timer = setTimeout(() => {
+      const qs = window.quickBankScanState;
+      if (qs && qs.active) {
+        qs.currentIndex++;
+        requestNextQuickScanPatch();
+      }
+    }, 300);
+  }
+
+  function finishQuickBankScan() {
+    const qState = window.quickBankScanState;
+    if (!qState) return;
+    if (qState.timer) clearTimeout(qState.timer);
+    const bName = BANK_NAMES[qState.bankIndex] || `Banco ${qState.bankIndex}`;
+    const statusEl = document.getElementById('quickScanStatus');
+    if (statusEl) {
+      statusEl.style.color = '#80c090';
+      statusEl.textContent = `✅ ${bName}: 128 nomi memorizzati!`;
+    }
+    document.getElementById('midi-debug').innerHTML = `<span style="color:#80c090;">✅ QUICK SCAN: Completata lettura nomi per ${bName}!</span>`;
+    setLastAction('quick scan complete ' + bName);
+    qState.active = false;
+    window.quickBankScanState = null;
+  }
+
   function createPartRow(index){
     const part = multiParts[index];
     const partColor = PART_COLORS[index];
@@ -5183,7 +5412,7 @@ function exportCurrentPatchSyx() {
     const audBtn = document.createElement('button');
     audBtn.className = 'chassis-page-btn';
     audBtn.style.cssText = 'padding: 3px 8px; font-size: 11px; color: var(--accent);';
-    audBtn.textContent = '▶ PROVA';
+    audBtn.textContent = '▶ ASCOLTA';
     audBtn.title = `Suona una nota di prova su P${index + 1}`;
     audBtn.addEventListener('click', () => auditionPart(index));
     headerLeft.appendChild(audBtn);
@@ -5196,15 +5425,15 @@ function exportCurrentPatchSyx() {
     const readBtn = document.createElement('button');
     readBtn.className = 'chassis-page-btn';
     readBtn.style.cssText = 'padding: 3px 8px; font-size: 11px;';
-    readBtn.textContent = 'LEGGI DUMP';
-    readBtn.title = `Leggi la patch di P${index + 1} dal synth`;
+    readBtn.textContent = '🔄 LEGGI DUMP';
+    readBtn.title = `Richiedi e leggi il dump completo di P${index + 1} dal Virus TI`;
     readBtn.addEventListener('click', () => requestPartDump(index));
     headerRight.appendChild(readBtn);
 
     const editBtn = document.createElement('button');
     editBtn.className = 'chassis-page-btn';
     editBtn.style.cssText = `padding: 3px 10px; font-size: 11px; font-weight: bold; color: ${partColor}; border-color: ${partColor}; background: rgba(0,0,0,0.5);`;
-    editBtn.textContent = 'MODIFICA IN SINGLE ➔';
+    editBtn.textContent = '✏️ MODIFICA IN SINGLE ➔';
     editBtn.title = `Apri P${index + 1} nell'editor Single per scolpirne tutti i 150+ parametri`;
     editBtn.addEventListener('click', () => editPartInSingleView(index));
     headerRight.appendChild(editBtn);
@@ -5212,130 +5441,156 @@ function exportCurrentPatchSyx() {
     headerBar.appendChild(headerRight);
     row.appendChild(headerBar);
 
-    // --- CORPO CONTROLLI DELLA PARTE (CLUSTER ORGANIZZATI) ---
+    // --- CORPO CONTROLLI: 4 CLUSTER CHIARI ---
     const main = document.createElement('div');
     main.className = 'part-main';
 
-    // CLUSTER 1: MIDI & SELEZIONE PATCH
+    // CLUSTER 1: SCELTA SUONO DAL SYNTH (TENDINA PRIMARIA)
     const c1 = document.createElement('div');
-    c1.className = 'part-cluster';
+    c1.className = 'part-cluster part-cluster-sound';
+    const c1Badge = document.createElement('span');
+    c1Badge.className = 'part-cluster-badge';
+    c1Badge.textContent = '1. SUONO DAL VIRUS';
+    c1.appendChild(c1Badge);
+
+    // Dropdown del Banco
+    const bankWrap = document.createElement('div');
+    bankWrap.className = 'field';
+    const bankLbl = document.createElement('label');
+    bankLbl.textContent = 'BANCO';
+    const bankSelect = document.createElement('select');
+    bankSelect.style.cssText = 'font-size: 11px; font-weight: bold; font-family: monospace; background: #18181e; color: #fff; border: 1px solid var(--border); border-radius: 3px; padding: 4px 6px; cursor: pointer;';
+    BANK_NAMES.forEach((bName, bIdx) => {
+      const opt = document.createElement('option');
+      opt.value = String(bIdx);
+      opt.textContent = bName;
+      if (bIdx === part.values.bank) opt.selected = true;
+      bankSelect.appendChild(opt);
+    });
+    bankWrap.appendChild(bankLbl);
+    bankWrap.appendChild(bankSelect);
+    c1.appendChild(bankWrap);
+
+    // Tendina Primaria 128 Suoni + Pulsanti Prev/Next
+    const patchWrap = document.createElement('div');
+    patchWrap.className = 'field';
+    patchWrap.style.cssText = 'flex: 1 1 240px; min-width: 210px;';
+    const patchLbl = document.createElement('label');
+    patchLbl.textContent = 'SUONO (TENDINA)';
+
+    const patchRow = document.createElement('div');
+    patchRow.style.cssText = 'display: flex; align-items: center; gap: 4px; width: 100%;';
+
+    const btnPrev = document.createElement('button');
+    btnPrev.className = 'part-stepper-btn';
+    btnPrev.textContent = '◀';
+    btnPrev.title = 'Suono precedente (Program -1)';
+
+    const patchSelect = document.createElement('select');
+    patchSelect.className = 'part-patch-dropdown';
+    patchSelect.title = 'Seleziona direttamente uno dei 128 suoni di questo banco';
+    populatePartPatchDropdown(patchSelect, part.values.bank, part.values.program);
+
+    const btnNext = document.createElement('button');
+    btnNext.className = 'part-stepper-btn';
+    btnNext.textContent = '▶';
+    btnNext.title = 'Suono successivo (Program +1)';
+
+    const applySoundChange = (newProg) => {
+      newProg = clamp7(newProg);
+      part.values.program = newProg;
+      patchSelect.value = String(newProg);
+      sendMultiPartParam(index, 31, part.values.bank);
+      sendMultiPartParam(index, 33, newProg);
+      clearTimeout(part._dumpTimer);
+      part._dumpTimer = setTimeout(() => requestPartDump(index), 120);
+    };
+
+    patchSelect.addEventListener('change', () => {
+      applySoundChange(parseInt(patchSelect.value, 10) || 0);
+    });
+
+    btnPrev.addEventListener('click', () => {
+      const cur = parseInt(patchSelect.value, 10) || 0;
+      applySoundChange((cur - 1 + 128) % 128);
+    });
+
+    btnNext.addEventListener('click', () => {
+      const cur = parseInt(patchSelect.value, 10) || 0;
+      applySoundChange((cur + 1) % 128);
+    });
+
+    bankSelect.addEventListener('change', () => {
+      const newBank = parseInt(bankSelect.value, 10);
+      part.values.bank = newBank;
+      sendMultiPartParam(index, 31, newBank);
+      populatePartPatchDropdown(patchSelect, newBank, part.values.program);
+      sendMultiPartParam(index, 33, part.values.program);
+      clearTimeout(part._dumpTimer);
+      part._dumpTimer = setTimeout(() => requestPartDump(index), 150);
+    });
+
+    patchRow.appendChild(btnPrev);
+    patchRow.appendChild(patchSelect);
+    patchRow.appendChild(btnNext);
+    patchWrap.appendChild(patchLbl);
+    patchWrap.appendChild(patchRow);
+    c1.appendChild(patchWrap);
+    main.appendChild(c1);
+
+    // CLUSTER 2: LIVE MIXER
+    const c2 = document.createElement('div');
+    c2.className = 'part-cluster part-cluster-mixer';
+    const c2Badge = document.createElement('span');
+    c2Badge.className = 'part-cluster-badge';
+    c2Badge.textContent = '2. LIVE MIXER';
+    c2.appendChild(c2Badge);
 
     // MIDI channel
     const channels = [];
     for (let c = 1; c <= 16; c++) channels.push(String(c));
-    c1.appendChild(createSelectField('ch', channels, part.values.channel, (v) => {
+    c2.appendChild(createSelectField('ch', channels, part.values.channel, (v) => {
       part.values.channel = v;
       sendMultiPartParam(index, 34, v);
       if (typeof renderMultiPartsOverview === 'function') renderMultiPartsOverview();
       if (typeof updateKeyboardPartDisplay === 'function') updateKeyboardPartDisplay();
     }));
 
-    // Bank select
-    c1.appendChild(createSelectField('bank', BANK_NAMES, part.values.bank, (v) => {
-      part.values.bank = v;
-      sendMultiPartParam(index, 31, v);
-      clearTimeout(part._dumpTimer);
-      part._dumpTimer = setTimeout(() => requestPartDump(index), 150);
+    // Output select
+    c2.appendChild(createSelectField('out', OUTPUT_NAMES, part.values.output, (v) => {
+      part.values.output = v;
+      sendMultiPartParam(index, 41, v);
     }));
 
-    // Program change number input + step buttons
-    const progField = document.createElement('div');
-    progField.className = 'field field-prg';
-    const progLabel = document.createElement('label');
-    progLabel.textContent = 'prg';
-    const progInputWrapper = document.createElement('div');
-    progInputWrapper.style.cssText = 'display: flex; align-items: center; gap: 2px;';
+    // Volume knob
+    const volKnob = createPartKnob(index, PART_PARAMS.find(p => p.id === 'volume'));
+    volKnob.classList.add('vol-knob');
+    c2.appendChild(volKnob);
 
-    const progInput = document.createElement('input');
-    progInput.type = 'number';
-    progInput.min = '0';
-    progInput.max = '127';
-    progInput.value = String(part.values.program);
-    progInput.style.width = '38px';
+    // Pan knob
+    const panKnob = createPartKnob(index, PART_PARAMS.find(p => p.id === 'pan'));
+    c2.appendChild(panKnob);
 
-    const updatePrg = (v) => {
-      v = clamp7(v);
-      progInput.value = String(v);
-      part.values.program = v;
-      sendMultiPartParam(index, 33, v);
-      clearTimeout(part._dumpTimer);
-      part._dumpTimer = setTimeout(() => requestPartDump(index), 150);
-    };
+    main.appendChild(c2);
 
-    progInput.addEventListener('change', () => {
-      updatePrg(parseInt(progInput.value, 10) || 0);
-    });
+    // CLUSTER 3: RANGE SPLIT & ACCORDATURA
+    const c3 = document.createElement('div');
+    c3.className = 'part-cluster part-cluster-split';
+    const c3Badge = document.createElement('span');
+    c3Badge.className = 'part-cluster-badge';
+    c3Badge.textContent = '3. SPLIT & ACCORDATURA';
+    c3.appendChild(c3Badge);
 
-    progInputWrapper.appendChild(progInput);
-    progField.appendChild(progLabel);
-    progField.appendChild(progInputWrapper);
-    c1.appendChild(progField);
-
-    // Quick Patch Selector dropdown (sfogliatore per nome)
-    const patchField = document.createElement('div');
-    patchField.className = 'field';
-    const patchLabel = document.createElement('label');
-    patchLabel.textContent = 'suono salvato';
-    const patchSelect = document.createElement('select');
-    patchSelect.style.cssText = 'font-size: 11px; max-width: 140px;';
-
-    function refreshPatchSelectOptions() {
-      patchSelect.innerHTML = '';
-      const defOpt = document.createElement('option');
-      defOpt.value = '';
-      defOpt.textContent = '-- Scegli suono --';
-      patchSelect.appendChild(defOpt);
-
-      const lib = loadLibrary();
-      const names = Object.keys(lib).sort();
-      names.forEach(name => {
-        const opt = document.createElement('option');
-        opt.value = name;
-        opt.textContent = name;
-        patchSelect.appendChild(opt);
-      });
-    }
-    refreshPatchSelectOptions();
-
-    patchSelect.addEventListener('change', () => {
-      const chosenName = patchSelect.value;
-      if (!chosenName) return;
-      const lib = loadLibrary();
-      if (lib[chosenName]) {
-        loadPatchToPart(lib[chosenName], index);
-      }
-    });
-
-    patchField.appendChild(patchLabel);
-    patchField.appendChild(patchSelect);
-    c1.appendChild(patchField);
-    main.appendChild(c1);
-
-    // CLUSTER 2: RANGE SPLIT & TUNE
-    const c2 = document.createElement('div');
-    c2.className = 'part-cluster';
-    c2.appendChild(createKeyField(index, PART_PARAMS.find(p => p.id === 'lowkey')));
-    c2.appendChild(createKeyField(index, PART_PARAMS.find(p => p.id === 'highkey')));
+    c3.appendChild(createKeyField(index, PART_PARAMS.find(p => p.id === 'lowkey')));
+    c3.appendChild(createKeyField(index, PART_PARAMS.find(p => p.id === 'highkey')));
 
     const trspKnob = createPartKnob(index, PART_PARAMS.find(p => p.id === 'transpose'));
     trspKnob.classList.add('trsp-knob');
-    c2.appendChild(trspKnob);
+    c3.appendChild(trspKnob);
 
     const dtunKnob = createPartKnob(index, PART_PARAMS.find(p => p.id === 'detune'));
     dtunKnob.classList.add('dtun-knob');
-    c2.appendChild(dtunKnob);
-    main.appendChild(c2);
-
-    // CLUSTER 3: MIXER STEREO & FILTRI
-    const c3 = document.createElement('div');
-    c3.className = 'part-cluster';
-
-    const volKnob = createPartKnob(index, PART_PARAMS.find(p => p.id === 'volume'));
-    volKnob.classList.add('vol-knob');
-    c3.appendChild(volKnob);
-
-    const panKnob = createPartKnob(index, PART_PARAMS.find(p => p.id === 'pan'));
-    c3.appendChild(panKnob);
+    c3.appendChild(dtunKnob);
 
     const cutKnob = createPartSoundKnob(index, PARAMS.find(p => p.id === 'f1_cutoff'));
     cutKnob.classList.add('cut-knob');
@@ -5345,16 +5600,20 @@ function exportCurrentPatchSyx() {
     resKnob.classList.add('res-knob');
     c3.appendChild(resKnob);
 
-    c3.appendChild(createSelectField('out', OUTPUT_NAMES, part.values.output, (v) => {
-      part.values.output = v;
-      sendMultiPartParam(index, 41, v);
-    }));
     main.appendChild(c3);
 
-    // CLUSTER 4: DISPLAY RETRO VINTAGE
+    // CLUSTER 4: DISPLAY LCD RETRO MATRIX
+    const c4 = document.createElement('div');
+    c4.className = 'part-cluster part-cluster-lcd';
+    const c4Badge = document.createElement('span');
+    c4Badge.className = 'part-cluster-badge';
+    c4Badge.textContent = '4. DISPLAY LCD';
+    c4.appendChild(c4Badge);
+
     const display = createPartDisplay(index);
-    main.appendChild(display);
+    c4.appendChild(display);
     partDisplays.push(display);
+    main.appendChild(c4);
 
     row.appendChild(main);
     return row;
@@ -5369,7 +5628,36 @@ function exportCurrentPatchSyx() {
       partList.appendChild(createPartRow(i));
     }
     renderKeyboardSplitVisualizer();
+
+    // Inizializza selettore banco veloce se non già popolato
+    const quickScanSel = document.getElementById('quickBankScanSelect');
+    if (quickScanSel && quickScanSel.options.length === 0) {
+      BANK_NAMES.forEach((bName, idx) => {
+        const opt = document.createElement('option');
+        opt.value = String(idx);
+        opt.textContent = bName;
+        quickScanSel.appendChild(opt);
+      });
+    }
   }
+
+  // Quick Bank Scanner & Visualizer Toggle wiring
+  document.getElementById('btnQuickScanBank')?.addEventListener('click', () => {
+    const quickScanSel = document.getElementById('quickBankScanSelect');
+    if (!quickScanSel) return;
+    const bIdx = parseInt(quickScanSel.value, 10) || 0;
+    startQuickBankScan(bIdx);
+  });
+
+  document.getElementById('btnToggleSplitVisualizer')?.addEventListener('click', () => {
+    const splitCard = document.getElementById('keyboardSplitVisualizerCard');
+    const btn = document.getElementById('btnToggleSplitVisualizer');
+    if (!splitCard) return;
+    const isVis = splitCard.style.display !== 'none';
+    splitCard.style.display = isVis ? 'none' : 'block';
+    if (btn) btn.classList.toggle('active', !isVis);
+    if (!isVis) renderKeyboardSplitVisualizer();
+  });
 
   // Controlli Multi Globali
   const playModeSelect = document.getElementById('playModeSelect');
@@ -5873,6 +6161,9 @@ function exportCurrentPatchSyx() {
   window.addEventListener('keydown', (e) => {
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) return;
     if (e.repeat) return;
+    // Se la tastiera è esclusa/nascosta, non suonare note via tastiera mac
+    const kbdDock = document.getElementById('virtualKeyboardDock');
+    if (!kbdDock || kbdDock.style.display === 'none') return;
 
     if (e.code === 'KeyZ') {
       changeOctave(-1);
@@ -5900,6 +6191,9 @@ function exportCurrentPatchSyx() {
 
   window.addEventListener('keyup', (e) => {
     if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) return;
+    const kbdDock = document.getElementById('virtualKeyboardDock');
+    if (!kbdDock || kbdDock.style.display === 'none') return;
+
     if (PC_KEY_MAP[e.code] !== undefined) {
       const semitone = PC_KEY_MAP[e.code];
       const note = (currentOctave + 1) * 12 + semitone;
@@ -5918,6 +6212,32 @@ function exportCurrentPatchSyx() {
     btnWebAudio.textContent = webAudioEnabled ? '🔊 AUDIO MAC: ON' : '🔇 AUDIO MAC: OFF';
     btnWebAudio.style.color = webAudioEnabled ? 'var(--accent)' : '#777';
   });
+
+  // Controllo Visibilità Dock Tastiera (Completamente Escludibile)
+  const kbdDock = document.getElementById('virtualKeyboardDock');
+  const btnToggleKbd = document.getElementById('btnToggleKeyboard');
+  const btnCloseKbd = document.getElementById('btnCloseKeyboard');
+
+  function setKeyboardDockVisible(show) {
+    if (!kbdDock) return;
+    kbdDock.style.display = show ? 'flex' : 'none';
+    if (btnToggleKbd) btnToggleKbd.classList.toggle('active', show);
+    try { localStorage.setItem('virus_kbd_dock_visible', show ? '1' : '0'); } catch(e) {}
+    if (show) renderPianoKeys();
+  }
+
+  btnToggleKbd?.addEventListener('click', () => {
+    const isVisible = kbdDock && kbdDock.style.display !== 'none';
+    setKeyboardDockVisible(!isVisible);
+  });
+
+  btnCloseKbd?.addEventListener('click', () => {
+    setKeyboardDockVisible(false);
+  });
+
+  // Default: CHIUSA (display: none). Se l'utente l'aveva aperta in precedenza, rispetta la preferenza
+  const savedKbdVis = localStorage.getItem('virus_kbd_dock_visible') === '1';
+  setKeyboardDockVisible(savedKbdVis);
 
   let kbdCollapsed = false;
   const btnToggleSize = document.getElementById('btnToggleKeyboardSize');
