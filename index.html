@@ -533,15 +533,18 @@
     background: #141418;
     border-left-width: 5px;
     border-left-style: solid;
-    padding: 10px 14px;
+    padding: 10px 16px;
     border-radius: 6px;
-    box-shadow: 0 4px 14px rgba(0,0,0,0.4);
+    box-shadow: 0 3px 12px rgba(0,0,0,0.35);
     transition: opacity 200ms ease, background-color 200ms ease, border-color 200ms ease;
     display: flex;
-    flex-direction: column;
-    gap: 8px;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
     flex: 0 0 auto;
     box-sizing: border-box;
+    flex-wrap: wrap;
   }
   .part-row.disabled{
     opacity: 0.45;
@@ -1802,69 +1805,33 @@
     <div class="chassis-screw screw-bl"></div>
     <div class="chassis-screw screw-br"></div>
     <div class="chassis-logo">VIRUS-H MULTI</div>
-    <div style="z-index: 1; width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 40px; padding: 0 40px;">
-      <!-- Toolbar Multi Globale -->
-      <div class="multi-global" style="width: 100%; max-width: 1100px; background: rgba(0,0,0,0.45); border: 1px solid var(--border); border-radius: 6px; padding: 14px 20px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.05); margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px;">
-        <div style="display: flex; align-items: center; gap: 14px; flex-wrap: wrap;">
-          <div class="field" style="margin: 0;">
-            <label style="font-size: 11px; color: #888;">PLAY MODE</label>
-            <select id="playModeSelect" style="font-size: 12px; font-weight: bold; padding: 4px 8px; background: #1a1a20; color: #fff; border: 1px solid var(--border); border-radius: 3px;">
-              <option value="0">SINGLE</option>
-              <option value="1" selected>MULTI (4 PARTI)</option>
-            </select>
-          </div>
-          <div class="field" style="margin: 0; display: flex; align-items: center; gap: 4px;">
-            <label style="font-size: 11px; color: #888; margin-right: 4px;">MULTI PRG:</label>
-            <button id="btnMultiPrgDown" class="chassis-page-btn" style="padding: 2px 7px; font-size: 11px;">-</button>
-            <input type="number" id="multiProgramInput" min="0" max="127" value="0" style="width: 44px; text-align: center; font-weight: bold; font-size: 13px; background: #141418; color: #fff; border: 1px solid var(--border); border-radius: 3px; padding: 3px 0;">
-            <button id="btnMultiPrgUp" class="chassis-page-btn" style="padding: 2px 7px; font-size: 11px;">+</button>
-          </div>
-          <div style="display: flex; gap: 6px;">
-            <button id="btnMultiLoad" class="chassis-page-btn" style="padding: 5px 12px; font-size: 11px;">CARICA DUMP</button>
-            <button id="btnMultiSave" class="chassis-page-btn" style="padding: 5px 12px; font-size: 11px;">SALVA DUMP</button>
-          </div>
-        </div>
+    <div style="z-index: 1; width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 25px; padding: 0 20px;">
+      <!-- Barra comandi MULTI essenziale e pulita -->
+      <div style="width: 100%; max-width: 1050px; background: rgba(0,0,0,0.4); border: 1px solid var(--border); border-radius: 6px; padding: 10px 16px; margin-bottom: 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; font-family: monospace;">
         <div style="display: flex; align-items: center; gap: 10px;">
-          <button id="btnSyncMultiInView" class="chassis-page-btn" style="color: var(--accent); border-color: var(--accent); padding: 5px 14px; font-size: 11px; font-weight: bold; background: rgba(0,0,0,0.5);">🔄 SINCRONIZZA TUTTO (P1-P4)</button>
+          <span style="color: var(--accent); font-weight: 800; font-size: 13px; letter-spacing: 0.05em;">🎛️ MULTI (4 PARTI)</span>
+          <span style="font-size: 11px; color: #888;">— Scegli banco e suono da tendina per ogni parte</span>
         </div>
-      </div>
-
-      <!-- Bar Gestione Banco & Suoni Virus -->
-      <div style="width: 100%; max-width: 1100px; background: rgba(0,0,0,0.45); border: 1px solid var(--border); border-radius: 6px; padding: 12px 18px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; font-family: monospace;">
         <div style="display: flex; align-items: center; gap: 10px; flex-wrap: wrap;">
-          <span style="color: var(--accent); font-weight: bold; font-size: 12px; letter-spacing: 0.05em;">📂 SUONI DEL VIRUS:</span>
-          <span style="font-size: 11px; color: #888;">BANCO:</span>
-          <select id="quickBankScanSelect" style="padding: 4px 8px; font-size: 12px; font-weight: bold; background: #18181e; color: #fff; border: 1px solid var(--border); border-radius: 3px;">
-          </select>
-          <button id="btnQuickScanBank" class="chassis-page-btn" style="color: var(--accent); border-color: var(--accent); font-weight: bold; padding: 4px 12px;">
-            📥 SCANSIONA 128 NOMI DAL SYNTH
-          </button>
-          <span id="quickScanStatus" style="font-size: 11px; color: #aaa;"></span>
-        </div>
-        <div style="display: flex; gap: 8px;">
-          <button id="btnToggleSplitVisualizer" class="chassis-page-btn" style="font-size: 11px; padding: 4px 10px;">🎹 VISUALIZZATORE SPLIT</button>
+          <div style="display: flex; align-items: center; gap: 6px;">
+            <span style="font-size: 11px; color: #888;">BANCO:</span>
+            <select id="quickBankScanSelect" style="padding: 3px 6px; font-size: 11px; font-weight: bold; background: #18181e; color: #fff; border: 1px solid var(--border); border-radius: 3px;"></select>
+            <button id="btnQuickScanBank" class="chassis-page-btn" style="color: var(--accent); border-color: var(--accent); font-weight: bold; padding: 3px 10px; font-size: 11px;" title="Interroga il Virus via SysEx per leggere i 128 nomi del banco">📥 SCANSIONA 128 NOMI</button>
+            <span id="quickScanStatus" style="font-size: 11px; color: #aaa;"></span>
+          </div>
+          <button id="btnSyncMultiInView" class="chassis-page-btn" style="padding: 4px 12px; font-size: 11px; font-weight: bold;">🔄 LEGGI DAL SYNTH</button>
         </div>
       </div>
 
-      <!-- Keyboard Split & Layer Visualizer (Collassabile) -->
-      <div id="keyboardSplitVisualizerCard" style="display: none; width: 100%; max-width: 1100px; background: rgba(0,0,0,0.5); border: 1px solid var(--border); border-radius: 6px; padding: 12px 18px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.05); margin-bottom: 20px; font-family: monospace;">
-        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
-          <span style="color: #aaa; font-size: 11px; font-weight: 700; letter-spacing: 0.08em; display: flex; align-items: center; gap: 6px;">
-            🎹 KEYBOARD SPLIT & LAYER VISUALIZER <span style="font-size: 10px; color: #666; font-weight: normal;">(C-2 → G8, 128 NOTE MIDI)</span>
-          </span>
-          <span style="font-size: 10px; color: #888;">Zone attive delle 4 parti sulla tastiera</span>
-        </div>
-        <div id="splitVisualizerScale" style="position: relative; width: 100%; height: 72px; background: #0c0c10; border: 1px solid #222; border-radius: 4px; overflow: hidden; padding: 2px 0;"></div>
-      </div>
-
-      <div class="part-list" id="partList" style="width: 100%; max-width: 1100px; display: flex; flex-direction: column; gap: 14px;"></div>
+      <!-- Lista pulita delle 4 parti -->
+      <div class="part-list" id="partList" style="width: 100%; max-width: 1050px; display: flex; flex-direction: column; gap: 10px;"></div>
     </div>
     <div class="chassis-wood-strip"></div>
   </div>
 </div>
 
 <!-- Virtual Keyboard Dock (Ableton Style Mac Keyboard Player) - ESCLUDIBILE -->
-<div id="virtualKeyboardDock" style="display: none; width: 100%; background: #111114; border-top: 1px solid var(--border); padding: 8px 16px; flex-direction: column; gap: 8px; z-index: 99; flex-shrink: 0; box-shadow: 0 -4px 20px rgba(0,0,0,0.7);">
+<div id="virtualKeyboardDock" style="display: none !important; width: 100%; background: #111114; border-top: 2px solid var(--accent); padding: 8px 16px; flex-direction: column; gap: 8px; z-index: 999; flex-shrink: 0; box-shadow: 0 -6px 25px rgba(0,0,0,0.85);">
   <div style="display: flex; justify-content: space-between; align-items: center; font-family: monospace; font-size: 11px; flex-wrap: wrap; gap: 8px;">
     <div style="display: flex; align-items: center; gap: 12px; flex-wrap: wrap;">
       <span style="color: var(--accent); font-weight: bold; letter-spacing: 0.08em; display: flex; align-items: center; gap: 4px;">
@@ -1887,12 +1854,11 @@
         <span id="activeKbdPartDisplay" style="color: #fff; font-weight: bold; background: rgba(255,255,255,0.1); padding: 2px 6px; border-radius: 3px;">P1 (ch 1)</span>
       </div>
     </div>
-    <div style="display: flex; gap: 6px; align-items: center;">
+    <div style="display: flex; gap: 8px; align-items: center;">
       <button id="btnToggleWebAudio" class="chassis-page-btn" style="font-size: 10px; padding: 3px 8px; color: var(--accent);" title="Abilita/disabilita audio diretto dagli altoparlanti del Mac">🔊 AUDIO MAC: ON</button>
       <button id="btnAuditionNote" class="chassis-page-btn" style="font-size: 10px; padding: 3px 8px;">▶ PROVA NOTA</button>
-      <button id="btnAuditionChord" class="chassis-page-btn" style="font-size: 10px; padding: 3px 8px;">▶ PROVA ACCORDO</button>
       <button id="btnToggleKeyboardSize" class="chassis-page-btn" style="font-size: 10px; padding: 3px 8px;" title="Riduci/Espandi tastiera">▲ RIDUCI</button>
-      <button id="btnCloseKeyboard" class="chassis-page-btn" style="font-size: 10px; padding: 3px 8px; color: #ff6666; border-color: rgba(255,100,100,0.4);" title="Chiudi tastiera">✕ CHIUDI</button>
+      <button id="btnCloseKeyboard" class="chassis-page-btn" style="font-size: 11px; padding: 4px 14px; font-weight: bold; color: #fff; background: #e06c75; border-color: #e06c75; cursor: pointer;" title="Chiudi e nascondi completamente la tastiera">✕ CHIUDI TASTIERA</button>
     </div>
   </div>
   <div id="virtualPianoKeysWrapper" style="display: flex; justify-content: center; width: 100%; overflow-x: auto; padding: 2px 0;">
@@ -1902,7 +1868,16 @@
 
 <script>
 (function(){
-  // --- UI NAVIGATION TABS ---
+  function updateTopPanelsVisibility(view) {
+    const rail = document.querySelector('.control-room-rail');
+    const strip = document.querySelector('.command-strip');
+    const diag = document.getElementById('midiDiagnostics');
+    const show = (view === 'single');
+    if (rail) rail.style.display = show ? 'grid' : 'none';
+    if (strip) strip.style.display = show ? 'flex' : 'none';
+    if (!show && diag) diag.classList.add('hidden');
+  }
+
   function hideAllViews() {
     document.getElementById('singleView').style.display = 'none';
     document.getElementById('multiView').style.display = 'none';
@@ -1916,6 +1891,7 @@
 
   document.getElementById('btnTabSynth').addEventListener('click', () => {
     hideAllViews();
+    updateTopPanelsVisibility('single');
     const v = document.getElementById('singleView');
     v.style.display = 'block';
     document.getElementById('btnTabSynth').classList.add('active');
@@ -1924,6 +1900,7 @@
 
   document.getElementById('btnTabMultipart').addEventListener('click', () => {
     hideAllViews();
+    updateTopPanelsVisibility('multi');
     const v = document.getElementById('multiView');
     v.style.display = 'block';
     document.getElementById('btnTabMultipart').classList.add('active');
@@ -1932,6 +1909,7 @@
 
   document.getElementById('btnTabPatchManager').addEventListener('click', () => {
     hideAllViews();
+    updateTopPanelsVisibility('patch');
     const v = document.getElementById('patchManagerContent');
     v.style.display = 'block';
     document.getElementById('btnTabPatchManager').classList.add('active');
@@ -1941,6 +1919,7 @@
 
   document.getElementById('btnTabArp').addEventListener('click', () => {
     hideAllViews();
+    updateTopPanelsVisibility('arp');
     document.getElementById('arpContent').style.display = 'block';
     document.getElementById('btnTabArp').classList.add('active');
     updateControlRoomStatus();
@@ -1948,6 +1927,7 @@
 
   document.getElementById('btnTabSequencer').addEventListener('click', () => {
     hideAllViews();
+    updateTopPanelsVisibility('seq');
     document.getElementById('sequencerContent').style.display = 'block';
     document.getElementById('btnTabSequencer').classList.add('active');
     updateControlRoomStatus();
@@ -1955,6 +1935,7 @@
 
   document.getElementById('btnTabSong').addEventListener('click', () => {
     hideAllViews();
+    updateTopPanelsVisibility('song');
     document.getElementById('songContent').style.display = 'block';
     document.getElementById('btnTabSong').classList.add('active');
     updateControlRoomStatus();
@@ -5368,21 +5349,18 @@ function exportCurrentPatchSyx() {
     if (!part.enabled) row.classList.add('disabled');
     row.style.borderLeftColor = partColor;
 
-    // --- SUB-HEADER DELLA PARTE (BADGE, ON/OFF, MUTE, SOLO, AUDITION, LEGGI, EDIT) ---
-    const headerBar = document.createElement('div');
-    headerBar.className = 'part-header-bar';
-
-    const headerLeft = document.createElement('div');
-    headerLeft.className = 'part-header-left';
+    // 1. BADGE PARTE + ON/OFF + MUTE + SOLO
+    const leftGroup = document.createElement('div');
+    leftGroup.style.cssText = 'display: flex; align-items: center; gap: 6px; flex-shrink: 0;';
 
     const badge = document.createElement('div');
-    badge.style.cssText = `background: ${partColor}; color: #000; font-weight: 800; font-size: 12px; padding: 2px 9px; border-radius: 3px; font-family: monospace; letter-spacing: 0.05em;`;
+    badge.style.cssText = `background: ${partColor}; color: #000; font-weight: 800; font-size: 13px; padding: 4px 10px; border-radius: 4px; font-family: monospace; letter-spacing: 0.05em; min-width: 28px; text-align: center;`;
     badge.textContent = 'P' + (index + 1);
-    headerLeft.appendChild(badge);
+    leftGroup.appendChild(badge);
 
     const enableBtn = document.createElement('button');
     enableBtn.className = 'chassis-page-btn';
-    enableBtn.style.cssText = 'padding: 3px 8px; font-size: 11px;';
+    enableBtn.style.cssText = 'padding: 4px 8px; font-size: 11px; font-weight: bold;';
     enableBtn.classList.toggle('active', part.enabled);
     enableBtn.textContent = part.enabled ? 'ON' : 'OFF';
     enableBtn.addEventListener('click', () => {
@@ -5391,75 +5369,34 @@ function exportCurrentPatchSyx() {
       enableBtn.classList.toggle('active', part.enabled);
       applyPartMuteSoloState();
     });
-    headerLeft.appendChild(enableBtn);
+    leftGroup.appendChild(enableBtn);
 
     const muteBtn = document.createElement('button');
     muteBtn.className = 'chassis-page-btn btn-part-mute';
-    muteBtn.style.cssText = 'padding: 3px 8px; font-size: 11px; font-weight: bold;';
+    muteBtn.style.cssText = 'padding: 4px 8px; font-size: 11px; font-weight: bold;';
     muteBtn.textContent = 'M';
     muteBtn.title = `Muta P${index + 1}`;
     muteBtn.addEventListener('click', () => togglePartMute(index));
-    headerLeft.appendChild(muteBtn);
+    leftGroup.appendChild(muteBtn);
 
     const soloBtn = document.createElement('button');
     soloBtn.className = 'chassis-page-btn btn-part-solo';
-    soloBtn.style.cssText = 'padding: 3px 8px; font-size: 11px; font-weight: bold;';
+    soloBtn.style.cssText = 'padding: 4px 8px; font-size: 11px; font-weight: bold;';
     soloBtn.textContent = 'S';
     soloBtn.title = `Solo P${index + 1}`;
     soloBtn.addEventListener('click', () => togglePartSolo(index));
-    headerLeft.appendChild(soloBtn);
+    leftGroup.appendChild(soloBtn);
 
-    const audBtn = document.createElement('button');
-    audBtn.className = 'chassis-page-btn';
-    audBtn.style.cssText = 'padding: 3px 8px; font-size: 11px; color: var(--accent);';
-    audBtn.textContent = '▶ ASCOLTA';
-    audBtn.title = `Suona una nota di prova su P${index + 1}`;
-    audBtn.addEventListener('click', () => auditionPart(index));
-    headerLeft.appendChild(audBtn);
+    row.appendChild(leftGroup);
 
-    headerBar.appendChild(headerLeft);
-
-    const headerRight = document.createElement('div');
-    headerRight.className = 'part-header-right';
-
-    const readBtn = document.createElement('button');
-    readBtn.className = 'chassis-page-btn';
-    readBtn.style.cssText = 'padding: 3px 8px; font-size: 11px;';
-    readBtn.textContent = '🔄 LEGGI DUMP';
-    readBtn.title = `Richiedi e leggi il dump completo di P${index + 1} dal Virus TI`;
-    readBtn.addEventListener('click', () => requestPartDump(index));
-    headerRight.appendChild(readBtn);
-
-    const editBtn = document.createElement('button');
-    editBtn.className = 'chassis-page-btn';
-    editBtn.style.cssText = `padding: 3px 10px; font-size: 11px; font-weight: bold; color: ${partColor}; border-color: ${partColor}; background: rgba(0,0,0,0.5);`;
-    editBtn.textContent = '✏️ MODIFICA IN SINGLE ➔';
-    editBtn.title = `Apri P${index + 1} nell'editor Single per scolpirne tutti i 150+ parametri`;
-    editBtn.addEventListener('click', () => editPartInSingleView(index));
-    headerRight.appendChild(editBtn);
-
-    headerBar.appendChild(headerRight);
-    row.appendChild(headerBar);
-
-    // --- CORPO CONTROLLI: 4 CLUSTER CHIARI ---
-    const main = document.createElement('div');
-    main.className = 'part-main';
-
-    // CLUSTER 1: SCELTA SUONO DAL SYNTH (TENDINA PRIMARIA)
-    const c1 = document.createElement('div');
-    c1.className = 'part-cluster part-cluster-sound';
-    const c1Badge = document.createElement('span');
-    c1Badge.className = 'part-cluster-badge';
-    c1Badge.textContent = '1. SUONO DAL VIRUS';
-    c1.appendChild(c1Badge);
-
-    // Dropdown del Banco
+    // 2. SELEZIONE BANCO
     const bankWrap = document.createElement('div');
     bankWrap.className = 'field';
+    bankWrap.style.cssText = 'margin: 0; min-width: 90px; flex-shrink: 0;';
     const bankLbl = document.createElement('label');
     bankLbl.textContent = 'BANCO';
     const bankSelect = document.createElement('select');
-    bankSelect.style.cssText = 'font-size: 11px; font-weight: bold; font-family: monospace; background: #18181e; color: #fff; border: 1px solid var(--border); border-radius: 3px; padding: 4px 6px; cursor: pointer;';
+    bankSelect.style.cssText = 'font-size: 11px; font-weight: bold; font-family: monospace; background: #1a1a22; color: #fff; border: 1px solid var(--border); border-radius: 3px; padding: 5px 6px; cursor: pointer; width: 100%;';
     BANK_NAMES.forEach((bName, bIdx) => {
       const opt = document.createElement('option');
       opt.value = String(bIdx);
@@ -5469,14 +5406,14 @@ function exportCurrentPatchSyx() {
     });
     bankWrap.appendChild(bankLbl);
     bankWrap.appendChild(bankSelect);
-    c1.appendChild(bankWrap);
+    row.appendChild(bankWrap);
 
-    // Tendina Primaria 128 Suoni + Pulsanti Prev/Next
+    // 3. TENDINA SUONO 128 PATCH (HERO ELEMENT)
     const patchWrap = document.createElement('div');
     patchWrap.className = 'field';
-    patchWrap.style.cssText = 'flex: 1 1 240px; min-width: 210px;';
+    patchWrap.style.cssText = 'margin: 0; flex: 1 1 300px; min-width: 240px;';
     const patchLbl = document.createElement('label');
-    patchLbl.textContent = 'SUONO (TENDINA)';
+    patchLbl.textContent = 'SUONO (TENDINA 128 PATCH)';
 
     const patchRow = document.createElement('div');
     patchRow.style.cssText = 'display: flex; align-items: center; gap: 4px; width: 100%;';
@@ -5484,17 +5421,17 @@ function exportCurrentPatchSyx() {
     const btnPrev = document.createElement('button');
     btnPrev.className = 'part-stepper-btn';
     btnPrev.textContent = '◀';
-    btnPrev.title = 'Suono precedente (Program -1)';
+    btnPrev.title = 'Patch precedente (Program -1)';
 
     const patchSelect = document.createElement('select');
     patchSelect.className = 'part-patch-dropdown';
-    patchSelect.title = 'Seleziona direttamente uno dei 128 suoni di questo banco';
+    patchSelect.style.cssText = 'flex: 1; font-size: 12px; font-weight: bold; font-family: monospace; background: #181820; color: #fff; border: 1px solid var(--border); border-radius: 3px; padding: 5px 8px; cursor: pointer; max-width: none;';
     populatePartPatchDropdown(patchSelect, part.values.bank, part.values.program);
 
     const btnNext = document.createElement('button');
     btnNext.className = 'part-stepper-btn';
     btnNext.textContent = '▶';
-    btnNext.title = 'Suono successivo (Program +1)';
+    btnNext.title = 'Patch successiva (Program +1)';
 
     const applySoundChange = (newProg) => {
       newProg = clamp7(newProg);
@@ -5535,87 +5472,56 @@ function exportCurrentPatchSyx() {
     patchRow.appendChild(btnNext);
     patchWrap.appendChild(patchLbl);
     patchWrap.appendChild(patchRow);
-    c1.appendChild(patchWrap);
-    main.appendChild(c1);
+    row.appendChild(patchWrap);
 
-    // CLUSTER 2: LIVE MIXER
-    const c2 = document.createElement('div');
-    c2.className = 'part-cluster part-cluster-mixer';
-    const c2Badge = document.createElement('span');
-    c2Badge.className = 'part-cluster-badge';
-    c2Badge.textContent = '2. LIVE MIXER';
-    c2.appendChild(c2Badge);
-
-    // MIDI channel
+    // 4. CANALE MIDI
     const channels = [];
     for (let c = 1; c <= 16; c++) channels.push(String(c));
-    c2.appendChild(createSelectField('ch', channels, part.values.channel, (v) => {
+    const chField = createSelectField('ch', channels, part.values.channel, (v) => {
       part.values.channel = v;
       sendMultiPartParam(index, 34, v);
       if (typeof renderMultiPartsOverview === 'function') renderMultiPartsOverview();
       if (typeof updateKeyboardPartDisplay === 'function') updateKeyboardPartDisplay();
-    }));
+    });
+    chField.style.margin = '0';
+    chField.style.flexShrink = '0';
+    row.appendChild(chField);
 
-    // Output select
-    c2.appendChild(createSelectField('out', OUTPUT_NAMES, part.values.output, (v) => {
-      part.values.output = v;
-      sendMultiPartParam(index, 41, v);
-    }));
-
-    // Volume knob
+    // 5. VOLUME KNOB
     const volKnob = createPartKnob(index, PART_PARAMS.find(p => p.id === 'volume'));
     volKnob.classList.add('vol-knob');
-    c2.appendChild(volKnob);
+    volKnob.style.margin = '0';
+    volKnob.style.flexShrink = '0';
+    row.appendChild(volKnob);
 
-    // Pan knob
+    // 6. PAN KNOB
     const panKnob = createPartKnob(index, PART_PARAMS.find(p => p.id === 'pan'));
-    c2.appendChild(panKnob);
+    panKnob.style.margin = '0';
+    panKnob.style.flexShrink = '0';
+    row.appendChild(panKnob);
 
-    main.appendChild(c2);
+    // 7. AZIONI IMMEDIATE: ASCOLTA + EDIT IN SINGLE
+    const actionsGroup = document.createElement('div');
+    actionsGroup.style.cssText = 'display: flex; align-items: center; gap: 6px; flex-shrink: 0;';
 
-    // CLUSTER 3: RANGE SPLIT & ACCORDATURA
-    const c3 = document.createElement('div');
-    c3.className = 'part-cluster part-cluster-split';
-    const c3Badge = document.createElement('span');
-    c3Badge.className = 'part-cluster-badge';
-    c3Badge.textContent = '3. SPLIT & ACCORDATURA';
-    c3.appendChild(c3Badge);
+    const audBtn = document.createElement('button');
+    audBtn.className = 'chassis-page-btn';
+    audBtn.style.cssText = 'padding: 5px 12px; font-size: 11px; font-weight: bold; color: var(--accent); border-color: var(--accent);';
+    audBtn.textContent = '▶ PROVA';
+    audBtn.title = `Suona una nota di prova su P${index + 1}`;
+    audBtn.addEventListener('click', () => auditionPart(index));
+    actionsGroup.appendChild(audBtn);
 
-    c3.appendChild(createKeyField(index, PART_PARAMS.find(p => p.id === 'lowkey')));
-    c3.appendChild(createKeyField(index, PART_PARAMS.find(p => p.id === 'highkey')));
+    const editBtn = document.createElement('button');
+    editBtn.className = 'chassis-page-btn';
+    editBtn.style.cssText = `padding: 5px 10px; font-size: 11px; font-weight: bold; color: ${partColor}; border-color: ${partColor}; background: rgba(0,0,0,0.4);`;
+    editBtn.textContent = '✏️ SINGLE';
+    editBtn.title = `Apri P${index + 1} nell'editor Single per scolpirne tutti i dettagli`;
+    editBtn.addEventListener('click', () => editPartInSingleView(index));
+    actionsGroup.appendChild(editBtn);
 
-    const trspKnob = createPartKnob(index, PART_PARAMS.find(p => p.id === 'transpose'));
-    trspKnob.classList.add('trsp-knob');
-    c3.appendChild(trspKnob);
+    row.appendChild(actionsGroup);
 
-    const dtunKnob = createPartKnob(index, PART_PARAMS.find(p => p.id === 'detune'));
-    dtunKnob.classList.add('dtun-knob');
-    c3.appendChild(dtunKnob);
-
-    const cutKnob = createPartSoundKnob(index, PARAMS.find(p => p.id === 'f1_cutoff'));
-    cutKnob.classList.add('cut-knob');
-    c3.appendChild(cutKnob);
-
-    const resKnob = createPartSoundKnob(index, PARAMS.find(p => p.id === 'f1_resonance'));
-    resKnob.classList.add('res-knob');
-    c3.appendChild(resKnob);
-
-    main.appendChild(c3);
-
-    // CLUSTER 4: DISPLAY LCD RETRO MATRIX
-    const c4 = document.createElement('div');
-    c4.className = 'part-cluster part-cluster-lcd';
-    const c4Badge = document.createElement('span');
-    c4Badge.className = 'part-cluster-badge';
-    c4Badge.textContent = '4. DISPLAY LCD';
-    c4.appendChild(c4Badge);
-
-    const display = createPartDisplay(index);
-    c4.appendChild(display);
-    partDisplays.push(display);
-    main.appendChild(c4);
-
-    row.appendChild(main);
     return row;
   }
 
@@ -5627,7 +5533,6 @@ function exportCurrentPatchSyx() {
     for (let i = 0; i < NUM_PARTS; i++){
       partList.appendChild(createPartRow(i));
     }
-    renderKeyboardSplitVisualizer();
 
     // Inizializza selettore banco veloce se non già popolato
     const quickScanSel = document.getElementById('quickBankScanSelect');
@@ -5641,22 +5546,12 @@ function exportCurrentPatchSyx() {
     }
   }
 
-  // Quick Bank Scanner & Visualizer Toggle wiring
+  // Quick Bank Scanner wiring
   document.getElementById('btnQuickScanBank')?.addEventListener('click', () => {
     const quickScanSel = document.getElementById('quickBankScanSelect');
     if (!quickScanSel) return;
     const bIdx = parseInt(quickScanSel.value, 10) || 0;
     startQuickBankScan(bIdx);
-  });
-
-  document.getElementById('btnToggleSplitVisualizer')?.addEventListener('click', () => {
-    const splitCard = document.getElementById('keyboardSplitVisualizerCard');
-    const btn = document.getElementById('btnToggleSplitVisualizer');
-    if (!splitCard) return;
-    const isVis = splitCard.style.display !== 'none';
-    splitCard.style.display = isVis ? 'none' : 'block';
-    if (btn) btn.classList.toggle('active', !isVis);
-    if (!isVis) renderKeyboardSplitVisualizer();
   });
 
   // Controlli Multi Globali
@@ -6220,9 +6115,12 @@ function exportCurrentPatchSyx() {
 
   function setKeyboardDockVisible(show) {
     if (!kbdDock) return;
-    kbdDock.style.display = show ? 'flex' : 'none';
-    if (btnToggleKbd) btnToggleKbd.classList.toggle('active', show);
-    try { localStorage.setItem('virus_kbd_dock_visible', show ? '1' : '0'); } catch(e) {}
+    if (show) {
+      kbdDock.style.setProperty('display', 'flex', 'important');
+    } else {
+      kbdDock.style.setProperty('display', 'none', 'important');
+    }
+    if (btnToggleKbd) btnToggleKbd.classList.toggle('active', !!show);
     if (show) renderPianoKeys();
   }
 
@@ -6235,9 +6133,8 @@ function exportCurrentPatchSyx() {
     setKeyboardDockVisible(false);
   });
 
-  // Default: CHIUSA (display: none). Se l'utente l'aveva aperta in precedenza, rispetta la preferenza
-  const savedKbdVis = localStorage.getItem('virus_kbd_dock_visible') === '1';
-  setKeyboardDockVisible(savedKbdVis);
+  // All'avvio la tastiera è SEMPRE chiusa per non coprire lo schermo.
+  setKeyboardDockVisible(false);
 
   let kbdCollapsed = false;
   const btnToggleSize = document.getElementById('btnToggleKeyboardSize');
