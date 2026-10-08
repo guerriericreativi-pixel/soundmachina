@@ -1522,6 +1522,9 @@
     padding: 8px;
     box-shadow: inset 0 2px 10px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.05);
     border: 1px solid #111;
+    width: 480px;
+    max-width: 90vw;
+    box-sizing: border-box;
   }
 
   .chassis-wood-strip {
@@ -2813,6 +2816,7 @@
     v.style.display = 'block';
     document.getElementById('btnTabSynth').classList.add('active');
     updateControlRoomStatus();
+    if (typeof initElektronLcd === 'function') setTimeout(initElektronLcd, 30);
   });
 
   document.getElementById('btnTabMultipart').addEventListener('click', () => {
@@ -4391,8 +4395,10 @@ function exportCurrentPatchSyx() {
 
     const elektronLcd = document.createElement('canvas');
     elektronLcd.id = 'elektronLcd';
+    elektronLcd.width = 464;
+    elektronLcd.height = 240;
     elektronLcd.style.width = '100%';
-    elektronLcd.style.maxWidth = '500px';
+    elektronLcd.style.maxWidth = '480px';
     elektronLcd.style.height = '240px';
     elektronLcd.style.background = 'transparent';
     elektronLcd.style.display = 'block';
@@ -4787,8 +4793,8 @@ function exportCurrentPatchSyx() {
     const ctx = canvas.getContext('2d');
 
     const dpr = window.devicePixelRatio || 1;
-    const w = canvas.offsetWidth;
-    const h = canvas.offsetHeight;
+    const w = canvas.offsetWidth || 464;
+    const h = canvas.offsetHeight || 240;
     if (canvas.width !== w * dpr || canvas.height !== h * dpr) {
       canvas.width = w * dpr;
       canvas.height = h * dpr;
@@ -7009,7 +7015,7 @@ function exportCurrentPatchSyx() {
     // 3. HARDWARE ROTARY KNOBS: VOL, PAN, TRSP, CUTOFF, RESONANCE
     const knobsGroup = document.createElement('div');
     knobsGroup.className = 'part-knobs-group';
-    knobsGroup.style.cssText = 'display: flex; align-items: center; gap: 4px; flex-shrink: 0; margin-left: auto;';
+    knobsGroup.style.cssText = 'display: flex; align-items: center; gap: 6px; flex-shrink: 0; margin-left: auto;';
 
     const volParam = PART_PARAMS.find(p => p.id === 'volume');
     const volKnob = createPartKnob(index, volParam);
@@ -7028,12 +7034,12 @@ function exportCurrentPatchSyx() {
     knobsGroup.appendChild(trspKnob);
 
     const cutParam = PARAMS.find(p => p.id === 'f1_cutoff') || { id: 'f1_cutoff', name: 'Cutoff', short: 'CUT', cc: 40, default: 127 };
-    const cutKnob = createPartSoundKnob(index, cutParam);
+    const cutKnob = createPartSoundKnob(index, { ...cutParam, short: 'CUT' });
     cutKnob.style.margin = '0';
     knobsGroup.appendChild(cutKnob);
 
     const resParam = PARAMS.find(p => p.id === 'f1_resonance') || { id: 'f1_resonance', name: 'Resonance', short: 'RES', cc: 42, default: 0 };
-    const resKnob = createPartSoundKnob(index, resParam);
+    const resKnob = createPartSoundKnob(index, { ...resParam, short: 'RES' });
     resKnob.style.margin = '0';
     knobsGroup.appendChild(resKnob);
 
