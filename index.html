@@ -562,6 +562,16 @@
   .part-row.muted{
     opacity: 0.4;
   }
+  .part-row.selected-part{
+    border-color: var(--accent, #1e6091);
+    box-shadow: 0 0 0 1.5px var(--accent, #1e6091), 0 3px 10px rgba(0,0,0,0.12);
+    background: linear-gradient(180deg, #ffffff 0%, #edf1f7 100%);
+  }
+  html[data-skin="elektron"] .part-row.selected-part{
+    border-color: var(--accent, #56b6c2);
+    box-shadow: 0 0 0 1.5px var(--accent, #56b6c2), 0 4px 12px rgba(0,0,0,0.6);
+    background: #202026;
+  }
   .part-0{ border-left-color: #56b6c2; }
   .part-1{ border-left-color: #e59500; }
   .part-2{ border-left-color: #c678dd; }
@@ -3148,7 +3158,7 @@
   // ---------------------------------------------------------------------
   const ACCENT_KEY = 'virusTiSnow_accent';
   const accentPicker = document.getElementById('accentPicker');
-  const accentDots = Array.from(accentPicker.children);
+  const accentDots = accentPicker && accentPicker.children ? Array.from(accentPicker.children) : [];
   const lightLimiter = document.getElementById('lightLimiter');
   const lightLimitSteps = lightLimiter ? Array.from(lightLimiter.querySelectorAll('.light-limit-step')) : [];
 
@@ -4163,6 +4173,7 @@ function downloadBlob(bytes, filename, mimeType = 'application/octet-stream') {
 }
 
 function setSingleEditingPart(partIndex) {
+  currentPartIndex = partIndex;
   window.activeSinglePartIndex = partIndex;
   const container = document.getElementById('singlePartSelector');
   if (container) {
@@ -4171,16 +4182,24 @@ function setSingleEditingPart(partIndex) {
       b.style.borderColor = (idx === partIndex) ? 'var(--accent)' : 'var(--border)';
     });
   }
+  if (typeof selectPartRowUI === 'function') {
+    selectPartRowUI(partIndex);
+  }
   if (multiParts[partIndex]) {
     const ch = multiParts[partIndex].values.channel + 1;
     const chEl = document.getElementById('midiChannel');
     if (chEl) chEl.value = String(ch);
     setLastAction(`editing P${partIndex + 1} (ch ${ch})`);
   }
+  if (typeof updateVirusSnowMasterDisplay === 'function') {
+    updateVirusSnowMasterDisplay(partIndex);
+  }
   if (typeof updateKeyboardPartDisplay === 'function') {
     updateKeyboardPartDisplay();
   }
-  requestPartDump(partIndex);
+  if (selectedOutput) {
+    requestPartDump(partIndex);
+  }
 }
 
 function randomizePatch() {
@@ -5355,7 +5374,13 @@ function exportCurrentPatchSyx() {
       btnEdit.textContent = 'modifica';
       btnEdit.title = `Apri P${i + 1} nella vista Multi`;
       btnEdit.addEventListener('click', () => {
-        document.getElementById('btnTabMultipart').click();
+        currentPartIndex = i;
+        window.activeSinglePartIndex = i;
+        const tab = document.getElementById('btnTabMultipart');
+        if (tab) tab.click();
+        if (typeof selectPartRowUI === 'function') selectPartRowUI(i);
+        if (typeof updateVirusSnowMasterDisplay === 'function') updateVirusSnowMasterDisplay(i);
+        if (typeof updateKeyboardPartDisplay === 'function') updateKeyboardPartDisplay();
       });
 
       btnRow.appendChild(btnRead);
@@ -5793,7 +5818,18 @@ function exportCurrentPatchSyx() {
       getValue: () => multiParts[partIndex].values[pp.id],
       setValue: (value, send) => {
         multiParts[partIndex].values[pp.id] = value;
-        if (send) sendMultiPartParam(partIndex, pp.cc, value);
+        if (send) {
+          sendMultiPartParam(partIndex, pp.cc, value);
+          const ch = ((multiParts[partIndex].values.channel || 0) & 0x0F) + 1;
+          if (pp.id === 'volume') {
+            sendCC(ch, 7, value);
+          } else if (pp.id === 'pan') {
+            sendCC(ch, 10, value);
+          }
+        }
+        if (partIndex === currentPartIndex && typeof updateVirusSnowMasterDisplay === 'function') {
+          updateVirusSnowMasterDisplay(partIndex);
+        }
       }
     });
   }
@@ -5803,10 +5839,41 @@ function exportCurrentPatchSyx() {
       label: param.short || param.name,
       default: param.default,
       bipolar: param.bipolar,
-      getValue: () => multiParts[partIndex].sound[param.id],
+      getValue: () => {
+        if (multiParts[partIndex].values && multiParts[partIndex].values[param.id] !== undefined) {
+          return multiParts[partIndex].values[param.id];
+        }
+        return (multiParts[partIndex].sound && multiParts[partIndex].sound[param.id] !== undefined)
+          ? multiParts[partIndex].sound[param.id]
+          : param.default;
+      },
       setValue: (value, send) => {
+        if (!multiParts[partIndex].sound) multiParts[partIndex].sound = {};
         multiParts[partIndex].sound[param.id] = value;
-        if (send) sendPartSoundParam(partIndex, param.cc, value);
+        if (!multiParts[partIndex].values) multiParts[partIndex].values = {};
+        multiParts[partIndex].values[param.id] = value;
+        if (send) {
+          sendPartSoundParam(partIndex, param.cc, value);
+          const ch = ((multiParts[partIndex].values.channel || 0) & 0x0F) + 1;
+          if (param.id === 'f1_cutoff') {
+            sendCC(ch, 40, value);
+            sendCC(ch, 74, value);
+          } else if (param.id === 'f1_resonance') {
+            sendCC(ch, 42, value);
+            sendCC(ch, 71, value);
+          }
+        }
+        if (partIndex === currentPartIndex) {
+          if (typeof state !== 'undefined' && state && state.values) {
+            state.values[param.id] = value;
+          }
+          if (typeof patch !== 'undefined' && patch) {
+            patch[param.id] = value;
+          }
+          if (typeof updateVirusSnowFrontPanel === 'function') {
+            updateVirusSnowFrontPanel(partIndex);
+          }
+        }
       }
     });
   }
@@ -6029,7 +6096,12 @@ function exportCurrentPatchSyx() {
     }, 3000);
 
     wrap.addEventListener('click', () => {
-      requestPartDump(index);
+      currentPartIndex = index;
+      window.activeSinglePartIndex = index;
+      if (typeof selectPartRowUI === 'function') selectPartRowUI(index);
+      if (typeof updateVirusSnowMasterDisplay === 'function') updateVirusSnowMasterDisplay(index);
+      if (typeof updateKeyboardPartDisplay === 'function') updateKeyboardPartDisplay();
+      if (selectedOutput) requestPartDump(index);
     });
 
     wrap.addEventListener('dblclick', (e) => {
@@ -6160,9 +6232,27 @@ function exportCurrentPatchSyx() {
     applyPartMuteSoloState();
   }
 
+  function selectPartRowUI(index) {
+    document.querySelectorAll('.part-row').forEach((r, idx) => {
+      r.classList.toggle('selected-part', idx === index);
+    });
+  }
+
   function auditionPart(index) {
+    if (typeof getAudioContext === 'function') {
+      try {
+        const ctx = getAudioContext();
+        if (ctx && ctx.state === 'suspended') ctx.resume();
+      } catch(e) {}
+    }
+    currentPartIndex = index;
+    window.activeSinglePartIndex = index;
+    selectPartRowUI(index);
+    if (typeof updateVirusSnowMasterDisplay === 'function') updateVirusSnowMasterDisplay(index);
+    if (typeof updateKeyboardPartDisplay === 'function') updateKeyboardPartDisplay();
+
     const part = multiParts[index];
-    const ch = part.values.channel & 0x0F;
+    const ch = (part && part.values && part.values.channel !== undefined) ? (part.values.channel & 0x0F) : index;
     const note = 60; // C3
     const vel = 100;
 
@@ -6753,7 +6843,10 @@ function exportCurrentPatchSyx() {
 
     row.addEventListener('click', () => {
       currentPartIndex = index;
+      window.activeSinglePartIndex = index;
+      selectPartRowUI(index);
       updateVirusSnowMasterDisplay(index);
+      if (typeof updateKeyboardPartDisplay === 'function') updateKeyboardPartDisplay();
     });
 
     // 1. HARDWARE MATRIX & CHANNEL: BADGE + ON/OFF + MUTE + SOLO + MIDI CH
@@ -6996,6 +7089,7 @@ function exportCurrentPatchSyx() {
       });
     }
 
+    selectPartRowUI(currentPartIndex || 0);
     updateVirusSnowMasterDisplay(currentPartIndex || 0);
   }
 
@@ -7032,21 +7126,28 @@ function exportCurrentPatchSyx() {
   });
 
   const multiProgramInput = document.getElementById('multiProgramInput');
-  document.getElementById('btnMultiPrgDown')?.addEventListener('click', () => {
-    if (!multiProgramInput) return;
-    const v = clamp7((parseInt(multiProgramInput.value, 10) || 0) - 1);
-    multiProgramInput.value = String(v);
+  function handleMultiProgramChange(rawVal) {
+    const v = clamp7(rawVal);
+    if (multiProgramInput) multiProgramInput.value = String(v);
     if (selectedOutput) {
       try { selectedOutput.send(buildSysEx(105, v)); } catch(e) {}
     }
+    setLastAction(`multi prg: ${v}`);
+    if (typeof updateVirusSnowMasterDisplay === 'function') {
+      updateVirusSnowMasterDisplay(currentPartIndex || 0);
+    }
+  }
+
+  multiProgramInput?.addEventListener('change', () => {
+    handleMultiProgramChange(parseInt(multiProgramInput.value, 10) || 0);
+  });
+  document.getElementById('btnMultiPrgDown')?.addEventListener('click', () => {
+    if (!multiProgramInput) return;
+    handleMultiProgramChange((parseInt(multiProgramInput.value, 10) || 0) - 1);
   });
   document.getElementById('btnMultiPrgUp')?.addEventListener('click', () => {
     if (!multiProgramInput) return;
-    const v = clamp7((parseInt(multiProgramInput.value, 10) || 0) + 1);
-    multiProgramInput.value = String(v);
-    if (selectedOutput) {
-      try { selectedOutput.send(buildSysEx(105, v)); } catch(e) {}
-    }
+    handleMultiProgramChange((parseInt(multiProgramInput.value, 10) || 0) + 1);
   });
 
   document.getElementById('btnMultiLoad')?.addEventListener('click', () => {
@@ -7057,6 +7158,11 @@ function exportCurrentPatchSyx() {
       try{ selectedOutput.send(buildSysEx(105, v)); } catch(e){ console.error('MIDI send error', e); }
     }
     setLastAction('loaded multi prg ' + v);
+    const statusEl = document.getElementById('quickScanStatus');
+    if (statusEl) statusEl.textContent = `Caricato Multi Program ${v} dal Virus TI`;
+    if (typeof updateVirusSnowMasterDisplay === 'function') {
+      updateVirusSnowMasterDisplay(currentPartIndex || 0);
+    }
   });
 
   document.getElementById('btnMultiSave')?.addEventListener('click', () => {
@@ -7069,6 +7175,8 @@ function exportCurrentPatchSyx() {
       } catch(e){ console.error('MIDI send error', e); }
     }
     setLastAction('saved multi prg ' + v);
+    const statusEl = document.getElementById('quickScanStatus');
+    if (statusEl) statusEl.textContent = `Salvataggio Multi Program ${v} inviato al Virus TI`;
   });
 
   // ---------------------------------------------------------------------
@@ -7748,7 +7856,9 @@ function exportCurrentPatchSyx() {
       : computeSoundProfile(curPart ? curPart.name : '', curPart ? curPart.values.bank : 0, curPart ? curPart.values.program : 0);
 
     const octShift = (profile.octaveOffset || 0) * 12;
-    const transShift = (curPart && curPart.values && curPart.values.transpose !== undefined) ? curPart.values.transpose : 0;
+    const transShift = (curPart && curPart.values && curPart.values.transpose !== undefined)
+      ? (curPart.values.transpose - 64)
+      : 0;
     const finalNote = Math.max(12, Math.min(127, noteNumber + octShift + transShift));
     const freq = 440 * Math.pow(2, (finalNote - 69) / 12);
     const now = ctx.currentTime;
@@ -7772,9 +7882,9 @@ function exportCurrentPatchSyx() {
     filter.type = 'lowpass';
     const rawCutoff = (curPart && curPart.values && curPart.values.f1_cutoff !== undefined)
       ? curPart.values.f1_cutoff
-      : (profile.cutoff || 75);
-    const safeCutoff = Math.max(25, rawCutoff);
-    const baseCutoffHz = Math.max(300, Math.min(17000, 200 + Math.pow(safeCutoff / 127, 2.0) * 15000));
+      : ((curPart && curPart.sound && curPart.sound.f1_cutoff !== undefined) ? curPart.sound.f1_cutoff : (profile.cutoff || 75));
+    const safeCutoff = Math.max(15, rawCutoff);
+    const baseCutoffHz = Math.max(250, Math.min(17500, 180 + Math.pow(safeCutoff / 127, 2.0) * 16000));
     const envMult = 1 + (profile.filterEnvAmount || 0.5) * 1.6;
     const peakCutoffHz = Math.min(18500, baseCutoffHz * envMult);
 
@@ -7784,8 +7894,17 @@ function exportCurrentPatchSyx() {
 
     const rawRes = (curPart && curPart.values && curPart.values.f1_resonance !== undefined)
       ? curPart.values.f1_resonance
-      : (profile.resonance || 25);
-    filter.Q.setValueAtTime(1.2 + (rawRes / 127) * 7.0, now);
+      : ((curPart && curPart.sound && curPart.sound.f1_resonance !== undefined) ? curPart.sound.f1_resonance : (profile.resonance || 25));
+    filter.Q.setValueAtTime(1.0 + (rawRes / 127) * 8.0, now);
+
+    let panner = null;
+    if (typeof ctx.createStereoPanner === 'function') {
+      try {
+        panner = ctx.createStereoPanner();
+        const rawPan = (curPart && curPart.values && curPart.values.pan !== undefined) ? curPart.values.pan : 64;
+        panner.pan.setValueAtTime(Math.max(-1, Math.min(1, (rawPan - 64) / 64)), now);
+      } catch(e) {}
+    }
 
     const osc1 = ctx.createOscillator();
     osc1.type = profile.osc1 || 'sawtooth';
@@ -7798,13 +7917,18 @@ function exportCurrentPatchSyx() {
 
     osc1.connect(filter);
     osc2.connect(filter);
-    filter.connect(gainNode);
+    if (panner) {
+      filter.connect(panner);
+      panner.connect(gainNode);
+    } else {
+      filter.connect(gainNode);
+    }
     gainNode.connect(ctx.destination);
 
     osc1.start(now);
     osc2.start(now);
 
-    activeAudioVoices.set(noteNumber, { osc1, osc2, gainNode, ctx, profile });
+    activeAudioVoices.set(noteNumber, { osc1, osc2, gainNode, filter, panner, ctx, profile });
   }
 
   function stopWebAudioNote(noteNumber) {
@@ -8118,14 +8242,26 @@ function exportCurrentPatchSyx() {
   function setKeyboardDockVisible(show) {
     if (!kbdDock) return;
     if (show) {
-      kbdDock.style.setProperty('display', 'flex', 'important');
-      document.body.classList.add('keyboard-dock-open');
+      if (kbdDock.style && kbdDock.style.setProperty) {
+        kbdDock.style.setProperty('display', 'flex', 'important');
+      } else if (kbdDock.style) {
+        kbdDock.style.display = 'flex';
+      }
+      if (document.body && document.body.classList) {
+        document.body.classList.add('keyboard-dock-open');
+      }
       renderPianoKeys();
     } else {
-      kbdDock.style.setProperty('display', 'none', 'important');
-      document.body.classList.remove('keyboard-dock-open');
+      if (kbdDock.style && kbdDock.style.setProperty) {
+        kbdDock.style.setProperty('display', 'none', 'important');
+      } else if (kbdDock.style) {
+        kbdDock.style.display = 'none';
+      }
+      if (document.body && document.body.classList) {
+        document.body.classList.remove('keyboard-dock-open');
+      }
     }
-    if (btnToggleKbd) btnToggleKbd.classList.toggle('active', !!show);
+    if (btnToggleKbd && btnToggleKbd.classList) btnToggleKbd.classList.toggle('active', !!show);
   }
 
   btnToggleKbd?.addEventListener('click', () => {
