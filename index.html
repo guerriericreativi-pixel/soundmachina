@@ -1544,12 +1544,12 @@
      VIRUS TI SNOW // AUTHENTIC HARDWARE ARPEGGIATOR UX/UI
      ========================================================================== */
   .hardware-chassis.arp-chassis {
-    padding: 24px 28px 140px 28px !important;
-    gap: 12px !important;
-    background: linear-gradient(175deg, #f7f8fa 0%, #e9ebef 55%, #dde0e6 100%) !important;
+    padding: 30px 24px 100px 24px !important;
+    gap: 14px !important;
   }
   html[data-skin="elektron"] .hardware-chassis.arp-chassis {
-    background: linear-gradient(135deg, #252528 0%, #1a1a1c 100%) !important;
+    padding: 30px 24px 100px 24px !important;
+    gap: 14px !important;
   }
 
   .arp-snow-panel {
@@ -2707,8 +2707,8 @@
   }
 
   .hardware-chassis.arp-chassis {
-    padding: 24px 24px 150px 24px;
-    gap: 10px;
+    padding: 30px 24px 100px 24px !important;
+    gap: 14px !important;
   }
 
   .chassis-knob-container {
@@ -10096,35 +10096,20 @@ function exportCurrentPatchSyx() {
         const led = document.getElementById(`arpLedStep${i}`);
         if (led) {
           if (i === step) {
-            led.style.background = '#38bdf8';
-            led.style.boxShadow = '0 0 8px #38bdf8';
+            led.style.background = '#00ffcc';
+            led.style.boxShadow = '0 0 8px #00ffcc';
           } else {
-            led.style.background = '#131720';
+            led.style.background = '#222';
             led.style.boxShadow = 'none';
           }
         }
-        const pad = document.getElementById(`arpStepPad${i}`);
-        if (pad) {
+        const btn = document.getElementById(`arpStepBtn${i}`);
+        if (btn) {
           if (i === step && this.steps[i]) {
-            pad.classList.add('flash');
-            setTimeout(() => pad.classList.remove('flash'), 100);
+            btn.style.filter = 'brightness(1.5)';
+            setTimeout(() => { btn.style.filter = 'none'; }, 90);
           }
         }
-      }
-
-      // Aggiorna LCD Virus TI Snow
-      const beatNum = Math.floor(step / 4) + 1;
-      const subStep = (step % 4) + 1;
-      const stepStr = (step + 1).toString().padStart(2, '0');
-      const stepInfoEl = document.getElementById('arpSnowLcdStep');
-      if (stepInfoEl) {
-        stepInfoEl.textContent = `BEAT ${beatNum}.${subStep} (STEP ${stepStr}/16)`;
-      }
-
-      const bpmLed = document.getElementById('arpSnowLcdBpmLed');
-      if (bpmLed) {
-        bpmLed.style.background = (step % 4 === 0) ? '#ff3b4b' : '#7f1d1d';
-        bpmLed.style.boxShadow = (step % 4 === 0) ? '0 0 8px #ff3b4b' : 'none';
       }
     },
 
@@ -10132,74 +10117,49 @@ function exportCurrentPatchSyx() {
       const btn = document.getElementById('arpBtnPlayStop');
       if (btn) {
         if (this.running) {
-          btn.innerHTML = '<span>⏹</span> STOP ARP';
-          btn.className = 'snow-arp-btn danger';
+          btn.innerHTML = '⏹ stop arp';
+          btn.style.background = '#e06c75';
+          btn.style.borderColor = '#ff4d5a';
+          btn.style.color = '#fff';
+          btn.style.boxShadow = '0 0 12px rgba(224,108,117,0.5)';
         } else {
-          btn.innerHTML = '<span>▶</span> START ARP';
-          btn.className = 'snow-arp-btn primary';
+          btn.innerHTML = '▶ start arp';
+          btn.style.background = '#2bb673';
+          btn.style.borderColor = '#36d382';
+          btn.style.color = '#fff';
+          btn.style.boxShadow = 'none';
         }
       }
 
       const btnHold = document.getElementById('arpBtnHold');
       if (btnHold) {
         if (this.hold) {
-          btnHold.innerHTML = '<span>🔒</span> HOLD: ON';
-          btnHold.className = 'snow-arp-btn active-orange';
+          btnHold.innerHTML = 'hold: on 🔒';
+          btnHold.style.background = 'var(--accent)';
+          btnHold.style.color = '#000';
+          btnHold.style.borderColor = 'var(--accent)';
         } else {
-          btnHold.innerHTML = '<span>🔒</span> HOLD: OFF';
-          btnHold.className = 'snow-arp-btn';
+          btnHold.innerHTML = 'hold: off';
+          btnHold.style.background = '#fff';
+          btnHold.style.color = '#111';
+          btnHold.style.borderColor = '#ccc';
         }
       }
 
-      // Display LCD Virus Snow
-      const lcdStatus = document.getElementById('arpSnowLcdStatus');
-      if (lcdStatus) {
-        lcdStatus.textContent = this.running ? 'RUNNING' : 'STANDBY';
-        lcdStatus.style.color = this.running ? '#eaf3fa' : '#94a3b8';
+      const statusEl = document.getElementById('arpDisplayStatus');
+      if (statusEl) {
+        statusEl.textContent = this.running ? 'RUNNING' : 'STOPPED';
+        statusEl.style.color = this.running ? '#00ffcc' : '#888';
       }
 
-      const lcdCh = document.getElementById('arpSnowLcdChannel');
-      if (lcdCh) {
-        const ch = getActiveMidiChannel() + 1;
-        lcdCh.textContent = `[CH ${ch}]`;
-      }
+      const bpmEl = document.getElementById('arpDisplayBpm');
+      if (bpmEl) bpmEl.textContent = `${this.bpm} BPM`;
 
-      const lcdBpm = document.getElementById('arpSnowLcdBpm');
-      if (lcdBpm) lcdBpm.textContent = `${this.bpm} BPM`;
+      const modeEl = document.getElementById('arpDisplayMode');
+      if (modeEl) modeEl.textContent = this.modes[this.modeIdx];
 
-      const lcdMode = document.getElementById('arpSnowLcdModeName');
-      if (lcdMode) lcdMode.textContent = `${this.modes[this.modeIdx].toUpperCase()} ARPEGGIO`;
-
-      const lcdRate = document.getElementById('arpSnowLcdRate');
-      if (lcdRate) lcdRate.textContent = `DIV: ${this.rates[this.rateIdx].name}`;
-
-      const lcdOct = document.getElementById('arpSnowLcdOct');
-      if (lcdOct) lcdOct.textContent = `OCT: ${this.octaves}`;
-
-      const lcdGate = document.getElementById('arpSnowLcdGate');
-      if (lcdGate) lcdGate.textContent = `GATE: ${this.gatePercent}%`;
-
-      const lcdHold = document.getElementById('arpSnowLcdHold');
-      if (lcdHold) lcdHold.textContent = `HOLD: ${this.hold ? 'ON [LATCH]' : 'OFF'}`;
-
-      // Readouts delle 6 manopole
-      const vBpm = document.getElementById('arpValBpm');
-      if (vBpm) vBpm.textContent = `${this.bpm} BPM`;
-
-      const vMode = document.getElementById('arpValMode');
-      if (vMode) vMode.textContent = this.modes[this.modeIdx];
-
-      const vRate = document.getElementById('arpValRate');
-      if (vRate) vRate.textContent = this.rates[this.rateIdx].name;
-
-      const vOct = document.getElementById('arpValOct');
-      if (vOct) vOct.textContent = `${this.octaves} Oct`;
-
-      const vGate = document.getElementById('arpValGate');
-      if (vGate) vGate.textContent = `${this.gatePercent}%`;
-
-      const vSwing = document.getElementById('arpValSwing');
-      if (vSwing) vSwing.textContent = `${this.swingPercent}%`;
+      const rateEl = document.getElementById('arpDisplayRate');
+      if (rateEl) rateEl.textContent = this.rates[this.rateIdx].name;
     }
   };
 
@@ -10213,506 +10173,259 @@ function exportCurrentPatchSyx() {
     const elektronWrapper = document.createElement('div');
     elektronWrapper.className = 'hardware-chassis arp-chassis';
 
-    // 4 Viti dello chassis Virus TI Snow
+    // 4 Viti dello chassis
     const tlScrew = document.createElement('div'); tlScrew.className = 'chassis-screw screw-tl';
     const trScrew = document.createElement('div'); trScrew.className = 'chassis-screw screw-tr';
     const blScrew = document.createElement('div'); blScrew.className = 'chassis-screw screw-bl';
     const brScrew = document.createElement('div'); brScrew.className = 'chassis-screw screw-br';
+    const logo = document.createElement('div'); logo.className = 'chassis-logo';
+    logo.textContent = 'VIRUS-H LIVE ARPEGGIATOR';
+
     elektronWrapper.appendChild(tlScrew);
     elektronWrapper.appendChild(trScrew);
     elektronWrapper.appendChild(blScrew);
     elektronWrapper.appendChild(brScrew);
-
-    // Intestazione Hardware originale Virus TI Snow
-    const headerRow = document.createElement('div');
-    headerRow.style.cssText = 'width: 100%; max-width: 960px; display: flex; justify-content: space-between; align-items: center; margin-bottom: 2px; padding: 0 4px; box-sizing: border-box;';
-    headerRow.innerHTML = `
-      <div style="font-weight: 900; font-size: 14px; letter-spacing: 0.14em; color: #1e293b; font-family: 'Inter', sans-serif;">
-        VIRUS <span style="font-weight: 300; opacity: 0.4;">|</span> TI SNOW
-      </div>
-      <div style="font-family: monospace; font-size: 10px; font-weight: 800; letter-spacing: 0.15em; color: #475569; text-transform: uppercase;">
-        LIVE ARPEGGIATOR ENGINE // MATRIX CONTROL
-      </div>
-      <div style="font-weight: 900; font-size: 12px; letter-spacing: 0.16em; color: #0f172a; display: flex; align-items: center; gap: 4px;">
-        ❖ access
-      </div>
-    `;
-    elektronWrapper.appendChild(headerRow);
+    elektronWrapper.appendChild(logo);
 
     const innerLayout = document.createElement('div');
-    innerLayout.className = 'arp-snow-panel';
+    innerLayout.style.cssText = 'display: flex; flex-direction: column; gap: 16px; align-items: center; margin-top: 24px; width: 100%; box-sizing: border-box; z-index: 1; padding-bottom: 90px;';
 
     // =========================================================================
-    // 1. FINESTRA ACRILICA CON DISPLAY LCD AZZURRO-GHIACCIO VIRUS TI SNOW
+    // 1. TOP TRANSPORT & DIGITAL LCD DISPLAY
     // =========================================================================
-    const acrylicWin = document.createElement('div');
-    acrylicWin.className = 'snow-front-acrylic-window';
-    acrylicWin.style.maxWidth = '960px';
+    const topBar = document.createElement('div');
+    topBar.style.cssText = 'width: 100%; max-width: 960px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; padding: 10px 16px; background: rgba(0,0,0,0.55); border: 1px solid var(--border); border-radius: 6px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.5); box-sizing: border-box;';
 
-    // 4 Viti cromate della lastra trasparente
-    const s1 = document.createElement('div'); s1.className = 'acrylic-screw'; s1.style.cssText = 'top: 6px; left: 6px;';
-    const s2 = document.createElement('div'); s2.className = 'acrylic-screw'; s2.style.cssText = 'top: 6px; right: 6px;';
-    const s3 = document.createElement('div'); s3.className = 'acrylic-screw'; s3.style.cssText = 'bottom: 6px; left: 6px;';
-    const s4 = document.createElement('div'); s4.className = 'acrylic-screw'; s4.style.cssText = 'bottom: 6px; right: 6px;';
-    acrylicWin.appendChild(s1);
-    acrylicWin.appendChild(s2);
-    acrylicWin.appendChild(s3);
-    acrylicWin.appendChild(s4);
-
-    // Titolo lastra
-    const acrylicHdr = document.createElement('div');
-    acrylicHdr.style.cssText = 'display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; padding: 0 6px;';
-    acrylicHdr.innerHTML = `
-      <div style="display: flex; align-items: center; gap: 6px;">
-        <span id="arpSnowLcdBpmLed" style="width: 7px; height: 7px; border-radius: 50%; background: #ff3b4b; box-shadow: 0 0 6px #ff3b4b; display: inline-block;"></span>
-        <span style="font-size: 8.5px; font-weight: 800; letter-spacing: 0.12em; color: #334155;">BPM / LFO CLOCK</span>
-      </div>
-      <div style="font-size: 8.5px; font-weight: 800; letter-spacing: 0.1em; color: #475569;">
-        HARDWARE REAL-TIME ARP • SYSEX PAGE B
-      </div>
-    `;
-    acrylicWin.appendChild(acrylicHdr);
-
-    // Display LCD Backlit azzurro ghiaccio originale Virus TI Snow
-    const lcdScreen = document.createElement('div');
-    lcdScreen.id = 'arpSnowLcdScreen';
-    lcdScreen.className = 'virus-snow-lcd-front';
-    lcdScreen.style.minHeight = '78px';
-
-    // LCD Header Bar
-    const lcdHdr = document.createElement('div');
-    lcdHdr.className = 'lcd-header-bar';
-    lcdHdr.innerHTML = `
-      <span id="arpSnowLcdBadge" class="lcd-badge">ARP</span>
-      <span id="arpSnowLcdSub" style="letter-spacing: 0.06em; color: #eaf3fa; font-weight: 800;">LIVE 16-STEP SEQUENCER</span>
-      <span style="display: flex; align-items: center; gap: 5px; color: #d7e9f5;">
-        <span id="arpSnowLcdStatus">STANDBY</span>
-        <span id="arpSnowLcdChannel" style="font-weight: 900; background: rgba(255,255,255,0.2); padding: 0 4px; border-radius: 2px;">[CH 1]</span>
-      </span>
-    `;
-    lcdScreen.appendChild(lcdHdr);
-
-    // LCD Big Center Info
-    const lcdCenter = document.createElement('div');
-    lcdCenter.style.cssText = 'display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap; gap: 8px; margin: 3px 0;';
-    lcdCenter.innerHTML = `
-      <div style="display: flex; align-items: baseline; gap: 10px;">
-        <span id="arpSnowLcdBpm" class="lcd-bank-prog" style="font-size: 18px; color: #102a43;">124 BPM</span>
-        <span id="arpSnowLcdModeName" class="lcd-patch-name" style="font-size: 13px; font-weight: 900; color: #1e3a8a;">UP/DOWN ARPEGGIO</span>
-      </div>
-      <div style="display: flex; gap: 12px; font-size: 11px; font-weight: 900; color: #1e293b;">
-        <span id="arpSnowLcdRate">DIV: 1/16</span>
-        <span id="arpSnowLcdOct">OCT: 2</span>
-        <span id="arpSnowLcdGate">GATE: 70%</span>
-      </div>
-    `;
-    lcdScreen.appendChild(lcdCenter);
-
-    // LCD Footer Bar
-    const lcdFooter = document.createElement('div');
-    lcdFooter.className = 'lcd-footer-bar';
-    lcdFooter.style.marginTop = '2px';
-    lcdFooter.innerHTML = `
-      <span id="arpSnowLcdNotes" style="flex: 1; text-align: left; font-weight: 800; color: #0284c7;">NOTES: [ C3 E3 G3 B3 ]</span>
-      <span id="arpSnowLcdStep" style="flex: 1; text-align: center; color: #142434; font-weight: 900;">BEAT 1.1 (STEP 01/16)</span>
-      <span id="arpSnowLcdHold" style="flex: 1; text-align: right; font-weight: 800;">HOLD: OFF</span>
-    `;
-    lcdScreen.appendChild(lcdFooter);
-
-    acrylicWin.appendChild(lcdScreen);
-    innerLayout.appendChild(acrylicWin);
-
-    // =========================================================================
-    // 2. TOOLBAR TRASPORTO HARDWARE & AZIONI RAPIDE VIRUS TI
-    // =========================================================================
-    const transportBar = document.createElement('div');
-    transportBar.style.cssText = 'width: 100%; max-width: 960px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px; background: rgba(255,255,255,0.7); border: 1px solid rgba(180,190,205,0.7); border-radius: 6px; padding: 6px 10px; box-sizing: border-box; box-shadow: 0 1px 3px rgba(0,0,0,0.05);';
-
-    // Left Transport Buttons
-    const leftBtns = document.createElement('div');
-    leftBtns.style.cssText = 'display: flex; align-items: center; gap: 6px;';
+    const transportBox = document.createElement('div');
+    transportBox.style.cssText = 'display: flex; align-items: center; gap: 10px;';
 
     const btnPlayStop = document.createElement('button');
     btnPlayStop.id = 'arpBtnPlayStop';
-    btnPlayStop.className = 'snow-arp-btn primary';
-    btnPlayStop.innerHTML = '<span>▶</span> START ARP';
-    btnPlayStop.title = 'Avvia / Ferma riproduzione in tempo reale';
+    btnPlayStop.style.cssText = 'padding: 8px 18px; font-size: 13px; font-weight: 900; letter-spacing: 0.05em; border-radius: 4px; border: 2px solid #36d382; background: #2bb673; color: #fff; cursor: pointer; transition: all 0.1s; outline: none; user-select: none;';
+    btnPlayStop.innerHTML = '▶ start arp';
+    btnPlayStop.title = 'Avvia / Ferma riproduzione in tempo reale dell\'Arpeggiatore';
     btnPlayStop.addEventListener('click', () => {
       getAudioContext();
       unmuteAndSetVolume(getActiveMidiChannel());
       arpEngine.toggle();
     });
-    leftBtns.appendChild(btnPlayStop);
+    transportBox.appendChild(btnPlayStop);
 
     const btnHold = document.createElement('button');
     btnHold.id = 'arpBtnHold';
-    btnHold.className = 'snow-arp-btn';
-    btnHold.innerHTML = '<span>🔒</span> HOLD: OFF';
-    btnHold.title = 'Modalità Hold / Latch: mantiene attive le note';
+    btnHold.style.cssText = 'padding: 8px 14px; font-size: 11px; font-weight: bold; border-radius: 4px; border: 1px solid #ccc; background: #fff; color: #111; cursor: pointer; outline: none; user-select: none; transition: all 0.1s;';
+    btnHold.textContent = 'hold: off';
+    btnHold.title = 'Modalità Hold / Latch: mantiene attive le note anche se rilasci la tastiera';
     btnHold.addEventListener('click', () => {
       arpEngine.hold = !arpEngine.hold;
+      btnHold.textContent = arpEngine.hold ? 'hold: on 🔒' : 'hold: off';
+      btnHold.style.background = arpEngine.hold ? 'var(--accent)' : '#fff';
+      btnHold.style.color = arpEngine.hold ? '#000' : '#111';
+      btnHold.style.borderColor = arpEngine.hold ? 'var(--accent)' : '#ccc';
       arpEngine.syncHardwareArp();
       arpEngine.updateUI();
-      setLastAction(`Arp Hold: ${arpEngine.hold ? 'ON' : 'OFF'}`);
     });
-    leftBtns.appendChild(btnHold);
+    transportBox.appendChild(btnHold);
 
-    const btnTap = document.createElement('button');
-    btnTap.id = 'arpBtnTap';
-    btnTap.className = 'snow-arp-btn';
-    btnTap.innerHTML = '<span>⏱</span> TAP TEMPO';
-    btnTap.title = 'Clicca a tempo per impostare il BPM';
-    btnTap.addEventListener('click', () => {
-      arpEngine.tapTempo();
-    });
-    leftBtns.appendChild(btnTap);
+    topBar.appendChild(transportBox);
 
-    transportBar.appendChild(leftBtns);
+    // Digital readout status display
+    const lcdDisp = document.createElement('div');
+    lcdDisp.style.cssText = 'background: #0d0f12; border: 2px solid #1f232b; border-radius: 4px; padding: 6px 14px; color: var(--accent); font-family: monospace; font-size: 11px; display: flex; gap: 16px; align-items: center; box-shadow: inset 0 2px 8px rgba(0,0,0,0.8); user-select: none;';
+    lcdDisp.innerHTML = `
+      <div style="color: #666;">STATO: <span id="arpDisplayStatus" style="font-weight: bold; color: #888;">STOPPED</span></div>
+      <div style="color: #666;">TEMPO: <span id="arpDisplayBpm" style="font-weight: bold; color: #fff;">124 BPM</span></div>
+      <div style="color: #666;">MODALITÀ: <span id="arpDisplayMode" style="font-weight: bold; color: #fff;">Up</span></div>
+      <div style="color: #666;">RISOLUZIONE: <span id="arpDisplayRate" style="font-weight: bold; color: var(--accent);">1/16</span></div>
+    `;
+    topBar.appendChild(lcdDisp);
 
-    // Right Pattern Tools
-    const rightBtns = document.createElement('div');
-    rightBtns.style.cssText = 'display: flex; align-items: center; gap: 4px; flex-wrap: wrap;';
-
-    const addActionBtn = (lbl, title, fn) => {
-      const b = document.createElement('button');
-      b.className = 'snow-arp-btn';
-      b.style.cssText = 'padding: 5px 8px; font-size: 10px;';
-      b.textContent = lbl;
-      b.title = title;
-      b.addEventListener('click', fn);
-      rightBtns.appendChild(b);
-    };
-
-    addActionBtn('⌫ CLEAR', 'Azzera tutti gli step', () => arpEngine.clearSteps());
-    addActionBtn('■ ALL ON', 'Attiva tutti i 16 step', () => arpEngine.fillSteps());
-    addActionBtn('⟳ INVERT', 'Inverte gli step accesi e spenti', () => arpEngine.invertSteps());
-    addActionBtn('⚄ RANDOM', 'Genera ritmo casuale', () => arpEngine.randomizeSteps());
-    addActionBtn('◀ SHIFT', 'Sposta a sinistra', () => arpEngine.shiftSteps(-1));
-    addActionBtn('SHIFT ▶', 'Sposta a destra', () => arpEngine.shiftSteps(1));
-
-    transportBar.appendChild(rightBtns);
-    innerLayout.appendChild(transportBar);
+    innerLayout.appendChild(topBar);
 
     // =========================================================================
-    // 3. SEZIONE 6 MANOPOLE ROTATIVE HARDWARE VIRUS TI SNOW CON TACCHE RADIALI
+    // 2. ROTARY HARDWARE KNOBS SECTION
     // =========================================================================
-    const knobsRack = document.createElement('div');
-    knobsRack.className = 'snow-arp-knobs-rack';
-    knobsRack.style.maxWidth = '960px';
+    const knobsGrid = document.createElement('div');
+    knobsGrid.style.cssText = 'display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; width: 100%; max-width: 960px; padding: 12px 14px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; box-sizing: border-box;';
 
-    // Helper per creare una manopola originale Virus TI Snow con Tick Dial
-    function createSnowArpKnob(topLabel, subLabel, valId, initialVal, dataMin, dataMax, getValue, setValue) {
-      const unit = document.createElement('div');
-      unit.className = 'snow-knob-unit';
-
-      const topLbl = document.createElement('span');
-      topLbl.className = 'snow-knob-top-label';
-      topLbl.textContent = topLabel;
-      unit.appendChild(topLbl);
-
-      const dial = document.createElement('div');
-      dial.className = 'knob-tick-dial';
-
-      const knobOuter = document.createElement('div');
-      knobOuter.className = 'chassis-knob-outer snow-front-knob';
-      knobOuter.style.cssText = 'width: 44px; height: 44px; cursor: grab;';
-      knobOuter.title = `${topLabel} - ${subLabel}`;
-
-      const knobInner = document.createElement('div');
-      knobInner.className = 'chassis-knob-inner';
-      knobInner.style.cssText = 'width: 38px; height: 38px;';
-
-      const knobTop = document.createElement('div');
-      knobTop.className = 'chassis-knob-top';
-      knobTop.style.cssText = 'width: 29px; height: 29px;';
-
-      const indContainer = document.createElement('div');
-      indContainer.className = 'chassis-knob-indicator-container';
-      indContainer.style.transform = `rotate(${-135 + ((getValue() / 127) * 270)}deg)`;
-
-      const ind = document.createElement('div');
-      ind.className = 'chassis-knob-indicator';
-      ind.style.cssText = 'height: 9px; width: 2px; top: 1px;';
-
-      indContainer.appendChild(ind);
-      knobTop.appendChild(indContainer);
-      knobInner.appendChild(knobTop);
-      knobOuter.appendChild(knobInner);
-      dial.appendChild(knobOuter);
-      unit.appendChild(dial);
-
-      const subLbl = document.createElement('span');
-      subLbl.className = 'snow-knob-sub-label';
-      subLbl.textContent = subLabel;
-      unit.appendChild(subLbl);
-
-      const valSpan = document.createElement('span');
-      valSpan.id = valId;
-      valSpan.className = 'snow-front-val';
-      valSpan.textContent = initialVal;
-      unit.appendChild(valSpan);
-
-      // Drag interaction
-      let isDragging = false;
-      let startY = 0;
-      let startVal = 0;
-
-      const onMouseDown = (e) => {
-        isDragging = true;
-        startY = e.clientY;
-        startVal = getValue();
-        knobOuter.style.cursor = 'grabbing';
-        document.addEventListener('mousemove', onMouseMove);
-        document.addEventListener('mouseup', onMouseUp);
-        e.preventDefault();
-      };
-
-      const onMouseMove = (e) => {
-        if (!isDragging) return;
-        const delta = (startY - e.clientY) * 1.0;
-        let next = Math.max(0, Math.min(127, Math.round(startVal + delta)));
-        setValue(next);
-        indContainer.style.transform = `rotate(${-135 + ((next / 127) * 270)}deg)`;
-      };
-
-      const onMouseUp = () => {
-        if (!isDragging) return;
-        isDragging = false;
-        knobOuter.style.cursor = 'grab';
-        document.removeEventListener('mousemove', onMouseMove);
-        document.removeEventListener('mouseup', onMouseUp);
-      };
-
-      knobOuter.addEventListener('mousedown', onMouseDown);
-
-      return { unit, knobOuter, indContainer, valSpan };
-    }
-
-    // 1. TEMPO (BPM)
-    const bpmKnob = createSnowArpKnob(
-      'TEMPO',
-      'BPM CLOCK',
-      'arpValBpm',
-      `${arpEngine.bpm} BPM`,
-      40, 240,
-      () => Math.round(((arpEngine.bpm - 40) / 200) * 127),
-      (v) => {
+    // Knob 1: BPM / TEMPO
+    const bpmKnob = createKnobGeneric({
+      label: 'TEMPO (BPM)',
+      default: 124,
+      bipolar: false,
+      getValue: () => Math.round(((arpEngine.bpm - 40) / 200) * 127),
+      setValue: (v) => {
         const val = Math.round(40 + (v / 127) * 200);
         arpEngine.bpm = val;
-        bpmKnob.valSpan.textContent = `${val} BPM`;
-        arpEngine.updateUI();
+        const disp = document.getElementById('arpDisplayBpm');
+        if (disp) disp.textContent = `${val} BPM`;
       }
-    );
-    arpEngine.onBpmChange = (newBpm) => {
-      bpmKnob.valSpan.textContent = `${newBpm} BPM`;
-      const val = Math.round(((newBpm - 40) / 200) * 127);
-      bpmKnob.indContainer.style.transform = `rotate(${-135 + ((val / 127) * 270)}deg)`;
-    };
-    knobsRack.appendChild(bpmKnob.unit);
+    });
+    knobsGrid.appendChild(bpmKnob);
 
-    // 2. ARP MODE
-    const modeKnob = createSnowArpKnob(
-      'ARP MODE',
-      'NOTE ORDER',
-      'arpValMode',
-      arpEngine.modes[arpEngine.modeIdx],
-      0, 6,
-      () => Math.round((arpEngine.modeIdx / 6) * 127),
-      (v) => {
+    // Knob 2: MODE (Off, Up, Down, Up/Dn, As Ply, Rand, Chord)
+    const modeKnob = createKnobGeneric({
+      label: 'ARP MODE',
+      default: Math.round((arpEngine.modeIdx / 6) * 127),
+      bipolar: false,
+      getValue: () => Math.round((arpEngine.modeIdx / 6) * 127),
+      setValue: (v) => {
         const idx = Math.min(6, Math.max(0, Math.round((v / 127) * 6)));
         arpEngine.modeIdx = idx;
-        modeKnob.valSpan.textContent = arpEngine.modes[idx];
+        const name = arpEngine.modes[idx];
+        const disp = document.getElementById('arpDisplayMode');
+        if (disp) disp.textContent = name;
         arpEngine.syncHardwareArp();
-        arpEngine.updateUI();
       }
-    );
-    knobsRack.appendChild(modeKnob.unit);
+    });
+    knobsGrid.appendChild(modeKnob);
 
-    // 3. RESOLUTION / RATE
-    const rateKnob = createSnowArpKnob(
-      'RESOLUTION',
-      'STEP DIVIDER',
-      'arpValRate',
-      arpEngine.rates[arpEngine.rateIdx].name,
-      0, 5,
-      () => Math.round((arpEngine.rateIdx / 5) * 127),
-      (v) => {
+    // Knob 3: RATE / RESOLUTION (1/4, 1/8, 1/8T, 1/16, 1/16T, 1/32)
+    const rateKnob = createKnobGeneric({
+      label: 'RESOLUTION',
+      default: Math.round((arpEngine.rateIdx / 5) * 127),
+      bipolar: false,
+      getValue: () => Math.round((arpEngine.rateIdx / 5) * 127),
+      setValue: (v) => {
         const idx = Math.min(5, Math.max(0, Math.round((v / 127) * 5)));
         arpEngine.rateIdx = idx;
-        rateKnob.valSpan.textContent = arpEngine.rates[idx].name;
-        arpEngine.updateUI();
+        const name = arpEngine.rates[idx].name;
+        const disp = document.getElementById('arpDisplayRate');
+        if (disp) disp.textContent = name;
       }
-    );
-    knobsRack.appendChild(rateKnob.unit);
+    });
+    knobsGrid.appendChild(rateKnob);
 
-    // 4. OCTAVES
-    const octKnob = createSnowArpKnob(
-      'OCTAVES',
-      'OCTAVE RANGE',
-      'arpValOct',
-      `${arpEngine.octaves} Oct`,
-      1, 4,
-      () => Math.round(((arpEngine.octaves - 1) / 3) * 127),
-      (v) => {
+    // Knob 4: OCTAVES (1, 2, 3, 4)
+    const octKnob = createKnobGeneric({
+      label: 'OCTAVES',
+      default: Math.round(((arpEngine.octaves - 1) / 3) * 127),
+      bipolar: false,
+      getValue: () => Math.round(((arpEngine.octaves - 1) / 3) * 127),
+      setValue: (v) => {
         const oct = 1 + Math.min(3, Math.max(0, Math.round((v / 127) * 3)));
         arpEngine.octaves = oct;
-        octKnob.valSpan.textContent = `${oct} Oct`;
         arpEngine.syncHardwareArp();
-        arpEngine.updateUI();
       }
-    );
-    knobsRack.appendChild(octKnob.unit);
+    });
+    knobsGrid.appendChild(octKnob);
 
-    // 5. GATE LENGTH
-    const gateKnob = createSnowArpKnob(
-      'GATE LENGTH',
-      'NOTE DURATION',
-      'arpValGate',
-      `${arpEngine.gatePercent}%`,
-      10, 100,
-      () => Math.round((arpEngine.gatePercent / 100) * 127),
-      (v) => {
+    // Knob 5: GATE LENGTH (10%..100%)
+    const gateKnob = createKnobGeneric({
+      label: 'GATE LENGTH',
+      default: arpEngine.gatePercent,
+      bipolar: false,
+      getValue: () => Math.round((arpEngine.gatePercent / 100) * 127),
+      setValue: (v) => {
         const g = Math.max(10, Math.min(100, Math.round((v / 127) * 100)));
         arpEngine.gatePercent = g;
-        gateKnob.valSpan.textContent = `${g}%`;
-        arpEngine.updateUI();
       }
-    );
-    knobsRack.appendChild(gateKnob.unit);
+    });
+    knobsGrid.appendChild(gateKnob);
 
-    // 6. SWING
-    const swingKnob = createSnowArpKnob(
-      'SWING',
-      'GROOVE SHUFFLE',
-      'arpValSwing',
-      `${arpEngine.swingPercent}%`,
-      0, 75,
-      () => Math.round((arpEngine.swingPercent / 75) * 127),
-      (v) => {
+    // Knob 6: SWING (0%..75%)
+    const swingKnob = createKnobGeneric({
+      label: 'SWING',
+      default: 0,
+      bipolar: false,
+      getValue: () => Math.round((arpEngine.swingPercent / 75) * 127),
+      setValue: (v) => {
         const s = Math.round((v / 127) * 75);
         arpEngine.swingPercent = s;
-        swingKnob.valSpan.textContent = `${s}%`;
-        arpEngine.updateUI();
       }
-    );
-    knobsRack.appendChild(swingKnob.unit);
+    });
+    knobsGrid.appendChild(swingKnob);
 
-    innerLayout.appendChild(knobsRack);
-
-    // =========================================================================
-    // 4. SEQUENCER RITMICO 16 STEP (4 BEAT GROUPS - ZERO OVERFLOW)
-    // =========================================================================
-    const seqRack = document.createElement('div');
-    seqRack.className = 'snow-arp-seq-rack';
-    seqRack.style.maxWidth = '960px';
-
-    const seqHdr = document.createElement('div');
-    seqHdr.style.cssText = 'display: flex; justify-content: space-between; align-items: center; font-size: 10px; font-weight: 800; letter-spacing: 0.1em; color: #94a3b8; font-family: monospace; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 4px;';
-    seqHdr.innerHTML = `
-      <span>16-STEP RHYTHMIC GATE SEQUENCER (GROOVE MATRIX)</span>
-      <span style="color: #38bdf8;">LIVE PLAYHEAD ACTIVE</span>
-    `;
-    seqRack.appendChild(seqHdr);
-
-    const beatsContainer = document.createElement('div');
-    beatsContainer.style.cssText = 'display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; width: 100%; box-sizing: border-box;';
-
-    for (let beat = 0; beat < 4; beat++) {
-      const beatCol = document.createElement('div');
-      beatCol.className = 'snow-arp-beat-col';
-
-      const beatHeader = document.createElement('div');
-      beatHeader.style.cssText = 'font-size: 8.5px; font-weight: 800; letter-spacing: 0.12em; color: #64748b; text-align: center; font-family: monospace;';
-      beatHeader.textContent = `BEAT ${beat + 1}`;
-      beatCol.appendChild(beatHeader);
-
-      const beatSteps = document.createElement('div');
-      beatSteps.style.cssText = 'display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; width: 100%; box-sizing: border-box;';
-
-      for (let s = 0; s < 4; s++) {
-        const stepIndex = beat * 4 + s;
-        const stepUnit = document.createElement('div');
-        stepUnit.style.cssText = 'display: flex; flex-direction: column; align-items: center; gap: 3px; box-sizing: border-box; width: 100%;';
-
-        // LED
-        const led = document.createElement('div');
-        led.id = `arpLedStep${stepIndex}`;
-        led.style.cssText = 'width: 6px; height: 6px; border-radius: 50%; background: #131720; border: 1px solid #000; transition: background 0.04s, box-shadow 0.04s;';
-        stepUnit.appendChild(led);
-
-        // Pad
-        const pad = document.createElement('button');
-        pad.id = `arpStepPad${stepIndex}`;
-        pad.className = 'snow-arp-pad';
-        if (arpEngine.steps[stepIndex]) {
-          pad.classList.add('active');
-        }
-        pad.textContent = String(stepIndex + 1);
-        pad.title = `Step ${stepIndex + 1}: ${arpEngine.steps[stepIndex] ? 'ATTIVO (ON)' : 'PAUSA (OFF)'}`;
-
-        pad.addEventListener('click', () => {
-          arpEngine.steps[stepIndex] = !arpEngine.steps[stepIndex];
-          const on = arpEngine.steps[stepIndex];
-          if (on) pad.classList.add('active');
-          else pad.classList.remove('active');
-          pad.title = `Step ${stepIndex + 1}: ${on ? 'ATTIVO (ON)' : 'PAUSA (OFF)'}`;
-        });
-        stepUnit.appendChild(pad);
-
-        // Metrica
-        const met = document.createElement('span');
-        met.style.cssText = 'font-size: 7.5px; color: #475569; font-family: monospace;';
-        met.textContent = `${beat + 1}.${s + 1}`;
-        stepUnit.appendChild(met);
-
-        beatSteps.appendChild(stepUnit);
-      }
-
-      beatCol.appendChild(beatSteps);
-      beatsContainer.appendChild(beatCol);
-    }
-    seqRack.appendChild(beatsContainer);
+    innerLayout.appendChild(knobsGrid);
 
     // =========================================================================
-    // 5. BARRA DEI PRESET MUSICALI
+    // 3. 16-STEP VISUAL PATTERN SEQUENCER (ZERO OVERFLOW, PERFECT FIT)
     // =========================================================================
-    const presetsRow = document.createElement('div');
-    presetsRow.style.cssText = 'display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px; padding-top: 6px; border-top: 1px solid rgba(255,255,255,0.06); width: 100%; box-sizing: border-box;';
+    const seqSection = document.createElement('div');
+    seqSection.style.cssText = 'width: 100%; max-width: 960px; display: flex; flex-direction: column; align-items: center; gap: 12px; background: rgba(0,0,0,0.5); border: 1px solid var(--border); border-radius: 6px; padding: 16px 18px; box-sizing: border-box;';
 
-    const presetLabel = document.createElement('span');
-    presetLabel.style.cssText = 'font-size: 9px; font-weight: 800; color: #64748b; font-family: monospace; letter-spacing: 0.08em;';
-    presetLabel.textContent = 'FACTORY GROOVE PRESETS:';
-    presetsRow.appendChild(presetLabel);
+    const seqHeader = document.createElement('div');
+    seqHeader.style.cssText = 'width: 100%; display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: bold; letter-spacing: 0.08em; color: var(--accent); font-family: monospace; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px;';
+    seqHeader.innerHTML = `<span>16-STEP RHYTHM PATTERN (CLICCA PER ATTIVARE/DISATTIVARE GLI STEP)</span><span style="color: #888;">CURSORE TEMPO REALE</span>`;
+    seqSection.appendChild(seqHeader);
 
-    const presetBtns = document.createElement('div');
-    presetBtns.style.cssText = 'display: flex; gap: 4px; flex-wrap: wrap; align-items: center;';
+    const stepsRow = document.createElement('div');
+    stepsRow.style.cssText = 'display: grid; grid-template-columns: repeat(16, minmax(0, 1fr)); gap: 5px; width: 100%; box-sizing: border-box;';
 
-    const addPreset = (name, arr) => {
-      const b = document.createElement('button');
-      b.className = 'snow-arp-btn';
-      b.style.cssText = 'padding: 3px 7px; font-size: 9.5px; background: rgba(255,255,255,0.1); color: #cbd5e1; border-color: rgba(255,255,255,0.15);';
-      b.textContent = name;
-      b.addEventListener('click', () => {
-        arpEngine.applyPreset(arr);
-        setLastAction(`Preset Arp: ${name}`);
+    for (let i = 0; i < 16; i++) {
+      const col = document.createElement('div');
+      col.style.cssText = 'display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 0; box-sizing: border-box;';
+
+      // Indicator LED
+      const led = document.createElement('div');
+      led.id = `arpLedStep${i}`;
+      led.style.cssText = 'width: 9px; height: 9px; border-radius: 50%; background: #222; border: 1px solid #111; transition: background 0.04s, box-shadow 0.04s;';
+      col.appendChild(led);
+
+      // Step Button (Outline none evita il bordo blu visto nello screenshot)
+      const stepBtn = document.createElement('button');
+      stepBtn.id = `arpStepBtn${i}`;
+      const isActive = arpEngine.steps[i];
+      const isQuarter = (i % 4 === 0);
+      stepBtn.style.cssText = `width: 100%; height: 38px; border-radius: 4px; font-family: monospace; font-size: 11px; font-weight: 800; cursor: pointer; transition: all 0.1s; outline: none; border: 1px solid ${isQuarter ? '#666' : '#333'}; ${isActive ? 'background: var(--accent); color: #000; box-shadow: 0 0 6px var(--accent);' : 'background: #18181f; color: #555;'}`;
+      stepBtn.textContent = String(i + 1);
+      stepBtn.title = `Step ${i + 1}: ${isActive ? 'ATTIVO' : 'PAUSA'} (Clicca per cambiare)`;
+
+      stepBtn.addEventListener('click', () => {
+        arpEngine.steps[i] = !arpEngine.steps[i];
+        const on = arpEngine.steps[i];
+        stepBtn.style.background = on ? 'var(--accent)' : '#18181f';
+        stepBtn.style.color = on ? '#000' : '#555';
+        stepBtn.style.boxShadow = on ? '0 0 6px var(--accent)' : 'none';
+        stepBtn.title = `Step ${i + 1}: ${on ? 'ATTIVO' : 'PAUSA'}`;
       });
-      presetBtns.appendChild(b);
+
+      col.appendChild(stepBtn);
+      stepsRow.appendChild(col);
+    }
+    seqSection.appendChild(stepsRow);
+
+    // =========================================================================
+    // 4. PATTERN PRESETS TOOLBAR (PULSANTI BIANCHI ORIGINALI ALLINEATI)
+    // =========================================================================
+    const patternTools = document.createElement('div');
+    patternTools.style.cssText = 'display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; justify-content: center; width: 100%; box-sizing: border-box;';
+
+    const setPattern = (patternArr) => {
+      for (let i = 0; i < 16; i++) {
+        arpEngine.steps[i] = !!patternArr[i];
+        const btn = document.getElementById(`arpStepBtn${i}`);
+        if (btn) {
+          const on = arpEngine.steps[i];
+          btn.style.background = on ? 'var(--accent)' : '#18181f';
+          btn.style.color = on ? '#000' : '#555';
+          btn.style.boxShadow = on ? '0 0 6px var(--accent)' : 'none';
+        }
+      }
     };
 
-    addPreset('4-ON-FLOOR', [true,false,false,false, true,false,false,false, true,false,false,false, true,false,false,false]);
-    addPreset('STRAIGHT 8ths', [true,false,true,false, true,false,true,false, true,false,true,false, true,false,true,false]);
-    addPreset('OFFBEAT', [false,true,false,true, false,true,false,true, false,true,false,true, false,true,false,true]);
-    addPreset('TRANCE DRIVE', [true,true,false,true, true,false,true,true, false,true,true,false, true,true,false,true]);
-    addPreset('ACID 303', [true,false,true,true, false,true,true,false, true,false,true,true, true,false,false,true]);
-    addPreset('EUCLIDEAN 5', [true,false,false,true, false,false,true,false, false,true,false,false, true,false,false,false]);
+    const addPresetBtn = (label, arr) => {
+      const b = document.createElement('button');
+      b.style.cssText = 'font-size: 10.5px; font-weight: bold; font-family: sans-serif; padding: 6px 12px; background: #fff; color: #111; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; outline: none; transition: background 0.1s; user-select: none; box-shadow: 0 1px 2px rgba(0,0,0,0.15);';
+      b.textContent = label;
+      b.addEventListener('mouseenter', () => b.style.background = '#f0f0f0');
+      b.addEventListener('mouseleave', () => b.style.background = '#fff');
+      b.addEventListener('click', () => setPattern(arr));
+      patternTools.appendChild(b);
+    };
 
-    presetsRow.appendChild(presetBtns);
-    seqRack.appendChild(presetsRow);
+    addPresetBtn('tutti on (16/16)', new Array(16).fill(true));
+    addPresetBtn('4 sui 4 battiti', [true,false,false,false, true,false,false,false, true,false,false,false, true,false,false,false]);
+    addPresetBtn('ottavi (8/16)', [true,false,true,false, true,false,true,false, true,false,true,false, true,false,true,false]);
+    addPresetBtn('offbeat (sincopati)', [false,true,false,true, false,true,false,true, false,true,false,true, false,true,false,true]);
+    addPresetBtn('trance pattern', [true,true,false,true, true,false,true,true, false,true,true,false, true,true,false,true]);
+    addPresetBtn('acid shuffle', [true,false,true,true, false,true,true,false, true,false,true,true, true,false,false,true]);
 
-    innerLayout.appendChild(seqRack);
+    seqSection.appendChild(patternTools);
+    innerLayout.appendChild(seqSection);
+
     elektronWrapper.appendChild(innerLayout);
 
-    // Striscia in legno inferiore
     const woodStrip = document.createElement('div');
     woodStrip.className = 'chassis-wood-strip';
     elektronWrapper.appendChild(woodStrip);
