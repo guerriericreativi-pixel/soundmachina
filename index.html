@@ -8243,6 +8243,11 @@ function exportCurrentPatchSyx() {
   }
 
   function playNote(noteNumber, velocity = currentVelocity) {
+    if (window.arpEngine && window.arpEngine.running) {
+      window.arpEngine.noteDown(noteNumber);
+      return;
+    }
+
     getAudioContext();
     if (activeNotes.has(noteNumber)) {
       stopNote(noteNumber);
@@ -8271,6 +8276,11 @@ function exportCurrentPatchSyx() {
   }
 
   function stopNote(noteNumber) {
+    if (window.arpEngine && window.arpEngine.running) {
+      window.arpEngine.noteUp(noteNumber);
+      return;
+    }
+
     if (!activeNotes.has(noteNumber)) return;
     activeNotes.delete(noteNumber);
 
@@ -8576,8 +8586,283 @@ function exportCurrentPatchSyx() {
     }, 600);
   });
 
+  // ---------------------------------------------------------------------
+  // Interactive Live Arpeggiator Engine (Hardware Virus TI & Web Audio)
+  // ---------------------------------------------------------------------
+  const arpEngine = {
+    running: false,
+    timerId: null,
+    bpm: 124,
+    rateIdx: 3, // default 1/16
+    rates: [
+      { name: '1/4', mult: 1 },
+      { name: '1/8', mult: 0.5 },
+      { name: '1/8T', mult: 0.3333 },
+      { name: '1/16', mult: 0.25 },
+      { name: '1/16T', mult: 0.1667 },
+      { name: '1/32', mult: 0.125 }
+    ],
+    modeIdx: 1, // default Up
+    modes: ['Off', 'Up', 'Down', 'Up/Dn', 'As Ply', 'Rand', 'Chord'],
+    octaves: 2, // 1..4
+    gatePercent: 70, // 10%..100%
+    swingPercent: 0, // 0%..75%
+    hold: false,
+    currentStep: 0,
+    steps: [true, true, true, true, true, true, true, true, true, true, true, true, true, true, true, true],
+    heldNotes: [],
+    latchNotes: [60, 64, 67, 72], // C major default
+    cycleIndex: 0,
+    upDownDir: 1,
+    activeNotesPlaying: new Set(),
+
+    toggle() {
+      if (this.running) this.stop();
+      else this.start();
+    },
+
+    start() {
+      if (this.running) return;
+      this.running = true;
+      this.currentStep = 0;
+      this.cycleIndex = 0;
+      this.upDownDir = 1;
+      this.syncHardwareArp();
+      this.scheduleNextTick();
+      this.updateUI();
+      const ch = getActiveMidiChannel();
+      setLastAction(`Arp START (BPM ${this.bpm}, ch ${ch + 1})`);
+      const dbg = document.getElementById('midi-debug');
+      if (dbg) dbg.innerHTML = `<span style="color:#00ffcc;">▶ ARP ATTIVO: ${this.bpm} BPM | Rate: ${this.rates[this.rateIdx].name} | Ch ${ch + 1}</span>`;
+    },
+
+    stop() {
+      if (!this.running) return;
+      this.running = false;
+      if (this.timerId) {
+        clearTimeout(this.timerId);
+        this.timerId = null;
+      }
+      this.activeNotesPlaying.forEach(n => this.rawStop(n));
+      this.activeNotesPlaying.clear();
+      this.currentStep = 0;
+      this.updateUI();
+      setLastAction('Arp STOPPED');
+      const dbg = document.getElementById('midi-debug');
+      if (dbg) dbg.innerHTML = `<span style="color:#aaa;">⏹ ARP FERMATO</span>`;
+    },
+
+    getStepMs() {
+      const beatMs = 60000 / Math.max(40, Math.min(260, this.bpm));
+      return beatMs * this.rates[this.rateIdx].mult;
+    },
+
+    scheduleNextTick() {
+      if (!this.running) return;
+      const stepMs = this.getStepMs();
+      let delay = stepMs;
+      if (this.swingPercent > 0 && (this.currentStep % 2 === 1)) {
+        delay += stepMs * (this.swingPercent / 100) * 0.33;
+      }
+      this.timerId = setTimeout(() => {
+        this.tick();
+        this.scheduleNextTick();
+      }, Math.max(20, delay));
+    },
+
+    tick() {
+      if (!this.running) return;
+
+      // Spegni le note dello step precedente
+      this.activeNotesPlaying.forEach(n => this.rawStop(n));
+      this.activeNotesPlaying.clear();
+
+      const step = this.currentStep;
+      this.highlightStepUI(step);
+
+      if (this.steps[step]) {
+        const notes = this.calcStepNotes();
+        const gateMs = Math.max(25, (this.getStepMs() * (this.gatePercent / 100)) - 12);
+        const vel = (step % 4 === 0) ? 115 : 95;
+
+        notes.forEach(noteNum => {
+          this.rawPlay(noteNum, vel);
+          this.activeNotesPlaying.add(noteNum);
+          setTimeout(() => {
+            if (this.activeNotesPlaying.has(noteNum)) {
+              this.rawStop(noteNum);
+              this.activeNotesPlaying.delete(noteNum);
+            }
+          }, gateMs);
+        });
+      }
+
+      this.currentStep = (this.currentStep + 1) % 16;
+    },
+
+    calcStepNotes() {
+      let pool = this.heldNotes.length > 0 ? [...this.heldNotes] : [...this.latchNotes];
+      if (pool.length === 0) pool = [60, 64, 67, 72];
+
+      const mode = this.modes[this.modeIdx];
+      if (mode === 'Off') return [];
+
+      let fullPool = [];
+      for (let oct = 0; oct < this.octaves; oct++) {
+        pool.forEach(n => {
+          const on = n + (oct * 12);
+          if (on <= 127) fullPool.push(on);
+        });
+      }
+
+      if (mode === 'Chord') return fullPool;
+
+      if (mode === 'Up') {
+        fullPool.sort((a, b) => a - b);
+        const n = fullPool[this.cycleIndex % fullPool.length];
+        this.cycleIndex++;
+        return [n];
+      }
+
+      if (mode === 'Down') {
+        fullPool.sort((a, b) => b - a);
+        const n = fullPool[this.cycleIndex % fullPool.length];
+        this.cycleIndex++;
+        return [n];
+      }
+
+      if (mode === 'Up/Dn') {
+        fullPool.sort((a, b) => a - b);
+        if (fullPool.length <= 1) return [fullPool[0]];
+        const n = fullPool[this.cycleIndex];
+        this.cycleIndex += this.upDownDir;
+        if (this.cycleIndex >= fullPool.length - 1) {
+          this.cycleIndex = fullPool.length - 1;
+          this.upDownDir = -1;
+        } else if (this.cycleIndex <= 0) {
+          this.cycleIndex = 0;
+          this.upDownDir = 1;
+        }
+        return [n];
+      }
+
+      if (mode === 'Rand') {
+        return [fullPool[Math.floor(Math.random() * fullPool.length)]];
+      }
+
+      // As Ply
+      const n = fullPool[this.cycleIndex % fullPool.length];
+      this.cycleIndex++;
+      return [n];
+    },
+
+    rawPlay(noteNumber, velocity) {
+      if (webAudioEnabled) {
+        playWebAudioNote(noteNumber, velocity);
+      }
+      if (selectedOutput) {
+        const ch = getActiveMidiChannel();
+        try {
+          selectedOutput.send(new Uint8Array([0x90 | ch, noteNumber & 0x7F, velocity & 0x7F]));
+        } catch(e) {}
+      }
+      highlightPianoKey(noteNumber, true);
+    },
+
+    rawStop(noteNumber) {
+      if (webAudioEnabled) {
+        stopWebAudioNote(noteNumber);
+      }
+      if (selectedOutput) {
+        const ch = getActiveMidiChannel();
+        try {
+          selectedOutput.send(new Uint8Array([0x80 | ch, noteNumber & 0x7F, 0]));
+        } catch(e) {}
+      }
+      highlightPianoKey(noteNumber, false);
+    },
+
+    noteDown(n) {
+      if (!this.heldNotes.includes(n)) {
+        this.heldNotes.push(n);
+        this.latchNotes = [...this.heldNotes];
+      }
+      if (!this.running && this.modes[this.modeIdx] !== 'Off') {
+        this.start();
+      }
+    },
+
+    noteUp(n) {
+      const idx = this.heldNotes.indexOf(n);
+      if (idx !== -1) {
+        this.heldNotes.splice(idx, 1);
+      }
+    },
+
+    syncHardwareArp() {
+      if (!selectedOutput) return;
+      try {
+        const modeVal = this.modeIdx;
+        const octVal = Math.max(0, this.octaves - 1);
+        const holdVal = this.hold ? 1 : 0;
+        // SysEx Page B (cmd 0x01, page 0x01): param 78=Mode, 81=Octaves, 84=Hold
+        selectedOutput.send(new Uint8Array([...SYSEX_PREFIX, deviceId(), 0x01, 0x01, 78, modeVal, 0xF7]));
+        selectedOutput.send(new Uint8Array([...SYSEX_PREFIX, deviceId(), 0x01, 0x01, 81, octVal, 0xF7]));
+        selectedOutput.send(new Uint8Array([...SYSEX_PREFIX, deviceId(), 0x01, 0x01, 84, holdVal, 0xF7]));
+      } catch(e) {}
+    },
+
+    highlightStepUI(step) {
+      for (let i = 0; i < 16; i++) {
+        const led = document.getElementById(`arpLedStep${i}`);
+        if (led) {
+          if (i === step) {
+            led.style.background = '#00ffcc';
+            led.style.boxShadow = '0 0 10px #00ffcc';
+          } else {
+            led.style.background = '#222';
+            led.style.boxShadow = 'none';
+          }
+        }
+      }
+    },
+
+    updateUI() {
+      const btn = document.getElementById('arpBtnPlayStop');
+      if (btn) {
+        if (this.running) {
+          btn.innerHTML = '⏹ STOP ARP';
+          btn.style.background = '#e06c75';
+          btn.style.color = '#fff';
+          btn.style.borderColor = '#ff4d5a';
+          btn.style.boxShadow = '0 0 14px rgba(224,108,117,0.5)';
+        } else {
+          btn.innerHTML = '▶ START ARP';
+          btn.style.background = '#2bb673';
+          btn.style.color = '#fff';
+          btn.style.borderColor = '#36d382';
+          btn.style.boxShadow = '0 0 14px rgba(43,182,115,0.4)';
+        }
+      }
+      const statusEl = document.getElementById('arpDisplayStatus');
+      if (statusEl) {
+        statusEl.textContent = this.running ? 'RUNNING' : 'STOPPED';
+        statusEl.style.color = this.running ? '#00ffcc' : '#888';
+      }
+      const bpmEl = document.getElementById('arpDisplayBpm');
+      if (bpmEl) bpmEl.textContent = `${this.bpm} BPM`;
+      const modeEl = document.getElementById('arpDisplayMode');
+      if (modeEl) modeEl.textContent = this.modes[this.modeIdx];
+      const rateEl = document.getElementById('arpDisplayRate');
+      if (rateEl) rateEl.textContent = this.rates[this.rateIdx].name;
+    }
+  };
+
+  window.arpEngine = arpEngine;
+
   function buildArpView() {
     const root = document.getElementById('arpContent');
+    if (!root) return;
     root.innerHTML = '';
 
     const elektronWrapper = document.createElement('div');
@@ -8588,7 +8873,7 @@ function exportCurrentPatchSyx() {
     const blScrew = document.createElement('div'); blScrew.className = 'chassis-screw screw-bl';
     const brScrew = document.createElement('div'); brScrew.className = 'chassis-screw screw-br';
     const logo = document.createElement('div'); logo.className = 'chassis-logo';
-    logo.textContent = 'VIRUS-H ARP';
+    logo.textContent = 'VIRUS-H LIVE ARPEGGIATOR';
 
     elektronWrapper.appendChild(tlScrew);
     elektronWrapper.appendChild(trScrew);
@@ -8598,176 +8883,247 @@ function exportCurrentPatchSyx() {
 
     const innerLayout = document.createElement('div');
     innerLayout.style.display = 'flex';
-    innerLayout.style.flexDirection = 'row';
-    innerLayout.style.gap = '60px';
-    innerLayout.style.alignItems = 'flex-start';
-    innerLayout.style.justifyContent = 'center';
-    innerLayout.style.flexWrap = 'wrap';
-    innerLayout.style.marginTop = '40px';
+    innerLayout.style.flexDirection = 'column';
+    innerLayout.style.gap = '20px';
+    innerLayout.style.alignItems = 'center';
+    innerLayout.style.marginTop = '36px';
     innerLayout.style.width = '100%';
     innerLayout.style.zIndex = '1';
 
-    // Helper for ARP Discrete controls mapped to Knobs
-    function createArpDiscreteKnob(label, options, ccIndex) {
-      let currentIdx = 0;
+    // 1. TOP TRANSPORT & DIGITAL LCD DISPLAY
+    const topBar = document.createElement('div');
+    topBar.style.cssText = 'width: 100%; max-width: 960px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 14px; padding: 12px 18px; background: rgba(0,0,0,0.55); border: 1px solid var(--border); border-radius: 6px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.5);';
 
-      const knobContainer = createKnobGeneric({
-        label: label,
-        default: 0,
-        bipolar: false,
-        getValue: () => Math.round((currentIdx / (options.length - 1)) * 127),
-        setValue: (v, send) => {
-          let step = Math.round((v / 127) * (options.length - 1));
-          if(step >= options.length) step = options.length - 1;
-          currentIdx = step;
+    const transportBox = document.createElement('div');
+    transportBox.style.cssText = 'display: flex; align-items: center; gap: 10px;';
 
-          const labelEl = knobContainer.querySelector('.chassis-knob-label');
-          if(labelEl) labelEl.textContent = label + ': ' + options[step].name;
+    const btnPlayStop = document.createElement('button');
+    btnPlayStop.id = 'arpBtnPlayStop';
+    btnPlayStop.style.cssText = 'padding: 8px 18px; font-size: 13px; font-weight: 900; letter-spacing: 0.05em; border-radius: 4px; border: 2px solid #36d382; background: #2bb673; color: #fff; cursor: pointer; transition: all 0.1s;';
+    btnPlayStop.innerHTML = '▶ START ARP';
+    btnPlayStop.title = 'Avvia / Ferma riproduzione in tempo reale dell\'Arpeggiatore';
+    btnPlayStop.addEventListener('click', () => {
+      getAudioContext();
+      unmuteAndSetVolume(getActiveMidiChannel());
+      arpEngine.toggle();
+    });
+    transportBox.appendChild(btnPlayStop);
 
-          if(send) sendCC(1, ccIndex, options[step].val);
-        }
-      });
-      const labelEl = knobContainer.querySelector('.chassis-knob-label');
-      if(labelEl) labelEl.textContent = label + ': ' + options[currentIdx].name;
-      return knobContainer;
-    }
+    const btnHold = document.createElement('button');
+    btnHold.id = 'arpBtnHold';
+    btnHold.className = 'chassis-page-btn';
+    btnHold.style.cssText = 'padding: 8px 14px; font-size: 11px; font-weight: bold; cursor: pointer;';
+    btnHold.textContent = 'HOLD: OFF';
+    btnHold.title = 'Mantieni le note in loop continuo (Latch)';
+    btnHold.addEventListener('click', () => {
+      arpEngine.hold = !arpEngine.hold;
+      btnHold.textContent = arpEngine.hold ? 'HOLD: ON 🔒' : 'HOLD: OFF';
+      btnHold.style.borderColor = arpEngine.hold ? 'var(--accent)' : 'var(--border)';
+      btnHold.style.color = arpEngine.hold ? 'var(--accent)' : 'var(--fg)';
+      arpEngine.syncHardwareArp();
+    });
+    transportBox.appendChild(btnHold);
 
-    const grid = document.createElement('div');
-    grid.style.display = 'grid';
-    grid.style.gridTemplateColumns = 'repeat(4, 1fr)';
-    grid.style.gap = '32px';
-    grid.style.padding = '20px';
+    // Mini LCD Status Display
+    const lcdBox = document.createElement('div');
+    lcdBox.style.cssText = 'display: flex; align-items: center; gap: 16px; font-family: monospace; font-size: 11px; background: #0c0c10; padding: 6px 14px; border: 1px solid #222; border-radius: 4px;';
+    lcdBox.innerHTML = `
+      <div>STATO: <b id="arpDisplayStatus" style="color: #888;">STOPPED</b></div>
+      <div>TEMPO: <b id="arpDisplayBpm" style="color: var(--accent);">124 BPM</b></div>
+      <div>MODALITÀ: <b id="arpDisplayMode" style="color: #fff;">Up</b></div>
+      <div>RISOLUZIONE: <b id="arpDisplayRate" style="color: #00ffcc;">1/16</b></div>
+    `;
 
-    grid.appendChild(createArpDiscreteKnob('Mode', [
-      {val: 0, name: 'Off'}, {val: 1, name: 'Up'}, {val: 2, name: 'Down'},
-      {val: 3, name: 'Up/Dn'}, {val: 4, name: 'As Ply'}, {val: 5, name: 'Rand'}, {val: 6, name: 'Chord'}
-    ], 100));
+    topBar.appendChild(transportBox);
+    topBar.appendChild(lcdBox);
+    innerLayout.appendChild(topBar);
 
-    const patternOpts = [];
-    for(let i=1; i<=64; i++) patternOpts.push({val: i-1, name: `Pat ${i}`});
-    patternOpts.push({val: 64, name: 'User'});
-    grid.appendChild(createArpDiscreteKnob('Pattern', patternOpts, 101));
+    // 2. ROTARY HARDWARE KNOBS SECTION
+    const knobsGrid = document.createElement('div');
+    knobsGrid.style.cssText = 'display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 24px; width: 100%; max-width: 960px; padding: 14px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px;';
 
-    grid.appendChild(createArpDiscreteKnob('Res', [
-      {val: 0, name: '1/2'}, {val: 1, name: '1/4'}, {val: 2, name: '1/8'},
-      {val: 3, name: '1/16'}, {val: 4, name: '1/32'}, {val: 5, name: '1/64'}
-    ], 102));
-
-    grid.appendChild(createArpDiscreteKnob('Octaves', [
-      {val: 0, name: '1'}, {val: 1, name: '2'}, {val: 2, name: '3'}, {val: 3, name: '4'}
-    ], 103));
-
-    let lenVal = 64;
-    const arpLenKnob = createKnobGeneric({
-      label: 'Length', default: 64, bipolar: false,
-      getValue: () => lenVal,
-      setValue: (v, send) => {
-        lenVal = v;
-        const lbl = arpLenKnob.querySelector('.chassis-knob-label');
-        if(lbl) lbl.textContent = 'Length: ' + Math.round(v);
-        if(send) sendCC(1, 104, v);
+    // Knob 1: BPM / TEMPO
+    const bpmKnob = createKnobGeneric({
+      label: 'Tempo (BPM)',
+      default: 124,
+      bipolar: false,
+      getValue: () => Math.round(((arpEngine.bpm - 40) / 200) * 127),
+      setValue: (v) => {
+        const val = Math.round(40 + (v / 127) * 200);
+        arpEngine.bpm = val;
+        const lbl = bpmKnob.querySelector('.chassis-knob-label');
+        if (lbl) lbl.textContent = `BPM: ${val}`;
+        const disp = document.getElementById('arpDisplayBpm');
+        if (disp) disp.textContent = `${val} BPM`;
       }
     });
-    grid.appendChild(arpLenKnob);
+    knobsGrid.appendChild(bpmKnob);
 
-    let swingVal = 0;
-    const arpSwingKnob = createKnobGeneric({
-      label: 'Swing', default: 0, bipolar: false,
-      getValue: () => swingVal,
-      setValue: (v, send) => {
-        swingVal = v;
-        const lbl = arpSwingKnob.querySelector('.chassis-knob-label');
-        if(lbl) lbl.textContent = 'Swing: ' + Math.round(v);
-        if(send) sendCC(1, 105, v);
+    // Knob 2: MODE (Off, Up, Down, Up/Dn, As Ply, Rand, Chord)
+    const modeKnob = createKnobGeneric({
+      label: 'Arp Mode',
+      default: Math.round((arpEngine.modeIdx / 6) * 127),
+      bipolar: false,
+      getValue: () => Math.round((arpEngine.modeIdx / 6) * 127),
+      setValue: (v) => {
+        const idx = Math.min(6, Math.max(0, Math.round((v / 127) * 6)));
+        arpEngine.modeIdx = idx;
+        const name = arpEngine.modes[idx];
+        const lbl = modeKnob.querySelector('.chassis-knob-label');
+        if (lbl) lbl.textContent = `Mode: ${name}`;
+        const disp = document.getElementById('arpDisplayMode');
+        if (disp) disp.textContent = name;
+        arpEngine.syncHardwareArp();
       }
     });
-    grid.appendChild(arpSwingKnob);
+    knobsGrid.appendChild(modeKnob);
 
-    const holdBtnContainer = document.createElement('div');
-    holdBtnContainer.className = 'chassis-knob-container';
-    holdBtnContainer.style.justifyContent = 'flex-end';
-
-    const holdBtn = document.createElement('button');
-    holdBtn.className = 'chassis-page-btn';
-    holdBtn.textContent = 'HOLD';
-    holdBtn.style.width = '40px';
-    holdBtn.style.height = '24px';
-    let holdState = false;
-    holdBtn.addEventListener('click', () => {
-      holdState = !holdState;
-      holdBtn.style.background = holdState ? 'var(--accent)' : '#222';
-      holdBtn.style.color = holdState ? '#000' : 'var(--fg)';
-      sendCC(1, 106, holdState ? 127 : 0);
+    // Knob 3: RATE / RESOLUTION (1/4, 1/8, 1/8T, 1/16, 1/16T, 1/32)
+    const rateKnob = createKnobGeneric({
+      label: 'Resolution',
+      default: Math.round((arpEngine.rateIdx / 5) * 127),
+      bipolar: false,
+      getValue: () => Math.round((arpEngine.rateIdx / 5) * 127),
+      setValue: (v) => {
+        const idx = Math.min(5, Math.max(0, Math.round((v / 127) * 5)));
+        arpEngine.rateIdx = idx;
+        const name = arpEngine.rates[idx].name;
+        const lbl = rateKnob.querySelector('.chassis-knob-label');
+        if (lbl) lbl.textContent = `Rate: ${name}`;
+        const disp = document.getElementById('arpDisplayRate');
+        if (disp) disp.textContent = name;
+      }
     });
+    knobsGrid.appendChild(rateKnob);
 
-    const holdLabel = document.createElement('div');
-    holdLabel.className = 'chassis-knob-label';
-    holdLabel.textContent = 'Hold';
+    // Knob 4: OCTAVES (1, 2, 3, 4)
+    const octKnob = createKnobGeneric({
+      label: 'Octaves',
+      default: Math.round(((arpEngine.octaves - 1) / 3) * 127),
+      bipolar: false,
+      getValue: () => Math.round(((arpEngine.octaves - 1) / 3) * 127),
+      setValue: (v) => {
+        const oct = 1 + Math.min(3, Math.max(0, Math.round((v / 127) * 3)));
+        arpEngine.octaves = oct;
+        const lbl = octKnob.querySelector('.chassis-knob-label');
+        if (lbl) lbl.textContent = `Octaves: ${oct}`;
+        arpEngine.syncHardwareArp();
+      }
+    });
+    knobsGrid.appendChild(octKnob);
 
-    holdBtnContainer.appendChild(holdBtn);
-    holdBtnContainer.appendChild(holdLabel);
-    grid.appendChild(holdBtnContainer);
+    // Knob 5: GATE LENGTH (10%..100%)
+    const gateKnob = createKnobGeneric({
+      label: 'Gate Length',
+      default: arpEngine.gatePercent,
+      bipolar: false,
+      getValue: () => Math.round((arpEngine.gatePercent / 100) * 127),
+      setValue: (v) => {
+        const g = Math.max(10, Math.min(100, Math.round((v / 127) * 100)));
+        arpEngine.gatePercent = g;
+        const lbl = gateKnob.querySelector('.chassis-knob-label');
+        if (lbl) lbl.textContent = `Gate: ${g}%`;
+      }
+    });
+    knobsGrid.appendChild(gateKnob);
 
-    innerLayout.appendChild(grid);
+    // Knob 6: SWING (0%..75%)
+    const swingKnob = createKnobGeneric({
+      label: 'Swing',
+      default: 0,
+      bipolar: false,
+      getValue: () => Math.round((arpEngine.swingPercent / 75) * 127),
+      setValue: (v) => {
+        const s = Math.round((v / 127) * 75);
+        arpEngine.swingPercent = s;
+        const lbl = swingKnob.querySelector('.chassis-knob-label');
+        if (lbl) lbl.textContent = `Swing: ${s}%`;
+      }
+    });
+    knobsGrid.appendChild(swingKnob);
 
-    const arpStepsContainer = document.createElement('div');
-    arpStepsContainer.style.width = '100%';
-    arpStepsContainer.style.marginTop = '20px';
-    arpStepsContainer.style.display = 'flex';
-    arpStepsContainer.style.flexDirection = 'column';
-    arpStepsContainer.style.alignItems = 'center';
+    innerLayout.appendChild(knobsGrid);
 
-    const arpSeqGrid = document.createElement('div');
-    arpSeqGrid.style.display = 'grid';
-    arpSeqGrid.style.gridTemplateColumns = 'repeat(16, 1fr)';
-    arpSeqGrid.style.gap = '16px';
-    arpSeqGrid.style.padding = '0 40px';
+    // 3. 16-STEP VISUAL PATTERN SEQUENCER
+    const seqSection = document.createElement('div');
+    seqSection.style.cssText = 'width: 100%; max-width: 960px; display: flex; flex-direction: column; align-items: center; gap: 12px; background: rgba(0,0,0,0.5); border: 1px solid var(--border); border-radius: 6px; padding: 18px 20px;';
 
-    for(let i = 0; i < 16; i++) {
-      const stepWrapper = document.createElement('div');
-      stepWrapper.style.display = 'flex';
-      stepWrapper.style.flexDirection = 'column';
-      stepWrapper.style.alignItems = 'center';
-      stepWrapper.style.gap = '8px';
+    const seqHeader = document.createElement('div');
+    seqHeader.style.cssText = 'width: 100%; display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: bold; letter-spacing: 0.08em; color: var(--accent); font-family: monospace; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px;';
+    seqHeader.innerHTML = `<span>16-STEP RHYTHM PATTERN (CLICCA PER ATTIVARE/DISATTIVARE GLI STEP)</span><span style="color: #888;">CURSORE TEMPO REALE</span>`;
+    seqSection.appendChild(seqHeader);
 
-      const stepLabel = document.createElement('div');
-      stepLabel.textContent = (i + 1).toString();
-      stepLabel.style.color = '#666';
-      stepLabel.style.fontSize = '10px';
-      stepLabel.style.fontFamily = 'monospace';
+    const stepsRow = document.createElement('div');
+    stepsRow.style.cssText = 'display: grid; grid-template-columns: repeat(16, 1fr); gap: 6px; width: 100%;';
 
-      const stepBtn = document.createElement('div');
-      stepBtn.style.width = '40px';
-      stepBtn.style.height = '30px';
-      stepBtn.style.backgroundColor = '#1a1a1a';
-      stepBtn.style.border = '2px solid #111';
-      stepBtn.style.borderRadius = '4px';
-      stepBtn.style.boxShadow = 'inset 0 1px 2px rgba(255,255,255,0.1), 0 2px 4px rgba(0,0,0,0.5)';
-      stepBtn.style.cursor = 'pointer';
-      stepBtn.style.transition = 'all 100ms ease';
+    for (let i = 0; i < 16; i++) {
+      const col = document.createElement('div');
+      col.style.cssText = 'display: flex; flex-direction: column; align-items: center; gap: 6px;';
 
-      let stepActive = false;
+      // Indicator LED
+      const led = document.createElement('div');
+      led.id = `arpLedStep${i}`;
+      led.style.cssText = 'width: 10px; height: 10px; border-radius: 50%; background: #222; border: 1px solid #111; transition: background 0.05s;';
+      col.appendChild(led);
+
+      // Step Button
+      const stepBtn = document.createElement('button');
+      stepBtn.id = `arpStepBtn${i}`;
+      const isActive = arpEngine.steps[i];
+      const isQuarter = (i % 4 === 0);
+      stepBtn.style.cssText = `width: 100%; height: 38px; border-radius: 4px; font-family: monospace; font-size: 10px; font-weight: 800; cursor: pointer; transition: all 0.1s; border: 1px solid ${isQuarter ? '#666' : '#333'}; ${isActive ? 'background: var(--accent); color: #000; box-shadow: 0 0 6px var(--accent);' : 'background: #18181f; color: #555;'}`;
+      stepBtn.textContent = String(i + 1);
+      stepBtn.title = `Step ${i + 1}: ${isActive ? 'ATTIVO' : 'PAUSA'} (Clicca per cambiare)`;
+
       stepBtn.addEventListener('click', () => {
-        stepActive = !stepActive;
-        if (stepActive) {
-          stepBtn.style.backgroundColor = 'var(--accent)';
-          stepBtn.style.boxShadow = `0 0 ${Math.round(limitedGlow(10))}px var(--accent), inset 0 1px 2px rgba(255,255,255,0.5)`;
-          stepBtn.style.borderColor = '#ff9900';
-        } else {
-          stepBtn.style.backgroundColor = '#1a1a1a';
-          stepBtn.style.boxShadow = 'inset 0 1px 2px rgba(255,255,255,0.1), 0 2px 4px rgba(0,0,0,0.5)';
-          stepBtn.style.borderColor = '#111';
-        }
-        sendCC(1, 110 + i, stepActive ? 127 : 0);
+        arpEngine.steps[i] = !arpEngine.steps[i];
+        const on = arpEngine.steps[i];
+        stepBtn.style.background = on ? 'var(--accent)' : '#18181f';
+        stepBtn.style.color = on ? '#000' : '#555';
+        stepBtn.style.boxShadow = on ? '0 0 6px var(--accent)' : 'none';
+        stepBtn.title = `Step ${i + 1}: ${on ? 'ATTIVO' : 'PAUSA'}`;
       });
 
-      stepWrapper.appendChild(stepBtn);
-      stepWrapper.appendChild(stepLabel);
-      arpSeqGrid.appendChild(stepWrapper);
+      col.appendChild(stepBtn);
+      stepsRow.appendChild(col);
     }
+    seqSection.appendChild(stepsRow);
 
-    arpStepsContainer.appendChild(arpSeqGrid);
-    innerLayout.appendChild(arpStepsContainer);
+    // Pattern presets toolbar
+    const patternTools = document.createElement('div');
+    patternTools.style.cssText = 'display: flex; gap: 8px; flex-wrap: wrap; margin-top: 6px; justify-content: center;';
+
+    const setPattern = (patternArr) => {
+      for (let i = 0; i < 16; i++) {
+        arpEngine.steps[i] = !!patternArr[i];
+        const btn = document.getElementById(`arpStepBtn${i}`);
+        if (btn) {
+          const on = arpEngine.steps[i];
+          btn.style.background = on ? 'var(--accent)' : '#18181f';
+          btn.style.color = on ? '#000' : '#555';
+          btn.style.boxShadow = on ? '0 0 6px var(--accent)' : 'none';
+        }
+      }
+    };
+
+    const addPresetBtn = (label, arr) => {
+      const b = document.createElement('button');
+      b.className = 'chassis-page-btn';
+      b.style.cssText = 'font-size: 10px; padding: 3px 8px;';
+      b.textContent = label;
+      b.addEventListener('click', () => setPattern(arr));
+      patternTools.appendChild(b);
+    };
+
+    addPresetBtn('TUTTI ON (16/16)', new Array(16).fill(true));
+    addPresetBtn('4 SUI 4 BATTITI', [true,false,false,false, true,false,false,false, true,false,false,false, true,false,false,false]);
+    addPresetBtn('OTTAVI (8/16)', [true,false,true,false, true,false,true,false, true,false,true,false, true,false,true,false]);
+    addPresetBtn('OFFBEAT (SINCOPATI)', [false,true,false,true, false,true,false,true, false,true,false,true, false,true,false,true]);
+    addPresetBtn('TRANCE PATTERN', [true,true,false,true, true,false,true,true, false,true,true,false, true,true,false,true]);
+    addPresetBtn('ACID SHUFFLE', [true,false,true,true, false,true,true,false, true,false,true,true, true,false,false,true]);
+
+    seqSection.appendChild(patternTools);
+    innerLayout.appendChild(seqSection);
 
     elektronWrapper.appendChild(innerLayout);
 
@@ -8776,6 +9132,7 @@ function exportCurrentPatchSyx() {
     elektronWrapper.appendChild(woodStrip);
 
     root.appendChild(elektronWrapper);
+    arpEngine.updateUI();
   }
 
   function buildSeqView() {
