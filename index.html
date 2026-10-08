@@ -2606,6 +2606,9 @@
         <button id="frontPatchPrev" class="snow-matrix-btn" style="padding: 4px 10px; font-size: 10px;" title="Patch precedente">◀</button>
         <select id="frontPatchSelect" class="snow-select" style="min-width: 220px; font-family: monospace; font-size: 11px;"></select>
         <button id="frontPatchNext" class="snow-matrix-btn" style="padding: 4px 10px; font-size: 10px;" title="Patch successiva">▶</button>
+        <button id="frontBtnFetchCurrent" class="snow-matrix-btn" style="padding: 4px 10px; font-size: 10px; font-weight: bold; color: #00705a; background: #e6f7f2; border: 1px solid #7ed0b9;" title="Leggi patch attiva e parametri direttamente dalla memoria del Virus TI reale via SysEx">🔄 LEGGI DAL SYNTH</button>
+        <button id="frontBtnScanBank" class="snow-matrix-btn" style="padding: 4px 10px; font-size: 10px; font-weight: bold; color: #3b5998; background: #eef2f9; border: 1px solid #9fb3db;" title="Scansiona tutti i 128 veri nomi del banco selezionato dal Virus reale via SysEx">📥 SCANSIONA BANCO</button>
+        <span id="frontScanStatus" style="font-size: 10px; font-weight: 800; color: #008060; margin-left: 4px;"></span>
       </div>
 
       <div style="display: flex; gap: 8px;">
@@ -2806,6 +2809,9 @@
         updateVirusSnowFrontPanel(currentPartIndex || 0);
       }
       updateControlRoomStatus();
+      if (selectedOutput) {
+        requestDump(0);
+      }
     });
   }
 
@@ -3414,7 +3420,59 @@
       }
     });
 
+    const pIdx = currentPartIndex || 0;
+    if (multiParts && multiParts[pIdx]) {
+      multiParts[pIdx].name = name;
+      multiParts[pIdx].dump = Array.from(msgBytes);
+
+      // Estrai Cutoff (CC 40) e Resonance (CC 42) reali dal dump SysEx
+      if (msgBytes.length > 51) {
+        const cutVal = msgBytes[9 + 40];
+        const resVal = msgBytes[9 + 42];
+        if (cutVal !== undefined && cutVal <= 127) {
+          multiParts[pIdx].values.f1_cutoff = cutVal;
+          if (state && state.values) state.values.f1_cutoff = cutVal;
+        }
+        if (resVal !== undefined && resVal <= 127) {
+          multiParts[pIdx].values.f1_resonance = resVal;
+          if (state && state.values) state.values.f1_resonance = resVal;
+        }
+      }
+
+      const curBank = multiParts[pIdx].values.bank;
+      const curProg = multiParts[pIdx].values.program;
+
+      // Memorizza il vero nome letto dal synth nella cache del banco per questo preset
+      if (name && (typeof isDummyPatchName === 'function' ? !isDummyPatchName(name) : true) && curBank !== undefined && curProg !== undefined) {
+        if (typeof saveBankSoundName === 'function') {
+          saveBankSoundName(curBank, curProg, name);
+        }
+      }
+
+      if (typeof updateVirusSnowMasterDisplay === 'function') {
+        updateVirusSnowMasterDisplay(pIdx);
+      }
+      if (typeof updateVirusSnowFrontPanel === 'function') {
+        updateVirusSnowFrontPanel(pIdx);
+      }
+      if (typeof updatePartDropdownSelection === 'function') {
+        updatePartDropdownSelection(pIdx, curBank, curProg);
+      }
+
+      const fPatchSel = document.getElementById('frontPatchSelect');
+      if (fPatchSel) {
+        if (fPatchSel.options.length === 0 || fPatchSel.dataset.loadedBank !== String(curBank)) {
+          if (typeof populatePartPatchDropdown === 'function') {
+            populatePartPatchDropdown(fPatchSel, curBank, curProg);
+            fPatchSel.dataset.loadedBank = String(curBank);
+          }
+        }
+        fPatchSel.value = String(curProg);
+      }
+    }
+
     refreshAllKnobs();
+    if (typeof initElektronLcd === 'function') initElektronLcd();
   }
 
   function handleIncomingMidi(event) {
@@ -3440,12 +3498,25 @@
        }
     }
 
-    // --- RICEZIONE CC (Control Change) ---
+    // --- RICEZIONE CC (Control Change) & BANK SELECT ---
     if ((bytes[0] & 0xF0) === 0xB0 && bytes.length === 3) {
       midiStats.cc++;
       updateMidiDiagnostics();
+      const midiCh = bytes[0] & 0x0F;
       const ccNumber = bytes[1];
       const ccValue = bytes[2];
+
+      // Bank Select LSB (CC 32)
+      if (ccNumber === 32) {
+        window.incomingBankByChannel = window.incomingBankByChannel || {};
+        window.incomingBankByChannel[midiCh] = ccValue;
+        return;
+      }
+      // Bank Select MSB (CC 0)
+      if (ccNumber === 0) {
+        return;
+      }
+
       const param = PARAMS.find(p => p.cc === ccNumber);
       if (param) {
         patch[param.id] = ccValue;
@@ -3456,6 +3527,48 @@
         if (typeof initElektronLcd === 'function') initElektronLcd();
       }
       return; // Finito con questo pacchetto (CC)
+    }
+
+    // --- RICEZIONE PROGRAM CHANGE DAL SYNTH FISICO ---
+    if ((bytes[0] & 0xF0) === 0xC0 && bytes.length >= 2) {
+      const midiCh = bytes[0] & 0x0F;
+      const progNum = bytes[1] & 0x7F;
+      const pIdx = currentPartIndex || 0;
+      const incomingBank = (window.incomingBankByChannel && window.incomingBankByChannel[midiCh] !== undefined)
+        ? window.incomingBankByChannel[midiCh]
+        : (multiParts[pIdx]?.values?.bank ?? 0);
+
+      let targetPartIdx = pIdx;
+      for (let i = 0; i < NUM_PARTS; i++) {
+        const pCh = (multiParts[i]?.values?.channel !== undefined) ? multiParts[i].values.channel : i;
+        if (pCh === midiCh) {
+          targetPartIdx = i;
+          break;
+        }
+      }
+
+      if (multiParts[targetPartIdx]) {
+        multiParts[targetPartIdx].values.program = progNum;
+        if (incomingBank !== undefined) multiParts[targetPartIdx].values.bank = incomingBank;
+        const knownName = getBankPatchName(multiParts[targetPartIdx].values.bank, progNum);
+        if (knownName && (typeof isDummyPatchName === 'function' ? !isDummyPatchName(knownName) : true)) {
+          multiParts[targetPartIdx].name = knownName;
+        }
+        if (typeof updateVirusSnowFrontPanel === 'function') updateVirusSnowFrontPanel(targetPartIdx);
+        if (typeof updateVirusSnowMasterDisplay === 'function') updateVirusSnowMasterDisplay(targetPartIdx);
+        if (typeof updatePartDropdownSelection === 'function') {
+          updatePartDropdownSelection(targetPartIdx, multiParts[targetPartIdx].values.bank, progNum);
+        }
+      }
+
+      // Richiedi il dump dal Virus reale per sincronizzare i veri parametri e il vero nome
+      clearTimeout(window._incomingDumpDebounce);
+      window._incomingDumpDebounce = setTimeout(() => {
+        requestDump(targetPartIdx);
+      }, 70);
+
+      document.getElementById('midi-debug').innerHTML = `<span style="color:#00ffcc;">📥 SYNTH HARDWARE -> PROG CHANGE: P${targetPartIdx + 1} Prog ${progNum + 1} (Bank ${incomingBank})</span>`;
+      return;
     }
 
     // --- RICEZIONE SYSEX (Streaming buffer persistente) ---
@@ -4353,6 +4466,21 @@ function exportCurrentPatchSyx() {
       exportCurrentPatchSyx();
     });
 
+    const btnFetchSyx = document.createElement('button');
+    btnFetchSyx.className = 'chassis-page-btn';
+    btnFetchSyx.style.cssText = 'padding: 3px 8px; font-size: 11px; color: var(--accent); border-color: var(--accent); font-weight: bold;';
+    btnFetchSyx.textContent = '🔄 LEGGI DAL SYNTH';
+    btnFetchSyx.title = 'Scarica la patch attiva corrente direttamente dal Virus TI Snow via SysEx';
+    btnFetchSyx.addEventListener('click', () => {
+      if (!selectedOutput) {
+        alert('Collega prima una porta MIDI Output in alto!');
+        return;
+      }
+      requestDump(window.activeSinglePartIndex || 0);
+      setLastAction('Richiesta patch dal synth...');
+    });
+
+    toolsBox.appendChild(btnFetchSyx);
     toolsBox.appendChild(btnRand);
     toolsBox.appendChild(btnMut);
     toolsBox.appendChild(btnExpSyx);
@@ -6647,6 +6775,11 @@ function exportCurrentPatchSyx() {
       statusEl.style.color = 'var(--accent)';
       statusEl.textContent = `Scansione ${bName}: avviata...`;
     }
+    const frontStatusEl = document.getElementById('frontScanStatus');
+    if (frontStatusEl) {
+      frontStatusEl.style.color = '#00705a';
+      frontStatusEl.textContent = `Scansione ${bName}...`;
+    }
     document.getElementById('midi-debug').textContent = `🔥 QUICK SCAN: Scansione banco ${bName} (SysEx Bank ${bankIndex + 1}, patch 0..127)...`;
 
     window.quickBankScanState = {
@@ -6680,6 +6813,11 @@ function exportCurrentPatchSyx() {
       statusEl.style.color = 'var(--accent)';
       statusEl.innerHTML = `Scansione ${bName}: <b>${patchIdx + 1}/128</b>...`;
     }
+    const frontStatusEl = document.getElementById('frontScanStatus');
+    if (frontStatusEl) {
+      frontStatusEl.style.color = '#00705a';
+      frontStatusEl.textContent = `${bName} ${patchIdx + 1}/128`;
+    }
 
     if (qState.timer) clearTimeout(qState.timer);
     // Timeout di sicurezza rapido per singola patch: 140ms
@@ -6700,10 +6838,29 @@ function exportCurrentPatchSyx() {
     saveBankSoundCache(qState.bankIndex, qState.names);
     updateAllPartDropdownsForBank(qState.bankIndex);
 
+    const fBankSel = document.getElementById('frontBankSelect');
+    const fPatchSel = document.getElementById('frontPatchSelect');
+    if (fBankSel && parseInt(fBankSel.value, 10) === qState.bankIndex && fPatchSel) {
+      const pIdx = currentPartIndex || 0;
+      const curProg = multiParts[pIdx]?.values?.program || 0;
+      populatePartPatchDropdown(fPatchSel, qState.bankIndex, curProg);
+      fPatchSel.dataset.loadedBank = String(qState.bankIndex);
+      fPatchSel.value = String(curProg);
+    }
+    if (typeof updateVirusSnowFrontPanel === 'function') {
+      updateVirusSnowFrontPanel(currentPartIndex || 0);
+    }
+
     const statusEl = document.getElementById('quickScanStatus');
     if (statusEl) {
       statusEl.style.color = '#80c090';
       statusEl.innerHTML = `✅ <b>${bName}</b>: 128 suoni memorizzati!`;
+    }
+    const frontStatusEl = document.getElementById('frontScanStatus');
+    if (frontStatusEl) {
+      frontStatusEl.style.color = '#00705a';
+      frontStatusEl.textContent = `✅ ${bName}: 128 salvati`;
+      setTimeout(() => { if (frontStatusEl) frontStatusEl.textContent = ''; }, 4000);
     }
     document.getElementById('midi-debug').innerHTML = `<span style="color:#80c090;">✅ QUICK SCAN: Memorizzati con successo 128 suoni per ${bName}!</span>`;
     setLastAction('quick scan complete ' + bName);
@@ -7420,6 +7577,45 @@ function exportCurrentPatchSyx() {
       const part = multiParts[pIdx];
       if (!part) return;
       applyFrontSoundChange((part.values.program + 1) % 128);
+    });
+
+    document.getElementById('frontBtnFetchCurrent')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!selectedOutput) {
+        alert('Collega prima una porta MIDI Output in alto per comunicare col Virus TI!');
+        return;
+      }
+      const frontStatusEl = document.getElementById('frontScanStatus');
+      if (frontStatusEl) {
+        frontStatusEl.style.color = '#00705a';
+        frontStatusEl.textContent = 'Lettura dal synth...';
+      }
+      requestDump(0);
+      setLastAction('Richiesta patch attiva dal Virus (SysEx)');
+    });
+
+    document.getElementById('frontBtnScanBank')?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      if (!selectedOutput) {
+        alert('Collega prima una porta MIDI Output in alto per scansionare il Virus!');
+        return;
+      }
+      const fBankSel = document.getElementById('frontBankSelect');
+      const bankIdx = parseInt(fBankSel?.value || '0', 10);
+      const bName = BANK_NAMES[bankIdx] || `Banco ${bankIdx}`;
+      const frontStatusEl = document.getElementById('frontScanStatus');
+      if (frontStatusEl) {
+        frontStatusEl.style.color = '#3b5998';
+        frontStatusEl.textContent = `Scansione ${bName}...`;
+      }
+      startQuickBankScan(bankIdx, () => {
+        if (frontStatusEl) {
+          frontStatusEl.style.color = '#00705a';
+          frontStatusEl.textContent = `✅ ${bName}: 128 salvati`;
+          setTimeout(() => { if (frontStatusEl) frontStatusEl.textContent = ''; }, 4000);
+        }
+      });
+      setLastAction(`Scansione banco ${bName}`);
     });
 
     // 2. Hardware Button: AUDITION 🎵 (Suona la nota di prova sul canale della parte attiva)
