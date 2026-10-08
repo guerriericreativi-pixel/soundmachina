@@ -2809,7 +2809,10 @@
         updateVirusSnowFrontPanel(currentPartIndex || 0);
       }
       updateControlRoomStatus();
+      if (typeof updateKeyboardPartDisplay === 'function') updateKeyboardPartDisplay();
       if (selectedOutput) {
+        sendVirusMode(0); // Commuta il Virus hardware in Single Mode
+        unmuteAndSetVolume(getActiveMidiChannel());
         requestDump(0);
       }
     });
@@ -2822,6 +2825,11 @@
     v.style.display = 'block';
     document.getElementById('btnTabSynth').classList.add('active');
     updateControlRoomStatus();
+    if (typeof updateKeyboardPartDisplay === 'function') updateKeyboardPartDisplay();
+    if (selectedOutput) {
+      sendVirusMode(0); // Commuta il Virus hardware in Single Mode
+      unmuteAndSetVolume(getActiveMidiChannel());
+    }
     if (typeof initElektronLcd === 'function') setTimeout(initElektronLcd, 30);
   });
 
@@ -2836,6 +2844,10 @@
       partDisplays.forEach(d => { if (d && d._render) d._render(); });
     }
     updateControlRoomStatus();
+    if (typeof updateKeyboardPartDisplay === 'function') updateKeyboardPartDisplay();
+    if (selectedOutput) {
+      sendVirusMode(1); // Commuta il Virus hardware in Multi Mode
+    }
   });
 
   document.getElementById('btnTabPatchManager').addEventListener('click', () => {
@@ -3969,14 +3981,38 @@
   function sendCC(channel, cc, value) {
     if (selectedOutput) {
       try {
-        const chanByte = 0xB0 | ((channel - 1) & 0x0F);
+        // Normalizza: se 1..16 converti a 0..15, se 0..15 usa direttamente
+        const ch = (channel >= 1 && channel <= 16) ? (channel - 1) : (channel & 0x0F);
+        const chanByte = 0xB0 | (ch & 0x0F);
         const bytes = new Uint8Array([chanByte, cc & 0x7F, value & 0x7F]);
         selectedOutput.send(bytes);
-        recordMidiTx('cc ' + cc, bytes);
+        recordMidiTx('cc ' + cc + ' (ch ' + (ch + 1) + ')', bytes);
       } catch (e) { console.error('MIDI sendCC error', e); }
     } else {
       setLastAction('connect midi output first');
     }
+  }
+
+  function unmuteAndSetVolume(channel = null) {
+    if (!selectedOutput) return;
+    const ch = (channel !== null && channel !== undefined) ? (channel & 0x0F) : getActiveMidiChannel();
+    try {
+      selectedOutput.send(new Uint8Array([0xB0 | ch, 7, 127]));  // CC 7: Volume Max (127)
+      selectedOutput.send(new Uint8Array([0xB0 | ch, 11, 127])); // CC 11: Expression Max (127)
+      selectedOutput.send(new Uint8Array([0xB0 | ch, 10, 64]));  // CC 10: Pan Center (64)
+    } catch(e) {}
+  }
+
+  function sendVirusMode(mode = 0) { // 0 = Single Mode, 1 = Multi Mode, 2 = Sequencer
+    if (!selectedOutput) return;
+    try {
+      // SysEx Global Param (0x73), Param 0 (Synth Mode), Value: 0 (Single) / 1 (Multi)
+      const bytes = new Uint8Array([
+        ...SYSEX_PREFIX, deviceId(), 0x73, 0x00, mode & 0x7F, 0xF7
+      ]);
+      selectedOutput.send(bytes);
+      recordMidiTx(mode === 0 ? 'set synth mode: SINGLE' : 'set synth mode: MULTI', bytes);
+    } catch(e) { console.error('sendVirusMode error', e); }
   }
 
   // Multi mode SysEx send
@@ -7626,11 +7662,10 @@ function exportCurrentPatchSyx() {
       if (isAuditioning) return;
       isAuditioning = true;
       if (btnAudition) btnAudition.classList.add('audition-active');
-      const pIdx = currentPartIndex || 0;
-      const part = multiParts[pIdx];
-      const ch = part ? (part.channel !== undefined ? part.channel : pIdx) : 0;
+      const ch = getActiveMidiChannel();
+      unmuteAndSetVolume(ch);
       playNote(60, 100);
-      setLastAction(`♪ Audition P${pIdx + 1} (ch ${ch + 1})`);
+      setLastAction(`♪ Audition (ch ${ch + 1})`);
     };
 
     const stopAuditionSound = () => {
@@ -7736,10 +7771,14 @@ function exportCurrentPatchSyx() {
       if (isMulti) {
         if (modeBadge) modeBadge.textContent = 'SINGLE';
         setLastAction('Mode: SINGLE');
+        sendVirusMode(0); // Commuta il Virus hardware in Single Mode via SysEx
+        unmuteAndSetVolume(getActiveMidiChannel());
       } else {
         if (modeBadge) modeBadge.textContent = 'MULTI';
         setLastAction('Mode: MULTI');
+        sendVirusMode(1); // Commuta il Virus hardware in Multi Mode via SysEx
       }
+      if (typeof updateKeyboardPartDisplay === 'function') updateKeyboardPartDisplay();
     });
 
     // 7. Tasti Matrice Fila Superiore (OSC 1, OSC 2, FILTERS, MOD, ENV, EFFECTS, ARP, COMMON)
@@ -8157,28 +8196,50 @@ function exportCurrentPatchSyx() {
   }
 
   function getActiveMidiChannel() {
+    const chEl = document.getElementById('midiChannel');
+    const configuredGlobalCh = chEl ? (parseInt(chEl.value, 10) - 1) & 0x0F : 0;
+
+    // Rileva se ci troviamo in Single Mode (vista TI-SNOW, vista SINGLE o badge frontale SINGLE)
+    const isSnowView = document.getElementById('btnTabSnow')?.classList.contains('active');
+    const isSingleView = document.getElementById('btnTabSynth')?.classList.contains('active');
+    const modeBadge = document.getElementById('frontLcdModeBadge');
+    const isSingleMode = isSnowView || isSingleView || (modeBadge && modeBadge.textContent === 'SINGLE');
+
+    if (isSingleMode) {
+      // In modalità SINGLE, il Virus TI reale risponde esclusivamente sul suo Global Channel
+      return configuredGlobalCh;
+    }
+
+    // In modalità MULTI, usa il canale assegnato alla parte attiva corrente
     const pIdx = (typeof currentPartIndex !== 'undefined')
       ? currentPartIndex
       : ((typeof window.activeSinglePartIndex !== 'undefined') ? window.activeSinglePartIndex : 0);
-    if (typeof multiParts !== 'undefined' && multiParts && multiParts[pIdx] && multiParts[pIdx].values) {
+    if (typeof multiParts !== 'undefined' && multiParts && multiParts[pIdx] && multiParts[pIdx].values && multiParts[pIdx].values.channel !== undefined) {
       return multiParts[pIdx].values.channel & 0x0F;
     }
-    const chEl = document.getElementById('midiChannel');
-    return chEl ? (parseInt(chEl.value, 10) - 1) & 0x0F : 0;
+    return configuredGlobalCh;
   }
 
   function updateKeyboardPartDisplay() {
     const el = document.getElementById('activeKbdPartDisplay');
     if (!el) return;
+    const isSnowView = document.getElementById('btnTabSnow')?.classList.contains('active');
+    const isSingleView = document.getElementById('btnTabSynth')?.classList.contains('active');
+    const modeBadge = document.getElementById('frontLcdModeBadge');
+    const isSingleMode = isSnowView || isSingleView || (modeBadge && modeBadge.textContent === 'SINGLE');
+
     const pIdx = (typeof currentPartIndex !== 'undefined') ? currentPartIndex : 0;
     const part = (typeof multiParts !== 'undefined' && multiParts && multiParts[pIdx]) ? multiParts[pIdx] : null;
-    const ch = (part && part.values && part.values.channel !== undefined)
-      ? (part.values.channel + 1)
-      : (pIdx + 1);
     const pName = (part && part.name && part.name !== 'init' && !isDummyPatchName(part.name))
       ? part.name
-      : (part ? getBankPatchName(part.values.bank, part.values.program) : `Patch ${pIdx + 1}`);
-    el.textContent = `P${pIdx + 1}: ${pName} (ch ${ch})`;
+      : (part ? getBankPatchName(part.values.bank, part.values.program) : 'Init');
+
+    const ch = getActiveMidiChannel() + 1;
+    if (isSingleMode) {
+      el.textContent = `SINGLE: ${pName} (MIDI Ch ${ch})`;
+    } else {
+      el.textContent = `MULTI P${pIdx + 1}: ${pName} (ch ${ch})`;
+    }
   }
 
   function playNote(noteNumber, velocity = currentVelocity) {
@@ -8196,8 +8257,13 @@ function exportCurrentPatchSyx() {
       const ch = getActiveMidiChannel();
       try {
         selectedOutput.send(new Uint8Array([0x90 | ch, noteNumber & 0x7F, velocity & 0x7F]));
-        recordMidiTx('note on ' + noteNumber, [0x90 | ch, noteNumber, velocity]);
+        recordMidiTx('note on ' + noteNumber + ' (ch ' + (ch + 1) + ')', [0x90 | ch, noteNumber, velocity]);
       } catch(e) { console.error('playNote error', e); }
+    } else {
+      const dbg = document.getElementById('midi-debug');
+      if (dbg) {
+        dbg.innerHTML = '<span style="color:#ffb86c;">⚠️ MIDI OUT NON CONNESSO: Seleziona la porta del Virus in alto per sentire il synth!</span>';
+      }
     }
 
     highlightPianoKey(noteNumber, true);
