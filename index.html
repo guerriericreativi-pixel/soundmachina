@@ -1547,6 +1547,9 @@
     padding: 30px 24px 100px 24px !important;
     gap: 14px !important;
   }
+  #arpContent .hardware-chassis.arp-chassis {
+    --accent: #d8dde6 !important;
+  }
   html[data-skin="elektron"] .hardware-chassis.arp-chassis {
     padding: 30px 24px 100px 24px !important;
     gap: 14px !important;
@@ -1764,13 +1767,13 @@
     box-shadow: 0 1px 2px rgba(0,0,0,0.3), inset 0 1px 3px rgba(0,0,0,0.2);
   }
   .arp-hw-btn-hold.latched {
-    background: linear-gradient(180deg, #6ef2eb 0%, #20b8b0 100%) !important;
-    border: 1px solid #148b85 !important;
-    border-top: 1px solid rgba(255,255,255,0.85) !important;
-    border-bottom: 2px solid #0f6e69 !important;
-    color: #032022 !important;
-    text-shadow: 0 1px 0 rgba(255,255,255,0.4) !important;
-    box-shadow: 0 0 12px rgba(85,208,222,0.6), 0 2px 4px rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,0.85) !important;
+    background: linear-gradient(180deg, #f2f4f8 0%, #cfd4dc 50%, #abb1bd 100%) !important;
+    border: 1px solid #7c828e !important;
+    border-top: 1px solid #ffffff !important;
+    border-bottom: 2px solid #555a66 !important;
+    color: #12141a !important;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.6) !important;
+    box-shadow: 0 0 12px rgba(225,230,240,0.7), 0 2px 4px rgba(0,0,0,0.4), inset 0 1px 1px #ffffff !important;
   }
 
   /* 16 Step Silicone Groovebox Pads */
@@ -1820,16 +1823,17 @@
     box-shadow: 0 1px 2px rgba(0,0,0,0.7), inset 0 2px 4px rgba(0,0,0,0.5);
   }
   .arp-hw-step-pad.active {
-    background: linear-gradient(180deg, #64e9e0 0%, #1caea6 100%) !important;
-    border: 1px solid #13837e !important;
-    border-top: 1px solid rgba(255,255,255,0.85) !important;
-    border-bottom: 2px solid #0d5f5b !important;
-    box-shadow: 0 0 10px rgba(85,208,222,0.55), 0 3px 5px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,255,255,0.7), inset 0 -2px 3px rgba(0,0,0,0.2) !important;
-    color: #032022 !important;
-    text-shadow: 0 1px 0 rgba(255,255,255,0.35) !important;
+    background: linear-gradient(180deg, #f0f3f7 0%, #d1d6df 50%, #afb5c2 100%) !important;
+    border: 1px solid #7a818e !important;
+    border-top: 1px solid #ffffff !important;
+    border-bottom: 2px solid #545a66 !important;
+    box-shadow: 0 0 10px rgba(220,225,235,0.55), 0 3px 5px rgba(0,0,0,0.5), inset 0 1px 1px #ffffff, inset 0 -2px 3px rgba(0,0,0,0.2) !important;
+    color: #12141a !important;
+    font-weight: 800 !important;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.5) !important;
   }
   .arp-hw-step-pad.flash {
-    filter: brightness(1.75) drop-shadow(0 0 6px #ffffff) !important;
+    filter: brightness(1.7) drop-shadow(0 0 8px #ffffff) !important;
   }
 
   /* 3D Domed Jewel LEDs */
@@ -1855,9 +1859,9 @@
     transition: all 0.04s ease;
   }
   .arp-hw-led.active {
-    background: radial-gradient(circle at 35% 35%, #ffffff 0%, #00ffcc 50%, #00997a 100%) !important;
-    border-color: #00ffcc !important;
-    box-shadow: 0 0 8px #00ffcc, 0 0 14px rgba(0,255,204,0.7) !important;
+    background: radial-gradient(circle at 35% 35%, #ffffff 0%, #e2e6ee 45%, #9aa2b0 100%) !important;
+    border-color: #f0f3f8 !important;
+    box-shadow: 0 0 8px #ffffff, 0 0 14px rgba(255,255,255,0.85) !important;
   }
 
   /* Realistic Elektron-Style White Keycaps for Presets */
@@ -4748,8 +4752,8 @@
   });
 
   function updateConnectionIndicator(){
-    const outConnected = !!(selectedOutput && selectedOutput.state === 'connected');
-    const inConnected = !!(selectedInput && selectedInput.state === 'connected');
+    const outConnected = !!(selectedOutput && (!selectedOutput.state || selectedOutput.state === 'connected' || selectedOutput.state === 'opened'));
+    const inConnected = !!(selectedInput && (!selectedInput.state || selectedInput.state === 'connected' || selectedInput.state === 'opened'));
     if (outConnected || inConnected){
       connDot.classList.add('on');
       let label = 'connected: ';
@@ -4765,6 +4769,9 @@
     }
     wasConnected = (outConnected || inConnected);
     updateControlRoomStatus();
+    if (window.arpEngine && typeof window.arpEngine.updateUI === 'function') {
+      window.arpEngine.updateUI();
+    }
   }
 
   // Persistent SysEx reception buffer across chunked Web MIDI events
@@ -5215,6 +5222,8 @@
       outSelect.value = matchedOutId;
     } else if (fallbackOutId) {
       outSelect.value = fallbackOutId;
+    } else if (outSelect.options.length > 1) {
+      outSelect.value = outSelect.options[1].value;
     }
 
     let matchedInId = null;
@@ -5235,6 +5244,8 @@
       inSelect.value = matchedInId;
     } else if (fallbackInId) {
       inSelect.value = fallbackInId;
+    } else if (inSelect.options.length > 1) {
+      inSelect.value = inSelect.options[1].value;
     }
 
     onOutputChange();
@@ -5379,6 +5390,7 @@
       selectedOutput.send(new Uint8Array([0xB0 | ch, 7, 127]));  // CC 7: Volume Max (127)
       selectedOutput.send(new Uint8Array([0xB0 | ch, 11, 127])); // CC 11: Expression Max (127)
       selectedOutput.send(new Uint8Array([0xB0 | ch, 10, 64]));  // CC 10: Pan Center (64)
+      selectedOutput.send(new Uint8Array([0xB0 | ch, 41, 0]));   // CC 41: Output Select = Out 1 L+R (Main/Phones)
     } catch(e) {}
   }
 
@@ -9579,14 +9591,18 @@ function exportCurrentPatchSyx() {
     const chEl = document.getElementById('midiChannel');
     const configuredGlobalCh = chEl ? (parseInt(chEl.value, 10) - 1) & 0x0F : 0;
 
-    // Rileva se ci troviamo in Single Mode (vista TI-SNOW, vista SINGLE o badge frontale SINGLE o stato memorizzato)
+    // Rileva se ci troviamo in Single Mode (vista TI-SNOW, vista SINGLE, ARP, SEQ, SONG o badge frontale SINGLE o stato memorizzato)
     const isSnowView = document.getElementById('btnTabSnow')?.classList.contains('active');
     const isSingleView = document.getElementById('btnTabSynth')?.classList.contains('active');
+    const isArpView = document.getElementById('btnTabArp')?.classList.contains('active');
+    const isSeqView = document.getElementById('btnTabSequencer')?.classList.contains('active');
+    const isSongView = document.getElementById('btnTabSong')?.classList.contains('active');
     const modeBadge = document.getElementById('frontLcdModeBadge');
-    const isSingleMode = isSnowView || isSingleView || (window.currentSynthMode === 'single') || (modeBadge && modeBadge.textContent === 'SINGLE');
+    const isSingleMode = isSnowView || isSingleView || isArpView || isSeqView || isSongView ||
+                         (window.currentSynthMode === 'single') || (modeBadge && modeBadge.textContent === 'SINGLE');
 
     if (isSingleMode) {
-      // In modalità SINGLE, il Virus TI reale risponde esclusivamente sul suo Global Channel
+      // In modalità SINGLE o viste primarie, il Virus TI reale risponde sul suo Global Channel (default Ch 1)
       return configuredGlobalCh;
     }
 
@@ -9649,6 +9665,7 @@ function exportCurrentPatchSyx() {
       if (dbg) {
         dbg.innerHTML = '<span style="color:#ffb86c;">⚠️ MIDI OUT NON CONNESSO: Seleziona la porta del Virus in alto per sentire il synth!</span>';
       }
+      setLastAction('⚠️ MIDI OUT non connesso (Clicca MIDI in alto)');
     }
 
     highlightPianoKey(noteNumber, true);
@@ -10004,7 +10021,7 @@ function exportCurrentPatchSyx() {
     upDownDir: 1,
     activeNotesPlaying: new Set(),
     tapTimes: [],
-    targetCh: null, // null = auto (usa getActiveMidiChannel()), 0..15 = canale fisso
+    targetCh: 0, // default Channel 1 (ch 0 = Canale 1 MIDI, standard per Single e Part 1)
 
     getTargetChannel() {
       if (this.targetCh !== null && this.targetCh !== undefined) {
@@ -10029,9 +10046,14 @@ function exportCurrentPatchSyx() {
       unmuteAndSetVolume(ch);
       if (selectedOutput) {
         try {
-          // Volume CC 7 max e Expression CC 11 max per garantire volume al synth hardware
+          // Volume CC 7 max, Expression CC 11 max e Out 1 L+R (CC 41 = 0) al synth hardware
           selectedOutput.send(new Uint8Array([0xB0 | ch, 7, 127]));
           selectedOutput.send(new Uint8Array([0xB0 | ch, 11, 127]));
+          selectedOutput.send(new Uint8Array([0xB0 | ch, 41, 0]));
+          if (ch === 0) {
+            selectedOutput.send(new Uint8Array([0xB0, 7, 127]));
+            selectedOutput.send(new Uint8Array([0xB0, 11, 127]));
+          }
           // Assicura che l'Arp interno del synth Virus sia disattivato per far suonare le note esterne
           selectedOutput.send(new Uint8Array([...SYSEX_PREFIX, deviceId(), 0x10, 0x01, 78, 0x00, 0xF7]));
         } catch(e) {}
@@ -10041,7 +10063,7 @@ function exportCurrentPatchSyx() {
       this.updateUI();
       setLastAction(`Arp START (BPM ${this.bpm}, ch ${ch + 1})`);
       const dbg = document.getElementById('midi-debug');
-      if (dbg) dbg.innerHTML = `<span style="color:#00ffcc;">▶ ARP ATTIVO: ${this.bpm} BPM | Rate: ${this.rates[this.rateIdx].name} | MIDI Ch ${ch + 1}</span>`;
+      if (dbg) dbg.innerHTML = `<span style="color:#e0e4ec;">▶ ARP ATTIVO: ${this.bpm} BPM | Rate: ${this.rates[this.rateIdx].name} | MIDI Ch ${ch + 1}</span>`;
     },
 
     stop() {
@@ -10084,8 +10106,8 @@ function exportCurrentPatchSyx() {
       }
       const tapBtn = document.getElementById('arpBtnTap');
       if (tapBtn) {
-        tapBtn.style.background = '#00ffcc';
-        tapBtn.style.color = '#000';
+        tapBtn.style.background = '#e2e6ee';
+        tapBtn.style.color = '#12141a';
         setTimeout(() => {
           tapBtn.style.background = '#181a22';
           tapBtn.style.color = '#9299ab';
@@ -10362,7 +10384,7 @@ function exportCurrentPatchSyx() {
       const statusEl = document.getElementById('arpDisplayStatus');
       if (statusEl) {
         statusEl.textContent = this.running ? 'RUNNING' : 'STOPPED';
-        statusEl.style.color = this.running ? '#00ffcc' : '#888';
+        statusEl.style.color = this.running ? '#ffffff' : '#888';
       }
 
       const bpmEl = document.getElementById('arpDisplayBpm');
@@ -10378,6 +10400,19 @@ function exportCurrentPatchSyx() {
       if (chEl) {
         const ch = this.getTargetChannel();
         chEl.textContent = `CH ${ch + 1}`;
+      }
+
+      const midiOutEl = document.getElementById('arpDisplayMidiOut');
+      if (midiOutEl) {
+        if (selectedOutput) {
+          midiOutEl.textContent = selectedOutput.name;
+          midiOutEl.style.color = '#e0e4ec';
+          midiOutEl.title = `Interfaccia MIDI OUT: ${selectedOutput.name} (attiva)`;
+        } else {
+          midiOutEl.textContent = 'NON CONNESSO ⚠️';
+          midiOutEl.style.color = '#ffaa44';
+          midiOutEl.title = 'Nessuna interfaccia MIDI OUT selezionata. Clicca per aprire impostazioni MIDI.';
+        }
       }
     }
   };
@@ -10444,25 +10479,28 @@ function exportCurrentPatchSyx() {
 
     topBar.appendChild(transportBox);
 
-    // Digital readout status display
+    // Digital readout status display (high-end monochrome OLED)
     const lcdDisp = document.createElement('div');
-    lcdDisp.style.cssText = 'background: #0d0f12; border: 2px solid #1f232b; border-radius: 4px; padding: 6px 14px; color: var(--accent); font-family: monospace; font-size: 11px; display: flex; gap: 14px; align-items: center; flex-wrap: wrap; box-shadow: inset 0 2px 8px rgba(0,0,0,0.8); user-select: none;';
+    lcdDisp.style.cssText = 'background: #0d0f12; border: 2px solid #1f232b; border-radius: 4px; padding: 6px 14px; color: #d0d4dc; font-family: monospace; font-size: 11px; display: flex; gap: 14px; align-items: center; flex-wrap: wrap; box-shadow: inset 0 2px 8px rgba(0,0,0,0.8); user-select: none;';
     lcdDisp.innerHTML = `
       <div style="color: #666;">STATO: <span id="arpDisplayStatus" style="font-weight: bold; color: #888;">STOPPED</span></div>
       <div style="color: #666;">TEMPO: <span id="arpDisplayBpm" style="font-weight: bold; color: #fff;">124 BPM</span></div>
       <div style="color: #666;">MODALITÀ: <span id="arpDisplayMode" style="font-weight: bold; color: #fff;">Up</span></div>
-      <div style="color: #666;">RISOLUZIONE: <span id="arpDisplayRate" style="font-weight: bold; color: var(--accent);">1/16</span></div>
+      <div style="color: #666;">RISOLUZIONE: <span id="arpDisplayRate" style="font-weight: bold; color: #e0e4ec;">1/16</span></div>
       <div style="display: flex; align-items: center; gap: 6px;">
         <span style="color: #666;">DEST:</span>
-        <select id="arpTargetSelect" style="background: #181a20; color: var(--accent); border: 1px solid #333; border-radius: 3px; font-size: 10px; font-family: monospace; font-weight: bold; padding: 2px 6px; outline: none; cursor: pointer;">
-          <option value="auto">AUTO (Attivo)</option>
-          <option value="single">SINGLE (Ch Globale)</option>
-          <option value="0">MULTI P1 (Ch 1)</option>
+        <select id="arpTargetSelect" style="background: #181a20; color: #e0e4ec; border: 1px solid #333; border-radius: 3px; font-size: 10px; font-family: monospace; font-weight: bold; padding: 2px 6px; outline: none; cursor: pointer;">
+          <option value="0" selected>CH 1 (Global / Single / P1)</option>
+          <option value="auto">AUTO (Segui vista attiva)</option>
           <option value="1">MULTI P2 (Ch 2)</option>
           <option value="2">MULTI P3 (Ch 3)</option>
           <option value="3">MULTI P4 (Ch 4)</option>
         </select>
-        <span id="arpDisplayCh" style="color: var(--accent); font-weight: bold;">CH 1</span>
+        <span id="arpDisplayCh" style="color: #fff; font-weight: bold;">CH 1</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 6px; border-left: 1px solid #222; padding-left: 10px; cursor: pointer;" id="arpMidiOutStatusBox" title="Stato interfaccia MIDI OUT (clicca per configurare)">
+        <span style="color: #666;">MIDI OUT:</span>
+        <span id="arpDisplayMidiOut" style="color: #e0e4ec; font-weight: bold;">...</span>
       </div>
     `;
     topBar.appendChild(lcdDisp);
@@ -10486,6 +10524,13 @@ function exportCurrentPatchSyx() {
           unmuteAndSetVolume(arpEngine.getTargetChannel());
           arpEngine.updateUI();
           setLastAction(`Arp Target: ${sel.options[sel.selectedIndex].text}`);
+        });
+      }
+
+      const midiBox = document.getElementById('arpMidiOutStatusBox');
+      if (midiBox) {
+        midiBox.addEventListener('click', () => {
+          if (typeof openSettingsModal === 'function') openSettingsModal();
         });
       }
     }, 0);
@@ -10593,7 +10638,7 @@ function exportCurrentPatchSyx() {
     seqSection.style.cssText = 'width: 100%; max-width: 960px; display: flex; flex-direction: column; align-items: center; gap: 12px; background: rgba(0,0,0,0.5); border: 1px solid var(--border); border-radius: 6px; padding: 16px 18px; box-sizing: border-box;';
 
     const seqHeader = document.createElement('div');
-    seqHeader.style.cssText = 'width: 100%; display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: bold; letter-spacing: 0.08em; color: var(--accent); font-family: monospace; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px;';
+    seqHeader.style.cssText = 'width: 100%; display: flex; justify-content: space-between; align-items: center; font-size: 11px; font-weight: bold; letter-spacing: 0.08em; color: #d0d4dd; font-family: monospace; border-bottom: 1px solid rgba(255,255,255,0.08); padding-bottom: 8px;';
     seqHeader.innerHTML = `<span>16-STEP RHYTHM PATTERN (CLICCA PER ATTIVARE/DISATTIVARE GLI STEP)</span><span style="color: #888;">CURSORE TEMPO REALE</span>`;
     seqSection.appendChild(seqHeader);
 
