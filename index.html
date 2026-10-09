@@ -289,7 +289,7 @@
   }
   .command-strip{
     display: grid;
-    grid-template-columns: auto auto auto auto 1fr;
+    grid-template-columns: repeat(5, auto) 1fr;
     align-items: center;
     gap: 8px;
     margin: -8px 0 16px 0;
@@ -3551,6 +3551,7 @@
 <div class="command-strip" aria-label="Virus TI Snow command strip">
   <button id="btnReceiveSingle" type="button">receive single</button>
   <button id="btnSendCurrent" type="button">send current</button>
+  <button id="btnTestHwSound" type="button" style="font-weight: 800; color: #fff; background: linear-gradient(180deg, #2a3444 0%, #18202c 100%); border-color: #4b5d78;" title="Invia una nota di test C4 a C2MIDI Pro per verificare il suono del synth Virus">🔊 test virus</button>
   <button id="btnPanic" class="danger" type="button">panic</button>
   <button id="btnToggleDiagnostics" type="button">diagnostics</button>
   <div class="command-state" id="opsLastAction">idle</div>
@@ -3601,6 +3602,13 @@
     </div>
     <div id="midi-debug" style="font-family: monospace; color: #80c090; background: #111; padding: 4px 8px; border-radius: 4px; font-size: 12px; text-align: center; margin-top: 10px;">
       MIDI: ...
+    </div>
+    <div style="margin-top: 14px; background: rgba(255,255,255,0.04); padding: 10px 12px; border-radius: 4px; border: 1px solid rgba(255,255,255,0.1); font-size: 11px; line-height: 1.5; color: #b0b8c4;">
+      <div style="font-weight: bold; color: #ffd166; margin-bottom: 4px;">🎧 COME ASCOLTARE IL SUONO DEL VIRUS TI:</div>
+      Il cavo MIDI (C2MIDI Pro) invia <b>esclusivamente note e comandi digitali</b>, non trasferisce l'audio del sintetizzatore agli altoparlanti del Mac.<br>
+      • Collega le <b>cuffie</b> all'uscita <b>PHONES</b> del Virus TI (oppure l'uscita <b>OUT 1 L/R</b> a casse monitor o scheda audio).<br>
+      • Assicurati che la manopola fisica <b>MASTER VOLUME</b> sul frontale del Virus TI sia alzata.<br>
+      • Puoi disattivare il sintetizzatore Web Audio del Mac in fondo alla schermata (tasto <b>AUDIO MAC: OFF</b>) per ascoltare esclusivamente il Virus TI reale.
     </div>
   </div>
 </div>
@@ -5281,21 +5289,35 @@
   chanSelect.addEventListener('change', updateControlRoomStatus);
   devIdSelect.addEventListener('change', updateControlRoomStatus);
 
-  if (navigator.requestMIDIAccess){
-    navigator.requestMIDIAccess({ sysex: true }).then(access => {
+  function initWebMidi(){
+    if (!navigator.requestMIDIAccess){
+      connLabel.textContent = 'web midi non supportato';
+      updateControlRoomStatus();
+      setLastAction('⚠️ Usa Google Chrome o Edge (Safari non supporta Web MIDI)');
+      return;
+    }
+
+    const onAccessSuccess = (access) => {
       midiAccess = access;
       refreshPorts();
       midiAccess.onstatechange = refreshPorts;
       updateControlRoomStatus();
-    }).catch(err => {
-      connLabel.textContent = 'midi unavailable';
-      updateControlRoomStatus();
-      console.error(err);
+      if (selectedOutput) {
+        setLastAction(`Connesso a ${selectedOutput.name}`);
+      }
+    };
+
+    navigator.requestMIDIAccess({ sysex: true }).then(onAccessSuccess).catch(err => {
+      console.warn('Richiesta SysEx non autorizzata, provo con MIDI standard...', err);
+      navigator.requestMIDIAccess({ sysex: false }).then(onAccessSuccess).catch(err2 => {
+        connLabel.textContent = 'midi non autorizzato';
+        updateControlRoomStatus();
+        setLastAction('⚠️ Abilita i permessi MIDI nel browser per comunicare col Virus');
+        console.error('Web MIDI access denied:', err2);
+      });
     });
-  } else {
-    connLabel.textContent = 'web midi not supported';
-    updateControlRoomStatus();
   }
+  initWebMidi();
 
   // ---------------------------------------------------------------------
   // SysEx send
@@ -9306,6 +9328,38 @@ function exportCurrentPatchSyx() {
     sendFullPatch(patch);
   });
 
+  document.getElementById('btnTestHwSound')?.addEventListener('click', () => {
+    if (!selectedOutput) {
+      openSettingsModal();
+      setLastAction('⚠️ Seleziona prima la porta MIDI OUT');
+      return;
+    }
+    try {
+      const ch = getActiveMidiChannel();
+      unmuteAndSetVolume(ch);
+      selectedOutput.send(new Uint8Array([0xB0 | ch, 7, 127]));
+      selectedOutput.send(new Uint8Array([0xB0 | ch, 11, 127]));
+      selectedOutput.send(new Uint8Array([0xB0 | ch, 41, 0]));
+      selectedOutput.send(new Uint8Array([0x90 | ch, 60, 120]));
+      if (ch !== 0) {
+        selectedOutput.send(new Uint8Array([0x90, 60, 120]));
+      }
+      setLastAction(`🔊 TEST INVIATO A ${selectedOutput.name}! Ascolta da PHONES/OUT 1 del Virus`);
+      const dbg = document.getElementById('midi-debug');
+      if (dbg) {
+        dbg.innerHTML = `<span style="color:#fff;">🔊 NOTA TEST INVIATA A ${selectedOutput.name}! Ricorda di ascoltare dall'uscita CUFFIE o OUT 1 del Virus TI!</span>`;
+      }
+      setTimeout(() => {
+        try {
+          selectedOutput.send(new Uint8Array([0x80 | ch, 60, 0]));
+          if (ch !== 0) selectedOutput.send(new Uint8Array([0x80, 60, 0]));
+        } catch(e) {}
+      }, 800);
+    } catch(e) {
+      console.error(e);
+    }
+  });
+
   document.getElementById('btnPanic').addEventListener('click', () => {
     if (!selectedOutput) {
       setLastAction('connect midi output first');
@@ -10476,6 +10530,33 @@ function exportCurrentPatchSyx() {
       arpEngine.updateUI();
     });
     transportBox.appendChild(btnHold);
+
+    const btnTestHwArp = document.createElement('button');
+    btnTestHwArp.id = 'arpBtnTestHw';
+    btnTestHwArp.className = 'arp-hw-preset-btn';
+    btnTestHwArp.style.cssText = 'padding: 8px 12px; font-weight: 800; font-size: 11px;';
+    btnTestHwArp.innerHTML = '🔊 test synth';
+    btnTestHwArp.title = 'Invia una nota di prova hardware al synth Virus TI';
+    btnTestHwArp.addEventListener('click', () => {
+      const ch = arpEngine.getTargetChannel();
+      unmuteAndSetVolume(ch);
+      if (selectedOutput) {
+        try {
+          selectedOutput.send(new Uint8Array([0xB0 | ch, 7, 127]));
+          selectedOutput.send(new Uint8Array([0xB0 | ch, 11, 127]));
+          selectedOutput.send(new Uint8Array([0xB0 | ch, 41, 0]));
+          selectedOutput.send(new Uint8Array([0x90 | ch, 60, 120]));
+          setLastAction(`🔊 TEST INVIATO A ${selectedOutput.name}! Ascolta da PHONES/OUT 1`);
+          setTimeout(() => {
+            selectedOutput.send(new Uint8Array([0x80 | ch, 60, 0]));
+          }, 800);
+        } catch(e) {}
+      } else {
+        openSettingsModal();
+        setLastAction('⚠️ Seleziona prima la porta MIDI OUT');
+      }
+    });
+    transportBox.appendChild(btnTestHwArp);
 
     topBar.appendChild(transportBox);
 
