@@ -1692,6 +1692,207 @@
     box-shadow: 0 0 18px #ffffff, 0 0 22px #38bdf8 !important;
   }
 
+  /* ==========================================================================
+     AUTHENTIC HARDWARE BUTTONS & PADS (VIRUS TI & ELEKTRON SKEUOMORPHIC REALISM)
+     ========================================================================== */
+  .arp-hw-btn-play {
+    padding: 8px 20px;
+    font-size: 13px;
+    font-weight: 900;
+    letter-spacing: 0.05em;
+    border-radius: 4px;
+    border: 1px solid #145e37;
+    border-top: 1px solid rgba(255,255,255,0.7);
+    border-bottom: 2px solid #0f4427;
+    background: linear-gradient(180deg, #3cd789 0%, #25a05f 60%, #1b7a48 100%);
+    color: #ffffff;
+    cursor: pointer;
+    outline: none !important;
+    user-select: none;
+    box-shadow: 0 3px 5px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,255,255,0.7), inset 0 -2px 3px rgba(0,0,0,0.25);
+    text-shadow: 0 -1px 1px rgba(0,0,0,0.6);
+    transition: transform 0.06s ease, filter 0.1s ease, box-shadow 0.1s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 6px;
+  }
+  .arp-hw-btn-play:hover {
+    filter: brightness(1.08);
+  }
+  .arp-hw-btn-play:active {
+    transform: translateY(1.5px);
+    border-bottom-width: 1px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.6), inset 0 2px 4px rgba(0,0,0,0.4);
+  }
+  .arp-hw-btn-play.running {
+    background: linear-gradient(180deg, #ff5c6a 0%, #d43b49 60%, #a82532 100%) !important;
+    border: 1px solid #801822 !important;
+    border-top: 1px solid rgba(255,255,255,0.75) !important;
+    border-bottom: 2px solid #5e1119 !important;
+    box-shadow: 0 0 14px rgba(255,77,90,0.6), 0 3px 5px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,255,255,0.8), inset 0 -2px 3px rgba(0,0,0,0.3) !important;
+    text-shadow: 0 -1px 1px rgba(0,0,0,0.7) !important;
+  }
+
+  .arp-hw-btn-hold {
+    padding: 8px 16px;
+    font-size: 11px;
+    font-weight: 800;
+    border-radius: 4px;
+    border: 1px solid #a8abb2;
+    border-top: 1px solid #ffffff;
+    border-bottom: 2px solid #8b8e96;
+    background: linear-gradient(180deg, #ffffff 0%, #eceef2 60%, #d8dbe2 100%);
+    color: #1a1c22;
+    cursor: pointer;
+    outline: none !important;
+    user-select: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.35), inset 0 1px 0 #ffffff, inset 0 -1px 2px rgba(0,0,0,0.08);
+    text-shadow: 0 1px 0 rgba(255,255,255,0.9);
+    transition: transform 0.06s ease, filter 0.1s ease, box-shadow 0.1s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+  }
+  .arp-hw-btn-hold:hover {
+    background: linear-gradient(180deg, #ffffff 0%, #f4f5f8 60%, #e2e4ea 100%);
+  }
+  .arp-hw-btn-hold:active {
+    transform: translateY(1.5px);
+    border-bottom-width: 1px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.3), inset 0 1px 3px rgba(0,0,0,0.2);
+  }
+  .arp-hw-btn-hold.latched {
+    background: linear-gradient(180deg, #6ef2eb 0%, #20b8b0 100%) !important;
+    border: 1px solid #148b85 !important;
+    border-top: 1px solid rgba(255,255,255,0.85) !important;
+    border-bottom: 2px solid #0f6e69 !important;
+    color: #032022 !important;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.4) !important;
+    box-shadow: 0 0 12px rgba(85,208,222,0.6), 0 2px 4px rgba(0,0,0,0.4), inset 0 1px 1px rgba(255,255,255,0.85) !important;
+  }
+
+  /* 16 Step Silicone Groovebox Pads */
+  .arp-hw-pad-well {
+    width: 100%;
+    padding: 2px;
+    background: #0f1014;
+    border-radius: 5px;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.08);
+    box-sizing: border-box;
+  }
+
+  .arp-hw-step-pad {
+    width: 100%;
+    height: 38px;
+    border-radius: 4px;
+    font-family: monospace;
+    font-size: 11px;
+    font-weight: 800;
+    cursor: pointer;
+    outline: none !important;
+    user-select: none;
+    box-sizing: border-box;
+    background: linear-gradient(180deg, #282a34 0%, #171820 100%);
+    border: 1px solid #111216;
+    border-top: 1px solid rgba(255,255,255,0.16);
+    border-bottom: 2px solid #090a0d;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08);
+    color: #687082;
+    text-shadow: 0 -1px 0 #0a0b0e;
+    transition: transform 0.05s ease, filter 0.08s ease, box-shadow 0.08s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .arp-hw-step-pad.quarter {
+    border-top: 1px solid rgba(255,255,255,0.28);
+    background: linear-gradient(180deg, #30333e 0%, #1b1c24 100%);
+    color: #8892a6;
+  }
+  .arp-hw-step-pad:hover {
+    filter: brightness(1.15);
+  }
+  .arp-hw-step-pad:active {
+    transform: translateY(1.5px);
+    border-bottom-width: 1px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.7), inset 0 2px 4px rgba(0,0,0,0.5);
+  }
+  .arp-hw-step-pad.active {
+    background: linear-gradient(180deg, #64e9e0 0%, #1caea6 100%) !important;
+    border: 1px solid #13837e !important;
+    border-top: 1px solid rgba(255,255,255,0.85) !important;
+    border-bottom: 2px solid #0d5f5b !important;
+    box-shadow: 0 0 10px rgba(85,208,222,0.55), 0 3px 5px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,255,255,0.7), inset 0 -2px 3px rgba(0,0,0,0.2) !important;
+    color: #032022 !important;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.35) !important;
+  }
+  .arp-hw-step-pad.flash {
+    filter: brightness(1.75) drop-shadow(0 0 6px #ffffff) !important;
+  }
+
+  /* 3D Domed Jewel LEDs */
+  .arp-hw-led-well {
+    width: 13px;
+    height: 13px;
+    border-radius: 50%;
+    background: #0d0e12;
+    border: 1px solid rgba(255,255,255,0.06);
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.9), 0 1px 0 rgba(255,255,255,0.08);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-sizing: border-box;
+  }
+  .arp-hw-led {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: radial-gradient(circle at 35% 35%, #383b44 0%, #121317 75%);
+    border: 1px solid #090a0d;
+    box-sizing: border-box;
+    transition: all 0.04s ease;
+  }
+  .arp-hw-led.active {
+    background: radial-gradient(circle at 35% 35%, #ffffff 0%, #00ffcc 50%, #00997a 100%) !important;
+    border-color: #00ffcc !important;
+    box-shadow: 0 0 8px #00ffcc, 0 0 14px rgba(0,255,204,0.7) !important;
+  }
+
+  /* Realistic Elektron-Style White Keycaps for Presets */
+  .arp-hw-preset-btn {
+    font-size: 11px;
+    font-weight: 700;
+    font-family: var(--font-ui), -apple-system, sans-serif;
+    letter-spacing: 0.02em;
+    padding: 6px 14px;
+    background: linear-gradient(180deg, #ffffff 0%, #eff1f5 55%, #dce0e7 100%);
+    color: #1a1c22;
+    border: 1px solid #b2b5bd;
+    border-top: 1px solid #ffffff;
+    border-bottom: 2px solid #9aa0a8;
+    border-radius: 4px;
+    cursor: pointer;
+    outline: none !important;
+    user-select: none;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.25), inset 0 1px 0 #ffffff;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.8);
+    transition: transform 0.06s ease, filter 0.1s ease, box-shadow 0.1s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .arp-hw-preset-btn:hover {
+    background: linear-gradient(180deg, #ffffff 0%, #f6f7fa 55%, #e4e7ee 100%);
+    border-color: #9ea2ab;
+  }
+  .arp-hw-preset-btn:active {
+    transform: translateY(1.5px);
+    border-bottom-width: 1px;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.2), inset 0 1px 3px rgba(0,0,0,0.15);
+  }
+
   .chassis-knob-container {
     width: 38px;
   }
@@ -4037,6 +4238,13 @@
     document.getElementById('arpContent').style.display = 'block';
     document.getElementById('btnTabArp').classList.add('active');
     updateControlRoomStatus();
+    if (typeof updateKeyboardPartDisplay === 'function') updateKeyboardPartDisplay();
+    if (selectedOutput) {
+      unmuteAndSetVolume(getActiveMidiChannel());
+    }
+    if (window.arpEngine) {
+      window.arpEngine.updateUI();
+    }
   });
 
   document.getElementById('btnTabSequencer').addEventListener('click', () => {
@@ -5175,6 +5383,7 @@
   }
 
   function sendVirusMode(mode = 0) { // 0 = Single Mode, 1 = Multi Mode, 2 = Sequencer
+    window.currentSynthMode = mode === 0 ? 'single' : 'multi';
     if (!selectedOutput) return;
     try {
       // SysEx Global Param (0x73), Param 0 (Synth Mode), Value: 0 (Single) / 1 (Multi)
@@ -9370,11 +9579,11 @@ function exportCurrentPatchSyx() {
     const chEl = document.getElementById('midiChannel');
     const configuredGlobalCh = chEl ? (parseInt(chEl.value, 10) - 1) & 0x0F : 0;
 
-    // Rileva se ci troviamo in Single Mode (vista TI-SNOW, vista SINGLE o badge frontale SINGLE)
+    // Rileva se ci troviamo in Single Mode (vista TI-SNOW, vista SINGLE o badge frontale SINGLE o stato memorizzato)
     const isSnowView = document.getElementById('btnTabSnow')?.classList.contains('active');
     const isSingleView = document.getElementById('btnTabSynth')?.classList.contains('active');
     const modeBadge = document.getElementById('frontLcdModeBadge');
-    const isSingleMode = isSnowView || isSingleView || (modeBadge && modeBadge.textContent === 'SINGLE');
+    const isSingleMode = isSnowView || isSingleView || (window.currentSynthMode === 'single') || (modeBadge && modeBadge.textContent === 'SINGLE');
 
     if (isSingleMode) {
       // In modalità SINGLE, il Virus TI reale risponde esclusivamente sul suo Global Channel
@@ -9795,6 +10004,14 @@ function exportCurrentPatchSyx() {
     upDownDir: 1,
     activeNotesPlaying: new Set(),
     tapTimes: [],
+    targetCh: null, // null = auto (usa getActiveMidiChannel()), 0..15 = canale fisso
+
+    getTargetChannel() {
+      if (this.targetCh !== null && this.targetCh !== undefined) {
+        return this.targetCh & 0x0F;
+      }
+      return getActiveMidiChannel();
+    },
 
     toggle() {
       if (this.running) this.stop();
@@ -9807,13 +10024,24 @@ function exportCurrentPatchSyx() {
       this.currentStep = 0;
       this.cycleIndex = 0;
       this.upDownDir = 1;
-      this.syncHardwareArp();
+
+      const ch = this.getTargetChannel();
+      unmuteAndSetVolume(ch);
+      if (selectedOutput) {
+        try {
+          // Volume CC 7 max e Expression CC 11 max per garantire volume al synth hardware
+          selectedOutput.send(new Uint8Array([0xB0 | ch, 7, 127]));
+          selectedOutput.send(new Uint8Array([0xB0 | ch, 11, 127]));
+          // Assicura che l'Arp interno del synth Virus sia disattivato per far suonare le note esterne
+          selectedOutput.send(new Uint8Array([...SYSEX_PREFIX, deviceId(), 0x10, 0x01, 78, 0x00, 0xF7]));
+        } catch(e) {}
+      }
+
       this.scheduleNextTick();
       this.updateUI();
-      const ch = getActiveMidiChannel();
       setLastAction(`Arp START (BPM ${this.bpm}, ch ${ch + 1})`);
       const dbg = document.getElementById('midi-debug');
-      if (dbg) dbg.innerHTML = `<span style="color:#00ffcc;">▶ ARP ATTIVO: ${this.bpm} BPM | Rate: ${this.rates[this.rateIdx].name} | Ch ${ch + 1}</span>`;
+      if (dbg) dbg.innerHTML = `<span style="color:#00ffcc;">▶ ARP ATTIVO: ${this.bpm} BPM | Rate: ${this.rates[this.rateIdx].name} | MIDI Ch ${ch + 1}</span>`;
     },
 
     stop() {
@@ -9825,6 +10053,12 @@ function exportCurrentPatchSyx() {
       }
       this.activeNotesPlaying.forEach(n => this.rawStop(n));
       this.activeNotesPlaying.clear();
+      if (selectedOutput) {
+        const ch = this.getTargetChannel();
+        try {
+          selectedOutput.send(new Uint8Array([0xB0 | ch, 123, 0])); // All Notes Off
+        } catch(e) {}
+      }
       this.currentStep = 0;
       this.updateUI();
       setLastAction('Arp STOPPED');
@@ -9913,7 +10147,7 @@ function exportCurrentPatchSyx() {
 
     refreshStepsUI() {
       for (let i = 0; i < 16; i++) {
-        const pad = document.getElementById(`arpStepPad${i}`);
+        const pad = document.getElementById(`arpStepBtn${i}`);
         if (pad) {
           const on = this.steps[i];
           if (on) pad.classList.add('active');
@@ -10037,9 +10271,10 @@ function exportCurrentPatchSyx() {
         playWebAudioNote(noteNumber, velocity);
       }
       if (selectedOutput) {
-        const ch = getActiveMidiChannel();
+        const ch = this.getTargetChannel();
         try {
           selectedOutput.send(new Uint8Array([0x90 | ch, noteNumber & 0x7F, velocity & 0x7F]));
+          recordMidiTx('arp on ' + noteNumber + ' (ch ' + (ch + 1) + ')', [0x90 | ch, noteNumber, velocity]);
         } catch(e) {}
       }
       highlightPianoKey(noteNumber, true);
@@ -10050,7 +10285,7 @@ function exportCurrentPatchSyx() {
         stopWebAudioNote(noteNumber);
       }
       if (selectedOutput) {
-        const ch = getActiveMidiChannel();
+        const ch = this.getTargetChannel();
         try {
           selectedOutput.send(new Uint8Array([0x80 | ch, noteNumber & 0x7F, 0]));
         } catch(e) {}
@@ -10080,34 +10315,22 @@ function exportCurrentPatchSyx() {
     },
 
     syncHardwareArp() {
-      if (!selectedOutput) return;
-      try {
-        const modeVal = this.modeIdx;
-        const octVal = Math.max(0, this.octaves - 1);
-        const holdVal = this.hold ? 1 : 0;
-        selectedOutput.send(new Uint8Array([...SYSEX_PREFIX, deviceId(), 0x01, 0x01, 78, modeVal, 0xF7]));
-        selectedOutput.send(new Uint8Array([...SYSEX_PREFIX, deviceId(), 0x01, 0x01, 81, octVal, 0xF7]));
-        selectedOutput.send(new Uint8Array([...SYSEX_PREFIX, deviceId(), 0x01, 0x01, 84, holdVal, 0xF7]));
-      } catch(e) {}
+      const ch = this.getTargetChannel();
+      unmuteAndSetVolume(ch);
     },
 
     highlightStepUI(step) {
       for (let i = 0; i < 16; i++) {
         const led = document.getElementById(`arpLedStep${i}`);
         if (led) {
-          if (i === step) {
-            led.style.background = '#00ffcc';
-            led.style.boxShadow = '0 0 8px #00ffcc';
-          } else {
-            led.style.background = '#222';
-            led.style.boxShadow = 'none';
-          }
+          if (i === step) led.classList.add('active');
+          else led.classList.remove('active');
         }
         const btn = document.getElementById(`arpStepBtn${i}`);
         if (btn) {
           if (i === step && this.steps[i]) {
-            btn.style.filter = 'brightness(1.5)';
-            setTimeout(() => { btn.style.filter = 'none'; }, 90);
+            btn.classList.add('flash');
+            setTimeout(() => { btn.classList.remove('flash'); }, 90);
           }
         }
       }
@@ -10118,16 +10341,10 @@ function exportCurrentPatchSyx() {
       if (btn) {
         if (this.running) {
           btn.innerHTML = '⏹ stop arp';
-          btn.style.background = '#e06c75';
-          btn.style.borderColor = '#ff4d5a';
-          btn.style.color = '#fff';
-          btn.style.boxShadow = '0 0 12px rgba(224,108,117,0.5)';
+          btn.classList.add('running');
         } else {
           btn.innerHTML = '▶ start arp';
-          btn.style.background = '#2bb673';
-          btn.style.borderColor = '#36d382';
-          btn.style.color = '#fff';
-          btn.style.boxShadow = 'none';
+          btn.classList.remove('running');
         }
       }
 
@@ -10135,14 +10352,10 @@ function exportCurrentPatchSyx() {
       if (btnHold) {
         if (this.hold) {
           btnHold.innerHTML = 'hold: on 🔒';
-          btnHold.style.background = 'var(--accent)';
-          btnHold.style.color = '#000';
-          btnHold.style.borderColor = 'var(--accent)';
+          btnHold.classList.add('latched');
         } else {
           btnHold.innerHTML = 'hold: off';
-          btnHold.style.background = '#fff';
-          btnHold.style.color = '#111';
-          btnHold.style.borderColor = '#ccc';
+          btnHold.classList.remove('latched');
         }
       }
 
@@ -10160,6 +10373,12 @@ function exportCurrentPatchSyx() {
 
       const rateEl = document.getElementById('arpDisplayRate');
       if (rateEl) rateEl.textContent = this.rates[this.rateIdx].name;
+
+      const chEl = document.getElementById('arpDisplayCh');
+      if (chEl) {
+        const ch = this.getTargetChannel();
+        chEl.textContent = `CH ${ch + 1}`;
+      }
     }
   };
 
@@ -10201,27 +10420,23 @@ function exportCurrentPatchSyx() {
 
     const btnPlayStop = document.createElement('button');
     btnPlayStop.id = 'arpBtnPlayStop';
-    btnPlayStop.style.cssText = 'padding: 8px 18px; font-size: 13px; font-weight: 900; letter-spacing: 0.05em; border-radius: 4px; border: 2px solid #36d382; background: #2bb673; color: #fff; cursor: pointer; transition: all 0.1s; outline: none; user-select: none;';
+    btnPlayStop.className = 'arp-hw-btn-play';
     btnPlayStop.innerHTML = '▶ start arp';
     btnPlayStop.title = 'Avvia / Ferma riproduzione in tempo reale dell\'Arpeggiatore';
     btnPlayStop.addEventListener('click', () => {
       getAudioContext();
-      unmuteAndSetVolume(getActiveMidiChannel());
+      unmuteAndSetVolume(arpEngine.getTargetChannel());
       arpEngine.toggle();
     });
     transportBox.appendChild(btnPlayStop);
 
     const btnHold = document.createElement('button');
     btnHold.id = 'arpBtnHold';
-    btnHold.style.cssText = 'padding: 8px 14px; font-size: 11px; font-weight: bold; border-radius: 4px; border: 1px solid #ccc; background: #fff; color: #111; cursor: pointer; outline: none; user-select: none; transition: all 0.1s;';
+    btnHold.className = 'arp-hw-btn-hold';
     btnHold.textContent = 'hold: off';
     btnHold.title = 'Modalità Hold / Latch: mantiene attive le note anche se rilasci la tastiera';
     btnHold.addEventListener('click', () => {
       arpEngine.hold = !arpEngine.hold;
-      btnHold.textContent = arpEngine.hold ? 'hold: on 🔒' : 'hold: off';
-      btnHold.style.background = arpEngine.hold ? 'var(--accent)' : '#fff';
-      btnHold.style.color = arpEngine.hold ? '#000' : '#111';
-      btnHold.style.borderColor = arpEngine.hold ? 'var(--accent)' : '#ccc';
       arpEngine.syncHardwareArp();
       arpEngine.updateUI();
     });
@@ -10231,16 +10446,49 @@ function exportCurrentPatchSyx() {
 
     // Digital readout status display
     const lcdDisp = document.createElement('div');
-    lcdDisp.style.cssText = 'background: #0d0f12; border: 2px solid #1f232b; border-radius: 4px; padding: 6px 14px; color: var(--accent); font-family: monospace; font-size: 11px; display: flex; gap: 16px; align-items: center; box-shadow: inset 0 2px 8px rgba(0,0,0,0.8); user-select: none;';
+    lcdDisp.style.cssText = 'background: #0d0f12; border: 2px solid #1f232b; border-radius: 4px; padding: 6px 14px; color: var(--accent); font-family: monospace; font-size: 11px; display: flex; gap: 14px; align-items: center; flex-wrap: wrap; box-shadow: inset 0 2px 8px rgba(0,0,0,0.8); user-select: none;';
     lcdDisp.innerHTML = `
       <div style="color: #666;">STATO: <span id="arpDisplayStatus" style="font-weight: bold; color: #888;">STOPPED</span></div>
       <div style="color: #666;">TEMPO: <span id="arpDisplayBpm" style="font-weight: bold; color: #fff;">124 BPM</span></div>
       <div style="color: #666;">MODALITÀ: <span id="arpDisplayMode" style="font-weight: bold; color: #fff;">Up</span></div>
       <div style="color: #666;">RISOLUZIONE: <span id="arpDisplayRate" style="font-weight: bold; color: var(--accent);">1/16</span></div>
+      <div style="display: flex; align-items: center; gap: 6px;">
+        <span style="color: #666;">DEST:</span>
+        <select id="arpTargetSelect" style="background: #181a20; color: var(--accent); border: 1px solid #333; border-radius: 3px; font-size: 10px; font-family: monospace; font-weight: bold; padding: 2px 6px; outline: none; cursor: pointer;">
+          <option value="auto">AUTO (Attivo)</option>
+          <option value="single">SINGLE (Ch Globale)</option>
+          <option value="0">MULTI P1 (Ch 1)</option>
+          <option value="1">MULTI P2 (Ch 2)</option>
+          <option value="2">MULTI P3 (Ch 3)</option>
+          <option value="3">MULTI P4 (Ch 4)</option>
+        </select>
+        <span id="arpDisplayCh" style="color: var(--accent); font-weight: bold;">CH 1</span>
+      </div>
     `;
     topBar.appendChild(lcdDisp);
 
     innerLayout.appendChild(topBar);
+
+    // Gestione cambio canale target
+    setTimeout(() => {
+      const sel = document.getElementById('arpTargetSelect');
+      if (sel) {
+        sel.addEventListener('change', () => {
+          const val = sel.value;
+          if (val === 'auto') {
+            arpEngine.targetCh = null;
+          } else if (val === 'single') {
+            const chEl = document.getElementById('midiChannel');
+            arpEngine.targetCh = chEl ? (parseInt(chEl.value, 10) - 1) & 0x0F : 0;
+          } else {
+            arpEngine.targetCh = parseInt(val, 10) & 0x0F;
+          }
+          unmuteAndSetVolume(arpEngine.getTargetChannel());
+          arpEngine.updateUI();
+          setLastAction(`Arp Target: ${sel.options[sel.selectedIndex].text}`);
+        });
+      }
+    }, 0);
 
     // =========================================================================
     // 2. ROTARY HARDWARE KNOBS SECTION
@@ -10356,37 +10604,42 @@ function exportCurrentPatchSyx() {
       const col = document.createElement('div');
       col.style.cssText = 'display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 0; box-sizing: border-box;';
 
-      // Indicator LED
+      // 3D Domed Indicator LED
+      const ledWell = document.createElement('div');
+      ledWell.className = 'arp-hw-led-well';
       const led = document.createElement('div');
       led.id = `arpLedStep${i}`;
-      led.style.cssText = 'width: 9px; height: 9px; border-radius: 50%; background: #222; border: 1px solid #111; transition: background 0.04s, box-shadow 0.04s;';
-      col.appendChild(led);
+      led.className = 'arp-hw-led';
+      ledWell.appendChild(led);
+      col.appendChild(ledWell);
 
-      // Step Button (Outline none evita il bordo blu visto nello screenshot)
+      // 3D Tactile Silicone Step Button
+      const padWell = document.createElement('div');
+      padWell.className = 'arp-hw-pad-well';
       const stepBtn = document.createElement('button');
       stepBtn.id = `arpStepBtn${i}`;
       const isActive = arpEngine.steps[i];
       const isQuarter = (i % 4 === 0);
-      stepBtn.style.cssText = `width: 100%; height: 38px; border-radius: 4px; font-family: monospace; font-size: 11px; font-weight: 800; cursor: pointer; transition: all 0.1s; outline: none; border: 1px solid ${isQuarter ? '#666' : '#333'}; ${isActive ? 'background: var(--accent); color: #000; box-shadow: 0 0 6px var(--accent);' : 'background: #18181f; color: #555;'}`;
+      stepBtn.className = `arp-hw-step-pad ${isQuarter ? 'quarter' : ''} ${isActive ? 'active' : ''}`;
       stepBtn.textContent = String(i + 1);
       stepBtn.title = `Step ${i + 1}: ${isActive ? 'ATTIVO' : 'PAUSA'} (Clicca per cambiare)`;
 
       stepBtn.addEventListener('click', () => {
         arpEngine.steps[i] = !arpEngine.steps[i];
         const on = arpEngine.steps[i];
-        stepBtn.style.background = on ? 'var(--accent)' : '#18181f';
-        stepBtn.style.color = on ? '#000' : '#555';
-        stepBtn.style.boxShadow = on ? '0 0 6px var(--accent)' : 'none';
+        if (on) stepBtn.classList.add('active');
+        else stepBtn.classList.remove('active');
         stepBtn.title = `Step ${i + 1}: ${on ? 'ATTIVO' : 'PAUSA'}`;
       });
 
-      col.appendChild(stepBtn);
+      padWell.appendChild(stepBtn);
+      col.appendChild(padWell);
       stepsRow.appendChild(col);
     }
     seqSection.appendChild(stepsRow);
 
     // =========================================================================
-    // 4. PATTERN PRESETS TOOLBAR (PULSANTI BIANCHI ORIGINALI ALLINEATI)
+    // 4. PATTERN PRESETS TOOLBAR (PULSANTI BIANCHI SKEUOMORFICI ELEKTRON-STYLE)
     // =========================================================================
     const patternTools = document.createElement('div');
     patternTools.style.cssText = 'display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; justify-content: center; width: 100%; box-sizing: border-box;';
@@ -10396,20 +10649,16 @@ function exportCurrentPatchSyx() {
         arpEngine.steps[i] = !!patternArr[i];
         const btn = document.getElementById(`arpStepBtn${i}`);
         if (btn) {
-          const on = arpEngine.steps[i];
-          btn.style.background = on ? 'var(--accent)' : '#18181f';
-          btn.style.color = on ? '#000' : '#555';
-          btn.style.boxShadow = on ? '0 0 6px var(--accent)' : 'none';
+          if (arpEngine.steps[i]) btn.classList.add('active');
+          else btn.classList.remove('active');
         }
       }
     };
 
     const addPresetBtn = (label, arr) => {
       const b = document.createElement('button');
-      b.style.cssText = 'font-size: 10.5px; font-weight: bold; font-family: sans-serif; padding: 6px 12px; background: #fff; color: #111; border: 1px solid #ccc; border-radius: 4px; cursor: pointer; outline: none; transition: background 0.1s; user-select: none; box-shadow: 0 1px 2px rgba(0,0,0,0.15);';
+      b.className = 'arp-hw-preset-btn';
       b.textContent = label;
-      b.addEventListener('mouseenter', () => b.style.background = '#f0f0f0');
-      b.addEventListener('mouseleave', () => b.style.background = '#fff');
       b.addEventListener('click', () => setPattern(arr));
       patternTools.appendChild(b);
     };
