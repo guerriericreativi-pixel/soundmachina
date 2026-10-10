@@ -13,7 +13,7 @@
     --section-bg: #e6e6e6;
     --border: #cccccc;
     --dot-color: #d8d8d8;
-    --accent: #56b6c2;
+    --accent: #888888;
     --light-limit: 0.72;
     --led-halo: 6px;
     --led-halo-soft: 14px;
@@ -27,7 +27,7 @@
     --section-bg: #222226;
     --border: #333338;
     --dot-color: #2a2a30;
-    --accent: #56b6c2;
+    --accent: #888888;
   }
   *{
     box-sizing: border-box;
@@ -1553,6 +1553,33 @@
   html[data-skin="elektron"] .hardware-chassis.arp-chassis {
     padding: 30px 24px 100px 24px !important;
     gap: 14px !important;
+  }
+
+  /* ==========================================================================
+     VIRUS TI SNOW // SINGLE SYNTHESIZER DISPLAY & CHASSIS UNIFICATION
+     ========================================================================== */
+  .hardware-chassis.single-chassis,
+  #singleView .hardware-chassis {
+    padding: 30px 24px 100px 24px !important;
+    gap: 14px !important;
+    --accent: #d8dde6 !important;
+  }
+  .single-chassis .chassis-screen-recess {
+    background: #080a0e !important;
+    border: 2px solid #1a1e27 !important;
+    border-radius: 6px !important;
+    padding: 8px !important;
+    box-shadow: inset 0 3px 12px rgba(0,0,0,0.9), 0 1px 0 rgba(255,255,255,0.08) !important;
+    position: relative;
+    overflow: hidden;
+  }
+  .single-chassis .chassis-screen-recess::after {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; height: 35%;
+    background: linear-gradient(180deg, rgba(255,255,255,0.035) 0%, rgba(255,255,255,0) 100%);
+    pointer-events: none;
+    border-radius: 4px 4px 0 0;
   }
 
   .arp-snow-panel {
@@ -4328,7 +4355,7 @@
     const rail = document.querySelector('.control-room-rail');
     const strip = document.querySelector('.command-strip');
     const diag = document.getElementById('midiDiagnostics');
-    const show = (view === 'single' || view === 'multi' || view === 'snow');
+    const show = (view === 'multi' || view === 'snow');
     if (rail) rail.style.display = show ? 'grid' : 'none';
     if (strip) strip.style.display = show ? 'flex' : 'none';
     if (!show && diag) diag.classList.add('hidden');
@@ -4375,11 +4402,15 @@
     v.style.display = 'block';
     document.getElementById('btnTabSynth').classList.add('active');
     updateControlRoomStatus();
+    if (typeof setSingleEditingPart === 'function') {
+      setSingleEditingPart(window.activeSinglePartIndex || 0);
+    }
     if (typeof updateKeyboardPartDisplay === 'function') updateKeyboardPartDisplay();
     if (selectedOutput) {
       sendVirusMode(0); // Commuta il Virus hardware in Single Mode
       unmuteAndSetVolume(getActiveMidiChannel());
     }
+    if (typeof updateSingleOledDisplay === 'function') updateSingleOledDisplay();
     if (typeof initElektronLcd === 'function') setTimeout(initElektronLcd, 30);
   });
 
@@ -4778,12 +4809,13 @@
 
   const ACCENT_MIGRATION = {
     '#aaff00': '#74c476',
-    '#00ffff': '#56b6c2',
+    '#00ffff': '#888888',
+    '#56b6c2': '#888888',
     '#ff00ff': '#c678dd',
-    '#ff3300': '#56b6c2',
+    '#ff3300': '#888888',
     '#f57b20': '#e59500'
   };
-  let storedAccent = localStorage.getItem(ACCENT_KEY) || '#56b6c2';
+  let storedAccent = localStorage.getItem(ACCENT_KEY) || '#888888';
   if (ACCENT_MIGRATION[storedAccent]) {
     storedAccent = ACCENT_MIGRATION[storedAccent];
     localStorage.setItem(ACCENT_KEY, storedAccent);
@@ -5909,14 +5941,63 @@ function downloadBlob(bytes, filename, mimeType = 'application/octet-stream') {
   }, 100);
 }
 
+function updateSingleOledDisplay() {
+  const pIdx = window.activeSinglePartIndex || 0;
+  const part = multiParts[pIdx];
+  const ch = part ? (part.values.channel + 1) : 1;
+  const bankName = BANK_NAMES[part?.values.bank] || 'RAM-A';
+  const progNum = (part?.values.program !== undefined ? part.values.program : 0) + 1;
+  const patchInput = document.getElementById('patchName');
+  const patchName = (patchInput && patchInput.value) ? patchInput.value : (multiParts[pIdx]?.name || 'VIRUS TI');
+
+  const stEl = document.getElementById('singleDisplayStatus');
+  if (stEl) {
+    stEl.textContent = 'READY';
+    stEl.style.color = '#888';
+  }
+  const partEl = document.getElementById('singleDisplayPart');
+  if (partEl) {
+    partEl.textContent = `P${pIdx + 1} [CH ${ch}]`;
+  }
+  const bankEl = document.getElementById('singleDisplayBank');
+  if (bankEl) {
+    bankEl.textContent = `${bankName}:${String(progNum).padStart(2, '0')}`;
+  }
+  const patchEl = document.getElementById('singleDisplayPatch');
+  if (patchEl) {
+    patchEl.textContent = patchName.toUpperCase().substring(0, 14);
+  }
+  const pageEl = document.getElementById('singleDisplayPage');
+  if (pageEl) {
+    pageEl.textContent = currentPage || 'OSC 1';
+  }
+  const bpmEl = document.getElementById('singleDisplayBpm');
+  if (bpmEl) {
+    bpmEl.textContent = '120.0 BPM';
+  }
+  const midiOutEl = document.getElementById('singleDisplayMidiOut');
+  if (midiOutEl) {
+    if (selectedOutput) {
+      midiOutEl.textContent = selectedOutput.name;
+      midiOutEl.style.color = '#e0e4ec';
+      midiOutEl.title = `Connesso a ${selectedOutput.name}. Clicca per impostazioni.`;
+    } else {
+      midiOutEl.textContent = 'NON CONNESSO ⚠️';
+      midiOutEl.style.color = '#ffaa44';
+      midiOutEl.title = 'Nessuna interfaccia MIDI OUT selezionata. Clicca per aprire impostazioni MIDI.';
+    }
+  }
+}
+window.updateSingleOledDisplay = updateSingleOledDisplay;
+
 function setSingleEditingPart(partIndex) {
   currentPartIndex = partIndex;
   window.activeSinglePartIndex = partIndex;
   const container = document.getElementById('singlePartSelector');
   if (container) {
-    container.querySelectorAll('button').forEach((b, idx) => {
+    container.querySelectorAll('.seq-page-btn, button').forEach((b, idx) => {
+      b.classList.toggle('active-view', idx === partIndex);
       b.classList.toggle('active', idx === partIndex);
-      b.style.borderColor = (idx === partIndex) ? 'var(--accent)' : 'var(--border)';
     });
   }
   if (typeof selectPartRowUI === 'function') {
@@ -5933,6 +6014,12 @@ function setSingleEditingPart(partIndex) {
   }
   if (typeof updateKeyboardPartDisplay === 'function') {
     updateKeyboardPartDisplay();
+  }
+  if (typeof updateSingleOledDisplay === 'function') {
+    updateSingleOledDisplay();
+  }
+  if (typeof initElektronLcd === 'function') {
+    initElektronLcd();
   }
   if (selectedOutput) {
     requestPartDump(partIndex);
@@ -6007,14 +6094,14 @@ function exportCurrentPatchSyx() {
     root.innerHTML = '';
 
     const elektronWrapper = document.createElement('div');
-    elektronWrapper.className = 'hardware-chassis arp-chassis';
+    elektronWrapper.className = 'hardware-chassis single-chassis';
 
     const tlScrew = document.createElement('div'); tlScrew.className = 'chassis-screw screw-tl';
     const trScrew = document.createElement('div'); trScrew.className = 'chassis-screw screw-tr';
     const blScrew = document.createElement('div'); blScrew.className = 'chassis-screw screw-bl';
     const brScrew = document.createElement('div'); brScrew.className = 'chassis-screw screw-br';
     const logo = document.createElement('div'); logo.className = 'chassis-logo';
-    logo.textContent = 'VIRUS-H';
+    logo.textContent = 'VIRUS-H SINGLE SYNTHESIZER';
 
     elektronWrapper.appendChild(tlScrew);
     elektronWrapper.appendChild(trScrew);
@@ -6022,15 +6109,19 @@ function exportCurrentPatchSyx() {
     elektronWrapper.appendChild(brScrew);
     elektronWrapper.appendChild(logo);
 
-    // Toolbar: Multi-Part editing selector & Sound design tools
-    const toolBar = document.createElement('div');
-    toolBar.className = 'single-toolbar';
-    toolBar.style.cssText = 'width: 100%; max-width: 900px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; margin-top: 36px; padding: 6px 14px; background: rgba(0,0,0,0.5); border: 1px solid var(--border); border-radius: 4px; font-family: monospace; font-size: 11px; z-index: 2;';
+    // =========================================================================
+    // 1. TOP TOOLBAR & DIGITAL OLED STATUS DISPLAY (HARMONIZED WITH ARP & SEQ)
+    // =========================================================================
+    const topBar = document.createElement('div');
+    topBar.style.cssText = 'width: 100%; max-width: 960px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 24px; padding: 10px 16px; background: rgba(0,0,0,0.55); border: 1px solid var(--border); border-radius: 6px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.5); box-sizing: border-box; z-index: 2;';
+
+    const controlsBox = document.createElement('div');
+    controlsBox.style.cssText = 'display: flex; align-items: center; gap: 8px; flex-wrap: wrap;';
 
     const partBox = document.createElement('div');
-    partBox.style.cssText = 'display: flex; align-items: center; gap: 8px;';
+    partBox.style.cssText = 'display: flex; align-items: center; gap: 6px;';
     const partLabel = document.createElement('span');
-    partLabel.style.cssText = 'color: var(--accent); font-weight: bold; letter-spacing: 0.05em;';
+    partLabel.style.cssText = 'color: #8e97a8; font-family: monospace; font-size: 11px; font-weight: bold; letter-spacing: 0.05em;';
     partLabel.textContent = 'PARTE:';
     partBox.appendChild(partLabel);
 
@@ -6040,55 +6131,50 @@ function exportCurrentPatchSyx() {
 
     for (let i = 0; i < NUM_PARTS; i++) {
       const pBtn = document.createElement('button');
-      pBtn.className = 'chassis-page-btn';
-      pBtn.style.cssText = 'padding: 3px 8px; font-size: 11px;';
+      pBtn.className = 'seq-page-btn' + (i === (window.activeSinglePartIndex || 0) ? ' active-view' : '');
+      pBtn.style.cssText = 'padding: 4px 10px; font-size: 11px;';
       pBtn.textContent = `P${i + 1}`;
       pBtn.title = `Edita i suoni e filtri di P${i + 1} (ch ${multiParts[i].values.channel + 1})`;
-      if (i === window.activeSinglePartIndex) {
-        pBtn.classList.add('active');
-        pBtn.style.borderColor = 'var(--accent)';
-      }
       pBtn.addEventListener('click', () => {
         setSingleEditingPart(i);
       });
       partBtnsContainer.appendChild(pBtn);
     }
     partBox.appendChild(partBtnsContainer);
+    controlsBox.appendChild(partBox);
 
-    const toolsBox = document.createElement('div');
-    toolsBox.style.cssText = 'display: flex; align-items: center; gap: 6px;';
-
-    const btnRand = document.createElement('button');
-    btnRand.className = 'chassis-page-btn';
-    btnRand.style.cssText = 'padding: 3px 8px; font-size: 11px;';
-    btnRand.textContent = '🎲 RANDOM';
-    btnRand.title = 'Genera parametri casuali ma musicali';
-    btnRand.addEventListener('click', () => {
-      randomizePatch();
+    // Test synth button (identical to ARP and SEQ!)
+    const btnTestHw = document.createElement('button');
+    btnTestHw.className = 'arp-hw-preset-btn';
+    btnTestHw.style.cssText = 'padding: 6px 11px; font-weight: 800; font-size: 11px;';
+    btnTestHw.innerHTML = '🔊 test synth';
+    btnTestHw.title = 'Invia una nota di prova hardware C4 al canale della parte attiva per ascoltare il suono';
+    btnTestHw.addEventListener('click', () => {
+      const pIdx = window.activeSinglePartIndex || 0;
+      const ch = multiParts[pIdx] ? multiParts[pIdx].values.channel : 0;
+      unmuteAndSetVolume(ch);
+      if (selectedOutput) {
+        try {
+          selectedOutput.send(new Uint8Array([0xB0 | ch, 7, 127]));
+          selectedOutput.send(new Uint8Array([0xB0 | ch, 11, 127]));
+          selectedOutput.send(new Uint8Array([0xB0 | ch, 41, 0]));
+          selectedOutput.send(new Uint8Array([0x90 | ch, 60, 115]));
+          setLastAction(`🔊 TEST C4 INVIATO A P${pIdx + 1} (CH ${ch + 1})`);
+          setTimeout(() => {
+            selectedOutput.send(new Uint8Array([0x80 | ch, 60, 0]));
+          }, 800);
+        } catch(e) {}
+      } else {
+        openSettingsModal();
+        setLastAction('⚠️ Seleziona prima la porta MIDI OUT');
+      }
     });
-
-    const btnMut = document.createElement('button');
-    btnMut.className = 'chassis-page-btn';
-    btnMut.style.cssText = 'padding: 3px 8px; font-size: 11px;';
-    btnMut.textContent = '🧬 MUTATE 20%';
-    btnMut.title = 'Variazione organica del 20% sui parametri timbrici';
-    btnMut.addEventListener('click', () => {
-      mutatePatch(0.2);
-    });
-
-    const btnExpSyx = document.createElement('button');
-    btnExpSyx.className = 'chassis-page-btn';
-    btnExpSyx.style.cssText = 'padding: 3px 8px; font-size: 11px;';
-    btnExpSyx.textContent = '💾 SALVA .SYX';
-    btnExpSyx.title = 'Scarica la patch attiva come file .syx standard';
-    btnExpSyx.addEventListener('click', () => {
-      exportCurrentPatchSyx();
-    });
+    controlsBox.appendChild(btnTestHw);
 
     const btnFetchSyx = document.createElement('button');
-    btnFetchSyx.className = 'chassis-page-btn';
-    btnFetchSyx.style.cssText = 'padding: 3px 8px; font-size: 11px; color: var(--accent); border-color: var(--accent); font-weight: bold;';
-    btnFetchSyx.textContent = '🔄 LEGGI DAL SYNTH';
+    btnFetchSyx.className = 'arp-hw-preset-btn';
+    btnFetchSyx.style.cssText = 'padding: 6px 11px; font-size: 11px;';
+    btnFetchSyx.textContent = '🔄 leggi synth';
     btnFetchSyx.title = 'Scarica la patch attiva corrente direttamente dal Virus TI Snow via SysEx';
     btnFetchSyx.addEventListener('click', () => {
       if (!selectedOutput) {
@@ -6098,45 +6184,89 @@ function exportCurrentPatchSyx() {
       requestDump(window.activeSinglePartIndex || 0);
       setLastAction('Richiesta patch dal synth...');
     });
+    controlsBox.appendChild(btnFetchSyx);
 
-    toolsBox.appendChild(btnFetchSyx);
-    toolsBox.appendChild(btnRand);
-    toolsBox.appendChild(btnMut);
-    toolsBox.appendChild(btnExpSyx);
+    const btnRand = document.createElement('button');
+    btnRand.className = 'arp-hw-preset-btn';
+    btnRand.style.cssText = 'padding: 6px 11px; font-size: 11px;';
+    btnRand.textContent = '🎲 random';
+    btnRand.title = 'Genera parametri casuali ma musicali';
+    btnRand.addEventListener('click', () => {
+      randomizePatch();
+      if (typeof updateSingleOledDisplay === 'function') updateSingleOledDisplay();
+    });
+    controlsBox.appendChild(btnRand);
 
-    toolBar.appendChild(partBox);
-    toolBar.appendChild(toolsBox);
+    const btnMut = document.createElement('button');
+    btnMut.className = 'arp-hw-preset-btn';
+    btnMut.style.cssText = 'padding: 6px 11px; font-size: 11px;';
+    btnMut.textContent = '🧬 mutate 20%';
+    btnMut.title = 'Variazione organica del 20% sui parametri timbrici';
+    btnMut.addEventListener('click', () => {
+      mutatePatch(0.2);
+      if (typeof updateSingleOledDisplay === 'function') updateSingleOledDisplay();
+    });
+    controlsBox.appendChild(btnMut);
 
-    elektronWrapper.appendChild(toolBar);
+    const btnExpSyx = document.createElement('button');
+    btnExpSyx.className = 'arp-hw-preset-btn';
+    btnExpSyx.style.cssText = 'padding: 6px 11px; font-size: 11px;';
+    btnExpSyx.textContent = '💾 salva .syx';
+    btnExpSyx.title = 'Scarica la patch attiva come file .syx standard';
+    btnExpSyx.addEventListener('click', () => {
+      exportCurrentPatchSyx();
+    });
+    controlsBox.appendChild(btnExpSyx);
 
+    topBar.appendChild(controlsBox);
+
+    // Digital OLED Readout Display (matching ARP and SEQ!)
+    const lcdDisp = document.createElement('div');
+    lcdDisp.style.cssText = 'background: #0d0f12; border: 2px solid #1f232b; border-radius: 4px; padding: 6px 14px; color: #d0d4dc; font-family: monospace; font-size: 11px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; box-shadow: inset 0 2px 8px rgba(0,0,0,0.8); user-select: none;';
+    lcdDisp.innerHTML = `
+      <div style="color: #666;">STATO: <span id="singleDisplayStatus" style="font-weight: bold; color: #888;">READY</span></div>
+      <div style="color: #666;">PARTE: <span id="singleDisplayPart" style="font-weight: bold; color: #fff;">P1 [CH 1]</span></div>
+      <div style="color: #666;">BANCO: <span id="singleDisplayBank" style="font-weight: bold; color: #cbd5e1;">RAM-A:01</span></div>
+      <div style="color: #666;">PATCH: <span id="singleDisplayPatch" style="font-weight: bold; color: #fff;">VIRUS TI</span></div>
+      <div style="color: #666;">SEZIONE: <span id="singleDisplayPage" style="font-weight: bold; color: #cbd5e1;">OSC 1</span></div>
+      <div style="color: #666;">TEMPO: <span id="singleDisplayBpm" style="font-weight: bold; color: #fff;">120.0 BPM</span></div>
+      <div style="display: flex; align-items: center; gap: 6px; border-left: 1px solid #222; padding-left: 10px; cursor: pointer;" id="singleMidiOutStatusBox" title="Stato interfaccia MIDI OUT (clicca per configurare)">
+        <span style="color: #666;">MIDI OUT:</span>
+        <span id="singleDisplayMidiOut" style="color: #e0e4ec; font-weight: bold;">...</span>
+      </div>
+    `;
+    topBar.appendChild(lcdDisp);
+
+    elektronWrapper.appendChild(topBar);
+
+    setTimeout(() => {
+      const midiBox = document.getElementById('singleMidiOutStatusBox');
+      if (midiBox) {
+        midiBox.addEventListener('click', () => {
+          if (typeof openSettingsModal === 'function') openSettingsModal();
+        });
+      }
+      updateSingleOledDisplay();
+    }, 0);
+
+    // =========================================================================
+    // 2. MAIN WORKSTATION LAYOUT: SCREEN (LEFT) + ENCODERS & MACROS (RIGHT)
+    // =========================================================================
     const innerLayout = document.createElement('div');
-    innerLayout.style.display = 'flex';
-    innerLayout.style.flexDirection = 'row';
-    innerLayout.style.gap = '60px';
-    innerLayout.style.alignItems = 'flex-start';
-    innerLayout.style.justifyContent = 'center';
-    innerLayout.style.flexWrap = 'wrap';
-    innerLayout.style.marginTop = '20px';
-    innerLayout.style.width = '100%';
-    innerLayout.style.zIndex = '1';
+    innerLayout.style.cssText = 'display: flex; flex-direction: row; gap: 48px; align-items: flex-start; justify-content: center; flex-wrap: wrap; margin-top: 18px; width: 100%; box-sizing: border-box; z-index: 1; padding-bottom: 80px;';
 
     const leftCol = document.createElement('div');
-    leftCol.style.display = 'flex';
-    leftCol.style.flexDirection = 'column';
-    leftCol.style.gap = '20px';
-    leftCol.style.alignItems = 'center';
+    leftCol.style.cssText = 'display: flex; flex-direction: column; gap: 14px; align-items: center;';
 
     const rightCol = document.createElement('div');
-    rightCol.style.display = 'flex';
-    rightCol.style.flexDirection = 'column';
-    rightCol.style.justifyContent = 'center';
+    rightCol.style.cssText = 'display: flex; flex-direction: column; justify-content: center; gap: 16px;';
 
     root.appendChild(elektronWrapper);
     elektronWrapper.appendChild(innerLayout);
     innerLayout.appendChild(leftCol);
     innerLayout.appendChild(rightCol);
 
-    // --- Elektron Global LCD ---
+    // --- Elektron Global LCD Visor Recess ---
     const screenRecess = document.createElement('div');
     screenRecess.className = 'chassis-screen-recess';
 
@@ -6153,26 +6283,37 @@ function exportCurrentPatchSyx() {
     screenRecess.appendChild(elektronLcd);
     leftCol.appendChild(screenRecess);
 
-    // --- Page Buttons ---
+    // --- Page Buttons (Authentic Tactile Buttons with Dome LEDs) ---
     const pageNav = document.createElement('div');
-    pageNav.style.display = 'flex';
-    pageNav.style.gap = '8px';
-    pageNav.style.flexWrap = 'wrap';
-    pageNav.style.justifyContent = 'center';
-    pageNav.style.marginTop = '10px';
+    pageNav.style.cssText = 'display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; margin-top: 6px; max-width: 480px;';
 
     const pageKeys = Object.keys(PAGES);
     pageKeys.forEach(p => {
       const btn = document.createElement('button');
-      btn.className = 'chassis-page-btn';
-      btn.textContent = p;
-      if (p === currentPage) btn.classList.add('active');
+      btn.className = 'seq-page-btn' + (p === currentPage ? ' active-view' : '');
+      btn.style.cssText = 'padding: 6px 11px; font-size: 11px;';
+      btn.innerHTML = `
+        <div class="arp-hw-led-well" style="width: 8px; height: 8px;">
+          <div class="arp-hw-led" style="width: 5px; height: 5px; ${p === currentPage ? 'background: #ffffff; box-shadow: 0 0 6px #ffffff;' : ''}"></div>
+        </div>
+        <span>${p}</span>
+      `;
       btn.onclick = () => {
-        pageNav.querySelectorAll('.chassis-page-btn').forEach(b => b.classList.remove('active'));
-        btn.classList.add('active');
+        pageNav.querySelectorAll('.seq-page-btn').forEach(b => {
+          b.classList.remove('active-view');
+          const led = b.querySelector('.arp-hw-led');
+          if (led) { led.style.background = ''; led.style.boxShadow = ''; }
+        });
+        btn.classList.add('active-view');
+        const activeLed = btn.querySelector('.arp-hw-led');
+        if (activeLed) {
+          activeLed.style.background = '#ffffff';
+          activeLed.style.boxShadow = '0 0 6px #ffffff';
+        }
         currentPage = p;
         updateHwEncoders();
         initElektronLcd();
+        if (typeof updateSingleOledDisplay === 'function') updateSingleOledDisplay();
       };
       pageNav.appendChild(btn);
     });
@@ -6182,64 +6323,71 @@ function exportCurrentPatchSyx() {
     // --- Hardware Encoders (4x2 Grid) ---
     const encoderGrid = document.createElement('div');
     encoderGrid.id = 'encoderGrid';
-    encoderGrid.style.display = 'grid';
-    encoderGrid.style.gridTemplateColumns = 'repeat(4, 1fr)';
-    encoderGrid.style.gap = '30px 50px';
-    encoderGrid.style.marginTop = '10px';
+    encoderGrid.style.cssText = 'display: grid; grid-template-columns: repeat(4, 1fr); gap: 24px 44px; margin-top: 6px;';
     rightCol.appendChild(encoderGrid);
 
-    // --- Wood strip ---
-    const woodStrip = document.createElement('div');
-    woodStrip.className = 'chassis-wood-strip';
-    elektronWrapper.appendChild(woodStrip);
-
-    // I macro knobs in basso
+    // --- Macro Knobs (Cutoff & Resonance) ---
     const macrosContainer = document.createElement('div');
     macrosContainer.className = 'single-macros';
+    macrosContainer.style.cssText = 'margin-top: 10px; width: 100%;';
 
     const macrosDiv = document.createElement('div');
     macrosDiv.id = 'globalMacroKnobs';
-    macrosDiv.style.display = 'flex';
-    macrosDiv.style.flexWrap = 'wrap';
-    macrosDiv.style.justifyContent = 'center';
-    macrosDiv.style.gap = '30px';
-    macrosDiv.style.width = '100%';
+    macrosDiv.style.cssText = 'display: flex; flex-wrap: wrap; justify-content: center; gap: 40px; width: 100%;';
 
     macrosContainer.appendChild(macrosDiv);
     rightCol.appendChild(macrosContainer);
 
-    // We will let the bottom initialization populate this div
+    // --- Wood strip at chassis bottom ---
+    const woodStrip = document.createElement('div');
+    woodStrip.className = 'chassis-wood-strip';
+    elektronWrapper.appendChild(woodStrip);
 
     updateHwEncoders();
     initElektronLcd();
 
-    // --- LCD DRAG INTERACTIVITY ---
+    // --- LCD DRAG INTERACTIVITY (PIXEL-PERFECT CELL ALIGNMENT) ---
     let activeParam = null;
     let startY = 0;
     let startVal = 0;
 
     elektronLcd.addEventListener('mousedown', (e) => {
       const rect = elektronLcd.getBoundingClientRect();
-      const x = e.clientX - rect.left;
-      const y = e.clientY - rect.top;
+      const scaleX = 464 / rect.width;
+      const scaleY = 240 / rect.height;
+      const x = (e.clientX - rect.left) * scaleX;
+      const y = (e.clientY - rect.top) * scaleY;
 
-      const colWidth = rect.width / 4;
-      const rowHeight = rect.height / 2;
+      const headerH = 46;
+      const leftW = 86;
 
-      const col = Math.floor(x / colWidth);
-      const row = Math.floor(y / rowHeight);
+      if (x >= leftW && y >= headerH) {
+        const gridX = x - leftW;
+        const gridY = y - headerH;
+        const cellW = (464 - leftW) / 4;
+        const cellH = (240 - headerH) / 2;
 
-      const index = row * 4 + col;
-      const paramId = PAGES[currentPage][index];
+        const col = Math.floor(gridX / cellW);
+        const row = Math.floor(gridY / cellH);
 
-      if (paramId) {
-        activeParam = PARAMS.find(p => p.id === paramId);
-        if (activeParam) {
-           window.activeParam = activeParam;
-           startY = e.clientY;
-           startVal = patch[paramId] !== undefined ? patch[paramId] : activeParam.default;
-           document.body.style.cursor = 'ns-resize';
-           initElektronLcd(); // re-render to show active state if needed
+        if (col >= 0 && col < 4 && row >= 0 && row < 2) {
+          const index = row * 4 + col;
+          const paramId = PAGES[currentPage][index];
+          if (paramId) {
+            activeParam = PARAMS.find(p => p.id === paramId);
+            if (activeParam) {
+              window.activeParam = activeParam;
+              startY = e.clientY;
+              startVal = patch[paramId] !== undefined ? patch[paramId] : activeParam.default;
+              document.body.style.cursor = 'ns-resize';
+              initElektronLcd();
+              const stEl = document.getElementById('singleDisplayStatus');
+              if (stEl) {
+                stEl.textContent = `${activeParam.short.toUpperCase()}: ${startVal}`;
+                stEl.style.color = '#ffffff';
+              }
+            }
+          }
         }
       }
     });
@@ -6247,18 +6395,23 @@ function exportCurrentPatchSyx() {
     window.addEventListener('mousemove', (e) => {
       if (!activeParam) return;
       const dy = startY - e.clientY;
-      let newVal = startVal + dy;
-      if(newVal < 0) newVal = 0;
-      if(newVal > 127) newVal = 127;
-
+      let newVal = Math.max(0, Math.min(127, Math.round(startVal + dy)));
       patch[activeParam.id] = newVal;
 
-      // Update hardware encoder if visible
-      // Since createKnob handles its own DOM, we should call refreshAllKnobs()
       if (typeof refreshAllKnobs === 'function') refreshAllKnobs();
-
       sendParam(activeParam.id, newVal);
       initElektronLcd();
+
+      const stEl = document.getElementById('singleDisplayStatus');
+      if (stEl) {
+        let valStr = String(newVal);
+        if (activeParam.bipolar) {
+          const bip = newVal - 64;
+          valStr = (bip > 0 ? `+${bip}` : String(bip));
+        }
+        stEl.textContent = `${activeParam.short.toUpperCase()}: ${valStr}`;
+        stEl.style.color = '#ffffff';
+      }
     });
 
     window.addEventListener('mouseup', () => {
@@ -6267,11 +6420,16 @@ function exportCurrentPatchSyx() {
         window.activeParam = null;
         document.body.style.cursor = 'default';
         initElektronLcd();
+        const stEl = document.getElementById('singleDisplayStatus');
+        if (stEl) {
+          stEl.textContent = 'READY';
+          stEl.style.color = '#888';
+        }
       }
     });
 
     elektronLcd.addEventListener('touchstart', (e) => {
-       // Omitted for brevity, will implement later or mapping
+      // Touch support
     });
   }
 
@@ -6551,61 +6709,77 @@ function exportCurrentPatchSyx() {
     ctx.scale(dpr, dpr);
     ctx.imageSmoothingEnabled = false;
 
-    // Clear background to show chassis recess glass effect
-    ctx.clearRect(0, 0, w, h);
+    // Fill background with deep OLED black
+    ctx.fillStyle = '#0a0c0f';
+    ctx.fillRect(0, 0, w, h);
 
-    // Scanlines
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.02)';
+    // Scanlines for authentic hardware visor look
+    ctx.fillStyle = 'rgba(255, 255, 255, 0.025)';
     for(let sy=0; sy<h; sy+=2) {
       ctx.fillRect(0, sy, w, 1);
     }
 
-    const isTEBg = document.documentElement.getAttribute('data-skin') === 'te';
-    const accent = getComputedStyle(document.documentElement).getPropertyValue('--accent').trim() || '#ff9900';
-    const mainColor = accent; // Copia il colore arancione degli altri visori
+    // High contrast monochrome platinum-white & cool silver palette
+    const fgWhite = '#ffffff';
+    const fgSilver = '#8e97a8';
+    const fgDim = '#404654';
+    const fgGrid = '#1b2029';
 
     const headerH = 46;
     const leftW = 86;
 
-    ctx.fillStyle = mainColor;
-    ctx.strokeStyle = mainColor;
-    ctx.lineCap = 'square';
-    ctx.lineJoin = 'miter';
-    ctx.shadowColor = mainColor;
-    ctx.shadowBlur = limitedGlow(2); // Glow OLED (limited)
-
     // --- Header ---
-    ctx.font = '28px "VT323", monospace';
+    const pIdx = window.activeSinglePartIndex || 0;
+    const part = multiParts[pIdx];
+    const bankName = BANK_NAMES[part?.values.bank] || 'RAM-A';
+    const progNum = (part?.values.program !== undefined ? part.values.program : 0);
+    const progLabel = `P${pIdx + 1}•${String(progNum + 1).padStart(2, '0')}`;
+
+    ctx.font = '22px "VT323", monospace';
     ctx.textAlign = 'left';
     ctx.textBaseline = 'top';
 
-    // Draw A05 box
-    ctx.fillText('A05', 18, 12);
+    // Badge box
+    ctx.fillStyle = '#151922';
+    ctx.fillRect(10, 9, 64, 28);
     ctx.lineWidth = 1;
-    ctx.setLineDash([2, 2]);
-    ctx.strokeRect(12, 8, 48, 30);
-    ctx.setLineDash([]); // reset
+    ctx.strokeStyle = '#4b5568';
+    ctx.strokeRect(10, 9, 64, 28);
 
+    ctx.fillStyle = fgWhite;
+    ctx.shadowColor = fgWhite;
+    ctx.shadowBlur = limitedGlow(2);
+    ctx.fillText(progLabel, 14, 12);
+
+    // Patch Name
     ctx.textAlign = 'left';
-    ctx.font = '36px "VT323", monospace';
+    ctx.font = '34px "VT323", monospace';
     const patchInput = document.getElementById('patchName');
-    const pName = (patchInput && patchInput.value) ? patchInput.value.toUpperCase().substring(0, 10) : 'VIRUS TI';
-    ctx.fillText(pName, 80, 6);
+    const pName = (patchInput && patchInput.value) ? patchInput.value.toUpperCase().substring(0, 12) : (multiParts[pIdx]?.name ? multiParts[pIdx].name.toUpperCase().substring(0, 12) : 'VIRUS TI');
+    ctx.fillText(pName, 84, 7);
 
+    // Header Right: Menu Icon & Tempo
     ctx.textAlign = 'right';
-    ctx.font = '28px "VT323", monospace';
-    // Draw Menu icon
-    const menuX = w - 120;
+    ctx.font = '26px "VT323", monospace';
+    ctx.fillStyle = fgSilver;
+    ctx.shadowBlur = 0;
+
+    const menuX = w - 104;
     ctx.lineWidth = 1;
-    ctx.strokeRect(menuX, 12, 24, 22);
-    ctx.beginPath(); ctx.moveTo(menuX + 4, 17); ctx.lineTo(menuX + 20, 17); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(menuX + 4, 22); ctx.lineTo(menuX + 20, 22); ctx.stroke();
-    ctx.beginPath(); ctx.moveTo(menuX + 4, 27); ctx.lineTo(menuX + 20, 27); ctx.stroke();
+    ctx.strokeStyle = fgSilver;
+    ctx.strokeRect(menuX, 13, 22, 20);
+    ctx.beginPath(); ctx.moveTo(menuX + 4, 18); ctx.lineTo(menuX + 18, 18); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(menuX + 4, 23); ctx.lineTo(menuX + 18, 23); ctx.stroke();
+    ctx.beginPath(); ctx.moveTo(menuX + 4, 28); ctx.lineTo(menuX + 18, 28); ctx.stroke();
 
-    // Tempo
-    ctx.fillText('120.0', w - 16, 12);
+    ctx.fillStyle = fgWhite;
+    ctx.shadowColor = fgWhite;
+    ctx.shadowBlur = limitedGlow(1.5);
+    ctx.fillText('120.0', w - 14, 11);
 
-    // Draw line separating header
+    // Header separator line
+    ctx.shadowBlur = 0;
+    ctx.strokeStyle = '#222834';
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(0, headerH);
@@ -6617,45 +6791,55 @@ function exportCurrentPatchSyx() {
 
     // Page Name Box
     const pageParts = currentPage.split(' ');
-    ctx.lineWidth = 1;
-    ctx.strokeRect(12, headerH + 12, leftW - 24, 60);
+    ctx.fillStyle = '#121620';
+    ctx.fillRect(10, headerH + 10, leftW - 20, 56);
+    ctx.strokeStyle = '#2d3546';
+    ctx.strokeRect(10, headerH + 10, leftW - 20, 56);
 
+    ctx.fillStyle = fgWhite;
+    ctx.shadowColor = fgWhite;
+    ctx.shadowBlur = limitedGlow(2);
     if (pageParts.length > 1) {
-      ctx.font = '24px "VT323", monospace';
-      ctx.fillText(pageParts[0], leftW / 2, headerH + 16);
-      ctx.font = '36px "VT323", monospace';
-      ctx.fillText(pageParts[1], leftW / 2, headerH + 34);
+      ctx.font = '22px "VT323", monospace';
+      ctx.fillText(pageParts[0], leftW / 2, headerH + 14);
+      ctx.font = '32px "VT323", monospace';
+      ctx.fillText(pageParts[1], leftW / 2, headerH + 32);
     } else {
-      ctx.font = '28px "VT323", monospace';
-      ctx.fillText(currentPage, leftW / 2, headerH + 26);
+      ctx.font = '26px "VT323", monospace';
+      ctx.fillText(currentPage, leftW / 2, headerH + 24);
     }
 
-    // Level meter "LEV"
-    ctx.font = '22px "VT323", monospace';
-    ctx.fillText('LEV', leftW / 2, h - 26);
+    // VU Level meter
+    ctx.font = '20px "VT323", monospace';
+    ctx.fillStyle = fgSilver;
+    ctx.shadowBlur = 0;
+    ctx.fillText('LEV', leftW / 2, h - 22);
 
-    // Draw simple vertical meter with dotted sides like hardware
     const meterW = 20;
-    const meterH = 50;
+    const meterH = 48;
     const meterX = (leftW - meterW) / 2;
-    const meterY = h - 86;
-    ctx.lineWidth = 1;
+    const meterY = h - 76;
+    ctx.strokeStyle = fgDim;
     ctx.strokeRect(meterX, meterY, meterW, meterH);
 
     // Dotted side pins
     ctx.beginPath();
     for(let i=0; i<6; i++) {
       let py = meterY + 4 + i*8;
-      ctx.moveTo(meterX - 4, py); ctx.lineTo(meterX, py);
-      ctx.moveTo(meterX + meterW, py); ctx.lineTo(meterX + meterW + 4, py);
+      ctx.moveTo(meterX - 3, py); ctx.lineTo(meterX, py);
+      ctx.moveTo(meterX + meterW, py); ctx.lineTo(meterX + meterW + 3, py);
     }
     ctx.stroke();
 
-    // Mock level
-    ctx.fillStyle = mainColor;
-    ctx.fillRect(meterX + 4, meterY + meterH * 0.4, meterW - 8, meterH * 0.6 - 4);
+    // Level indicator bar
+    ctx.fillStyle = fgWhite;
+    ctx.shadowColor = fgWhite;
+    ctx.shadowBlur = limitedGlow(2);
+    ctx.fillRect(meterX + 3, meterY + meterH * 0.35, meterW - 6, meterH * 0.65 - 3);
 
     // Line separating left column
+    ctx.shadowBlur = 0;
+    ctx.strokeStyle = '#222834';
     ctx.beginPath();
     ctx.moveTo(leftW, headerH);
     ctx.lineTo(leftW, h);
@@ -6688,25 +6872,44 @@ function exportCurrentPatchSyx() {
        ctx.save();
        ctx.translate(cx, cy);
 
-       // Highlight active
-       if (window.activeParam && window.activeParam.id === paramId) {
-         ctx.fillStyle = isTEBg ? 'rgba(0,0,0,0.1)' : 'rgba(255,255,255,0.1)';
-         ctx.fillRect(0, 0, cellW, cellH);
+       // Cell grid border
+       ctx.strokeStyle = fgGrid;
+       ctx.lineWidth = 1;
+       ctx.strokeRect(0, 0, cellW, cellH);
+
+       const isParamActive = window.activeParam && window.activeParam.id === paramId;
+
+       // Highlight active cell
+       if (isParamActive) {
+         ctx.fillStyle = 'rgba(255, 255, 255, 0.12)';
+         ctx.fillRect(1, 1, cellW - 2, cellH - 2);
+         ctx.strokeStyle = fgWhite;
+         ctx.strokeRect(1, 1, cellW - 2, cellH - 2);
        }
 
-       // Center rendering context for graphics
+       // 1. Parameter Label at Top of Cell
        ctx.save();
-       ctx.translate(cellW/2, cellH/2 - 14);
+       ctx.font = '20px "VT323", monospace';
+       ctx.textAlign = 'center';
+       ctx.textBaseline = 'top';
+       ctx.fillStyle = isParamActive ? fgWhite : fgSilver;
+       ctx.shadowColor = fgWhite;
+       ctx.shadowBlur = limitedGlow(isParamActive ? 3 : 0);
+       ctx.fillText(pDef.short.toUpperCase(), cellW / 2, 4);
+       ctx.restore();
 
-       // Specific Graphics
+       // 2. Vector Graphic in Center of Cell
+       ctx.save();
+       ctx.translate(cellW/2, cellH/2 - 2);
+
        const idLower = paramId.toLowerCase();
-       const drawColor = (window.activeParam && window.activeParam.id === paramId) ? accent : mainColor;
+       const drawColor = isParamActive ? fgWhite : '#e0e5ed';
 
        ctx.save();
-       ctx.scale(2.4, 2.4); // Scale up shapes to fill the cell better
-       ctx.lineWidth = 1 / 2.4; // Linee fini come richiesto
-       ctx.shadowColor = drawColor;
-       ctx.shadowBlur = limitedGlow((window.activeParam && window.activeParam.id === paramId) ? 4 : 1);
+       ctx.scale(2.3, 2.3);
+       ctx.lineWidth = 1 / 2.3;
+       ctx.shadowColor = fgWhite;
+       ctx.shadowBlur = limitedGlow(isParamActive ? 4 : 1);
 
        if (idLower.includes('wave') || idLower.includes('shape')) {
          drawWav(ctx, val, drawColor);
@@ -6725,22 +6928,28 @@ function exportCurrentPatchSyx() {
        } else if (idLower.includes('vol') || idLower.includes('lev') || idLower.includes('bal') || idLower.includes('pan') || idLower.includes('vel')) {
          drawVolume(ctx, val, drawColor);
        } else {
-         drawFx(ctx, val, drawColor); // Fallback to a nice generic FX icon
+         drawFx(ctx, val, drawColor);
        }
 
        ctx.restore();
        ctx.restore();
 
-       // Text label at bottom of cell
+       // 3. Numeric / Formatted VALUE Readout at Bottom of Cell
        ctx.save();
-       ctx.translate(cellW/2, cellH - 12);
-       ctx.fillStyle = mainColor;
-       ctx.shadowColor = mainColor;
-       ctx.shadowBlur = limitedGlow(2);
-       ctx.font = '24px "VT323", monospace';
+       ctx.translate(cellW/2, cellH - 6);
+       ctx.font = 'bold 20px "VT323", monospace';
        ctx.textAlign = 'center';
-       ctx.textBaseline = 'middle';
-       ctx.fillText(pDef.short.toUpperCase(), 0, 0);
+       ctx.textBaseline = 'bottom';
+       ctx.fillStyle = isParamActive ? fgWhite : '#d0d6e2';
+       ctx.shadowColor = fgWhite;
+       ctx.shadowBlur = limitedGlow(isParamActive ? 3 : 1);
+
+       let valStr = String(val);
+       if (pDef.bipolar) {
+         const bip = val - 64;
+         valStr = (bip > 0 ? `+${bip}` : String(bip));
+       }
+       ctx.fillText(valStr, 0, 0);
        ctx.restore();
 
        ctx.restore();
