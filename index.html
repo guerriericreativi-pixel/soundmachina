@@ -22,12 +22,12 @@
     --font-ui: 'Inter', sans-serif;
   }
   html[data-skin="elektron"]{
-    --bg: #18181c;
-    --fg: #eeeeee;
-    --section-bg: #222226;
-    --border: #333338;
-    --dot-color: #2a2a30;
-    --accent: #888888;
+    --bg: #111317;
+    --fg: #e2e8f0;
+    --section-bg: #1b1e26;
+    --border: #282d3a;
+    --dot-color: #202430;
+    --accent: #e02424;
   }
   *{
     box-sizing: border-box;
@@ -1479,14 +1479,14 @@
   }
 
   html[data-skin="elektron"] .hardware-chassis {
-    background: linear-gradient(135deg, #252528 0%, #1a1a1c 100%);
-    border: 1px solid #1a1a1a;
+    background: linear-gradient(135deg, #242834 0%, #171922 100%) !important;
+    border: 1px solid #14161f !important;
     box-shadow:
-      inset 0 2px 0 rgba(255,255,255,0.1),
-      inset 0 -2px 0 rgba(0,0,0,0.5),
-      0 15px 40px rgba(0,0,0,0.6),
-      -10px 0 0 #4a3018, 10px 0 0 #4a3018;
-    color: #eee;
+      inset 0 2px 0 rgba(255,255,255,0.08),
+      inset 0 -2px 0 rgba(0,0,0,0.85),
+      0 18px 45px rgba(0,0,0,0.7),
+      -10px 0 0 #121418, 10px 0 0 #121418 !important; /* Access Virus TI2 Dark Star smoked cheeks */
+    color: #e2e8f0 !important;
   }
 
   .chassis-screw {
@@ -1512,8 +1512,8 @@
   .screw-br { bottom: 15px; right: 15px; }
 
   html[data-skin="elektron"] .chassis-screw {
-    background: #444;
-    border-color: #222;
+    background: radial-gradient(circle at 35% 35%, #3d414e 0%, #191b22 100%) !important;
+    border-color: #111318 !important;
   }
 
   .chassis-screen-recess {
@@ -1536,8 +1536,98 @@
     box-shadow: inset 0 1px 2px rgba(255,255,255,0.2);
   }
   html[data-skin="elektron"] .chassis-wood-strip {
-    background: linear-gradient(to right, #4a3018, #6b4423, #4a3018);
-    border-top: 1px solid #2a1b0d;
+    background: linear-gradient(to right, #121418, #222630, #121418) !important;
+    border-top: 1px solid #0d0e12 !important;
+  }
+
+  /* Dark Star signature glowing evil red Access Logo */
+  html[data-skin="elektron"] .chassis-access-logo {
+    color: #e02424 !important;
+    text-shadow: 0 0 10px rgba(224, 36, 36, 0.75), 0 0 22px rgba(224, 36, 36, 0.4) !important;
+  }
+  html[data-skin="elektron"] .chassis-access-logo span {
+    color: #ff3333 !important;
+    text-shadow: 0 0 10px #ff3333 !important;
+  }
+
+  /* Top Hardware Transport / Readout Bar & Visors across all chassis views */
+  .chassis-hardware-topbar {
+    width: 100%;
+    max-width: 960px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+    padding: 10px 16px;
+    border-radius: 6px;
+    box-sizing: border-box;
+    z-index: 2;
+    transition: background 0.2s ease, border-color 0.2s ease;
+  }
+  html:not([data-skin="elektron"]) .chassis-hardware-topbar,
+  html[data-skin="te"] .chassis-hardware-topbar {
+    background: rgba(0, 0, 0, 0.03) !important;
+    border: 1px solid var(--border) !important;
+    box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.04) !important;
+  }
+  html[data-skin="elektron"] .chassis-hardware-topbar {
+    background: rgba(14, 16, 22, 0.75) !important;
+    border: 1px solid #232734 !important;
+    box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.6) !important;
+  }
+
+  .chassis-top-display-visor {
+    border-radius: 4px;
+    padding: 6px 14px;
+    font-family: monospace;
+    font-size: 11px;
+    display: flex;
+    gap: 12px;
+    align-items: center;
+    flex-wrap: wrap;
+    user-select: none;
+    transition: all 0.2s ease;
+  }
+  html:not([data-skin="elektron"]) .chassis-top-display-visor,
+  html[data-skin="te"] .chassis-top-display-visor {
+    background: linear-gradient(180deg, #d9ecf8 0%, #c4ddf1 100%) !important;
+    border: 2px solid #16202c !important;
+    color: #142434 !important;
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.30), 0 1px 1px rgba(255,255,255,0.7) !important;
+  }
+  html:not([data-skin="elektron"]) .chassis-top-display-visor div,
+  html[data-skin="te"] .chassis-top-display-visor div {
+    color: #3d5268 !important;
+  }
+  html:not([data-skin="elektron"]) .chassis-top-display-visor span,
+  html[data-skin="te"] .chassis-top-display-visor span {
+    color: #111d28 !important;
+    font-weight: bold !important;
+  }
+  html[data-skin="elektron"] .chassis-top-display-visor {
+    background: #090a0d !important;
+    border: 2px solid #1e222b !important;
+    color: #d0d4dc !important;
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.9), 0 1px 0 rgba(255,255,255,0.06) !important;
+  }
+  html[data-skin="elektron"] .chassis-top-display-visor div {
+    color: #667284 !important;
+  }
+  html[data-skin="elektron"] .chassis-top-display-visor span {
+    color: #ffffff !important;
+    font-weight: bold !important;
+  }
+  html:not([data-skin="elektron"]) .chassis-top-display-visor select,
+  html[data-skin="te"] .chassis-top-display-visor select {
+    background: #c0d8ec !important;
+    color: #111d28 !important;
+    border: 1px solid #7ea3c2 !important;
+  }
+  html[data-skin="elektron"] .chassis-top-display-visor select {
+    background: #181a20 !important;
+    color: #e0e4ec !important;
+    border: 1px solid #333 !important;
   }
 
   /* ==========================================================================
@@ -1556,30 +1646,59 @@
   }
 
   /* ==========================================================================
-     VIRUS TI SNOW // SINGLE SYNTHESIZER DISPLAY & CHASSIS UNIFICATION
+     VIRUS TI SNOW / DARK STAR // SINGLE SYNTHESIZER DISPLAY UNIFICATION
      ========================================================================== */
   .hardware-chassis.single-chassis,
   #singleView .hardware-chassis {
     padding: 30px 24px 100px 24px !important;
     gap: 14px !important;
-    --accent: #d8dde6 !important;
   }
-  .single-chassis .chassis-screen-recess {
-    background: #080a0e !important;
-    border: 2px solid #1a1e27 !important;
-    border-radius: 6px !important;
-    padding: 8px !important;
-    box-shadow: inset 0 3px 12px rgba(0,0,0,0.9), 0 1px 0 rgba(255,255,255,0.08) !important;
-    position: relative;
-    overflow: hidden;
+
+  /* Faceplate / Recess: In Light Mode = Virus TI Snow acrylic faceplate with screws; In Dark Mode = Dark Star smoked faceplate */
+  html:not([data-skin="elektron"]) .single-chassis .chassis-screen-recess,
+  html[data-skin="te"] .single-chassis .chassis-screen-recess {
+    background: linear-gradient(135deg, rgba(255, 255, 255, 0.75) 0%, rgba(240, 245, 252, 0.40) 45%, rgba(255, 255, 255, 0.60) 100%) !important;
+    backdrop-filter: blur(2.5px) !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.88) !important;
+    border-radius: 7px !important;
+    padding: 8px 12px 10px 12px !important;
+    box-shadow:
+      0 6px 18px rgba(0, 0, 0, 0.12),
+      inset 0 1.5px 2px rgba(255, 255, 255, 0.95),
+      inset 0 -1px 2px rgba(0, 0, 0, 0.06),
+      0 0 0 1px rgba(180, 185, 195, 0.45) !important;
+    position: relative !important;
+    overflow: hidden !important;
+    width: 488px !important;
+    max-width: 90vw !important;
+    box-sizing: border-box !important;
   }
-  .single-chassis .chassis-screen-recess::after {
-    content: '';
-    position: absolute;
-    top: 0; left: 0; right: 0; height: 35%;
-    background: linear-gradient(180deg, rgba(255,255,255,0.035) 0%, rgba(255,255,255,0) 100%);
-    pointer-events: none;
-    border-radius: 4px 4px 0 0;
+  html[data-skin="elektron"] .single-chassis .chassis-screen-recess {
+    background: linear-gradient(135deg, rgba(32, 36, 48, 0.75) 0%, rgba(18, 20, 28, 0.60) 100%) !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.12) !important;
+    border-radius: 7px !important;
+    padding: 8px 12px 10px 12px !important;
+    box-shadow:
+      0 8px 24px rgba(0, 0, 0, 0.55),
+      inset 0 1px 1px rgba(255, 255, 255, 0.15),
+      0 0 0 1px rgba(0,0,0,0.6) !important;
+    position: relative !important;
+    overflow: hidden !important;
+    width: 488px !important;
+    max-width: 90vw !important;
+    box-sizing: border-box !important;
+  }
+
+  html:not([data-skin="elektron"]) #elektronLcd,
+  html[data-skin="te"] #elektronLcd {
+    border: 2px solid #16202c !important;
+    border-radius: 3px !important;
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.35), 0 1px 1px rgba(255,255,255,0.6) !important;
+  }
+  html[data-skin="elektron"] #elektronLcd {
+    border: 2px solid #232734 !important;
+    border-radius: 3px !important;
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.9), 0 1px 0 rgba(255,255,255,0.06) !important;
   }
 
   .arp-snow-panel {
@@ -1930,19 +2049,22 @@
   .seq-chassis {
     --accent: #d8dde6 !important;
   }
-  .seq-page-btn {
+  /* Tactile Hardware Page Buttons (OSC 1, FILTER, etc.) in Light Snow vs Dark Star */
+  html:not([data-skin="elektron"]) .seq-page-btn,
+  html[data-skin="te"] .seq-page-btn {
     font-size: 11px;
     font-weight: 800;
     font-family: monospace;
     padding: 6px 14px;
-    background: linear-gradient(180deg, #282a34 0%, #171820 100%);
-    color: #8b92a2;
-    border: 1px solid #14161c;
-    border-top: 1px solid rgba(255,255,255,0.18);
-    border-bottom: 2px solid #090a0d;
+    background: linear-gradient(180deg, #ffffff 0%, #edf0f5 55%, #dce0e8 100%) !important;
+    color: #222936 !important;
+    border: 1px solid #b8bac4 !important;
+    border-top: 1px solid #ffffff !important;
+    border-bottom: 2px solid #9aa0aa !important;
     border-radius: 4px;
     cursor: pointer;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06);
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1), inset 0 1px 0 #ffffff !important;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.8) !important;
     display: inline-flex;
     align-items: center;
     gap: 8px;
@@ -1950,23 +2072,63 @@
     user-select: none;
     transition: transform 0.05s ease, filter 0.08s ease, box-shadow 0.08s ease;
   }
-  .seq-page-btn:hover {
-    color: #ffffff;
-    filter: brightness(1.15);
+  html:not([data-skin="elektron"]) .seq-page-btn:hover,
+  html[data-skin="te"] .seq-page-btn:hover {
+    background: linear-gradient(180deg, #ffffff 0%, #f4f6fa 55%, #e4e7ee 100%) !important;
+    color: #111822 !important;
   }
-  .seq-page-btn:active {
+  html:not([data-skin="elektron"]) .seq-page-btn:active,
+  html[data-skin="te"] .seq-page-btn:active {
     transform: translateY(1.5px);
     border-bottom-width: 1px;
   }
-  .seq-page-btn.active-view {
-    background: linear-gradient(180deg, #f0f3f7 0%, #d1d6df 50%, #afb5c2 100%) !important;
-    border: 1px solid #7a818e !important;
-    border-top: 1px solid #ffffff !important;
-    border-bottom: 2px solid #545a66 !important;
-    color: #12141a !important;
+  html:not([data-skin="elektron"]) .seq-page-btn.active-view,
+  html[data-skin="te"] .seq-page-btn.active-view {
+    background: linear-gradient(180deg, #e4e8f0 0%, #d0d5e0 100%) !important;
+    border: 1px solid #7a8392 !important;
+    border-top: 1px solid #bcc2cd !important;
+    border-bottom: 2px solid #5a6270 !important;
+    color: #0d131c !important;
     font-weight: 900 !important;
-    text-shadow: 0 1px 0 rgba(255,255,255,0.6) !important;
-    box-shadow: 0 0 10px rgba(220,225,235,0.5), 0 3px 5px rgba(0,0,0,0.5), inset 0 1px 1px #ffffff !important;
+    box-shadow: inset 0 2px 4px rgba(0,0,0,0.18), 0 1px 2px rgba(0,0,0,0.05) !important;
+  }
+
+  html[data-skin="elektron"] .seq-page-btn {
+    font-size: 11px;
+    font-weight: 800;
+    font-family: monospace;
+    padding: 6px 14px;
+    background: linear-gradient(180deg, #282c38 0%, #171820 100%) !important;
+    color: #949db0 !important;
+    border: 1px solid #14161c !important;
+    border-top: 1px solid rgba(255,255,255,0.18) !important;
+    border-bottom: 2px solid #090a0d !important;
+    border-radius: 4px;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06) !important;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    outline: none !important;
+    user-select: none;
+    transition: transform 0.05s ease, filter 0.08s ease, box-shadow 0.08s ease;
+  }
+  html[data-skin="elektron"] .seq-page-btn:hover {
+    color: #ffffff !important;
+    filter: brightness(1.15);
+  }
+  html[data-skin="elektron"] .seq-page-btn:active {
+    transform: translateY(1.5px);
+    border-bottom-width: 1px;
+  }
+  html[data-skin="elektron"] .seq-page-btn.active-view {
+    background: linear-gradient(180deg, #323848 0%, #202430 100%) !important;
+    border: 1px solid #e02424 !important;
+    border-top: 1px solid #ff4d4d !important;
+    border-bottom: 2px solid #991010 !important;
+    color: #ffffff !important;
+    font-weight: 900 !important;
+    box-shadow: 0 0 12px rgba(224,36,36,0.45), 0 3px 5px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,255,255,0.2) !important;
   }
   .seq-pad-note {
     font-size: 10px;
@@ -3427,6 +3589,102 @@
     margin-top: 4px;
   }
 
+  /* Access Virus TI2 Dark Star Front Panel & Display Overrides */
+  html[data-skin="elektron"] .snow-hardware-front {
+    background: linear-gradient(180deg, #242834 0%, #171922 100%) !important;
+    border: 1px solid #14161f !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.08),
+      inset 0 -2px 0 rgba(0,0,0,0.85),
+      0 20px 50px rgba(0,0,0,0.65),
+      -18px 0 0 #121418, -20px 0 0 #0a0b0e,
+      18px 0 0 #121418, 20px 0 0 #0a0b0e !important;
+  }
+  html[data-skin="elektron"] .snow-hardware-front::before {
+    background: linear-gradient(90deg, #0a0b0e 0%, #1c202a 50%, #0a0b0e 100%) !important;
+  }
+  html[data-skin="elektron"] .snow-hardware-front::after {
+    background: linear-gradient(90deg, #0a0b0e 0%, #1c202a 50%, #0a0b0e 100%) !important;
+  }
+  html[data-skin="elektron"] .snow-front-acrylic-window {
+    background: linear-gradient(135deg, rgba(32, 36, 48, 0.75) 0%, rgba(18, 20, 28, 0.60) 100%) !important;
+    border: 1.5px solid rgba(255, 255, 255, 0.12) !important;
+    box-shadow: 0 8px 24px rgba(0, 0, 0, 0.55), inset 0 1px 1px rgba(255, 255, 255, 0.15), 0 0 0 1px rgba(0,0,0,0.6) !important;
+  }
+  html[data-skin="elektron"] .acrylic-screw {
+    background: radial-gradient(circle at 35% 35%, #424652 0%, #1c1e24 100%) !important;
+    border-color: #121418 !important;
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.2), 0 1px 3px rgba(0,0,0,0.5) !important;
+  }
+  html[data-skin="elektron"] .acrylic-screw::after {
+    background: #0d0f12 !important;
+  }
+  html[data-skin="elektron"] .virus-snow-lcd-front,
+  html[data-skin="elektron"] #virusSnowLcdScreen {
+    background: #0b0d12 !important;
+    border: 2px solid #232734 !important;
+    color: #e2e8f0 !important;
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.9), 0 1px 0 rgba(255,255,255,0.06) !important;
+  }
+  html[data-skin="elektron"] .lcd-header-bar,
+  html[data-skin="elektron"] #virusSnowLcdScreen > div:first-child {
+    background: #181c26 !important;
+    color: #ffffff !important;
+    border-bottom: 1px solid #282e3e !important;
+  }
+  html[data-skin="elektron"] .lcd-badge,
+  html[data-skin="elektron"] #virusSnowLcdScreen span:first-child {
+    background: #e02424 !important;
+    color: #ffffff !important;
+    box-shadow: 0 0 6px rgba(224,36,36,0.6) !important;
+  }
+  html[data-skin="elektron"] .lcd-bank-prog,
+  html[data-skin="elektron"] #snowLcdBankProg {
+    color: #e02424 !important;
+    font-weight: 900 !important;
+  }
+  html[data-skin="elektron"] .lcd-patch-name,
+  html[data-skin="elektron"] #snowLcdPatchName {
+    color: #ffffff !important;
+    text-shadow: 0 0 8px rgba(255,255,255,0.3) !important;
+  }
+  html[data-skin="elektron"] .lcd-footer-bar,
+  html[data-skin="elektron"] #virusSnowLcdScreen > div:last-child {
+    color: #8b96a8 !important;
+    border-top: 1px dotted rgba(255,255,255,0.15) !important;
+  }
+  html[data-skin="elektron"] .lcd-footer-bar span,
+  html[data-skin="elektron"] #virusSnowLcdScreen > div:last-child span {
+    color: #cbd5e1 !important;
+  }
+  html[data-skin="elektron"] .snow-knob-top-label,
+  html[data-skin="elektron"] .snow-front-val {
+    color: #e2e8f0 !important;
+  }
+  html[data-skin="elektron"] .snow-knob-sub-label {
+    color: #8b96a8 !important;
+  }
+  html[data-skin="elektron"] .snow-sq-btn,
+  html[data-skin="elektron"] .snow-matrix-btn,
+  html[data-skin="elektron"] .snow-wide-tactile-btn {
+    background: linear-gradient(180deg, #282c38 0%, #1a1c24 100%) !important;
+    border-color: #323848 !important;
+    color: #e2e8f0 !important;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08) !important;
+    text-shadow: none !important;
+  }
+  html[data-skin="elektron"] .snow-sq-btn:hover,
+  html[data-skin="elektron"] .snow-matrix-btn:hover,
+  html[data-skin="elektron"] .snow-wide-tactile-btn:hover {
+    border-color: #e02424 !important;
+    color: #ffffff !important;
+  }
+  html[data-skin="elektron"] .snow-select {
+    background: #171922 !important;
+    color: #ffffff !important;
+    border-color: #2f3546 !important;
+  }
+
   /* RIGA ORIZZONTALE DELLE 4 MANOPOLE SOTTO IL DISPLAY (Volume, Value 1, 2, 3) */
   .snow-front-4knobs {
     display: flex;
@@ -3699,6 +3957,7 @@
     </div>
 
     <div class="accent-picker" id="accentPicker">
+      <button class="accent-dot" data-accent="#e02424" style="--led-color:#e02424" title="Dark Star red"></button>
       <button class="accent-dot" data-accent="#888888" style="--led-color:#888888" title="grey"></button>
       <button class="accent-dot" data-accent="#74c476" style="--led-color:#74c476" title="sage green"></button>
       <button class="accent-dot" data-accent="#56b6c2" style="--led-color:#56b6c2" title="soft cyan"></button>
@@ -4745,17 +5004,57 @@
   const themeToggle = document.getElementById('themeToggle');
 
   function applyTheme(theme){
-    if (theme === 'elektron'){
+    const isDark = (theme === 'elektron');
+    if (isDark){
       document.documentElement.setAttribute('data-skin', 'elektron');
       themeToggle.textContent = '●';
+      themeToggle.title = 'Tema attivo: Access Virus TI2 Dark Star (clicca per Virus TI Snow)';
+      const pDisplay = document.getElementById('patchNameDisplay');
+      if (pDisplay && pDisplay.textContent.includes('virus ti snow')) {
+        pDisplay.textContent = pDisplay.textContent.replace('virus ti snow', 'virus ti2 dark star');
+      }
+      document.querySelectorAll('.chassis-logo').forEach(el => {
+        if (el.textContent.includes('SINGLE')) el.textContent = 'VIRUS TI2 // DARK STAR SINGLE';
+        else if (el.textContent.includes('ARPEGGIATOR')) el.textContent = 'VIRUS TI2 // DARK STAR ARPEGGIATOR';
+        else if (el.textContent.includes('64-STEP') || el.textContent.includes('SEQUENCER')) el.textContent = 'VIRUS TI2 // DARK STAR SEQUENCER';
+        else if (el.textContent.includes('SNOW')) el.textContent = 'VIRUS TI2 | DARK STAR';
+      });
+      const badgeModel = document.getElementById('singleLcdModelBadge');
+      if (badgeModel) badgeModel.innerHTML = 'VIRUS TI2 <span style="font-weight: 300; opacity: 0.5;">|</span> DARK STAR';
     } else {
       document.documentElement.setAttribute('data-skin', 'te');
       themeToggle.textContent = '○';
+      themeToggle.title = 'Tema attivo: Access Virus TI Snow (clicca per Virus TI2 Dark Star)';
+      const pDisplay = document.getElementById('patchNameDisplay');
+      if (pDisplay && pDisplay.textContent.includes('virus ti2 dark star')) {
+        pDisplay.textContent = pDisplay.textContent.replace('virus ti2 dark star', 'virus ti snow');
+      }
+      document.querySelectorAll('.chassis-logo').forEach(el => {
+        if (el.textContent.includes('SINGLE')) el.textContent = 'VIRUS-H SINGLE SYNTHESIZER';
+        else if (el.textContent.includes('ARPEGGIATOR')) el.textContent = 'VIRUS-H LIVE ARPEGGIATOR';
+        else if (el.textContent.includes('64-STEP') || el.textContent.includes('SEQUENCER')) el.textContent = 'VIRUS-H 64-STEP SEQUENCER';
+        else if (el.textContent.includes('DARK STAR')) el.textContent = 'VIRUS | TI SNOW';
+      });
+      const badgeModel = document.getElementById('singleLcdModelBadge');
+      if (badgeModel) badgeModel.innerHTML = 'VIRUS <span style="font-weight: 300; opacity: 0.5;">|</span> TI SNOW';
     }
     if (appReady && typeof initElektronLcd === 'function') {
       initElektronLcd();
     }
+    if (typeof updateSingleOledDisplay === 'function') {
+      updateSingleOledDisplay();
+    }
+    if (appReady && typeof updateVirusSnowFrontPanel === 'function') {
+      updateVirusSnowFrontPanel(window.activeSinglePartIndex || 0);
+    }
+    if (appReady && typeof updateVirusSnowMasterDisplay === 'function') {
+      updateVirusSnowMasterDisplay(window.activeSinglePartIndex || 0);
+    }
+    if (typeof partDisplays !== 'undefined' && Array.isArray(partDisplays)) {
+      partDisplays.forEach(d => { if (d && d._render) d._render(); });
+    }
   }
+  window.applyTheme = applyTheme;
 
   let currentTheme = localStorage.getItem(THEME_KEY) || 'te';
   if (currentTheme === 'light' || currentTheme === 'dark') currentTheme = 'elektron';
@@ -5942,6 +6241,7 @@ function downloadBlob(bytes, filename, mimeType = 'application/octet-stream') {
 }
 
 function updateSingleOledDisplay() {
+  const isDark = document.documentElement.getAttribute('data-skin') === 'elektron';
   const pIdx = window.activeSinglePartIndex || 0;
   const part = multiParts[pIdx];
   const ch = part ? (part.values.channel + 1) : 1;
@@ -5953,37 +6253,42 @@ function updateSingleOledDisplay() {
   const stEl = document.getElementById('singleDisplayStatus');
   if (stEl) {
     stEl.textContent = 'READY';
-    stEl.style.color = '#888';
+    stEl.style.color = isDark ? '#e02424' : '#0c7040';
   }
   const partEl = document.getElementById('singleDisplayPart');
   if (partEl) {
     partEl.textContent = `P${pIdx + 1} [CH ${ch}]`;
+    partEl.style.color = isDark ? '#ffffff' : '#111d28';
   }
   const bankEl = document.getElementById('singleDisplayBank');
   if (bankEl) {
     bankEl.textContent = `${bankName}:${String(progNum).padStart(2, '0')}`;
+    bankEl.style.color = isDark ? '#cbd5e1' : '#23374b';
   }
   const patchEl = document.getElementById('singleDisplayPatch');
   if (patchEl) {
     patchEl.textContent = patchName.toUpperCase().substring(0, 14);
+    patchEl.style.color = isDark ? '#ffffff' : '#111d28';
   }
   const pageEl = document.getElementById('singleDisplayPage');
   if (pageEl) {
     pageEl.textContent = currentPage || 'OSC 1';
+    pageEl.style.color = isDark ? '#cbd5e1' : '#23374b';
   }
   const bpmEl = document.getElementById('singleDisplayBpm');
   if (bpmEl) {
     bpmEl.textContent = '120.0 BPM';
+    bpmEl.style.color = isDark ? '#ffffff' : '#111d28';
   }
   const midiOutEl = document.getElementById('singleDisplayMidiOut');
   if (midiOutEl) {
     if (selectedOutput) {
       midiOutEl.textContent = selectedOutput.name;
-      midiOutEl.style.color = '#e0e4ec';
+      midiOutEl.style.color = isDark ? '#ffffff' : '#111d28';
       midiOutEl.title = `Connesso a ${selectedOutput.name}. Clicca per impostazioni.`;
     } else {
       midiOutEl.textContent = 'NON CONNESSO ⚠️';
-      midiOutEl.style.color = '#ffaa44';
+      midiOutEl.style.color = '#ff9900';
       midiOutEl.title = 'Nessuna interfaccia MIDI OUT selezionata. Clicca per aprire impostazioni MIDI.';
     }
   }
@@ -6113,7 +6418,8 @@ function exportCurrentPatchSyx() {
     // 1. TOP TOOLBAR & DIGITAL OLED STATUS DISPLAY (HARMONIZED WITH ARP & SEQ)
     // =========================================================================
     const topBar = document.createElement('div');
-    topBar.style.cssText = 'width: 100%; max-width: 960px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 24px; padding: 10px 16px; background: rgba(0,0,0,0.55); border: 1px solid var(--border); border-radius: 6px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.5); box-sizing: border-box; z-index: 2;';
+    topBar.className = 'chassis-hardware-topbar single-top-bar';
+    topBar.style.cssText = 'width: 100%; max-width: 960px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 24px; padding: 10px 16px; border-radius: 6px; box-sizing: border-box; z-index: 2;';
 
     const controlsBox = document.createElement('div');
     controlsBox.style.cssText = 'display: flex; align-items: center; gap: 8px; flex-wrap: wrap;';
@@ -6220,9 +6526,9 @@ function exportCurrentPatchSyx() {
 
     topBar.appendChild(controlsBox);
 
-    // Digital OLED Readout Display (matching ARP and SEQ!)
+    // Digital OLED / LCD Readout Display (matching ARP and SEQ!)
     const lcdDisp = document.createElement('div');
-    lcdDisp.style.cssText = 'background: #0d0f12; border: 2px solid #1f232b; border-radius: 4px; padding: 6px 14px; color: #d0d4dc; font-family: monospace; font-size: 11px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; box-shadow: inset 0 2px 8px rgba(0,0,0,0.8); user-select: none;';
+    lcdDisp.className = 'chassis-top-display-visor single-oled-visor';
     lcdDisp.innerHTML = `
       <div style="color: #666;">STATO: <span id="singleDisplayStatus" style="font-weight: bold; color: #888;">READY</span></div>
       <div style="color: #666;">PARTE: <span id="singleDisplayPart" style="font-weight: bold; color: #fff;">P1 [CH 1]</span></div>
@@ -6230,7 +6536,7 @@ function exportCurrentPatchSyx() {
       <div style="color: #666;">PATCH: <span id="singleDisplayPatch" style="font-weight: bold; color: #fff;">VIRUS TI</span></div>
       <div style="color: #666;">SEZIONE: <span id="singleDisplayPage" style="font-weight: bold; color: #cbd5e1;">OSC 1</span></div>
       <div style="color: #666;">TEMPO: <span id="singleDisplayBpm" style="font-weight: bold; color: #fff;">120.0 BPM</span></div>
-      <div style="display: flex; align-items: center; gap: 6px; border-left: 1px solid #222; padding-left: 10px; cursor: pointer;" id="singleMidiOutStatusBox" title="Stato interfaccia MIDI OUT (clicca per configurare)">
+      <div style="display: flex; align-items: center; gap: 6px; border-left: 1px solid rgba(120,130,150,0.3); padding-left: 10px; cursor: pointer;" id="singleMidiOutStatusBox" title="Stato interfaccia MIDI OUT (clicca per configurare)">
         <span style="color: #666;">MIDI OUT:</span>
         <span id="singleDisplayMidiOut" style="color: #e0e4ec; font-weight: bold;">...</span>
       </div>
@@ -6266,9 +6572,33 @@ function exportCurrentPatchSyx() {
     innerLayout.appendChild(leftCol);
     innerLayout.appendChild(rightCol);
 
-    // --- Elektron Global LCD Visor Recess ---
+    // --- Faceplate / LCD Visor Recess (Harmonized with Snow in Light Mode, Dark Star in Dark Mode) ---
     const screenRecess = document.createElement('div');
-    screenRecess.className = 'chassis-screen-recess';
+    screenRecess.className = 'chassis-screen-recess single-screen-recess';
+
+    const scrTl = document.createElement('div'); scrTl.className = 'acrylic-screw'; scrTl.style.cssText = 'top: 6px; left: 6px;';
+    const scrTr = document.createElement('div'); scrTr.className = 'acrylic-screw'; scrTr.style.cssText = 'top: 6px; right: 6px;';
+    const scrBl = document.createElement('div'); scrBl.className = 'acrylic-screw'; scrBl.style.cssText = 'bottom: 6px; left: 6px;';
+    const scrBr = document.createElement('div'); scrBr.className = 'acrylic-screw'; scrBr.style.cssText = 'bottom: 6px; right: 6px;';
+
+    const isCurrentDark = document.documentElement.getAttribute('data-skin') === 'elektron';
+    const screenHeader = document.createElement('div');
+    screenHeader.style.cssText = 'display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; padding: 0 8px; width: 100%; box-sizing: border-box;';
+    screenHeader.innerHTML = `
+      <div style="display: flex; align-items: center; gap: 6px;">
+        <span class="pulse-bpm" style="width: 7px; height: 7px; border-radius: 50%; background: #ff3b4b; box-shadow: 0 0 7px #ff3b4b; display: inline-block;"></span>
+        <span style="font-size: 8.5px; font-weight: 800; letter-spacing: 0.12em; color: var(--fg); opacity: 0.85;">BPM / LFO</span>
+      </div>
+      <div style="font-weight: 900; font-size: 11px; letter-spacing: 0.14em; color: var(--fg); font-family: 'Inter', sans-serif;" id="singleLcdModelBadge">
+        ${isCurrentDark ? 'VIRUS TI2 <span style="font-weight: 300; opacity: 0.5;">|</span> DARK STAR' : 'VIRUS <span style="font-weight: 300; opacity: 0.5;">|</span> TI SNOW'}
+      </div>
+    `;
+
+    screenRecess.appendChild(scrTl);
+    screenRecess.appendChild(scrTr);
+    screenRecess.appendChild(scrBl);
+    screenRecess.appendChild(scrBr);
+    screenRecess.appendChild(screenHeader);
 
     const elektronLcd = document.createElement('canvas');
     elektronLcd.id = 'elektronLcd';
@@ -6288,13 +6618,16 @@ function exportCurrentPatchSyx() {
     pageNav.style.cssText = 'display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; margin-top: 6px; max-width: 480px;';
 
     const pageKeys = Object.keys(PAGES);
+    const isInitDark = document.documentElement.getAttribute('data-skin') === 'elektron';
+    const initLedColor = isInitDark ? '#e02424' : '#ff3b3b';
+
     pageKeys.forEach(p => {
       const btn = document.createElement('button');
       btn.className = 'seq-page-btn' + (p === currentPage ? ' active-view' : '');
       btn.style.cssText = 'padding: 6px 11px; font-size: 11px;';
       btn.innerHTML = `
         <div class="arp-hw-led-well" style="width: 8px; height: 8px;">
-          <div class="arp-hw-led" style="width: 5px; height: 5px; ${p === currentPage ? 'background: #ffffff; box-shadow: 0 0 6px #ffffff;' : ''}"></div>
+          <div class="arp-hw-led" style="width: 5px; height: 5px; ${p === currentPage ? `background: ${initLedColor}; box-shadow: 0 0 6px ${initLedColor};` : ''}"></div>
         </div>
         <span>${p}</span>
       `;
@@ -6307,8 +6640,10 @@ function exportCurrentPatchSyx() {
         btn.classList.add('active-view');
         const activeLed = btn.querySelector('.arp-hw-led');
         if (activeLed) {
-          activeLed.style.background = '#ffffff';
-          activeLed.style.boxShadow = '0 0 6px #ffffff';
+          const isClickDark = document.documentElement.getAttribute('data-skin') === 'elektron';
+          const clickLedColor = isClickDark ? '#e02424' : '#ff3b3b';
+          activeLed.style.background = clickLedColor;
+          activeLed.style.boxShadow = `0 0 6px ${clickLedColor}`;
         }
         currentPage = p;
         updateHwEncoders();
@@ -6709,21 +7044,39 @@ function exportCurrentPatchSyx() {
     ctx.scale(dpr, dpr);
     ctx.imageSmoothingEnabled = false;
 
-    // Fill background with deep OLED black
-    ctx.fillStyle = '#0a0c0f';
-    ctx.fillRect(0, 0, w, h);
+    const isDark = document.documentElement.getAttribute('data-skin') === 'elektron';
 
-    // Scanlines for authentic hardware visor look
-    ctx.fillStyle = 'rgba(255, 255, 255, 0.025)';
-    for(let sy=0; sy<h; sy+=2) {
-      ctx.fillRect(0, sy, w, 1);
+    if (isDark) {
+      // VIRUS DARK STAR: Deep OLED Black with white & crimson accents
+      ctx.fillStyle = '#090b0e';
+      ctx.fillRect(0, 0, w, h);
+
+      // Fine scanlines
+      ctx.fillStyle = 'rgba(255, 255, 255, 0.025)';
+      for(let sy = 0; sy < h; sy += 2) {
+        ctx.fillRect(0, sy, w, 1);
+      }
+    } else {
+      // VIRUS TI SNOW: Iconic backlit ice-blue LCD matching physical hardware
+      const bgGrad = ctx.createLinearGradient(0, 0, 0, h);
+      bgGrad.addColorStop(0, '#d9ecf8');
+      bgGrad.addColorStop(1, '#c4ddf1');
+      ctx.fillStyle = bgGrad;
+      ctx.fillRect(0, 0, w, h);
+
+      // Fine LCD scanlines
+      ctx.fillStyle = 'rgba(20, 36, 52, 0.035)';
+      for(let sy = 0; sy < h; sy += 2) {
+        ctx.fillRect(0, sy, w, 1);
+      }
     }
 
-    // High contrast monochrome platinum-white & cool silver palette
-    const fgWhite = '#ffffff';
-    const fgSilver = '#8e97a8';
-    const fgDim = '#404654';
-    const fgGrid = '#1b2029';
+    // Palette selection
+    const fgPrimary = isDark ? '#ffffff' : '#142434';
+    const fgSecondary = isDark ? '#94a1b2' : '#33485c';
+    const fgDim = isDark ? '#404654' : '#6d8296';
+    const fgGrid = isDark ? '#1b2029' : '#a8c0d4';
+    const headerSep = isDark ? '#222834' : '#9bb5cb';
 
     const headerH = 46;
     const leftW = 86;
@@ -6740,46 +7093,64 @@ function exportCurrentPatchSyx() {
     ctx.textBaseline = 'top';
 
     // Badge box
-    ctx.fillStyle = '#151922';
-    ctx.fillRect(10, 9, 64, 28);
-    ctx.lineWidth = 1;
-    ctx.strokeStyle = '#4b5568';
-    ctx.strokeRect(10, 9, 64, 28);
+    if (isDark) {
+      // Dark Star Red Badge
+      ctx.fillStyle = '#e02424';
+      ctx.fillRect(10, 9, 64, 28);
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = '#ff4d4d';
+      ctx.strokeRect(10, 9, 64, 28);
 
-    ctx.fillStyle = fgWhite;
-    ctx.shadowColor = fgWhite;
-    ctx.shadowBlur = limitedGlow(2);
-    ctx.fillText(progLabel, 14, 12);
+      ctx.fillStyle = '#ffffff';
+      ctx.shadowColor = '#ffffff';
+      ctx.shadowBlur = limitedGlow(2);
+      ctx.fillText(progLabel, 14, 12);
+    } else {
+      // TI Snow Inverted Navy Badge
+      ctx.fillStyle = '#1f3244';
+      ctx.fillRect(10, 9, 64, 28);
+      ctx.lineWidth = 1;
+      ctx.strokeStyle = '#142230';
+      ctx.strokeRect(10, 9, 64, 28);
+
+      ctx.fillStyle = '#d7e9f5';
+      ctx.shadowBlur = 0;
+      ctx.fillText(progLabel, 14, 12);
+    }
 
     // Patch Name
     ctx.textAlign = 'left';
     ctx.font = '34px "VT323", monospace';
     const patchInput = document.getElementById('patchName');
     const pName = (patchInput && patchInput.value) ? patchInput.value.toUpperCase().substring(0, 12) : (multiParts[pIdx]?.name ? multiParts[pIdx].name.toUpperCase().substring(0, 12) : 'VIRUS TI');
+    
+    ctx.fillStyle = fgPrimary;
+    ctx.shadowColor = isDark ? '#ffffff' : 'rgba(0,0,0,0)';
+    ctx.shadowBlur = isDark ? limitedGlow(2) : 0;
     ctx.fillText(pName, 84, 7);
 
     // Header Right: Menu Icon & Tempo
     ctx.textAlign = 'right';
     ctx.font = '26px "VT323", monospace';
-    ctx.fillStyle = fgSilver;
+    ctx.fillStyle = fgSecondary;
     ctx.shadowBlur = 0;
 
     const menuX = w - 104;
     ctx.lineWidth = 1;
-    ctx.strokeStyle = fgSilver;
+    ctx.strokeStyle = fgSecondary;
     ctx.strokeRect(menuX, 13, 22, 20);
     ctx.beginPath(); ctx.moveTo(menuX + 4, 18); ctx.lineTo(menuX + 18, 18); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(menuX + 4, 23); ctx.lineTo(menuX + 18, 23); ctx.stroke();
     ctx.beginPath(); ctx.moveTo(menuX + 4, 28); ctx.lineTo(menuX + 18, 28); ctx.stroke();
 
-    ctx.fillStyle = fgWhite;
-    ctx.shadowColor = fgWhite;
-    ctx.shadowBlur = limitedGlow(1.5);
+    ctx.fillStyle = fgPrimary;
+    ctx.shadowColor = isDark ? '#ffffff' : 'rgba(0,0,0,0)';
+    ctx.shadowBlur = isDark ? limitedGlow(1.5) : 0;
     ctx.fillText('120.0', w - 14, 11);
 
     // Header separator line
     ctx.shadowBlur = 0;
-    ctx.strokeStyle = '#222834';
+    ctx.strokeStyle = headerSep;
     ctx.lineWidth = 1;
     ctx.beginPath();
     ctx.moveTo(0, headerH);
@@ -6791,14 +7162,14 @@ function exportCurrentPatchSyx() {
 
     // Page Name Box
     const pageParts = currentPage.split(' ');
-    ctx.fillStyle = '#121620';
+    ctx.fillStyle = isDark ? '#141822' : '#c5dcee';
     ctx.fillRect(10, headerH + 10, leftW - 20, 56);
-    ctx.strokeStyle = '#2d3546';
+    ctx.strokeStyle = isDark ? '#2d3546' : '#2d4458';
     ctx.strokeRect(10, headerH + 10, leftW - 20, 56);
 
-    ctx.fillStyle = fgWhite;
-    ctx.shadowColor = fgWhite;
-    ctx.shadowBlur = limitedGlow(2);
+    ctx.fillStyle = fgPrimary;
+    ctx.shadowColor = isDark ? '#ffffff' : 'rgba(0,0,0,0)';
+    ctx.shadowBlur = isDark ? limitedGlow(2) : 0;
     if (pageParts.length > 1) {
       ctx.font = '22px "VT323", monospace';
       ctx.fillText(pageParts[0], leftW / 2, headerH + 14);
@@ -6811,7 +7182,7 @@ function exportCurrentPatchSyx() {
 
     // VU Level meter
     ctx.font = '20px "VT323", monospace';
-    ctx.fillStyle = fgSilver;
+    ctx.fillStyle = fgSecondary;
     ctx.shadowBlur = 0;
     ctx.fillText('LEV', leftW / 2, h - 22);
 
@@ -6832,14 +7203,14 @@ function exportCurrentPatchSyx() {
     ctx.stroke();
 
     // Level indicator bar
-    ctx.fillStyle = fgWhite;
-    ctx.shadowColor = fgWhite;
-    ctx.shadowBlur = limitedGlow(2);
+    ctx.fillStyle = fgPrimary;
+    ctx.shadowColor = isDark ? '#ffffff' : 'rgba(0,0,0,0)';
+    ctx.shadowBlur = isDark ? limitedGlow(2) : 0;
     ctx.fillRect(meterX + 3, meterY + meterH * 0.35, meterW - 6, meterH * 0.65 - 3);
 
     // Line separating left column
     ctx.shadowBlur = 0;
-    ctx.strokeStyle = '#222834';
+    ctx.strokeStyle = headerSep;
     ctx.beginPath();
     ctx.moveTo(leftW, headerH);
     ctx.lineTo(leftW, h);
@@ -6881,10 +7252,19 @@ function exportCurrentPatchSyx() {
 
        // Highlight active cell
        if (isParamActive) {
-         ctx.fillStyle = 'rgba(255, 255, 255, 0.12)';
-         ctx.fillRect(1, 1, cellW - 2, cellH - 2);
-         ctx.strokeStyle = fgWhite;
-         ctx.strokeRect(1, 1, cellW - 2, cellH - 2);
+         if (isDark) {
+           ctx.fillStyle = 'rgba(224, 36, 36, 0.20)';
+           ctx.fillRect(1, 1, cellW - 2, cellH - 2);
+           ctx.strokeStyle = '#e02424';
+           ctx.lineWidth = 1.5;
+           ctx.strokeRect(1, 1, cellW - 2, cellH - 2);
+         } else {
+           ctx.fillStyle = 'rgba(20, 36, 52, 0.12)';
+           ctx.fillRect(1, 1, cellW - 2, cellH - 2);
+           ctx.strokeStyle = '#142434';
+           ctx.lineWidth = 1.5;
+           ctx.strokeRect(1, 1, cellW - 2, cellH - 2);
+         }
        }
 
        // 1. Parameter Label at Top of Cell
@@ -6892,9 +7272,9 @@ function exportCurrentPatchSyx() {
        ctx.font = '20px "VT323", monospace';
        ctx.textAlign = 'center';
        ctx.textBaseline = 'top';
-       ctx.fillStyle = isParamActive ? fgWhite : fgSilver;
-       ctx.shadowColor = fgWhite;
-       ctx.shadowBlur = limitedGlow(isParamActive ? 3 : 0);
+       ctx.fillStyle = isParamActive ? (isDark ? '#ffffff' : '#08121c') : fgSecondary;
+       ctx.shadowColor = isDark ? '#ffffff' : 'rgba(0,0,0,0)';
+       ctx.shadowBlur = isDark ? limitedGlow(isParamActive ? 3 : 0) : 0;
        ctx.fillText(pDef.short.toUpperCase(), cellW / 2, 4);
        ctx.restore();
 
@@ -6903,13 +7283,13 @@ function exportCurrentPatchSyx() {
        ctx.translate(cellW/2, cellH/2 - 2);
 
        const idLower = paramId.toLowerCase();
-       const drawColor = isParamActive ? fgWhite : '#e0e5ed';
+       const drawColor = isParamActive ? (isDark ? '#ffffff' : '#08121c') : (isDark ? '#e0e5ed' : '#142434');
 
        ctx.save();
        ctx.scale(2.3, 2.3);
        ctx.lineWidth = 1 / 2.3;
-       ctx.shadowColor = fgWhite;
-       ctx.shadowBlur = limitedGlow(isParamActive ? 4 : 1);
+       ctx.shadowColor = isDark ? (isParamActive ? '#e02424' : '#ffffff') : 'rgba(0,0,0,0)';
+       ctx.shadowBlur = isDark ? limitedGlow(isParamActive ? 4 : 1) : 0;
 
        if (idLower.includes('wave') || idLower.includes('shape')) {
          drawWav(ctx, val, drawColor);
@@ -6940,9 +7320,9 @@ function exportCurrentPatchSyx() {
        ctx.font = 'bold 20px "VT323", monospace';
        ctx.textAlign = 'center';
        ctx.textBaseline = 'bottom';
-       ctx.fillStyle = isParamActive ? fgWhite : '#d0d6e2';
-       ctx.shadowColor = fgWhite;
-       ctx.shadowBlur = limitedGlow(isParamActive ? 3 : 1);
+       ctx.fillStyle = isParamActive ? (isDark ? '#ffffff' : '#08121c') : (isDark ? '#d0d6e2' : '#142434');
+       ctx.shadowColor = isDark ? '#ffffff' : 'rgba(0,0,0,0)';
+       ctx.shadowBlur = isDark ? limitedGlow(isParamActive ? 3 : 1) : 0;
 
        let valStr = String(val);
        if (pDef.bipolar) {
@@ -8248,7 +8628,7 @@ function exportCurrentPatchSyx() {
   // ---------------------------------------------------------------------
   // Multi-Mode Sound Cache & Dropdown Management
   // ---------------------------------------------------------------------
-  const VIRUS_FACTORY_BANKS = [
+  var VIRUS_FACTORY_BANKS = [
     [
       "Init", "SuperSaw", "Acid 303", "Sub Bass", "SwirlTine", "Dark Pad", "Moog Lead", "Trance Arp",
       "Reese Bass", "Modular Lead", "Vocodex", "Ambient Vox", "Punch Kick", "Neuro Bass", "Glass Bell", "Detuned Saw",
@@ -10898,7 +11278,8 @@ function exportCurrentPatchSyx() {
     // 1. TOP TRANSPORT & DIGITAL LCD DISPLAY
     // =========================================================================
     const topBar = document.createElement('div');
-    topBar.style.cssText = 'width: 100%; max-width: 960px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; padding: 10px 16px; background: rgba(0,0,0,0.55); border: 1px solid var(--border); border-radius: 6px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.5); box-sizing: border-box;';
+    topBar.className = 'chassis-hardware-topbar arp-top-bar';
+    topBar.style.cssText = 'width: 100%; max-width: 960px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; padding: 10px 16px; border-radius: 6px; box-sizing: border-box;';
 
     const transportBox = document.createElement('div');
     transportBox.style.cssText = 'display: flex; align-items: center; gap: 10px;';
@@ -10956,9 +11337,9 @@ function exportCurrentPatchSyx() {
 
     topBar.appendChild(transportBox);
 
-    // Digital readout status display (high-end monochrome OLED)
+    // Digital readout status display (harmonized OLED / ice-blue LCD)
     const lcdDisp = document.createElement('div');
-    lcdDisp.style.cssText = 'background: #0d0f12; border: 2px solid #1f232b; border-radius: 4px; padding: 6px 14px; color: #d0d4dc; font-family: monospace; font-size: 11px; display: flex; gap: 14px; align-items: center; flex-wrap: wrap; box-shadow: inset 0 2px 8px rgba(0,0,0,0.8); user-select: none;';
+    lcdDisp.className = 'chassis-top-display-visor arp-oled-visor';
     lcdDisp.innerHTML = `
       <div style="color: #666;">STATO: <span id="arpDisplayStatus" style="font-weight: bold; color: #888;">STOPPED</span></div>
       <div style="color: #666;">TEMPO: <span id="arpDisplayBpm" style="font-weight: bold; color: #fff;">124 BPM</span></div>
@@ -12015,7 +12396,8 @@ function exportCurrentPatchSyx() {
     // 1. TOP TRANSPORT & DIGITAL OLED DISPLAY
     // =========================================================================
     const topBar = document.createElement('div');
-    topBar.style.cssText = 'width: 100%; max-width: 960px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; padding: 10px 16px; background: rgba(0,0,0,0.55); border: 1px solid var(--border); border-radius: 6px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.5); box-sizing: border-box;';
+    topBar.className = 'chassis-hardware-topbar seq-top-bar';
+    topBar.style.cssText = 'width: 100%; max-width: 960px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; padding: 10px 16px; border-radius: 6px; box-sizing: border-box;';
 
     const transportBox = document.createElement('div');
     transportBox.style.cssText = 'display: flex; align-items: center; gap: 10px;';
@@ -12074,9 +12456,9 @@ function exportCurrentPatchSyx() {
 
     topBar.appendChild(transportBox);
 
-    // OLED Readout Display
+    // Harmonized OLED / ice-blue LCD Readout Display
     const lcdDisp = document.createElement('div');
-    lcdDisp.style.cssText = 'background: #0d0f12; border: 2px solid #1f232b; border-radius: 4px; padding: 6px 14px; color: #d0d4dc; font-family: monospace; font-size: 11px; display: flex; gap: 12px; align-items: center; flex-wrap: wrap; box-shadow: inset 0 2px 8px rgba(0,0,0,0.8); user-select: none;';
+    lcdDisp.className = 'chassis-top-display-visor seq-oled-visor';
     lcdDisp.innerHTML = `
       <div style="color: #666;">STATO: <span id="seqDisplayStatus" style="font-weight: bold; color: #888;">STOPPED</span></div>
       <div style="color: #666;">TEMPO: <span id="seqDisplayBpm" style="font-weight: bold; color: #fff;">125 BPM</span></div>
