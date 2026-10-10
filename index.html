@@ -1897,6 +1897,97 @@
     box-shadow: 0 1px 2px rgba(0,0,0,0.2), inset 0 1px 3px rgba(0,0,0,0.15);
   }
 
+  /* ==========================================================================
+     SEQUENCER REALISTIC HARDWARE STYLES (MONOCHROME PLATINUM / COOL SILVER)
+     ========================================================================== */
+  .seq-chassis {
+    --accent: #d8dde6 !important;
+  }
+  .seq-page-btn {
+    font-size: 11px;
+    font-weight: 800;
+    font-family: monospace;
+    padding: 6px 14px;
+    background: linear-gradient(180deg, #282a34 0%, #171820 100%);
+    color: #8b92a2;
+    border: 1px solid #14161c;
+    border-top: 1px solid rgba(255,255,255,0.18);
+    border-bottom: 2px solid #090a0d;
+    border-radius: 4px;
+    cursor: pointer;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.06);
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    outline: none !important;
+    user-select: none;
+    transition: transform 0.05s ease, filter 0.08s ease, box-shadow 0.08s ease;
+  }
+  .seq-page-btn:hover {
+    color: #ffffff;
+    filter: brightness(1.15);
+  }
+  .seq-page-btn:active {
+    transform: translateY(1.5px);
+    border-bottom-width: 1px;
+  }
+  .seq-page-btn.active-view {
+    background: linear-gradient(180deg, #f0f3f7 0%, #d1d6df 50%, #afb5c2 100%) !important;
+    border: 1px solid #7a818e !important;
+    border-top: 1px solid #ffffff !important;
+    border-bottom: 2px solid #545a66 !important;
+    color: #12141a !important;
+    font-weight: 900 !important;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.6) !important;
+    box-shadow: 0 0 10px rgba(220,225,235,0.5), 0 3px 5px rgba(0,0,0,0.5), inset 0 1px 1px #ffffff !important;
+  }
+  .seq-pad-note {
+    font-size: 10px;
+    font-weight: 900;
+    font-family: monospace;
+    letter-spacing: -0.02em;
+    margin-top: 2px;
+    color: inherit;
+  }
+  .seq-step-selected {
+    box-shadow: 0 0 0 2px #ffffff, 0 0 12px rgba(255,255,255,0.8), inset 0 1px 1px #ffffff !important;
+  }
+  .seq-subtoolbar-btn {
+    font-size: 10px;
+    font-weight: 800;
+    font-family: monospace;
+    padding: 5px 10px;
+    background: linear-gradient(180deg, #242630 0%, #15161c 100%);
+    color: #d0d4dc;
+    border: 1px solid #0f1015;
+    border-top: 1px solid rgba(255,255,255,0.15);
+    border-bottom: 2px solid #08090d;
+    border-radius: 3px;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.5);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 4px;
+    user-select: none;
+    transition: transform 0.05s ease, filter 0.08s ease;
+  }
+  .seq-subtoolbar-btn:hover {
+    color: #ffffff;
+    filter: brightness(1.2);
+  }
+  .seq-subtoolbar-btn:active {
+    transform: translateY(1px);
+    border-bottom-width: 1px;
+  }
+  .seq-subtoolbar-btn.active {
+    background: linear-gradient(180deg, #f0f3f7 0%, #d1d6df 50%, #afb5c2 100%) !important;
+    border-color: #7a818e !important;
+    color: #12141a !important;
+    font-weight: 900 !important;
+    box-shadow: 0 0 8px rgba(255,255,255,0.5) !important;
+  }
+
   .chassis-knob-container {
     width: 38px;
   }
@@ -3692,10 +3783,8 @@
 <!-- ARP -->
 <div id="arpContent" class="main-content single-view" style="display: none;"></div>
 
-<!-- Placeholder SEQUENCER -->
-<div id="sequencerContent" style="display: none; padding: 40px; text-align: center; border: 1px dashed var(--border); border-radius: 6px; margin-top: 20px;">
-  <h2 style="margin:0; opacity: 0.5;">SEQUENCER / SONG MODE (IN COSTRUZIONE)</h2>
-</div>
+<!-- 64-STEP SEQUENCER -->
+<div id="sequencerContent" class="main-content single-view" style="display: none; padding-bottom: 240px;"></div>
 <div id="songContent" class="main-content" style="display: none;"></div>
 
 <!-- FRONTALE HARDWARE ACCESS VIRUS TI SNOW -->
@@ -4265,6 +4354,9 @@
     document.getElementById('sequencerContent').style.display = 'block';
     document.getElementById('btnTabSequencer').classList.add('active');
     updateControlRoomStatus();
+    if (window.seqEngine) {
+      window.seqEngine.updateUI();
+    }
   });
 
   document.getElementById('btnTabSong').addEventListener('click', () => {
@@ -9698,6 +9790,10 @@ function exportCurrentPatchSyx() {
       return;
     }
 
+    if (document.getElementById('btnTabSequencer')?.classList.contains('active') && window.seqEngine && !window.seqEngine.running) {
+      window.seqEngine.recordStep(noteNumber, velocity);
+    }
+
     getAudioContext();
     if (activeNotes.has(noteNumber)) {
       stopNote(noteNumber);
@@ -10809,22 +10905,542 @@ function exportCurrentPatchSyx() {
     arpEngine.updateUI();
   }
 
+  // ---------------------------------------------------------------------
+  // Interactive 64-Step Melodic Sequencer Engine (Virus TI & Elektron Style)
+  // ---------------------------------------------------------------------
+  const seqEngine = {
+    running: false,
+    timerId: null,
+    bpm: 125,
+    length: 16, // 16, 32, 48, or 64 steps
+    rateIdx: 0, // default 1/16
+    rates: [
+      { name: '1/16', mult: 0.25 },
+      { name: '1/8', mult: 0.5 },
+      { name: '1/8T', mult: 0.3333 },
+      { name: '1/16T', mult: 0.1667 },
+      { name: '1/32', mult: 0.125 }
+    ],
+    gatePercent: 70,   // 10% to 120%
+    swingPercent: 0,   // 0% to 75%
+    currentPage: 0,    // 0: 1-16, 1: 17-32, 2: 33-48, 3: 49-64
+    followPage: true,  // follow running playhead
+    selectedStep: 0,   // step selected for editing (0..63)
+    targetCh: 0,       // MIDI channel (0..15)
+    currentStep: 0,
+    activeNotesPlaying: new Set(),
+    scaleKey: 9,       // 9 = A (0 = C, 2 = D, 4 = E, etc.)
+    scaleType: 'Minor',
+
+    scales: {
+      'Minor': [0, 2, 3, 5, 7, 8, 10],
+      'Major': [0, 2, 4, 5, 7, 9, 11],
+      'Pentatonic': [0, 3, 5, 7, 10],
+      'Dorian': [0, 2, 3, 5, 7, 9, 10],
+      'Phrygian': [0, 1, 3, 5, 7, 8, 10],
+      'Chromatic': [0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+    },
+
+    // 64 Step Array initialized with high-energy rolling bassline in A Minor
+    steps: Array.from({ length: 64 }, (_, i) => {
+      const defaultActive = i < 16 ? [true, false, true, false, true, true, false, true, true, false, true, false, true, true, true, false][i] : false;
+      const defaultNotes = [45, 45, 45, 48, 45, 45, 52, 50, 45, 45, 48, 45, 55, 52, 50, 48]; // A1, C2, E2, D2, G2...
+      return {
+        active: defaultActive,
+        note: i < 16 ? (defaultNotes[i] || 45) : 45,
+        velocity: 100,
+        tie: false
+      };
+    }),
+
+    getTargetChannel() {
+      if (this.targetCh === null || this.targetCh === undefined || this.targetCh === 'auto') {
+        return getActiveMidiChannel();
+      }
+      return this.targetCh & 0x0F;
+    },
+
+    getStepMs() {
+      const beatMs = 60000 / Math.max(40, Math.min(260, this.bpm));
+      return beatMs * this.rates[this.rateIdx].mult;
+    },
+
+    rawPlay(noteNumber, velocity) {
+      if (webAudioEnabled) {
+        playWebAudioNote(noteNumber, velocity);
+      }
+      if (selectedOutput) {
+        const ch = this.getTargetChannel();
+        try {
+          selectedOutput.send(new Uint8Array([0x90 | ch, noteNumber & 0x7F, velocity & 0x7F]));
+          recordMidiTx('seq on ' + midiNoteName(noteNumber) + ' (ch ' + (ch + 1) + ')', [0x90 | ch, noteNumber, velocity]);
+        } catch(e) {}
+      }
+      highlightPianoKey(noteNumber, true);
+    },
+
+    rawStop(noteNumber) {
+      if (webAudioEnabled) {
+        stopWebAudioNote(noteNumber);
+      }
+      if (selectedOutput) {
+        const ch = this.getTargetChannel();
+        try {
+          selectedOutput.send(new Uint8Array([0x80 | ch, noteNumber & 0x7F, 0]));
+        } catch(e) {}
+      }
+      highlightPianoKey(noteNumber, false);
+    },
+
+    start() {
+      if (this.running) return;
+      this.running = true;
+      this.currentStep = 0;
+      const ch = this.getTargetChannel();
+      unmuteAndSetVolume(ch);
+      this.tick();
+      this.scheduleNextTick();
+      this.updateUI();
+      setLastAction(`▶ Sequencer Avviato (${this.bpm} BPM, ${this.length} step, CH ${ch + 1})`);
+    },
+
+    stop() {
+      this.running = false;
+      if (this.timerId) {
+        clearTimeout(this.timerId);
+        this.timerId = null;
+      }
+      this.activeNotesPlaying.forEach(n => this.rawStop(n));
+      this.activeNotesPlaying.clear();
+      this.clearStepHighlights();
+      this.updateUI();
+      setLastAction('⏹ Sequencer Fermato');
+    },
+
+    toggle() {
+      if (this.running) this.stop();
+      else this.start();
+    },
+
+    scheduleNextTick() {
+      if (!this.running) return;
+      const stepMs = this.getStepMs();
+      let delay = stepMs;
+      if (this.swingPercent > 0 && (this.currentStep % 2 === 1)) {
+        delay += stepMs * (this.swingPercent / 100) * 0.33;
+      }
+      this.timerId = setTimeout(() => {
+        this.tick();
+        this.scheduleNextTick();
+      }, Math.max(18, delay));
+    },
+
+    tick() {
+      if (!this.running) return;
+
+      const step = this.currentStep;
+      const stepPage = Math.floor(step / 16);
+
+      // Follow Page Logic
+      if (this.followPage && this.currentPage !== stepPage) {
+        this.currentPage = stepPage;
+        this.renderPadsForCurrentPage();
+      }
+
+      this.highlightStepUI(step);
+
+      const stepData = this.steps[step];
+
+      // Stop previous non-tied notes
+      if (!stepData.tie) {
+        this.activeNotesPlaying.forEach(n => this.rawStop(n));
+        this.activeNotesPlaying.clear();
+      }
+
+      if (stepData.active) {
+        const note = stepData.note;
+        const vel = stepData.velocity || 100;
+        const stepMs = this.getStepMs();
+        const gateMs = Math.max(25, (stepMs * (this.gatePercent / 100)) - 10);
+
+        this.rawPlay(note, vel);
+        this.activeNotesPlaying.add(note);
+
+        if (!stepData.tie) {
+          setTimeout(() => {
+            if (this.activeNotesPlaying.has(note)) {
+              this.rawStop(note);
+              this.activeNotesPlaying.delete(note);
+            }
+          }, gateMs);
+        }
+      }
+
+      // Aggiorna indicatore step nel display LCD
+      const oledStep = document.getElementById('seqDisplayStep');
+      if (oledStep) {
+        oledStep.textContent = `${String(step + 1).padStart(2, '0')}/${this.length}`;
+      }
+
+      this.currentStep = (this.currentStep + 1) % this.length;
+    },
+
+    recordStep(noteNumber, velocity) {
+      if (this.running) return false;
+      if (this.selectedStep >= 0 && this.selectedStep < 64) {
+        this.steps[this.selectedStep].note = noteNumber;
+        this.steps[this.selectedStep].active = true;
+        if (velocity) this.steps[this.selectedStep].velocity = velocity;
+
+        const oldStep = this.selectedStep;
+        this.selectedStep = (this.selectedStep + 1) % this.length;
+        const newPage = Math.floor(this.selectedStep / 16);
+        if (newPage !== this.currentPage) {
+          this.currentPage = newPage;
+        }
+        this.renderPadsForCurrentPage();
+        this.updateOledDisplay();
+        this.updateStepEditToolbar();
+        setLastAction(`Seq Step ${oldStep + 1} impostato a ${midiNoteName(noteNumber)}`);
+        return true;
+      }
+      return false;
+    },
+
+    highlightStepUI(step) {
+      const stepPage = Math.floor(step / 16);
+
+      // Aggiorna i 4 LED delle pagine in tempo reale
+      for (let p = 0; p < 4; p++) {
+        const pageLed = document.getElementById(`seqPageLed${p}`);
+        if (pageLed) {
+          if (p === stepPage) pageLed.classList.add('active');
+          else pageLed.classList.remove('active');
+        }
+      }
+
+      // Se lo step è nella pagina attualmente visualizzata, illumina il LED del pad corrispondente
+      if (stepPage === this.currentPage) {
+        const padIdx = step % 16;
+        for (let i = 0; i < 16; i++) {
+          const led = document.getElementById(`seqLedStep${i}`);
+          if (led) {
+            if (i === padIdx) led.classList.add('active');
+            else led.classList.remove('active');
+          }
+          const pad = document.getElementById(`seqStepBtn${i}`);
+          if (pad && i === padIdx && this.steps[step].active) {
+            pad.classList.add('flash');
+            setTimeout(() => { pad.classList.remove('flash'); }, 90);
+          }
+        }
+      } else {
+        for (let i = 0; i < 16; i++) {
+          const led = document.getElementById(`seqLedStep${i}`);
+          if (led) led.classList.remove('active');
+        }
+      }
+    },
+
+    clearStepHighlights() {
+      for (let p = 0; p < 4; p++) {
+        const pageLed = document.getElementById(`seqPageLed${p}`);
+        if (pageLed) pageLed.classList.remove('active');
+      }
+      for (let i = 0; i < 16; i++) {
+        const led = document.getElementById(`seqLedStep${i}`);
+        if (led) led.classList.remove('active');
+      }
+    },
+
+    renderPadsForCurrentPage() {
+      const baseIdx = this.currentPage * 16;
+      for (let i = 0; i < 16; i++) {
+        const actualStep = baseIdx + i;
+        const pad = document.getElementById(`seqStepBtn${i}`);
+        const numLabel = document.getElementById(`seqPadNum${i}`);
+        const noteLabel = document.getElementById(`seqPadNote${i}`);
+        const tieBadge = document.getElementById(`seqPadTie${i}`);
+
+        if (pad && numLabel && noteLabel) {
+          const s = this.steps[actualStep];
+          numLabel.textContent = String(actualStep + 1).padStart(2, '0');
+          noteLabel.textContent = s.active ? midiNoteName(s.note) : '--';
+
+          if (s.active) pad.classList.add('active');
+          else pad.classList.remove('active');
+
+          if (tieBadge) {
+            tieBadge.style.display = s.tie ? 'block' : 'none';
+          }
+
+          if (actualStep === this.selectedStep) {
+            pad.classList.add('seq-step-selected');
+          } else {
+            pad.classList.remove('seq-step-selected');
+          }
+
+          if (actualStep >= this.length) {
+            pad.style.opacity = '0.35';
+          } else {
+            pad.style.opacity = '1';
+          }
+        }
+      }
+
+      // Aggiorna pulsanti pagina
+      for (let p = 0; p < 4; p++) {
+        const pBtn = document.getElementById(`seqPageBtn${p}`);
+        if (pBtn) {
+          if (p === this.currentPage) pBtn.classList.add('active-view');
+          else pBtn.classList.remove('active-view');
+        }
+      }
+    },
+
+    updateOledDisplay() {
+      const st = document.getElementById('seqDisplayStatus');
+      if (st) {
+        st.textContent = this.running ? 'RUNNING' : 'STOPPED';
+        st.style.color = this.running ? '#ffffff' : '#888';
+      }
+      const bpmEl = document.getElementById('seqDisplayBpm');
+      if (bpmEl) bpmEl.textContent = `${this.bpm} BPM`;
+
+      const lenEl = document.getElementById('seqDisplayLen');
+      if (lenEl) lenEl.textContent = `${this.length} STEPS`;
+
+      const rateEl = document.getElementById('seqDisplayRate');
+      if (rateEl) rateEl.textContent = this.rates[this.rateIdx].name;
+
+      const pageEl = document.getElementById('seqDisplayPage');
+      if (pageEl) pageEl.textContent = `PAGE ${this.currentPage + 1}/4`;
+
+      const chEl = document.getElementById('seqDisplayCh');
+      if (chEl) {
+        const ch = this.getTargetChannel();
+        chEl.textContent = `CH ${ch + 1}`;
+      }
+
+      const selStepEl = document.getElementById('seqDisplaySelStep');
+      if (selStepEl) {
+        const s = this.steps[this.selectedStep];
+        selStepEl.textContent = `STEP ${String(this.selectedStep + 1).padStart(2, '0')}: ${s.active ? midiNoteName(s.note) : 'PAUSA'} (Vel ${s.velocity}${s.tie ? ', TIE' : ''})`;
+      }
+
+      const midiOutEl = document.getElementById('seqDisplayMidiOut');
+      if (midiOutEl) {
+        if (selectedOutput) {
+          midiOutEl.textContent = selectedOutput.name;
+          midiOutEl.style.color = '#e0e4ec';
+        } else {
+          midiOutEl.textContent = 'NON CONNESSO ⚠️';
+          midiOutEl.style.color = '#ffaa44';
+        }
+      }
+    },
+
+    updateStepEditToolbar() {
+      const stepIdxEl = document.getElementById('seqEditStepIdx');
+      const noteBadge = document.getElementById('seqEditStepNote');
+      const tieBtn = document.getElementById('seqBtnToggleTie');
+      const accentBtn = document.getElementById('seqBtnToggleAccent');
+
+      if (stepIdxEl) stepIdxEl.textContent = `STEP ${String(this.selectedStep + 1).padStart(2, '0')}`;
+      const s = this.steps[this.selectedStep];
+      if (noteBadge) {
+        noteBadge.textContent = s.active ? `${midiNoteName(s.note)} (${s.note})` : 'PAUSA (OFF)';
+        noteBadge.style.color = s.active ? '#ffffff' : '#777';
+      }
+      if (tieBtn) {
+        if (s.tie) tieBtn.classList.add('active');
+        else tieBtn.classList.remove('active');
+      }
+      if (accentBtn) {
+        if (s.velocity >= 120) accentBtn.classList.add('active');
+        else accentBtn.classList.remove('active');
+      }
+    },
+
+    updateUI() {
+      const playBtn = document.getElementById('seqBtnPlayStop');
+      if (playBtn) {
+        if (this.running) {
+          playBtn.innerHTML = '⏹ stop seq';
+          playBtn.classList.add('running');
+        } else {
+          playBtn.innerHTML = '▶ start seq';
+          playBtn.classList.remove('running');
+        }
+      }
+      const followBtn = document.getElementById('seqBtnFollow');
+      if (followBtn) {
+        if (this.followPage) {
+          followBtn.textContent = 'follow: on 👁';
+          followBtn.classList.add('latched');
+        } else {
+          followBtn.textContent = 'follow: off';
+          followBtn.classList.remove('latched');
+        }
+      }
+      this.renderPadsForCurrentPage();
+      this.updateOledDisplay();
+      this.updateStepEditToolbar();
+    },
+
+    // Presets & Pattern Manipulations
+    presetRollingBass() {
+      const notes = [45, 45, 45, 48, 45, 45, 52, 50, 45, 45, 48, 45, 55, 52, 50, 48]; // A1, C2, E2, D2, G2
+      for (let i = 0; i < 64; i++) {
+        this.steps[i] = {
+          active: i < 16,
+          note: notes[i % 16],
+          velocity: (i % 4 === 0) ? 120 : 96,
+          tie: false
+        };
+      }
+      this.length = 16;
+      this.updateUI();
+      setLastAction('Seq Preset Caricato: Rolling Bass (16th)');
+    },
+
+    presetAcid303() {
+      // Classic 303 syncopated motif with accents and ties
+      const pattern = [
+        { on: true, n: 45, tie: false, v: 127 },
+        { on: false, n: 45, tie: false, v: 90 },
+        { on: true, n: 45, tie: true, v: 100 },
+        { on: true, n: 57, tie: false, v: 127 },
+        { on: false, n: 45, tie: false, v: 90 },
+        { on: true, n: 48, tie: false, v: 100 },
+        { on: true, n: 50, tie: true, v: 110 },
+        { on: true, n: 50, tie: false, v: 100 },
+        { on: true, n: 45, tie: false, v: 127 },
+        { on: false, n: 45, tie: false, v: 90 },
+        { on: true, n: 52, tie: false, v: 115 },
+        { on: false, n: 45, tie: false, v: 90 },
+        { on: true, n: 50, tie: true, v: 120 },
+        { on: true, n: 48, tie: false, v: 100 },
+        { on: true, n: 47, tie: false, v: 105 },
+        { on: false, n: 45, tie: false, v: 90 }
+      ];
+      for (let i = 0; i < 64; i++) {
+        const p = pattern[i % 16];
+        this.steps[i] = {
+          active: i < 16 ? p.on : false,
+          note: p.n,
+          velocity: p.v,
+          tie: p.tie
+        };
+      }
+      this.length = 16;
+      this.updateUI();
+      setLastAction('Seq Preset Caricato: Acid 303 (A Minor)');
+    },
+
+    presetMelodicTechno() {
+      // 32-step melodic techno progression (D Minor / F Major)
+      const dMin = [50, 53, 57, 62, 57, 53, 60, 57, 48, 52, 55, 60, 55, 52, 57, 53];
+      for (let i = 0; i < 64; i++) {
+        this.steps[i] = {
+          active: i < 32 && (i % 2 === 0 || i % 4 === 3),
+          note: dMin[i % 16] + (i >= 16 ? 2 : 0),
+          velocity: (i % 4 === 0) ? 118 : 95,
+          tie: false
+        };
+      }
+      this.length = 32;
+      this.updateUI();
+      setLastAction('Seq Preset Caricato: Melodic Techno (32 step)');
+    },
+
+    presetOffbeats() {
+      for (let i = 0; i < 64; i++) {
+        this.steps[i] = {
+          active: i < 16 ? (i % 2 === 1) : false,
+          note: 48,
+          velocity: 110,
+          tie: false
+        };
+      }
+      this.length = 16;
+      this.updateUI();
+      setLastAction('Seq Preset Caricato: Offbeat Stabs');
+    },
+
+    presetRandomizeKey() {
+      const scaleNotes = this.scales[this.scaleType] || this.scales['Minor'];
+      const baseRoot = 36 + (this.scaleKey % 12); // Octave 2 base
+      for (let i = 0; i < this.length; i++) {
+        const isActive = Math.random() < 0.65;
+        const degree = scaleNotes[Math.floor(Math.random() * scaleNotes.length)];
+        const octOffset = Math.floor(Math.random() * 2) * 12;
+        this.steps[i].active = isActive;
+        this.steps[i].note = baseRoot + degree + octOffset;
+        this.steps[i].velocity = Math.random() < 0.25 ? 127 : 96;
+        this.steps[i].tie = Math.random() < 0.15;
+      }
+      this.updateUI();
+      setLastAction(`Seq Randomizzato in chiave: ${midiNoteName(baseRoot).slice(0, -1)} ${this.scaleType}`);
+    },
+
+    presetShift(dir) {
+      if (this.length <= 1) return;
+      if (dir > 0) {
+        const last = { ...this.steps[this.length - 1] };
+        for (let i = this.length - 1; i > 0; i--) {
+          this.steps[i] = { ...this.steps[i - 1] };
+        }
+        this.steps[0] = last;
+      } else {
+        const first = { ...this.steps[0] };
+        for (let i = 0; i < this.length - 1; i++) {
+          this.steps[i] = { ...this.steps[i + 1] };
+        }
+        this.steps[this.length - 1] = first;
+      }
+      this.renderPadsForCurrentPage();
+      this.updateOledDisplay();
+      setLastAction(`Seq Pattern Shift: ${dir > 0 ? '+1 step' : '-1 step'}`);
+    },
+
+    presetInvert() {
+      for (let i = 0; i < this.length; i++) {
+        this.steps[i].active = !this.steps[i].active;
+      }
+      this.renderPadsForCurrentPage();
+      this.updateOledDisplay();
+      setLastAction('Seq Pattern Invertito');
+    },
+
+    presetClear() {
+      for (let i = 0; i < 64; i++) {
+        this.steps[i].active = false;
+        this.steps[i].tie = false;
+      }
+      this.renderPadsForCurrentPage();
+      this.updateOledDisplay();
+      setLastAction('Seq Svuotato (Tutti gli step disattivati)');
+    }
+  };
+
+  window.seqEngine = seqEngine;
+
   function buildSeqView() {
     const root = document.getElementById('sequencerContent');
+    if (!root) return;
     root.innerHTML = '';
 
     const elektronWrapper = document.createElement('div');
-    elektronWrapper.className = 'hardware-chassis';
-    elektronWrapper.style.width = '95%';
-    elektronWrapper.style.maxWidth = '1100px';
-    elektronWrapper.style.padding = '30px 20px';
+    elektronWrapper.className = 'hardware-chassis seq-chassis';
 
+    // 4 Viti dello chassis
     const tlScrew = document.createElement('div'); tlScrew.className = 'chassis-screw screw-tl';
     const trScrew = document.createElement('div'); trScrew.className = 'chassis-screw screw-tr';
     const blScrew = document.createElement('div'); blScrew.className = 'chassis-screw screw-bl';
     const brScrew = document.createElement('div'); brScrew.className = 'chassis-screw screw-br';
     const logo = document.createElement('div'); logo.className = 'chassis-logo';
-    logo.textContent = 'VIRUS-H SEQ';
+    logo.textContent = 'VIRUS-H 64-STEP MELODIC SEQUENCER';
 
     elektronWrapper.appendChild(tlScrew);
     elektronWrapper.appendChild(trScrew);
@@ -10833,201 +11449,519 @@ function exportCurrentPatchSyx() {
     elektronWrapper.appendChild(logo);
 
     const innerLayout = document.createElement('div');
-    innerLayout.style.display = 'flex';
-    innerLayout.style.flexDirection = 'column';
-    innerLayout.style.gap = '20px';
-    innerLayout.style.alignItems = 'center';
-    innerLayout.style.marginTop = '40px';
-    innerLayout.style.width = '100%';
-    innerLayout.style.zIndex = '1';
+    innerLayout.style.cssText = 'display: flex; flex-direction: column; gap: 16px; align-items: center; margin-top: 24px; width: 100%; box-sizing: border-box; z-index: 1; padding-bottom: 90px;';
 
-    const topSection = document.createElement('div');
-    topSection.style.display = 'flex';
-    topSection.style.width = '100%';
-    topSection.style.justifyContent = 'space-between';
-    topSection.style.alignItems = 'center';
-    topSection.style.gap = '20px';
+    // =========================================================================
+    // 1. TOP TRANSPORT & DIGITAL OLED DISPLAY
+    // =========================================================================
+    const topBar = document.createElement('div');
+    topBar.style.cssText = 'width: 100%; max-width: 960px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; padding: 10px 16px; background: rgba(0,0,0,0.55); border: 1px solid var(--border); border-radius: 6px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.5); box-sizing: border-box;';
 
+    const transportBox = document.createElement('div');
+    transportBox.style.cssText = 'display: flex; align-items: center; gap: 10px;';
 
-    // Helper for Seq Discrete controls mapped to Knobs
-    function createSeqDiscreteKnob(label, options, ccIndex) {
-      let currentIdx = 0;
-      const knobContainer = createKnobGeneric({
-        label: label,
-        default: 0,
-        bipolar: false,
-        getValue: () => Math.round((currentIdx / (options.length - 1)) * 127),
-        setValue: (v, send) => {
-          let step = Math.round((v / 127) * (options.length - 1));
-          if(step >= options.length) step = options.length - 1;
-          currentIdx = step;
-          const labelEl = knobContainer.querySelector('.chassis-knob-label');
-          if(labelEl) labelEl.textContent = label + ': ' + options[step].name;
-          if(send) window.sendCC(1, ccIndex, options[step].val);
-        }
-      });
-      const labelEl = knobContainer.querySelector('.chassis-knob-label');
-      if(labelEl) labelEl.textContent = label + ': ' + options[currentIdx].name;
-      return knobContainer;
-    }
+    const btnPlayStop = document.createElement('button');
+    btnPlayStop.id = 'seqBtnPlayStop';
+    btnPlayStop.className = 'arp-hw-btn-play';
+    btnPlayStop.innerHTML = '▶ start seq';
+    btnPlayStop.title = 'Avvia / Ferma riproduzione in tempo reale del Sequencer';
+    btnPlayStop.addEventListener('click', () => {
+      getAudioContext();
+      unmuteAndSetVolume(seqEngine.getTargetChannel());
+      seqEngine.toggle();
+    });
+    transportBox.appendChild(btnPlayStop);
 
-    const leftKnobs = document.createElement('div');
-    leftKnobs.style.display = 'flex';
-    leftKnobs.style.gap = '30px';
+    const btnFollow = document.createElement('button');
+    btnFollow.id = 'seqBtnFollow';
+    btnFollow.className = 'arp-hw-btn-hold latched';
+    btnFollow.textContent = 'follow: on 👁';
+    btnFollow.title = 'Page Follow: quando attivo, la vista salta automaticamente alla pagina che sta suonando';
+    btnFollow.addEventListener('click', () => {
+      seqEngine.followPage = !seqEngine.followPage;
+      seqEngine.updateUI();
+    });
+    transportBox.appendChild(btnFollow);
 
-    leftKnobs.appendChild(createSeqDiscreteKnob('Scale', [
-      {val: 0, name: '1/16'}, {val: 1, name: '1/32'}, {val: 2, name: '1/8'}, {val: 3, name: '1/4'}
-    ], 107));
+    const btnTestHw = document.createElement('button');
+    btnTestHw.className = 'arp-hw-preset-btn';
+    btnTestHw.style.cssText = 'padding: 8px 12px; font-weight: 800; font-size: 11px;';
+    btnTestHw.innerHTML = '🔊 test synth';
+    btnTestHw.title = 'Invia una nota di prova hardware al synth Virus TI';
+    btnTestHw.addEventListener('click', () => {
+      const ch = seqEngine.getTargetChannel();
+      unmuteAndSetVolume(ch);
+      if (selectedOutput) {
+        try {
+          selectedOutput.send(new Uint8Array([0xB0 | ch, 7, 127]));
+          selectedOutput.send(new Uint8Array([0xB0 | ch, 11, 127]));
+          selectedOutput.send(new Uint8Array([0xB0 | ch, 41, 0]));
+          selectedOutput.send(new Uint8Array([0x90 | ch, 60, 120]));
+          setLastAction(`🔊 TEST SEQ INVIATO A ${selectedOutput.name} (CH ${ch + 1})!`);
+          setTimeout(() => {
+            selectedOutput.send(new Uint8Array([0x80 | ch, 60, 0]));
+          }, 800);
+        } catch(e) {}
+      } else {
+        openSettingsModal();
+        setLastAction('⚠️ Seleziona prima la porta MIDI OUT');
+      }
+    });
+    transportBox.appendChild(btnTestHw);
 
-    let lenValRaw = 64;
+    topBar.appendChild(transportBox);
+
+    // OLED Readout Display
+    const lcdDisp = document.createElement('div');
+    lcdDisp.style.cssText = 'background: #0d0f12; border: 2px solid #1f232b; border-radius: 4px; padding: 6px 14px; color: #d0d4dc; font-family: monospace; font-size: 11px; display: flex; gap: 14px; align-items: center; flex-wrap: wrap; box-shadow: inset 0 2px 8px rgba(0,0,0,0.8); user-select: none;';
+    lcdDisp.innerHTML = `
+      <div style="color: #666;">STATO: <span id="seqDisplayStatus" style="font-weight: bold; color: #888;">STOPPED</span></div>
+      <div style="color: #666;">TEMPO: <span id="seqDisplayBpm" style="font-weight: bold; color: #fff;">125 BPM</span></div>
+      <div style="color: #666;">STEP: <span id="seqDisplayStep" style="font-weight: bold; color: #ffffff;">01/16</span></div>
+      <div style="color: #666;">LUNGHEZZA: <span id="seqDisplayLen" style="font-weight: bold; color: #fff;">16 STEPS</span></div>
+      <div style="color: #666;">RISOLUZIONE: <span id="seqDisplayRate" style="font-weight: bold; color: #e0e4ec;">1/16</span></div>
+      <div style="color: #666;"><span id="seqDisplayPage" style="font-weight: bold; color: #c0c4cc;">PAGE 1/4</span></div>
+      <div style="display: flex; align-items: center; gap: 6px;">
+        <span style="color: #666;">DEST:</span>
+        <select id="seqTargetSelect" style="background: #181a20; color: #e0e4ec; border: 1px solid #333; border-radius: 3px; font-size: 10px; font-family: monospace; font-weight: bold; padding: 2px 6px; outline: none; cursor: pointer;">
+          <option value="auto">AUTO (Segui vista attiva)</option>
+          <option value="0" selected>CH 1 (Global / Single / P1)</option>
+          <option value="1">MULTI P2 (Ch 2)</option>
+          <option value="2">MULTI P3 (Ch 3)</option>
+          <option value="3">MULTI P4 (Ch 4)</option>
+        </select>
+        <span id="seqDisplayCh" style="color: #fff; font-weight: bold;">CH 1</span>
+      </div>
+      <div style="display: flex; align-items: center; gap: 6px; border-left: 1px solid #222; padding-left: 10px; cursor: pointer;" id="seqMidiOutStatusBox" title="Stato interfaccia MIDI OUT (clicca per configurare)">
+        <span style="color: #666;">MIDI OUT:</span>
+        <span id="seqDisplayMidiOut" style="color: #e0e4ec; font-weight: bold;">...</span>
+      </div>
+    `;
+    topBar.appendChild(lcdDisp);
+
+    innerLayout.appendChild(topBar);
+
+    setTimeout(() => {
+      const sel = document.getElementById('seqTargetSelect');
+      if (sel) {
+        sel.addEventListener('change', () => {
+          const val = sel.value;
+          if (val === 'auto') {
+            seqEngine.targetCh = null;
+          } else {
+            seqEngine.targetCh = parseInt(val, 10) & 0x0F;
+          }
+          unmuteAndSetVolume(seqEngine.getTargetChannel());
+          seqEngine.updateUI();
+          setLastAction(`Seq Target Dest: ${sel.options[sel.selectedIndex].text}`);
+        });
+      }
+      const midiBox = document.getElementById('seqMidiOutStatusBox');
+      if (midiBox) {
+        midiBox.addEventListener('click', () => {
+          if (typeof openSettingsModal === 'function') openSettingsModal();
+        });
+      }
+    }, 0);
+
+    // =========================================================================
+    // 2. ROTARY HARDWARE KNOBS SECTION (6 KNOBS)
+    // =========================================================================
+    const knobsGrid = document.createElement('div');
+    knobsGrid.style.cssText = 'display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; width: 100%; max-width: 960px; padding: 12px 14px; background: rgba(0,0,0,0.3); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; box-sizing: border-box;';
+
+    // Knob 1: BPM / TEMPO
+    const bpmKnob = createKnobGeneric({
+      label: 'TEMPO (BPM)',
+      default: 125,
+      bipolar: false,
+      getValue: () => Math.round(((seqEngine.bpm - 40) / 200) * 127),
+      setValue: (v) => {
+        const val = Math.round(40 + (v / 127) * 200);
+        seqEngine.bpm = val;
+        seqEngine.updateOledDisplay();
+      }
+    });
+    knobsGrid.appendChild(bpmKnob);
+
+    // Knob 2: RESOLUTION (1/16, 1/8, 1/8T, 1/16T, 1/32)
+    const rateKnob = createKnobGeneric({
+      label: 'RESOLUTION',
+      default: 0,
+      bipolar: false,
+      getValue: () => Math.round((seqEngine.rateIdx / (seqEngine.rates.length - 1)) * 127),
+      setValue: (v) => {
+        const idx = Math.min(seqEngine.rates.length - 1, Math.max(0, Math.round((v / 127) * (seqEngine.rates.length - 1))));
+        seqEngine.rateIdx = idx;
+        seqEngine.updateOledDisplay();
+      }
+    });
+    knobsGrid.appendChild(rateKnob);
+
+    // Knob 3: LENGTH (16, 32, 48, 64)
+    const lenSteps = [16, 32, 48, 64];
     const lenKnob = createKnobGeneric({
-      label: 'Length', default: 64, bipolar: false,
-      getValue: () => lenValRaw,
-      setValue: (v, send) => {
-        lenValRaw = v;
-        let actualLen = Math.max(1, Math.round(v/127 * 64));
-        const lbl = lenKnob.querySelector('.chassis-knob-label');
-        if(lbl) lbl.textContent = 'Length: ' + actualLen;
-        if(send) window.sendCC(1, 108, actualLen);
+      label: 'LENGTH',
+      default: 0,
+      bipolar: false,
+      getValue: () => {
+        const idx = lenSteps.indexOf(seqEngine.length);
+        return Math.round(((idx >= 0 ? idx : 0) / 3) * 127);
+      },
+      setValue: (v) => {
+        const idx = Math.min(3, Math.max(0, Math.round((v / 127) * 3)));
+        seqEngine.length = lenSteps[idx];
+        seqEngine.renderPadsForCurrentPage();
+        seqEngine.updateOledDisplay();
       }
     });
-    leftKnobs.appendChild(lenKnob);
+    knobsGrid.appendChild(lenKnob);
 
-    let gateVal = 50;
+    // Knob 4: GATE LENGTH (10% - 120%)
     const gateKnob = createKnobGeneric({
-      label: 'Gate Time', default: 50, bipolar: false,
-      getValue: () => gateVal,
-      setValue: (v, send) => {
-        gateVal = v;
-        const lbl = gateKnob.querySelector('.chassis-knob-label');
-        if(lbl) lbl.textContent = 'Gate Time: ' + Math.round(v);
-        if(send) window.sendCC(1, 109, v);
+      label: 'GATE LENGTH',
+      default: Math.round(((seqEngine.gatePercent - 10) / 110) * 127),
+      bipolar: false,
+      getValue: () => Math.round(((seqEngine.gatePercent - 10) / 110) * 127),
+      setValue: (v) => {
+        const val = Math.round(10 + (v / 127) * 110);
+        seqEngine.gatePercent = val;
       }
     });
-    leftKnobs.appendChild(gateKnob);
+    knobsGrid.appendChild(gateKnob);
 
-    const rightKnobs = document.createElement('div');
-    rightKnobs.style.display = 'flex';
-    rightKnobs.style.gap = '30px';
-
-    let velVal = 100;
-    const velKnob = createKnobGeneric({
-      label: 'Velocity', default: 100, bipolar: false,
-      getValue: () => velVal,
-      setValue: (v, send) => {
-        velVal = v;
-        const lbl = velKnob.querySelector('.chassis-knob-label');
-        if(lbl) lbl.textContent = 'Velocity: ' + Math.round(v);
-        if(send) window.sendCC(1, 110, v);
-      }
-    });
-    rightKnobs.appendChild(velKnob);
-
-    rightKnobs.appendChild(createSeqDiscreteKnob('Direction', [
-      {val: 0, name: 'Fwd'}, {val: 1, name: 'Bwd'}, {val: 2, name: 'Ping'}, {val: 3, name: 'Rand'}
-    ], 111));
-
-    let seqSwingVal = 0;
+    // Knob 5: SWING (0% - 75%)
     const swingKnob = createKnobGeneric({
-      label: 'Swing', default: 0, bipolar: false,
-      getValue: () => seqSwingVal,
-      setValue: (v, send) => {
-        seqSwingVal = v;
-        const lbl = swingKnob.querySelector('.chassis-knob-label');
-        if(lbl) lbl.textContent = 'Swing: ' + Math.round(v);
-        if(send) window.sendCC(1, 112, v);
+      label: 'SWING',
+      default: 0,
+      bipolar: false,
+      getValue: () => Math.round((seqEngine.swingPercent / 75) * 127),
+      setValue: (v) => {
+        const val = Math.round((v / 127) * 75);
+        seqEngine.swingPercent = val;
       }
     });
-    rightKnobs.appendChild(swingKnob);
+    knobsGrid.appendChild(swingKnob);
 
-    // OLED Screen for Sequencer
-    const screenRecess = document.createElement('div');
-    screenRecess.className = 'chassis-screen-recess';
-    screenRecess.style.width = '300px';
-    screenRecess.style.height = '100px';
-    screenRecess.style.display = 'flex';
-    screenRecess.style.flexDirection = 'column';
-    screenRecess.style.justifyContent = 'center';
-    screenRecess.style.alignItems = 'center';
-
-    const seqTitle = document.createElement('div');
-    seqTitle.textContent = 'PATTERN 01';
-    seqTitle.style.color = 'var(--accent)';
-    seqTitle.style.fontSize = '24px';
-    seqTitle.style.textShadow = `0 0 ${Math.round(limitedGlow(6))}px var(--accent)`;
-    seqTitle.style.position = 'relative';
-    seqTitle.style.zIndex = '2';
-
-    const seqInfo = document.createElement('div');
-    seqInfo.textContent = 'SEQ RUNNING';
-    seqInfo.style.color = 'var(--accent)';
-    seqInfo.style.fontSize = '12px';
-    seqInfo.style.marginTop = '8px';
-    seqInfo.style.opacity = '0.8';
-    seqInfo.style.position = 'relative';
-    seqInfo.style.zIndex = '2';
-
-    screenRecess.appendChild(seqTitle);
-    screenRecess.appendChild(seqInfo);
-
-    topSection.appendChild(leftKnobs);
-    topSection.appendChild(screenRecess);
-    topSection.appendChild(rightKnobs);
-
-    innerLayout.appendChild(topSection);
-
-    // 64-step grid (4 rows of 16)
-    const seqGrid = document.createElement('div');
-    seqGrid.style.display = 'grid';
-    seqGrid.style.gridTemplateColumns = 'repeat(16, 1fr)';
-    seqGrid.style.gap = '12px';
-    seqGrid.style.width = '100%';
-    seqGrid.style.padding = '20px 0';
-
-    for(let i = 0; i < 64; i++) {
-      const stepWrapper = document.createElement('div');
-      stepWrapper.style.display = 'flex';
-      stepWrapper.style.flexDirection = 'column';
-      stepWrapper.style.alignItems = 'center';
-      stepWrapper.style.gap = '6px';
-
-      const stepLabel = document.createElement('div');
-      stepLabel.textContent = (i + 1).toString();
-      stepLabel.style.color = '#666';
-      stepLabel.style.fontSize = '10px';
-      stepLabel.style.fontFamily = 'monospace';
-
-      const stepBtn = document.createElement('div');
-      stepBtn.style.width = '35px';
-      stepBtn.style.height = '25px';
-      stepBtn.style.backgroundColor = '#1a1a1a';
-      stepBtn.style.border = '2px solid #111';
-      stepBtn.style.borderRadius = '3px';
-      stepBtn.style.boxShadow = 'inset 0 1px 2px rgba(255,255,255,0.1), 0 2px 4px rgba(0,0,0,0.5)';
-      stepBtn.style.cursor = 'pointer';
-      stepBtn.style.transition = 'all 100ms ease';
-
-      let stepActive = false;
-      stepBtn.addEventListener('click', () => {
-        stepActive = !stepActive;
-        if (stepActive) {
-          stepBtn.style.backgroundColor = 'var(--accent)';
-          stepBtn.style.boxShadow = `0 0 ${Math.round(limitedGlow(10))}px var(--accent), inset 0 1px 2px rgba(255,255,255,0.5)`;
-          stepBtn.style.borderColor = '#ff9900';
-        } else {
-          stepBtn.style.backgroundColor = '#1a1a1a';
-          stepBtn.style.boxShadow = 'inset 0 1px 2px rgba(255,255,255,0.1), 0 2px 4px rgba(0,0,0,0.5)';
-          stepBtn.style.borderColor = '#111';
+    // Knob 6: STEP PITCH (C1=24 to C6=84)
+    const pitchKnob = createKnobGeneric({
+      label: 'STEP PITCH',
+      default: Math.round(((45 - 24) / 60) * 127),
+      bipolar: false,
+      getValue: () => {
+        const s = seqEngine.steps[seqEngine.selectedStep];
+        return Math.round(((Math.min(84, Math.max(24, s.note)) - 24) / 60) * 127);
+      },
+      setValue: (v, send) => {
+        const note = Math.round(24 + (v / 127) * 60);
+        const s = seqEngine.steps[seqEngine.selectedStep];
+        s.note = note;
+        seqEngine.renderPadsForCurrentPage();
+        seqEngine.updateOledDisplay();
+        seqEngine.updateStepEditToolbar();
+        if (send && !seqEngine.running) {
+          seqEngine.rawPlay(note, s.velocity || 100);
+          setTimeout(() => seqEngine.rawStop(note), 200);
         }
-        if(window.sendCC) window.sendCC(1, 110 + (i%32), stepActive ? 127 : 0);
+      }
+    });
+    knobsGrid.appendChild(pitchKnob);
+
+    innerLayout.appendChild(knobsGrid);
+
+    // =========================================================================
+    // 3. ELEKTRON-STYLE 4-PAGE SELECTOR WITH LIVE RUNNING LEDS
+    // =========================================================================
+    const pageBar = document.createElement('div');
+    pageBar.style.cssText = 'width: 100%; max-width: 960px; display: flex; justify-content: space-between; align-items: center; padding: 6px 14px; background: rgba(0,0,0,0.45); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; box-sizing: border-box;';
+
+    const pageButtonsBox = document.createElement('div');
+    pageButtonsBox.style.cssText = 'display: flex; gap: 10px; align-items: center;';
+
+    const pageLabels = ['PAGE 1 [1-16]', 'PAGE 2 [17-32]', 'PAGE 3 [33-48]', 'PAGE 4 [49-64]'];
+    for (let p = 0; p < 4; p++) {
+      const pBtn = document.createElement('button');
+      pBtn.id = `seqPageBtn${p}`;
+      pBtn.className = 'seq-page-btn' + (p === seqEngine.currentPage ? ' active-view' : '');
+      pBtn.innerHTML = `
+        <div class="arp-hw-led-well" style="width: 10px; height: 10px;">
+          <div class="arp-hw-led" id="seqPageLed${p}" style="width: 6px; height: 6px;"></div>
+        </div>
+        <span>${pageLabels[p]}</span>
+      `;
+      pBtn.title = `Passa alla visualizzazione degli step ${p * 16 + 1} - ${(p + 1) * 16}`;
+      pBtn.addEventListener('click', () => {
+        seqEngine.currentPage = p;
+        seqEngine.renderPadsForCurrentPage();
+        seqEngine.updateOledDisplay();
+      });
+      pageButtonsBox.appendChild(pBtn);
+    }
+    pageBar.appendChild(pageButtonsBox);
+
+    // Selected step status in page bar
+    const selStepDisplay = document.createElement('div');
+    selStepDisplay.id = 'seqDisplaySelStep';
+    selStepDisplay.style.cssText = 'font-family: monospace; font-size: 11px; font-weight: bold; color: #e0e4ec; text-shadow: 0 0 6px rgba(255,255,255,0.4);';
+    selStepDisplay.textContent = 'STEP 01: A1 (45) (Vel 100)';
+    pageBar.appendChild(selStepDisplay);
+
+    innerLayout.appendChild(pageBar);
+
+    // =========================================================================
+    // 4. 16 TACTILE SILICONE STEP PADS WITH LED DOMES
+    // =========================================================================
+    const padsContainer = document.createElement('div');
+    padsContainer.style.cssText = 'display: grid; grid-template-columns: repeat(16, 1fr); gap: 6px; width: 100%; max-width: 960px; padding: 12px 14px; background: #0c0d11; border: 1px solid #1a1b22; border-radius: 6px; box-shadow: inset 0 2px 8px rgba(0,0,0,0.7); box-sizing: border-box;';
+
+    for (let i = 0; i < 16; i++) {
+      const col = document.createElement('div');
+      col.style.cssText = 'display: flex; flex-direction: column; align-items: center; gap: 4px;';
+
+      // 3D Domed Jewel LED Well
+      const ledWell = document.createElement('div');
+      ledWell.className = 'arp-hw-led-well';
+      const led = document.createElement('div');
+      led.className = 'arp-hw-led';
+      led.id = `seqLedStep${i}`;
+      ledWell.appendChild(led);
+      col.appendChild(ledWell);
+
+      // Silicone Pad Well
+      const padWell = document.createElement('div');
+      padWell.className = 'arp-hw-pad-well';
+
+      const padBtn = document.createElement('button');
+      padBtn.id = `seqStepBtn${i}`;
+      padBtn.className = 'arp-hw-step-pad' + (i % 4 === 0 ? ' quarter' : '');
+      padBtn.style.cssText = 'height: 48px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 1px; padding: 2px 0;';
+
+      const numSpan = document.createElement('span');
+      numSpan.id = `seqPadNum${i}`;
+      numSpan.style.cssText = 'font-size: 9px; opacity: 0.7;';
+      numSpan.textContent = String(i + 1).padStart(2, '0');
+
+      const noteSpan = document.createElement('span');
+      noteSpan.id = `seqPadNote${i}`;
+      noteSpan.className = 'seq-pad-note';
+      noteSpan.textContent = '--';
+
+      const tieSpan = document.createElement('span');
+      tieSpan.id = `seqPadTie${i}`;
+      tieSpan.style.cssText = 'font-size: 8px; line-height: 8px; color: #ffaa44; font-weight: bold; display: none;';
+      tieSpan.textContent = '∿ TIE';
+
+      padBtn.appendChild(numSpan);
+      padBtn.appendChild(noteSpan);
+      padBtn.appendChild(tieSpan);
+
+      padBtn.addEventListener('click', (e) => {
+        const actualStep = seqEngine.currentPage * 16 + i;
+        seqEngine.selectedStep = actualStep;
+
+        if (e.shiftKey) {
+          // Shift+Click: toggle tie
+          seqEngine.steps[actualStep].tie = !seqEngine.steps[actualStep].tie;
+        } else {
+          // Click normale: toggle attivo/inattivo
+          seqEngine.steps[actualStep].active = !seqEngine.steps[actualStep].active;
+          if (seqEngine.steps[actualStep].active && !seqEngine.running) {
+            seqEngine.rawPlay(seqEngine.steps[actualStep].note, seqEngine.steps[actualStep].velocity);
+            setTimeout(() => seqEngine.rawStop(seqEngine.steps[actualStep].note), 180);
+          }
+        }
+
+        seqEngine.renderPadsForCurrentPage();
+        seqEngine.updateOledDisplay();
+        seqEngine.updateStepEditToolbar();
       });
 
-      stepWrapper.appendChild(stepBtn);
-      stepWrapper.appendChild(stepLabel);
-      seqGrid.appendChild(stepWrapper);
+      padWell.appendChild(padBtn);
+      col.appendChild(padWell);
+
+      padsContainer.appendChild(col);
     }
 
-    innerLayout.appendChild(seqGrid);
+    innerLayout.appendChild(padsContainer);
+
+    // =========================================================================
+    // 5. STEP EDIT TOOLBAR (PITCH TRANSPOSE, TIE, ACCENT, AUDITION)
+    // =========================================================================
+    const stepEditBar = document.createElement('div');
+    stepEditBar.style.cssText = 'width: 100%; max-width: 960px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; padding: 10px 14px; background: rgba(0,0,0,0.5); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; box-sizing: border-box;';
+
+    const stepInfoGroup = document.createElement('div');
+    stepInfoGroup.style.cssText = 'display: flex; align-items: center; gap: 10px;';
+
+    const editStepIdx = document.createElement('span');
+    editStepIdx.id = 'seqEditStepIdx';
+    editStepIdx.style.cssText = 'font-family: monospace; font-size: 11px; font-weight: 800; color: #8892a6;';
+    editStepIdx.textContent = 'STEP 01';
+    stepInfoGroup.appendChild(editStepIdx);
+
+    const editStepNote = document.createElement('span');
+    editStepNote.id = 'seqEditStepNote';
+    editStepNote.style.cssText = 'font-family: monospace; font-size: 13px; font-weight: 900; color: #ffffff; background: #161820; border: 1px solid #282a36; border-radius: 4px; padding: 3px 8px;';
+    editStepNote.textContent = 'A1 (45)';
+    stepInfoGroup.appendChild(editStepNote);
+
+    stepEditBar.appendChild(stepInfoGroup);
+
+    // Transpose Buttons (-OCT, -1, +1, +OCT)
+    const pitchTransBox = document.createElement('div');
+    pitchTransBox.style.cssText = 'display: flex; gap: 6px; align-items: center;';
+
+    function addTransBtn(label, delta) {
+      const b = document.createElement('button');
+      b.className = 'seq-subtoolbar-btn';
+      b.textContent = label;
+      b.title = `Trasponi nota dello step di ${delta > 0 ? '+' : ''}${delta} semitoni`;
+      b.addEventListener('click', () => {
+        const s = seqEngine.steps[seqEngine.selectedStep];
+        s.note = Math.min(108, Math.max(21, s.note + delta));
+        s.active = true;
+        seqEngine.renderPadsForCurrentPage();
+        seqEngine.updateOledDisplay();
+        seqEngine.updateStepEditToolbar();
+        if (!seqEngine.running) {
+          seqEngine.rawPlay(s.note, s.velocity);
+          setTimeout(() => seqEngine.rawStop(s.note), 200);
+        }
+      });
+      pitchTransBox.appendChild(b);
+    }
+
+    addTransBtn('-OCT', -12);
+    addTransBtn('-1', -1);
+    addTransBtn('+1', 1);
+    addTransBtn('+OCT', 12);
+
+    stepEditBar.appendChild(pitchTransBox);
+
+    // Modifiers (TIE, ACCENT, AUDITION)
+    const modBox = document.createElement('div');
+    modBox.style.cssText = 'display: flex; gap: 8px; align-items: center;';
+
+    const btnTie = document.createElement('button');
+    btnTie.id = 'seqBtnToggleTie';
+    btnTie.className = 'seq-subtoolbar-btn';
+    btnTie.innerHTML = '∿ tie legato';
+    btnTie.title = 'Lega questa nota allo step successivo senza staccare il gate';
+    btnTie.addEventListener('click', () => {
+      const s = seqEngine.steps[seqEngine.selectedStep];
+      s.tie = !s.tie;
+      seqEngine.renderPadsForCurrentPage();
+      seqEngine.updateOledDisplay();
+      seqEngine.updateStepEditToolbar();
+    });
+    modBox.appendChild(btnTie);
+
+    const btnAccent = document.createElement('button');
+    btnAccent.id = 'seqBtnToggleAccent';
+    btnAccent.className = 'seq-subtoolbar-btn';
+    btnAccent.innerHTML = '⚡ accent';
+    btnAccent.title = 'Attiva Velocity Accent (127 vs 96)';
+    btnAccent.addEventListener('click', () => {
+      const s = seqEngine.steps[seqEngine.selectedStep];
+      s.velocity = (s.velocity >= 120) ? 96 : 127;
+      seqEngine.renderPadsForCurrentPage();
+      seqEngine.updateOledDisplay();
+      seqEngine.updateStepEditToolbar();
+    });
+    modBox.appendChild(btnAccent);
+
+    const btnAudition = document.createElement('button');
+    btnAudition.className = 'seq-subtoolbar-btn';
+    btnAudition.innerHTML = '🔊 audition';
+    btnAudition.title = 'Ascolta la nota dello step selezionato';
+    btnAudition.addEventListener('click', () => {
+      const s = seqEngine.steps[seqEngine.selectedStep];
+      seqEngine.rawPlay(s.note, s.velocity || 100);
+      setTimeout(() => seqEngine.rawStop(s.note), 300);
+    });
+    modBox.appendChild(btnAudition);
+
+    stepEditBar.appendChild(modBox);
+
+    innerLayout.appendChild(stepEditBar);
+
+    // =========================================================================
+    // 6. SCALE QUANTIZER & PATTERN PRESETS TOOLBAR
+    // =========================================================================
+    const presetsBar = document.createElement('div');
+    presetsBar.style.cssText = 'width: 100%; max-width: 960px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; padding: 10px 14px; background: rgba(0,0,0,0.35); border: 1px solid rgba(255,255,255,0.06); border-radius: 6px; box-sizing: border-box;';
+
+    // Scale Selector
+    const scaleGroup = document.createElement('div');
+    scaleGroup.style.cssText = 'display: flex; align-items: center; gap: 6px;';
+    scaleGroup.innerHTML = `
+      <span style="font-family: monospace; font-size: 10px; font-weight: bold; color: #8892a6;">SCALA:</span>
+      <select id="seqScaleKeySelect" style="background: #181a20; color: #e0e4ec; border: 1px solid #333; border-radius: 3px; font-size: 10px; font-family: monospace; font-weight: bold; padding: 2px 4px; outline: none; cursor: pointer;">
+        <option value="9" selected>A</option>
+        <option value="10">A# / Bb</option>
+        <option value="11">B</option>
+        <option value="0">C</option>
+        <option value="1">C# / Db</option>
+        <option value="2">D</option>
+        <option value="3">D# / Eb</option>
+        <option value="4">E</option>
+        <option value="5">F</option>
+        <option value="6">F# / Gb</option>
+        <option value="7">G</option>
+        <option value="8">G# / Ab</option>
+      </select>
+      <select id="seqScaleTypeSelect" style="background: #181a20; color: #e0e4ec; border: 1px solid #333; border-radius: 3px; font-size: 10px; font-family: monospace; font-weight: bold; padding: 2px 4px; outline: none; cursor: pointer;">
+        <option value="Minor" selected>Minor (Naturale)</option>
+        <option value="Major">Major</option>
+        <option value="Pentatonic">Pentatonic</option>
+        <option value="Dorian">Dorian</option>
+        <option value="Phrygian">Phrygian</option>
+        <option value="Chromatic">Chromatic</option>
+      </select>
+    `;
+    presetsBar.appendChild(scaleGroup);
+
+    setTimeout(() => {
+      const kSel = document.getElementById('seqScaleKeySelect');
+      const tSel = document.getElementById('seqScaleTypeSelect');
+      if (kSel) {
+        kSel.addEventListener('change', () => {
+          seqEngine.scaleKey = parseInt(kSel.value, 10);
+        });
+      }
+      if (tSel) {
+        tSel.addEventListener('change', () => {
+          seqEngine.scaleType = tSel.value;
+        });
+      }
+    }, 0);
+
+    // Preset Action Buttons
+    const presetsGroup = document.createElement('div');
+    presetsGroup.style.cssText = 'display: flex; gap: 6px; flex-wrap: wrap; align-items: center;';
+
+    function addPresetBtn(label, fn, title) {
+      const b = document.createElement('button');
+      b.className = 'arp-hw-preset-btn';
+      b.textContent = label;
+      if (title) b.title = title;
+      b.addEventListener('click', fn);
+      presetsGroup.appendChild(b);
+    }
+
+    addPresetBtn('rolling bass', () => seqEngine.presetRollingBass(), 'Carica linea di basso in sedicesimi in A Minor');
+    addPresetBtn('acid 303', () => seqEngine.presetAcid303(), 'Carica pattern acid 303 sincopato con tie e accenti');
+    addPresetBtn('melodic techno', () => seqEngine.presetMelodicTechno(), 'Carica pattern melodic techno a 32 step');
+    addPresetBtn('offbeats', () => seqEngine.presetOffbeats(), 'Carica pattern in levare');
+    addPresetBtn('🎲 random in key', () => seqEngine.presetRandomizeKey(), 'Genera note casuali quantizzate nella scala selezionata');
+    addPresetBtn('◀ shift', () => seqEngine.presetShift(-1), 'Sposta tutti gli step a sinistra');
+    addPresetBtn('shift ▶', () => seqEngine.presetShift(1), 'Sposta tutti gli step a destra');
+    addPresetBtn('invert', () => seqEngine.presetInvert(), 'Inverte gli step attivi/spenti');
+    addPresetBtn('clear', () => seqEngine.presetClear(), 'Svuota la sequenza');
+
+    presetsBar.appendChild(presetsGroup);
+
+    innerLayout.appendChild(presetsBar);
 
     elektronWrapper.appendChild(innerLayout);
 
@@ -11036,6 +11970,7 @@ function exportCurrentPatchSyx() {
     elektronWrapper.appendChild(woodStrip);
 
     root.appendChild(elektronWrapper);
+    seqEngine.updateUI();
   }
   function buildSongView() {
     const root = document.getElementById('songContent');
