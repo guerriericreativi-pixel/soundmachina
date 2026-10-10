@@ -1631,6 +1631,279 @@
   }
 
   /* ==========================================================================
+     VIRUS-H INFO HOVER POP-UP & HARDWARE SETUP GUIDE
+     ========================================================================== */
+  .virus-info-container {
+    position: relative;
+    display: inline-flex;
+    align-items: center;
+  }
+  .virus-info-btn {
+    width: 22px;
+    height: 22px;
+    min-width: 22px;
+    min-height: 22px;
+    padding: 0;
+    border-radius: 50%;
+    font-size: 11px;
+    font-weight: 800;
+    font-family: monospace;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    user-select: none;
+    transition: all 0.18s ease;
+    outline: none;
+    border: 1px solid var(--border);
+    background: var(--section-bg);
+    color: var(--fg);
+  }
+  html:not([data-skin="elektron"]) .virus-info-btn,
+  html[data-skin="te"] .virus-info-btn {
+    background: linear-gradient(180deg, #ffffff 0%, #e6e9f0 100%);
+    color: #142434;
+    border: 1px solid #b8cbdb;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.8);
+  }
+  html:not([data-skin="elektron"]) .virus-info-btn:hover,
+  html[data-skin="te"] .virus-info-btn:hover,
+  .virus-info-container:hover .virus-info-btn,
+  .virus-info-container.active .virus-info-btn {
+    background: #d9ecf8;
+    border-color: #16202c;
+    color: #0b1520;
+    box-shadow: 0 0 8px rgba(32, 120, 200, 0.35);
+    transform: scale(1.08);
+  }
+  html[data-skin="elektron"] .virus-info-btn {
+    background: linear-gradient(180deg, #2a2e3b 0%, #171922 100%);
+    color: #e2e8f0;
+    border: 1px solid #3d4558;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,255,255,0.1);
+  }
+  html[data-skin="elektron"] .virus-info-btn:hover,
+  html[data-skin="elektron"] .virus-info-container:hover .virus-info-btn,
+  html[data-skin="elektron"] .virus-info-container.active .virus-info-btn {
+    background: #e02424;
+    border-color: #ff4d4d;
+    color: #ffffff;
+    box-shadow: 0 0 10px rgba(224, 36, 36, 0.6);
+    transform: scale(1.08);
+  }
+
+  /* Pop-up Card */
+  .virus-info-popup {
+    position: absolute;
+    top: calc(100% + 10px);
+    left: 0;
+    width: 480px;
+    max-width: calc(100vw - 32px);
+    max-height: 82vh;
+    overflow-y: auto;
+    z-index: 99999;
+    border-radius: 8px;
+    box-sizing: border-box;
+    opacity: 0;
+    visibility: hidden;
+    pointer-events: none;
+    transform: translateY(6px);
+    transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.2s ease;
+    box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35), 0 2px 8px rgba(0, 0, 0, 0.15);
+  }
+  .virus-info-popup::before {
+    content: '';
+    position: absolute;
+    top: -12px;
+    left: 0;
+    width: 100%;
+    height: 12px;
+  }
+  .virus-info-container:hover .virus-info-popup,
+  .virus-info-container.active .virus-info-popup,
+  .virus-info-container:focus-within .virus-info-popup {
+    opacity: 1;
+    visibility: visible;
+    pointer-events: auto;
+    transform: translateY(0);
+  }
+
+  /* Themes for Popup */
+  html:not([data-skin="elektron"]) .virus-info-popup,
+  html[data-skin="te"] .virus-info-popup {
+    background: rgba(255, 255, 255, 0.98);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid #b8cde0;
+    color: #142434;
+  }
+  html[data-skin="elektron"] .virus-info-popup {
+    background: rgba(18, 20, 26, 0.98);
+    backdrop-filter: blur(16px);
+    -webkit-backdrop-filter: blur(16px);
+    border: 1px solid #2e3548;
+    color: #e2e8f0;
+    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85), 0 0 1px rgba(255, 255, 255, 0.15);
+  }
+
+  .virus-info-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 11px 14px;
+    user-select: none;
+  }
+  html:not([data-skin="elektron"]) .virus-info-header,
+  html[data-skin="te"] .virus-info-header {
+    background: linear-gradient(90deg, #d9ecf8 0%, #c4ddf1 100%);
+    border-bottom: 1px solid #a8c4dc;
+  }
+  html[data-skin="elektron"] .virus-info-header {
+    background: #111318;
+    border-bottom: 1px solid #282e3c;
+  }
+
+  .virus-info-title {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 11px;
+    font-weight: 800;
+    font-family: monospace;
+    letter-spacing: 0.06em;
+  }
+  .virus-info-logo-badge {
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 9.5px;
+    font-weight: 900;
+    letter-spacing: 0.1em;
+  }
+  html:not([data-skin="elektron"]) .virus-info-logo-badge,
+  html[data-skin="te"] .virus-info-logo-badge {
+    background: #1f3244;
+    color: #d7e9f5;
+  }
+  html[data-skin="elektron"] .virus-info-logo-badge {
+    background: #e02424;
+    color: #ffffff;
+    box-shadow: 0 0 8px rgba(224, 36, 36, 0.5);
+  }
+
+  .virus-info-close {
+    background: transparent;
+    border: none;
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: bold;
+    padding: 2px 6px;
+    border-radius: 3px;
+    line-height: 1;
+    color: inherit;
+    opacity: 0.6;
+    transition: opacity 0.15s ease, background 0.15s ease;
+  }
+  .virus-info-close:hover {
+    opacity: 1;
+    background: rgba(0,0,0,0.1);
+  }
+  html[data-skin="elektron"] .virus-info-close:hover {
+    background: rgba(255,255,255,0.1);
+  }
+
+  .virus-info-body {
+    padding: 14px;
+    display: flex;
+    flex-direction: column;
+    gap: 13px;
+  }
+
+  .virus-info-step {
+    display: flex;
+    gap: 10px;
+    align-items: flex-start;
+  }
+  .virus-info-step-num {
+    width: 20px;
+    height: 20px;
+    min-width: 20px;
+    border-radius: 50%;
+    font-size: 10px;
+    font-weight: 800;
+    font-family: monospace;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin-top: 1px;
+    user-select: none;
+  }
+  html:not([data-skin="elektron"]) .virus-info-step-num,
+  html[data-skin="te"] .virus-info-step-num {
+    background: #1f3244;
+    color: #d7e9f5;
+  }
+  html[data-skin="elektron"] .virus-info-step-num {
+    background: #e02424;
+    color: #ffffff;
+  }
+
+  .virus-info-step-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .virus-info-step-title {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    text-transform: uppercase;
+  }
+  .virus-info-step-desc {
+    font-size: 11.5px;
+    line-height: 1.45;
+    opacity: 0.9;
+  }
+  .virus-info-step-desc code {
+    font-family: monospace;
+    font-size: 10.5px;
+    padding: 1px 4px;
+    border-radius: 3px;
+    background: rgba(0,0,0,0.06);
+    border: 1px solid rgba(0,0,0,0.08);
+  }
+  html[data-skin="elektron"] .virus-info-step-desc code {
+    background: rgba(255,255,255,0.08);
+    border: 1px solid rgba(255,255,255,0.12);
+  }
+
+  .virus-info-footer {
+    padding: 10px 14px;
+    font-size: 10.5px;
+    line-height: 1.45;
+    display: flex;
+    flex-direction: column;
+    gap: 4px;
+    opacity: 0.88;
+  }
+  html:not([data-skin="elektron"]) .virus-info-footer,
+  html[data-skin="te"] .virus-info-footer {
+    background: #f0f5fa;
+    border-top: 1px solid #d0e0ee;
+  }
+  html[data-skin="elektron"] .virus-info-footer {
+    background: #0f1116;
+    border-top: 1px solid #242a36;
+  }
+  .virus-info-badge-shortcut {
+    font-size: 9px;
+    font-weight: 800;
+    text-transform: uppercase;
+    letter-spacing: 0.08em;
+    color: var(--accent);
+  }
+
+  /* ==========================================================================
      VIRUS TI SNOW // AUTHENTIC HARDWARE ARPEGGIATOR UX/UI
      ========================================================================== */
   .hardware-chassis.arp-chassis {
@@ -3935,8 +4208,82 @@
 
 <div class="app-header">
   <div class="app-header-left">
-    <div>
+    <div style="display: flex; align-items: center; gap: 8px; position: relative;">
       <h1 style="margin: 0; font-size: 24px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap;">VIRUS-H</h1>
+      <div class="virus-info-container" id="virusInfoContainer">
+        <button class="virus-info-btn" id="virusInfoBtn" aria-label="Istruzioni VIRUS-H" title="Come far funzionare VIRUS-H (Passa sopra con il mouse o clicca per le istruzioni)">ℹ</button>
+        <div class="virus-info-popup" id="virusInfoPopup" role="tooltip">
+          <div class="virus-info-header">
+            <div class="virus-info-title">
+              <span class="virus-info-logo-badge">VIRUS-H</span>
+              <span>GUIDA RAPIDA & SETUP HARDWARE</span>
+            </div>
+            <button class="virus-info-close" id="virusInfoClose" title="Chiudi guida" aria-label="Chiudi guida">✕</button>
+          </div>
+
+          <div class="virus-info-body">
+            <div class="virus-info-step">
+              <div class="virus-info-step-num">1</div>
+              <div class="virus-info-step-content">
+                <div class="virus-info-step-title">Connessione MIDI & Cavi Audio</div>
+                <div class="virus-info-step-desc">
+                  Clicca sul pulsante <strong>MIDI</strong> in alto a destra. Seleziona la porta <strong>MIDI OUT</strong> collegata al tuo Access Virus (es. <em>C2MIDI Pro</em> o <em>Virus TI Synth</em>). Collega le cuffie all'uscita <strong>PHONES</strong> o i monitor alle uscite audio <strong>OUT 1 L/R</strong> del Virus.
+                </div>
+              </div>
+            </div>
+
+            <div class="virus-info-step">
+              <div class="virus-info-step-num">2</div>
+              <div class="virus-info-step-content">
+                <div class="virus-info-step-title">Verifica del Suono (Test Immediato)</div>
+                <div class="virus-info-step-desc">
+                  Premi <strong>🔊 test virus</strong> o <strong>🔊 test synth</strong> per inviare una nota di prova hardware al canale attivo. Apri la tastiera virtuale con <strong>🎹 KEYS</strong> in alto per suonare a schermo, oppure usa direttamente la tastiera del Mac.
+                </div>
+              </div>
+            </div>
+
+            <div class="virus-info-step">
+              <div class="virus-info-step-num">3</div>
+              <div class="virus-info-step-content">
+                <div class="virus-info-step-title">Esplora le 6 Viste Dedicate</div>
+                <div class="virus-info-step-desc">
+                  • <strong>TI-SNOW</strong>: Replica fisica del frontale con manopole Cutoff/Resonance e display LCD.<br>
+                  • <strong>SINGLE</strong>: Sintetizzatore completo con display vettoriale, filtri, inviluppi e oscilloscopio.<br>
+                  • <strong>MULTI</strong>: Mixer multitimbrico a 4 parti (P1..P4) con banchi, volumi e pan indipendenti.<br>
+                  • <strong>ARP</strong>: Arpeggiatore avanzato a 16 step con rate, swing, ottave e canale di destinazione.<br>
+                  • <strong>SEQ</strong>: Sequencer a 64 step multi-traccia a 4 parti Elektron-style con pitch e accent.<br>
+                  • <strong>PATCH</strong>: Gestione e ricerca patch da tutti i banchi di fabbrica (RAM A-H, ROM).
+                </div>
+              </div>
+            </div>
+
+            <div class="virus-info-step">
+              <div class="virus-info-step-num">4</div>
+              <div class="virus-info-step-content">
+                <div class="virus-info-step-title">Sincronizzazione Patch & Dump SysEx</div>
+                <div class="virus-info-step-desc">
+                  Premi <strong>receive single</strong> o <strong>leggi synth</strong> per scaricare la patch attualmente selezionata nel Virus fisico. Per salvare le modifiche usa <strong>send current</strong> o esporta il file SysEx con <strong>💾 salva .syx</strong>.
+                </div>
+              </div>
+            </div>
+
+            <div class="virus-info-step">
+              <div class="virus-info-step-num">5</div>
+              <div class="virus-info-step-content">
+                <div class="virus-info-step-title">Tema Snow (Light) & Dark Star (Dark)</div>
+                <div class="virus-info-step-desc">
+                  Clicca sul pulsante <strong>○ / ●</strong> in alto a destra per alternare tra la finitura <em>Virus TI Snow</em> (chassis bianco con LCD azzurro ghiaccio) e la limited edition <em>Virus TI2 Dark Star</em> (alluminio canna di fucile, display OLED scuro e logo rosso sangue).
+                </div>
+              </div>
+            </div>
+          </div>
+
+          <div class="virus-info-footer">
+            <span class="virus-info-badge-shortcut">Scorciatoie Tastiera Mac</span>
+            <span>Suona le note con <code>A S D F G H J K L</code> • Cambia ottava con <code>Z / X</code> • Regola la velocity con <code>C / V</code>.</span>
+          </div>
+        </div>
+      </div>
     </div>
     <div class="segmented-control" id="partTabs">
       <button class="segmented-tab active" id="btnTabSnow">TI-SNOW</button>
@@ -5258,6 +5605,34 @@
       closeSettingsModal();
     }
   });
+
+  // ---------------------------------------------------------------------
+  // VIRUS-H Info Pop-up (Guida Rapida & Istruzioni Setup)
+  // ---------------------------------------------------------------------
+  const virusInfoContainer = document.getElementById('virusInfoContainer');
+  const virusInfoBtn = document.getElementById('virusInfoBtn');
+  const virusInfoClose = document.getElementById('virusInfoClose');
+
+  if (virusInfoBtn && virusInfoContainer) {
+    virusInfoBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      virusInfoContainer.classList.toggle('active');
+    });
+    virusInfoClose?.addEventListener('click', (e) => {
+      e.stopPropagation();
+      virusInfoContainer.classList.remove('active');
+    });
+    document.addEventListener('click', (e) => {
+      if (!virusInfoContainer.contains(e.target)) {
+        virusInfoContainer.classList.remove('active');
+      }
+    });
+    window.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && virusInfoContainer.classList.contains('active')) {
+        virusInfoContainer.classList.remove('active');
+      }
+    });
+  }
 
   function updateConnectionIndicator(){
     const outConnected = !!(selectedOutput && (!selectedOutput.state || selectedOutput.state === 'connected' || selectedOutput.state === 'opened'));
