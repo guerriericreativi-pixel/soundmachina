@@ -1,0 +1,671 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="UTF-8">
+<title>VIRUS-H // Facebook Post Cover</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=JetBrains+Mono:wght@500;700;800&display=swap');
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  body {
+    width: 1920px;
+    height: 1080px;
+    background: #090b10;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+    color: #e2e8f0;
+    position: relative;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    justify-content: space-between;
+    padding: 44px 56px;
+    user-select: none;
+  }
+
+  /* Deep Studio Background Grid & Lighting */
+  .bg-grid {
+    position: absolute;
+    inset: 0;
+    background-image: 
+      radial-gradient(circle at 25% 30%, rgba(224, 36, 36, 0.12) 0%, transparent 45%),
+      radial-gradient(circle at 80% 60%, rgba(32, 140, 220, 0.14) 0%, transparent 50%),
+      radial-gradient(circle at 50% 90%, rgba(245, 123, 32, 0.08) 0%, transparent 40%),
+      radial-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+    background-size: 100% 100%, 100% 100%, 100% 100%, 28px 28px;
+    z-index: 0;
+    pointer-events: none;
+  }
+
+  /* Decorative Ambient Vignette */
+  .vignette {
+    position: absolute;
+    inset: 0;
+    box-shadow: inset 0 0 160px rgba(0, 0, 0, 0.85), inset 0 0 0 1px rgba(255, 255, 255, 0.08);
+    pointer-events: none;
+    z-index: 1;
+  }
+
+  /* Header Bar */
+  .header-bar {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding-bottom: 20px;
+  }
+
+  .brand-group {
+    display: flex;
+    align-items: center;
+    gap: 16px;
+  }
+
+  .brand-logo {
+    font-size: 32px;
+    font-weight: 900;
+    letter-spacing: 0.14em;
+    color: #ffffff;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    text-shadow: 0 0 24px rgba(255, 255, 255, 0.3);
+  }
+
+  .brand-logo span {
+    color: #e02424;
+    text-shadow: 0 0 20px rgba(224, 36, 36, 0.8);
+  }
+
+  .brand-pill {
+    background: rgba(255, 255, 255, 0.06);
+    border: 1px solid rgba(255, 255, 255, 0.15);
+    padding: 6px 14px;
+    border-radius: 20px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 700;
+    letter-spacing: 0.08em;
+    color: #94a3b8;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+
+  .led-live {
+    width: 8px;
+    height: 8px;
+    border-radius: 50%;
+    background: #10b981;
+    box-shadow: 0 0 10px #10b981;
+  }
+
+  .header-community-tag {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 13px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: #cbd5e1;
+    background: linear-gradient(90deg, rgba(224, 36, 36, 0.15) 0%, rgba(30, 41, 59, 0.6) 100%);
+    border: 1px solid rgba(224, 36, 36, 0.35);
+    padding: 8px 18px;
+    border-radius: 6px;
+  }
+
+  .header-community-tag strong {
+    color: #ffffff;
+    font-weight: 900;
+  }
+
+  /* Main Split Content */
+  .main-content {
+    position: relative;
+    z-index: 2;
+    display: grid;
+    grid-template-columns: 1.05fr 1.35fr;
+    gap: 48px;
+    align-items: center;
+    flex: 1;
+    margin: 24px 0 20px 0;
+  }
+
+  /* Left Column: Text & Features */
+  .left-col {
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+    max-width: 780px;
+  }
+
+  .kicker-badge {
+    align-self: flex-start;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    background: rgba(224, 36, 36, 0.14);
+    border: 1px solid rgba(224, 36, 36, 0.5);
+    color: #ff6b6b;
+    padding: 6px 14px;
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 12px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    text-transform: uppercase;
+  }
+
+  .hero-headline {
+    font-size: 56px;
+    font-weight: 900;
+    line-height: 1.06;
+    letter-spacing: -0.02em;
+    color: #ffffff;
+  }
+
+  .hero-headline .highlight {
+    background: linear-gradient(90deg, #ff4757 0%, #ffa502 100%);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    display: block;
+    text-shadow: 0 0 40px rgba(255, 71, 87, 0.3);
+  }
+
+  .hero-subheadline {
+    font-size: 19px;
+    line-height: 1.45;
+    color: #94a3b8;
+    font-weight: 400;
+    border-left: 3px solid #e02424;
+    padding-left: 16px;
+  }
+
+  .hero-subheadline strong {
+    color: #f1f5f9;
+    font-weight: 700;
+  }
+
+  /* Feature Grid */
+  .features-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 12px;
+    margin-top: 4px;
+  }
+
+  .feature-item {
+    background: rgba(18, 22, 32, 0.7);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    border-radius: 8px;
+    padding: 12px 16px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+
+  .feature-icon {
+    font-size: 20px;
+    width: 36px;
+    height: 36px;
+    min-width: 36px;
+    border-radius: 8px;
+    background: rgba(255, 255, 255, 0.05);
+    border: 1px solid rgba(255, 255, 255, 0.1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  .feature-text {
+    display: flex;
+    flex-direction: column;
+    gap: 2px;
+  }
+
+  .feature-title {
+    font-size: 13.5px;
+    font-weight: 700;
+    color: #f8fafc;
+    letter-spacing: 0.01em;
+  }
+
+  .feature-desc {
+    font-size: 11.5px;
+    color: #94a3b8;
+    line-height: 1.3;
+  }
+
+  /* Synth Cafe Callout */
+  .callout-box {
+    margin-top: 6px;
+    background: linear-gradient(135deg, rgba(30, 41, 59, 0.5) 0%, rgba(15, 23, 42, 0.8) 100%);
+    border: 1px solid rgba(255, 255, 255, 0.12);
+    border-radius: 8px;
+    padding: 12px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+  }
+
+  .callout-text {
+    font-size: 13px;
+    color: #cbd5e1;
+    line-height: 1.4;
+  }
+
+  .callout-text strong {
+    color: #ffffff;
+  }
+
+  .callout-badge {
+    background: #e02424;
+    color: #ffffff;
+    font-size: 11px;
+    font-weight: 800;
+    padding: 6px 12px;
+    border-radius: 4px;
+    letter-spacing: 0.05em;
+    text-transform: uppercase;
+    white-space: nowrap;
+    box-shadow: 0 0 14px rgba(224, 36, 36, 0.45);
+  }
+
+  /* Right Column: Visual Composite Grid */
+  .right-col {
+    position: relative;
+    height: 640px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+
+  /* Visual Stage with 3D Overlapping Floating Cards */
+  .stage-container {
+    position: relative;
+    width: 100%;
+    height: 100%;
+  }
+
+  .showcase-card {
+    position: absolute;
+    border-radius: 10px;
+    overflow: hidden;
+    background: #10131a;
+    box-shadow: 0 24px 50px rgba(0, 0, 0, 0.75), 0 2px 10px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.14);
+    transition: transform 0.3s ease;
+  }
+
+  .card-header {
+    background: #151822;
+    border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+    padding: 7px 12px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 10.5px;
+    font-weight: 700;
+    letter-spacing: 0.06em;
+    color: #cbd5e1;
+  }
+
+  .card-tag {
+    padding: 2px 6px;
+    border-radius: 3px;
+    font-size: 9px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+  }
+
+  .tag-hardware {
+    background: #d97706;
+    color: #ffffff;
+  }
+
+  .tag-app {
+    background: #2563eb;
+    color: #ffffff;
+  }
+
+  .tag-dark {
+    background: #e02424;
+    color: #ffffff;
+  }
+
+  .tag-seq {
+    background: #059669;
+    color: #ffffff;
+  }
+
+  .card-img-wrap {
+    position: relative;
+    width: 100%;
+    overflow: hidden;
+    background: #000;
+  }
+
+  .card-img-wrap img {
+    display: block;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+  }
+
+  /* Card 1: Real Hardware Synth (Top Left of Stage) */
+  .card-real-synth {
+    width: 480px;
+    top: 0px;
+    left: 0px;
+    z-index: 4;
+    transform: rotate(-2.5deg);
+    border: 2px solid rgba(245, 158, 11, 0.55);
+    box-shadow: 0 28px 60px rgba(0, 0, 0, 0.85), 0 0 35px rgba(245, 158, 11, 0.25);
+  }
+  .card-real-synth .card-img-wrap {
+    height: 275px;
+  }
+  .card-real-synth .card-img-wrap img {
+    object-position: center 30%;
+    transform: scale(1.08);
+  }
+
+  /* Card 2: Virtual 1:1 Snow Panel (Top Right of Stage) */
+  .card-snow-app {
+    width: 530px;
+    top: 20px;
+    right: 0px;
+    z-index: 6; /* In front of Card 1 */
+    transform: rotate(2deg);
+    border: 2px solid rgba(59, 130, 246, 0.55);
+    box-shadow: 0 28px 60px rgba(0, 0, 0, 0.85), 0 0 35px rgba(59, 130, 246, 0.22);
+  }
+  .card-snow-app .card-img-wrap {
+    height: 285px;
+  }
+  .card-snow-app .card-img-wrap img {
+    object-position: center 46%;
+    transform: scale(1.22);
+  }
+
+  /* Card 3: Dark Star Single Engine (Bottom Left of Stage) */
+  .card-dark-star {
+    width: 520px;
+    bottom: 0px;
+    left: 0px;
+    z-index: 5;
+    transform: rotate(1.5deg);
+    border: 2px solid rgba(224, 36, 36, 0.6);
+    box-shadow: 0 32px 70px rgba(0, 0, 0, 0.9), 0 0 40px rgba(224, 36, 36, 0.3);
+  }
+  .card-dark-star .card-img-wrap {
+    height: 285px;
+  }
+  .card-dark-star .card-img-wrap img {
+    object-position: center 48%;
+    transform: scale(1.18);
+  }
+
+  /* Card 4: 64-Step Sequencer (Bottom Right of Stage) */
+  .card-sequencer {
+    width: 490px;
+    bottom: 12px;
+    right: 0px;
+    z-index: 7; /* In front of Card 3 */
+    transform: rotate(-1.5deg);
+    border: 2px solid rgba(16, 185, 129, 0.55);
+    box-shadow: 0 28px 60px rgba(0, 0, 0, 0.85), 0 0 35px rgba(16, 185, 129, 0.22);
+  }
+  .card-sequencer .card-img-wrap {
+    height: 275px;
+  }
+  .card-sequencer .card-img-wrap img {
+    object-position: center 44%;
+    transform: scale(1.2);
+  }
+
+  /* Central "VS / REPLICA 1:1" Connection Badge */
+  .central-badge {
+    position: absolute;
+    top: 295px;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: #0b0f19;
+    border: 2px solid #e02424;
+    border-radius: 50%;
+    width: 76px;
+    height: 76px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    z-index: 10;
+    box-shadow: 0 0 30px rgba(224, 36, 36, 0.75), 0 10px 25px rgba(0,0,0,0.9);
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: 900;
+    text-align: center;
+    color: #fff;
+  }
+
+  .central-badge span:first-child {
+    font-size: 14px;
+    letter-spacing: 0.05em;
+    color: #e02424;
+  }
+
+  .central-badge span:last-child {
+    font-size: 9.5px;
+    letter-spacing: 0.1em;
+    color: #94a3b8;
+  }
+
+  /* Footer Bar */
+  .footer-bar {
+    position: relative;
+    z-index: 2;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-top: 1px solid rgba(255, 255, 255, 0.1);
+    padding-top: 18px;
+    font-size: 12.5px;
+    color: #64748b;
+  }
+
+  .footer-pills {
+    display: flex;
+    gap: 10px;
+  }
+
+  .footer-pill {
+    background: rgba(255, 255, 255, 0.04);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    padding: 4px 10px;
+    border-radius: 4px;
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    font-weight: 600;
+    color: #94a3b8;
+  }
+
+  .footer-cta {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    color: #e2e8f0;
+    font-weight: 600;
+    font-size: 13px;
+  }
+
+  .footer-cta strong {
+    color: #38bdf8;
+  }
+</style>
+</head>
+<body>
+
+  <div class="bg-grid"></div>
+  <div class="vignette"></div>
+
+  <!-- HEADER -->
+  <header class="header-bar">
+    <div class="brand-group">
+      <div class="brand-logo">VIRUS<span>-</span>H</div>
+      <div class="brand-pill">
+        <span class="led-live"></span>
+        WEB MIDI CONTROLLER // ACCESS VIRUS TI
+      </div>
+    </div>
+    <div class="header-community-tag">
+      <span>COMUNITÀ FACEBOOK:</span>
+      <strong>SYNTH CAFE</strong>
+      <span style="opacity: 0.4;">|</span>
+      <span style="color: #38bdf8;">TEST & FEEDBACK</span>
+    </div>
+  </header>
+
+  <!-- MAIN -->
+  <main class="main-content">
+
+    <!-- LEFT: HEADLINE, SUBTITLE & BULLETS -->
+    <section class="left-col">
+      <div class="kicker-badge">
+        <span>❖</span> PROGETTO WEB MIDI OPEN SOURCE
+      </div>
+
+      <h1 class="hero-headline">
+        <span style="font-size: 34px; font-weight: 800; letter-spacing: 0.12em; color: #94a3b8; display: block; margin-bottom: 4px;">VIRUS-H // CONTROLLER</span>
+        RIVIVI IL TUO SYNTH
+        <span class="highlight">NEL TUO BROWSER.</span>
+      </h1>
+
+      <p class="hero-subheadline">
+        <strong>Addio a plugin e driver obsoleti a 32-bit.</strong> Collega il tuo Access Virus TI via USB o MIDI e scopri un editor completo: replica frontale 1:1, Multi Mixer a 4 parti, Dark Star OLED ed esclusivo Sequencer a 64 step.
+      </p>
+
+      <div class="features-grid">
+        <div class="feature-item">
+          <div class="feature-icon">🎛</div>
+          <div class="feature-text">
+            <span class="feature-title">Replica Hardware 1:1</span>
+            <span class="feature-desc">Pannello fotorealistico Virus TI Snow</span>
+          </div>
+        </div>
+
+        <div class="feature-item">
+          <div class="feature-icon">⚡</div>
+          <div class="feature-text">
+            <span class="feature-title">Multi 4-Parti & Split</span>
+            <span class="feature-desc">Routing SysEx canali 1..4 in un click</span>
+          </div>
+        </div>
+
+        <div class="feature-item">
+          <div class="feature-icon">🔥</div>
+          <div class="feature-text">
+            <span class="feature-title">Dark Star OLED Editor</span>
+            <span class="feature-desc">Curve di filtro vettoriali e parametri</span>
+          </div>
+        </div>
+
+        <div class="feature-item">
+          <div class="feature-icon">🎹</div>
+          <div class="feature-text">
+            <span class="feature-title">Sequencer 64-Step</span>
+            <span class="feature-desc">4 tracce simultanee con scale & accenti</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="callout-box">
+        <div class="callout-text">
+          <strong>Per gli utenti Synth Cafe:</strong> vorrei far testare il controller a chi possiede un Virus TI per raccogliere consigli e migliorarlo insieme!
+        </div>
+        <div class="callout-badge">TEST LIBERO</div>
+      </div>
+    </section>
+
+    <!-- RIGHT: VISUAL COMPOSITION (REAL SYNTH + APP SCREENSHOTS) -->
+    <section class="right-col">
+      <div class="stage-container">
+
+        <!-- CARD 1: REAL HARDWARE -->
+        <div class="showcase-card card-real-synth">
+          <div class="card-header">
+            <span>ACCESS VIRUS TI SNOW</span>
+            <span class="card-tag tag-hardware">HARDWARE REALE</span>
+          </div>
+          <div class="card-img-wrap">
+            <img src="/virus_ti_snow_hires.jpg" alt="Access Virus TI Snow Hardware">
+          </div>
+        </div>
+
+        <!-- CARD 2: VIRTUAL 1:1 SNOW PANEL -->
+        <div class="showcase-card card-snow-app">
+          <div class="card-header">
+            <span>PANNELLO VIRTUALE 1:1</span>
+            <span class="card-tag tag-app">WEB APP</span>
+          </div>
+          <div class="card-img-wrap">
+            <img src="/facebook_kit/01_VIRUS_TI_SNOW_LIGHT_PANEL.png" alt="VIRUS-H Snow Light Panel">
+          </div>
+        </div>
+
+        <!-- CARD 3: DARK STAR SINGLE ENGINE -->
+        <div class="showcase-card card-dark-star">
+          <div class="card-header">
+            <span>VIRUS TI2 // DARK STAR SINGLE</span>
+            <span class="card-tag tag-dark">OLED ENGINE</span>
+          </div>
+          <div class="card-img-wrap">
+            <img src="/facebook_kit/03_VIRUS_TI2_DARK_STAR.png" alt="VIRUS-H Dark Star Single Editor">
+          </div>
+        </div>
+
+        <!-- CARD 4: 64-STEP 4-PART SEQUENCER -->
+        <div class="showcase-card card-sequencer">
+          <div class="card-header">
+            <span>64-STEP MULTI SEQUENCER</span>
+            <span class="card-tag tag-seq">4 TRACCE</span>
+          </div>
+          <div class="card-img-wrap">
+            <img src="/facebook_kit/04_VIRUS_4PART_SEQUENCER.png" alt="VIRUS-H 4-Part Sequencer">
+          </div>
+        </div>
+
+        <!-- CENTRAL LINK BADGE -->
+        <div class="central-badge">
+          <span>1:1</span>
+          <span>SYNC</span>
+        </div>
+
+      </div>
+    </section>
+
+  </main>
+
+  <!-- FOOTER -->
+  <footer class="footer-bar">
+    <div class="footer-pills">
+      <div class="footer-pill">💻 COMPATIBILE CHROME / EDGE / OPERA</div>
+      <div class="footer-pill">🎹 WEB MIDI API & SYSEX NATIVO</div>
+      <div class="footer-pill">📦 BACKUP .SYX & DUMP JSON</div>
+    </div>
+    <div class="footer-cta">
+      <span>Progetto indipendente no-profit</span>
+      <span>•</span>
+      <strong>Post per il gruppo Synth Cafe</strong>
+    </div>
+  </footer>
+
+</body>
+</html>

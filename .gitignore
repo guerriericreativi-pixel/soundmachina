@@ -3,6 +3,7 @@ node_modules/
 *.bak
 *_backup.html
 *.png
+!facebook_kit/*.png
 fix_*.py
 fix_*.js
 check_*.py
