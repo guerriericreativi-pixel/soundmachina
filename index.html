@@ -1631,14 +1631,21 @@
   }
 
   /* ==========================================================================
-     VIRUS-H INFO HOVER POP-UP & HARDWARE SETUP GUIDE
+     VIRUS-H INFO HOVER POP-UP & HARDWARE SETUP GUIDE (GLOBAL & PER-SECTION)
      ========================================================================== */
-  .virus-info-container {
+  .virus-info-container,
+  .section-info-container {
     position: relative;
     display: inline-flex;
     align-items: center;
+    vertical-align: middle;
   }
-  .virus-info-btn {
+  .section-info-container {
+    margin-left: 8px;
+    z-index: 50;
+  }
+  .virus-info-btn,
+  .section-info-btn {
     width: 22px;
     height: 22px;
     min-width: 22px;
@@ -1660,7 +1667,9 @@
     color: var(--fg);
   }
   html:not([data-skin="elektron"]) .virus-info-btn,
-  html[data-skin="te"] .virus-info-btn {
+  html[data-skin="te"] .virus-info-btn,
+  html:not([data-skin="elektron"]) .section-info-btn,
+  html[data-skin="te"] .section-info-btn {
     background: linear-gradient(180deg, #ffffff 0%, #e6e9f0 100%);
     color: #142434;
     border: 1px solid #b8cbdb;
@@ -1669,14 +1678,19 @@
   html:not([data-skin="elektron"]) .virus-info-btn:hover,
   html[data-skin="te"] .virus-info-btn:hover,
   .virus-info-container:hover .virus-info-btn,
-  .virus-info-container.active .virus-info-btn {
+  .virus-info-container.active .virus-info-btn,
+  html:not([data-skin="elektron"]) .section-info-btn:hover,
+  html[data-skin="te"] .section-info-btn:hover,
+  .section-info-container:hover .section-info-btn,
+  .section-info-container.active .section-info-btn {
     background: #d9ecf8;
     border-color: #16202c;
     color: #0b1520;
     box-shadow: 0 0 8px rgba(32, 120, 200, 0.35);
     transform: scale(1.08);
   }
-  html[data-skin="elektron"] .virus-info-btn {
+  html[data-skin="elektron"] .virus-info-btn,
+  html[data-skin="elektron"] .section-info-btn {
     background: linear-gradient(180deg, #2a2e3b 0%, #171922 100%);
     color: #e2e8f0;
     border: 1px solid #3d4558;
@@ -1684,7 +1698,10 @@
   }
   html[data-skin="elektron"] .virus-info-btn:hover,
   html[data-skin="elektron"] .virus-info-container:hover .virus-info-btn,
-  html[data-skin="elektron"] .virus-info-container.active .virus-info-btn {
+  html[data-skin="elektron"] .virus-info-container.active .virus-info-btn,
+  html[data-skin="elektron"] .section-info-btn:hover,
+  html[data-skin="elektron"] .section-info-container:hover .section-info-btn,
+  html[data-skin="elektron"] .section-info-container.active .section-info-btn {
     background: #e02424;
     border-color: #ff4d4d;
     color: #ffffff;
@@ -1693,7 +1710,8 @@
   }
 
   /* Pop-up Card */
-  .virus-info-popup {
+  .virus-info-popup,
+  .section-info-popup {
     position: absolute;
     top: calc(100% + 10px);
     left: 0;
@@ -1710,8 +1728,27 @@
     transform: translateY(6px);
     transition: opacity 0.2s cubic-bezier(0.16, 1, 0.3, 1), transform 0.2s cubic-bezier(0.16, 1, 0.3, 1), visibility 0.2s ease;
     box-shadow: 0 16px 40px rgba(0, 0, 0, 0.35), 0 2px 8px rgba(0, 0, 0, 0.15);
+    text-align: left;
+    font-family: inherit;
+    font-weight: normal;
+    line-height: normal;
+    letter-spacing: normal;
+    text-transform: none;
   }
-  .virus-info-popup::before {
+  .section-info-popup {
+    width: 440px;
+    max-width: min(440px, calc(100vw - 36px));
+  }
+  .section-info-container.align-right .section-info-popup {
+    left: auto;
+    right: 0;
+  }
+  .section-info-container.align-right .section-info-popup::before {
+    left: auto;
+    right: 0;
+  }
+  .virus-info-popup::before,
+  .section-info-popup::before {
     content: '';
     position: absolute;
     top: -12px;
@@ -1721,7 +1758,10 @@
   }
   .virus-info-container:hover .virus-info-popup,
   .virus-info-container.active .virus-info-popup,
-  .virus-info-container:focus-within .virus-info-popup {
+  .virus-info-container:focus-within .virus-info-popup,
+  .section-info-container:hover .section-info-popup,
+  .section-info-container.active .section-info-popup,
+  .section-info-container:focus-within .section-info-popup {
     opacity: 1;
     visibility: visible;
     pointer-events: auto;
@@ -1730,14 +1770,17 @@
 
   /* Themes for Popup */
   html:not([data-skin="elektron"]) .virus-info-popup,
-  html[data-skin="te"] .virus-info-popup {
+  html[data-skin="te"] .virus-info-popup,
+  html:not([data-skin="elektron"]) .section-info-popup,
+  html[data-skin="te"] .section-info-popup {
     background: rgba(255, 255, 255, 0.98);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
     border: 1px solid #b8cde0;
     color: #142434;
   }
-  html[data-skin="elektron"] .virus-info-popup {
+  html[data-skin="elektron"] .virus-info-popup,
+  html[data-skin="elektron"] .section-info-popup {
     background: rgba(18, 20, 26, 0.98);
     backdrop-filter: blur(16px);
     -webkit-backdrop-filter: blur(16px);
@@ -1746,7 +1789,8 @@
     box-shadow: 0 20px 50px rgba(0, 0, 0, 0.85), 0 0 1px rgba(255, 255, 255, 0.15);
   }
 
-  .virus-info-header {
+  .virus-info-header,
+  .section-info-header {
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -1754,16 +1798,20 @@
     user-select: none;
   }
   html:not([data-skin="elektron"]) .virus-info-header,
-  html[data-skin="te"] .virus-info-header {
+  html[data-skin="te"] .virus-info-header,
+  html:not([data-skin="elektron"]) .section-info-header,
+  html[data-skin="te"] .section-info-header {
     background: linear-gradient(90deg, #d9ecf8 0%, #c4ddf1 100%);
     border-bottom: 1px solid #a8c4dc;
   }
-  html[data-skin="elektron"] .virus-info-header {
+  html[data-skin="elektron"] .virus-info-header,
+  html[data-skin="elektron"] .section-info-header {
     background: #111318;
     border-bottom: 1px solid #282e3c;
   }
 
-  .virus-info-title {
+  .virus-info-title,
+  .section-info-title {
     display: flex;
     align-items: center;
     gap: 8px;
@@ -1772,7 +1820,8 @@
     font-family: monospace;
     letter-spacing: 0.06em;
   }
-  .virus-info-logo-badge {
+  .virus-info-logo-badge,
+  .section-info-logo-badge {
     padding: 2px 6px;
     border-radius: 3px;
     font-size: 9.5px;
@@ -1780,17 +1829,21 @@
     letter-spacing: 0.1em;
   }
   html:not([data-skin="elektron"]) .virus-info-logo-badge,
-  html[data-skin="te"] .virus-info-logo-badge {
+  html[data-skin="te"] .virus-info-logo-badge,
+  html:not([data-skin="elektron"]) .section-info-logo-badge,
+  html[data-skin="te"] .section-info-logo-badge {
     background: #1f3244;
     color: #d7e9f5;
   }
-  html[data-skin="elektron"] .virus-info-logo-badge {
+  html[data-skin="elektron"] .virus-info-logo-badge,
+  html[data-skin="elektron"] .section-info-logo-badge {
     background: #e02424;
     color: #ffffff;
     box-shadow: 0 0 8px rgba(224, 36, 36, 0.5);
   }
 
-  .virus-info-close {
+  .virus-info-close,
+  .section-info-close {
     background: transparent;
     border: none;
     cursor: pointer;
@@ -1803,27 +1856,32 @@
     opacity: 0.6;
     transition: opacity 0.15s ease, background 0.15s ease;
   }
-  .virus-info-close:hover {
+  .virus-info-close:hover,
+  .section-info-close:hover {
     opacity: 1;
     background: rgba(0,0,0,0.1);
   }
-  html[data-skin="elektron"] .virus-info-close:hover {
+  html[data-skin="elektron"] .virus-info-close:hover,
+  html[data-skin="elektron"] .section-info-close:hover {
     background: rgba(255,255,255,0.1);
   }
 
-  .virus-info-body {
+  .virus-info-body,
+  .section-info-body {
     padding: 14px;
     display: flex;
     flex-direction: column;
     gap: 13px;
   }
 
-  .virus-info-step {
+  .virus-info-step,
+  .section-info-step {
     display: flex;
     gap: 10px;
     align-items: flex-start;
   }
-  .virus-info-step-num {
+  .virus-info-step-num,
+  .section-info-step-num {
     width: 20px;
     height: 20px;
     min-width: 20px;
@@ -1838,33 +1896,40 @@
     user-select: none;
   }
   html:not([data-skin="elektron"]) .virus-info-step-num,
-  html[data-skin="te"] .virus-info-step-num {
+  html[data-skin="te"] .virus-info-step-num,
+  html:not([data-skin="elektron"]) .section-info-step-num,
+  html[data-skin="te"] .section-info-step-num {
     background: #1f3244;
     color: #d7e9f5;
   }
-  html[data-skin="elektron"] .virus-info-step-num {
+  html[data-skin="elektron"] .virus-info-step-num,
+  html[data-skin="elektron"] .section-info-step-num {
     background: #e02424;
     color: #ffffff;
   }
 
-  .virus-info-step-content {
+  .virus-info-step-content,
+  .section-info-step-content {
     flex: 1;
     display: flex;
     flex-direction: column;
     gap: 3px;
   }
-  .virus-info-step-title {
+  .virus-info-step-title,
+  .section-info-step-title {
     font-size: 11px;
     font-weight: 800;
     letter-spacing: 0.04em;
     text-transform: uppercase;
   }
-  .virus-info-step-desc {
+  .virus-info-step-desc,
+  .section-info-step-desc {
     font-size: 11.5px;
     line-height: 1.45;
     opacity: 0.9;
   }
-  .virus-info-step-desc code {
+  .virus-info-step-desc code,
+  .section-info-step-desc code {
     font-family: monospace;
     font-size: 10.5px;
     padding: 1px 4px;
@@ -1872,12 +1937,14 @@
     background: rgba(0,0,0,0.06);
     border: 1px solid rgba(0,0,0,0.08);
   }
-  html[data-skin="elektron"] .virus-info-step-desc code {
+  html[data-skin="elektron"] .virus-info-step-desc code,
+  html[data-skin="elektron"] .section-info-step-desc code {
     background: rgba(255,255,255,0.08);
     border: 1px solid rgba(255,255,255,0.12);
   }
 
-  .virus-info-footer {
+  .virus-info-footer,
+  .section-info-footer {
     padding: 10px 14px;
     font-size: 10.5px;
     line-height: 1.45;
@@ -1887,11 +1954,14 @@
     opacity: 0.88;
   }
   html:not([data-skin="elektron"]) .virus-info-footer,
-  html[data-skin="te"] .virus-info-footer {
+  html[data-skin="te"] .virus-info-footer,
+  html:not([data-skin="elektron"]) .section-info-footer,
+  html[data-skin="te"] .section-info-footer {
     background: #f0f5fa;
     border-top: 1px solid #d0e0ee;
   }
-  html[data-skin="elektron"] .virus-info-footer {
+  html[data-skin="elektron"] .virus-info-footer,
+  html[data-skin="elektron"] .section-info-footer {
     background: #0f1116;
     border-top: 1px solid #242a36;
   }
@@ -4470,6 +4540,55 @@
     <div class="chassis-screw screw-bl"></div>
     <div class="chassis-screw screw-br"></div>
     <div class="chassis-logo">VIRUS-H PATCH</div>
+    <!-- Section Info Pop-up for Patch Manager -->
+    <div class="section-info-container align-right" style="position: absolute; top: 14px; right: 36px; z-index: 50;">
+      <button class="section-info-btn" aria-label="Info e Guida Patch Manager" title="Guida e comandi: Patch Manager & Libreria">ℹ</button>
+      <div class="section-info-popup">
+        <div class="section-info-header">
+          <div class="section-info-title">
+            <span class="section-info-logo-badge">PATCH</span>
+            <span>PATCH MANAGER & LIBRERIA</span>
+          </div>
+          <button class="section-info-close" type="button" title="Chiudi">✕</button>
+        </div>
+        <div class="section-info-body">
+          <div class="section-info-step">
+            <div class="section-info-step-num">1</div>
+            <div class="section-info-step-content">
+              <div class="section-info-step-title">Banchi RAM & ROM</div>
+              <div class="section-info-step-desc">Esplora i 128 programmi dei banchi RAM A-D e ROM A-Z con visualizzazione immediata dei metadati e categorie di suono.</div>
+            </div>
+          </div>
+          <div class="section-info-step">
+            <div class="section-info-step-num">2</div>
+            <div class="section-info-step-content">
+              <div class="section-info-step-title">Importazione & Export .SYX</div>
+              <div class="section-info-step-desc">Carica file standard MIDI SysEx (<code>.syx</code> o <code>.mid</code>) dal computer per caricare soundset professionali storici.</div>
+            </div>
+          </div>
+          <div class="section-info-step">
+            <div class="section-info-step-num">3</div>
+            <div class="section-info-step-content">
+              <div class="section-info-step-title">Backup JSON Completo</div>
+              <div class="section-info-step-desc">Esporta un archivio JSON con lo stato completo delle 4 parti, mixer, controlli e mappature del sintetizzatore.</div>
+            </div>
+          </div>
+          <div class="section-info-step">
+            <div class="section-info-step-num">4</div>
+            <div class="section-info-step-content">
+              <div class="section-info-step-title">Ricerca Testuale Immediata</div>
+              <div class="section-info-step-desc">Filtra all'istante migliaia di preset per nome (es. 'Moog', 'Sub', 'Acid', 'Trance') o per categoria sonora.</div>
+            </div>
+          </div>
+        </div>
+        <div class="section-info-footer">
+          <div style="font-weight: 700; display: flex; align-items: center; gap: 4px;">
+            <span>💡</span> <span>SUGGERIMENTO</span>
+          </div>
+          <div>Trascina direttamente i file <code>.syx</code> o <code>.mid</code> nella finestra per caricarli e inviarli al sintetizzatore in pochi secondi.</div>
+        </div>
+      </div>
+    </div>
     <div style="z-index: 1; width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 40px; padding: 0 40px;">
       <div class="section section-lib" style="width: 100%; max-width: 800px; background: rgba(10,10,12,0.85); border: 1px solid var(--border); border-radius: 6px; padding: 24px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.05); color: #fff;">
   <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px;">
@@ -4556,6 +4675,55 @@
     <div class="chassis-logo" style="top: 13px; left: 32px; font-size: 19px; letter-spacing: 0.12em; font-weight: 900;">VIRUS | TI SNOW</div>
     <div class="chassis-access-logo" style="position: absolute; top: 13px; right: 32px; font-weight: 800; font-size: 15px; letter-spacing: 0.1em; color: #333; display: flex; align-items: center; gap: 6px; font-family: 'Inter', sans-serif;">
       <span style="font-size: 18px; color: #222;">❖</span> access
+    </div>
+    <!-- Section Info Pop-up for Snow Front Panel -->
+    <div class="section-info-container align-right" style="position: absolute; top: 11px; right: 130px; z-index: 50;">
+      <button class="section-info-btn" aria-label="Info e Guida Pannello TI Snow" title="Guida e comandi: Pannello Frontale TI Snow">ℹ</button>
+      <div class="section-info-popup">
+        <div class="section-info-header">
+          <div class="section-info-title">
+            <span class="section-info-logo-badge">TI-SNOW</span>
+            <span>PANNELLO VIRUS TI SNOW</span>
+          </div>
+          <button class="section-info-close" type="button" title="Chiudi">✕</button>
+        </div>
+        <div class="section-info-body">
+          <div class="section-info-step">
+            <div class="section-info-step-num">1</div>
+            <div class="section-info-step-content">
+              <div class="section-info-step-title">Replica Hardware 1:1</div>
+              <div class="section-info-step-desc">Interfaccia fedele allo chassis del Virus TI Snow bianco con acrilico trasparente, viti a brugola e manopole analogiche graduate.</div>
+            </div>
+          </div>
+          <div class="section-info-step">
+            <div class="section-info-step-num">2</div>
+            <div class="section-info-step-content">
+              <div class="section-info-step-title">Master Cutoff, Reso & Volume</div>
+              <div class="section-info-step-desc">Controlla all'istante i filtri principali e il volume master con trasmissione MIDI CC continua ad alta risoluzione.</div>
+            </div>
+          </div>
+          <div class="section-info-step">
+            <div class="section-info-step-num">3</div>
+            <div class="section-info-step-content">
+              <div class="section-info-step-title">Navigazione & Soft Knobs</div>
+              <div class="section-info-step-desc">I pulsanti <code>PARAM &lt; / &gt;</code> e le 3 manopole <code>SOFT 1-3</code> sotto lo schermo LCD permettono di modificare i parametri secondari del suono.</div>
+            </div>
+          </div>
+          <div class="section-info-step">
+            <div class="section-info-step-num">4</div>
+            <div class="section-info-step-content">
+              <div class="section-info-step-title">Tap Tempo & Panic Istantaneo</div>
+              <div class="section-info-step-desc">Tasto <code>TAP TEMPO</code> per impostare la velocità dei delay/arp; doppio clic su <code>PANIC</code> per zittire subito eventuali note MIDI bloccate.</div>
+            </div>
+          </div>
+        </div>
+        <div class="section-info-footer">
+          <div style="font-weight: 700; display: flex; align-items: center; gap: 4px;">
+            <span>💡</span> <span>SUGGERIMENTO</span>
+          </div>
+          <div>Clicca sui pulsanti della matrice destra (OSC, FILTER, ARP, MULTI) per saltare direttamente alle sezioni corrispondenti dell'app.</div>
+        </div>
+      </div>
     </div>
 
     <!-- Griglia a 3 sezioni (Sinistra: 2 tasti verticali, Centro: Schermo su acrilico trasparente + 4 manopole, Destra: Matrice tasti con LED + modulo Filtro) -->
@@ -4864,6 +5032,55 @@
     <div class="chassis-access-logo" style="position: absolute; top: 16px; right: 36px; font-weight: 800; font-size: 16px; letter-spacing: 0.1em; color: #444; display: flex; align-items: center; gap: 6px; font-family: 'Inter', sans-serif;">
       <span style="font-size: 18px; color: #333;">❖</span> access
     </div>
+    <!-- Section Info Pop-up for Multi Mode -->
+    <div class="section-info-container align-right" style="position: absolute; top: 14px; right: 130px; z-index: 50;">
+      <button class="section-info-btn" aria-label="Info e Guida Multi Mixer" title="Guida e comandi: Multi Mixer 4 Parti">ℹ</button>
+      <div class="section-info-popup">
+        <div class="section-info-header">
+          <div class="section-info-title">
+            <span class="section-info-logo-badge">MULTI</span>
+            <span>MULTI MIXER (4 PARTI)</span>
+          </div>
+          <button class="section-info-close" type="button" title="Chiudi">✕</button>
+        </div>
+        <div class="section-info-body">
+          <div class="section-info-step">
+            <div class="section-info-step-num">1</div>
+            <div class="section-info-step-content">
+              <div class="section-info-step-title">Architettura Multitimbrica (P1-P4)</div>
+              <div class="section-info-step-desc">Il Virus TI Snow gestisce 4 parti simultanee. Clicca <code>⚡ MULTITIMBRICO</code> per assegnare automaticamente P1 a Ch1, P2 a Ch2, P3 a Ch3 e P4 a Ch4 via SysEx Page C.</div>
+            </div>
+          </div>
+          <div class="section-info-step">
+            <div class="section-info-step-num">2</div>
+            <div class="section-info-step-content">
+              <div class="section-info-step-title">Layer vs Canali Separati</div>
+              <div class="section-info-step-desc">Se suonando P1 suonano tutte le parti insieme, il Virus ha le parti assegnate sullo stesso canale (Layer). Clicca <code>⚡ MULTITIMBRICO</code> per separarle, o <code>🎛 LAYER</code> per sovrapporle.</div>
+            </div>
+          </div>
+          <div class="section-info-step">
+            <div class="section-info-step-num">3</div>
+            <div class="section-info-step-content">
+              <div class="section-info-step-title">Mixer, Mute & Solo</div>
+              <div class="section-info-step-desc">Regola Volume, Pan, Transpose, Cutoff e Risonanza per ciascuna parte. Usa <code>M</code> (Mute) e <code>S</code> (Solo) per isolare le singole parti nel mix.</div>
+            </div>
+          </div>
+          <div class="section-info-step">
+            <div class="section-info-step-num">4</div>
+            <div class="section-info-step-content">
+              <div class="section-info-step-title">Lettura & Scansione SysEx</div>
+              <div class="section-info-step-desc">Clicca <code>🔄 LEGGI 4 PARTI</code> per interrogare il synth e sincronizzare patch e volumi attivi; <code>📥 SCANSIONA 128</code> legge i nomi delle patch del banco selezionato.</div>
+            </div>
+          </div>
+        </div>
+        <div class="section-info-footer">
+          <div style="font-weight: 700; display: flex; align-items: center; gap: 4px;">
+            <span>💡</span> <span>HARDWARE TIP</span>
+          </div>
+          <div>Sul sintetizzatore fisico puoi anche attivare la modalità <b>SEQ</b> (tasto SEQ sullo Snow, MULTI+SINGLE sul TI Desktop) che forza l'assegnazione automatica dei 4 canali 1..4.</div>
+        </div>
+      </div>
+    </div>
 
     <div style="z-index: 1; width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 6px; padding: 0 8px; gap: 8px;">
       <!-- Master Access Virus TI Snow LCD Display Unit (Fondo chiaro con testi e icone grigie come hardware) -->
@@ -4932,6 +5149,15 @@
               <button id="btnOpenBankNamesModal" class="chassis-page-btn" style="padding: 3px 7px; font-size: 10px;">📋 NOMI</button>
             </div>
             <button id="btnSyncMultiInView" class="chassis-page-btn" style="padding: 4px 10px; font-size: 10px; font-weight: bold; color: #111; border-color: var(--accent); background: linear-gradient(to bottom, #fff, #e2e4e8);" title="Interroga le 4 parti attive del Virus">🔄 LEGGI 4 PARTI</button>
+          </div>
+          <!-- ROUTING MULTI MIDI ACTION BAR -->
+          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px; padding-top: 5px; border-top: 1px dashed rgba(0,0,0,0.12);">
+            <div style="display: flex; align-items: center; gap: 5px; flex-wrap: wrap;">
+              <span style="font-size: 9.5px; font-weight: 800; letter-spacing: 0.05em; color: #444;">ROUTING MIDI CANALI:</span>
+              <button id="btnSetMultiSplitChannels" class="chassis-page-btn" style="color: #0b7285; border-color: #0b7285; font-weight: 800; padding: 3px 8px; font-size: 9.5px;" title="Configura P1 su Ch 1, P2 su Ch 2, P3 su Ch 3, P4 su Ch 4 via SysEx sul Virus">⚡ MULTITIMBRICO (P1:Ch1 · P2:Ch2 · P3:Ch3 · P4:Ch4)</button>
+              <button id="btnSetMultiLayerChannels" class="chassis-page-btn" style="color: #5f3dc4; border-color: #5f3dc4; font-weight: 800; padding: 3px 8px; font-size: 9.5px;" title="Assegna tutte e 4 le parti al Canale 1 per suonare insieme in Layer">🎛 LAYER (TUTTE SU CH 1)</button>
+            </div>
+            <span style="font-size: 9px; opacity: 0.65; font-family: monospace;">SysEx Page C (0x72) Param 34</span>
           </div>
           <div id="quickScanStatus" style="font-size: 10px; color: #666; font-family: monospace; min-height: 14px;"></div>
         </div>
@@ -5082,6 +5308,13 @@
     if (typeof updateKeyboardPartDisplay === 'function') updateKeyboardPartDisplay();
     if (selectedOutput) {
       sendVirusMode(1); // Commuta il Virus hardware in Multi Mode
+      for (let i = 0; i < NUM_PARTS; i++) {
+        setTimeout(() => {
+          if (multiParts[i] && multiParts[i].values && typeof sendMultiPartParam === 'function') {
+            sendMultiPartParam(i, 34, multiParts[i].values.channel);
+          }
+        }, i * 25);
+      }
     }
   });
 
@@ -5655,8 +5888,115 @@
   });
 
   // ---------------------------------------------------------------------
-  // VIRUS-H Info Pop-up (Guida Rapida & Istruzioni Setup)
+  // VIRUS-H Info Pop-ups (Guida Globale & Info per Sezione)
   // ---------------------------------------------------------------------
+  function createSectionInfoElement({ title, badge, steps, tip, alignRight = true }) {
+    const container = document.createElement('div');
+    container.className = 'section-info-container' + (alignRight ? ' align-right' : '');
+
+    const btn = document.createElement('button');
+    btn.className = 'section-info-btn';
+    btn.type = 'button';
+    btn.textContent = 'ℹ';
+    btn.setAttribute('aria-label', `Info e Guida: ${title}`);
+    btn.title = `Guida e comandi: ${title} (passa il mouse o clicca per bloccare aperto)`;
+
+    const popup = document.createElement('div');
+    popup.className = 'section-info-popup';
+
+    const header = document.createElement('div');
+    header.className = 'section-info-header';
+    header.innerHTML = `
+      <div class="section-info-title">
+        <span class="section-info-logo-badge">${badge || 'VIRUS-H'}</span>
+        <span>${title}</span>
+      </div>
+      <button class="section-info-close" type="button" title="Chiudi guida" aria-label="Chiudi guida">✕</button>
+    `;
+
+    const body = document.createElement('div');
+    body.className = 'section-info-body';
+    (steps || []).forEach((st, idx) => {
+      const stepEl = document.createElement('div');
+      stepEl.className = 'section-info-step';
+      stepEl.innerHTML = `
+        <div class="section-info-step-num">${idx + 1}</div>
+        <div class="section-info-step-content">
+          <div class="section-info-step-title">${st.title}</div>
+          <div class="section-info-step-desc">${st.desc}</div>
+        </div>
+      `;
+      body.appendChild(stepEl);
+    });
+
+    const footer = document.createElement('div');
+    footer.className = 'section-info-footer';
+    footer.innerHTML = `
+      <div style="font-weight: 700; display: flex; align-items: center; gap: 4px;">
+        <span>💡</span> <span>SUGGERIMENTO</span>
+      </div>
+      <div>${tip || 'Tutte le modifiche e i parametri sono inviati in tempo reale al sintetizzatore via MIDI/SysEx.'}</div>
+    `;
+
+    popup.appendChild(header);
+    popup.appendChild(body);
+    popup.appendChild(footer);
+
+    container.appendChild(btn);
+    container.appendChild(popup);
+
+    btn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const isActive = container.classList.contains('active');
+      document.querySelectorAll('.section-info-container.active, .virus-info-container.active').forEach(c => c.classList.remove('active'));
+      if (!isActive) container.classList.add('active');
+    });
+
+    header.querySelector('.section-info-close').addEventListener('click', (e) => {
+      e.stopPropagation();
+      container.classList.remove('active');
+    });
+
+    popup.addEventListener('click', (e) => {
+      e.stopPropagation();
+    });
+
+    return container;
+  }
+
+  function initSectionInfoPopups() {
+    document.querySelectorAll('.section-info-container').forEach(container => {
+      const btn = container.querySelector('.section-info-btn');
+      const closeBtn = container.querySelector('.section-info-close');
+      const popup = container.querySelector('.section-info-popup');
+
+      if (btn && !btn._hasInfoListener) {
+        btn._hasInfoListener = true;
+        btn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          const wasActive = container.classList.contains('active');
+          document.querySelectorAll('.section-info-container.active, .virus-info-container.active').forEach(c => c.classList.remove('active'));
+          if (!wasActive) container.classList.add('active');
+        });
+      }
+
+      if (closeBtn && !closeBtn._hasInfoListener) {
+        closeBtn._hasInfoListener = true;
+        closeBtn.addEventListener('click', (e) => {
+          e.stopPropagation();
+          container.classList.remove('active');
+        });
+      }
+
+      if (popup && !popup._hasInfoListener) {
+        popup._hasInfoListener = true;
+        popup.addEventListener('click', (e) => {
+          e.stopPropagation();
+        });
+      }
+    });
+  }
+
   const virusInfoContainer = document.getElementById('virusInfoContainer');
   const virusInfoBtn = document.getElementById('virusInfoBtn');
   const virusInfoClose = document.getElementById('virusInfoClose');
@@ -5670,17 +6010,16 @@
       e.stopPropagation();
       virusInfoContainer.classList.remove('active');
     });
-    document.addEventListener('click', (e) => {
-      if (!virusInfoContainer.contains(e.target)) {
-        virusInfoContainer.classList.remove('active');
-      }
-    });
-    window.addEventListener('keydown', (e) => {
-      if (e.key === 'Escape' && virusInfoContainer.classList.contains('active')) {
-        virusInfoContainer.classList.remove('active');
-      }
-    });
   }
+
+  document.addEventListener('click', () => {
+    document.querySelectorAll('.section-info-container.active, .virus-info-container.active').forEach(c => c.classList.remove('active'));
+  });
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.section-info-container.active, .virus-info-container.active').forEach(c => c.classList.remove('active'));
+    }
+  });
 
   // ---------------------------------------------------------------------
   // Feedback & Community Modal (Synth Cafe / GitHub Support)
@@ -6918,8 +7257,21 @@ function exportCurrentPatchSyx() {
     elektronWrapper.appendChild(tlScrew);
     elektronWrapper.appendChild(trScrew);
     elektronWrapper.appendChild(blScrew);
-    elektronWrapper.appendChild(brScrew);
     elektronWrapper.appendChild(logo);
+
+    const singleInfo = createSectionInfoElement({
+      title: 'SINGLE SYNTH EDITOR',
+      badge: 'SINGLE',
+      steps: [
+        { title: 'Editing a 3 Oscillatori', desc: 'Naviga tra le pagine OSC 1, OSC 2, OSC 3/NOISE, FILTER, AMP, LFO 1 e FX per scolpire ogni dettaglio della parte attiva (P1..P4).' },
+        { title: 'Display Grafico & Curve Filtro', desc: 'Visualizzazione OLED vettoriale con curve di filtro passa-basso/alto/banda, inviluppi ADSR e valori numerici precisi.' },
+        { title: 'Strumenti Creativi (Random/Mutate)', desc: 'Genera patch musicali con <code>🎲 RANDOM</code>, crea variazioni sottili con <code>🧬 MUTATE</code> ed esporta il dump con <code>💾 SALVA .SYX</code>.' },
+        { title: 'Lettura Edit Buffer Hardware', desc: 'Clicca <code>📥 LEGGI SYNTH</code> per richiedere il dump SysEx della patch attiva dal Virus TI e visualizzarla su schermo.' }
+      ],
+      tip: 'Seleziona P1, P2, P3 o P4 nella barra superiore per passare all\'editing di un\'altra parte senza interrompere il suono.'
+    });
+    singleInfo.style.cssText = 'position: absolute; top: 14px; right: 36px; z-index: 50;';
+    elektronWrapper.appendChild(singleInfo);
 
     // =========================================================================
     // 1. TOP TOOLBAR & DIGITAL OLED STATUS DISPLAY (HARMONIZED WITH ARP & SEQ)
@@ -10754,6 +11106,51 @@ function exportCurrentPatchSyx() {
   document.getElementById('btnSyncMultiInView')?.addEventListener('click', syncAllMultiParts);
   document.getElementById('btnSyncMultiParts')?.addEventListener('click', syncAllMultiParts);
 
+  function setMultiRouting(mode) {
+    if (mode === 'split') {
+      for (let i = 0; i < NUM_PARTS; i++) {
+        multiParts[i].values.channel = i; // P1=0 (Ch 1), P2=1 (Ch 2), P3=2 (Ch 3), P4=3 (Ch 4)
+        multiParts[i].enabled = true;
+        if (typeof sendMultiPartParam === 'function') {
+          setTimeout(() => {
+            sendMultiPartParam(i, 34, i); // Param 34: Part MIDI Channel (0-15)
+            sendMultiPartParam(i, PART_ENABLE_PARAM, 1);
+            if (!multiParts[i].values.volume || multiParts[i].values.volume < 20) {
+              multiParts[i].values.volume = 127;
+              sendMultiPartParam(i, 39, 127);
+            }
+          }, i * 20);
+        }
+      }
+      buildMultiView();
+      if (typeof renderMultiPartsOverview === 'function') renderMultiPartsOverview();
+      if (typeof updateKeyboardPartDisplay === 'function') updateKeyboardPartDisplay();
+      setLastAction('⚡ Modalità Multitimbrica: P1->Ch1, P2->Ch2, P3->Ch3, P4->Ch4 sincronizzati');
+      const st = document.getElementById('quickScanStatus');
+      if (st) st.textContent = '⚡ Canali MIDI configurati via SysEx: P1=Ch1, P2=Ch2, P3=Ch3, P4=Ch4.';
+    } else if (mode === 'layer') {
+      for (let i = 0; i < NUM_PARTS; i++) {
+        multiParts[i].values.channel = 0; // Tutte su Canale 1
+        multiParts[i].enabled = true;
+        if (typeof sendMultiPartParam === 'function') {
+          setTimeout(() => {
+            sendMultiPartParam(i, 34, 0); // Param 34: Part MIDI Channel = 0 (Ch 1)
+            sendMultiPartParam(i, PART_ENABLE_PARAM, 1);
+          }, i * 20);
+        }
+      }
+      buildMultiView();
+      if (typeof renderMultiPartsOverview === 'function') renderMultiPartsOverview();
+      if (typeof updateKeyboardPartDisplay === 'function') updateKeyboardPartDisplay();
+      setLastAction('🎛 Modalità Layer 4 Parti: tutte le parti assegnate a Canale 1');
+      const st = document.getElementById('quickScanStatus');
+      if (st) st.textContent = '🎛 Tutte le 4 parti rispondono contemporaneamente su Canale 1 (Layer).';
+    }
+  }
+
+  document.getElementById('btnSetMultiSplitChannels')?.addEventListener('click', () => setMultiRouting('split'));
+  document.getElementById('btnSetMultiLayerChannels')?.addEventListener('click', () => setMultiRouting('layer'));
+
   // ---------------------------------------------------------------------
   // Virtual Keyboard & Audition Controller (Mac Keyboard Player)
   // ---------------------------------------------------------------------
@@ -11776,8 +12173,21 @@ function exportCurrentPatchSyx() {
     elektronWrapper.appendChild(tlScrew);
     elektronWrapper.appendChild(trScrew);
     elektronWrapper.appendChild(blScrew);
-    elektronWrapper.appendChild(brScrew);
     elektronWrapper.appendChild(logo);
+
+    const arpInfo = createSectionInfoElement({
+      title: 'LIVE ARPEGGIATOR',
+      badge: 'ARP',
+      steps: [
+        { title: 'Motore Pattern a 16 Step', desc: 'Pattern poliritmico con risoluzione da 1/4 a 1/32T, controllo Swing e modalità Up, Down, Up&Down, Random e As Played.' },
+        { title: 'Pad Hardware & Slider Step', desc: '16 pad tattili in silicone con LED a cupola per attivare/disattivare step e regolare velocity, gate e trasposizione per step.' },
+        { title: 'Destinazione MIDI (Target)', desc: 'Invia l\'arpeggio a una traccia specifica (P1, P2, P3, P4) oppure mantieni AUTO per seguire la parte selezionata.' },
+        { title: 'Preset & Funzione Hold', desc: 'Preset di genere pronti all\'uso (Trance, Acid, Melodic Techno). Attiva <code>HOLD</code> per mantenere l\'arpeggio attivo a mani libere.' }
+      ],
+      tip: 'Usa la tastiera a schermo o una tastiera MIDI esterna per cambiare gli accordi dell\'arpeggiatore in tempo reale.'
+    });
+    arpInfo.style.cssText = 'position: absolute; top: 14px; right: 36px; z-index: 50;';
+    elektronWrapper.appendChild(arpInfo);
 
     const innerLayout = document.createElement('div');
     innerLayout.style.cssText = 'display: flex; flex-direction: column; gap: 16px; align-items: center; margin-top: 24px; width: 100%; box-sizing: border-box; z-index: 1; padding-bottom: 90px;';
@@ -12894,8 +13304,21 @@ function exportCurrentPatchSyx() {
     elektronWrapper.appendChild(tlScrew);
     elektronWrapper.appendChild(trScrew);
     elektronWrapper.appendChild(blScrew);
-    elektronWrapper.appendChild(brScrew);
     elektronWrapper.appendChild(logo);
+
+    const seqInfo = createSectionInfoElement({
+      title: '64-STEP MULTI SEQUENCER',
+      badge: 'SEQ',
+      steps: [
+        { title: 'Sequencer a 4 Tracce', desc: '4 tracce parallele (T1..T4) connesse alle parti P1..P4 del Virus TI per polifonia, linee di basso e percussioni sincrone.' },
+        { title: '4 Pagine Elektron (64 Step)', desc: 'Naviga tra le pagine 1 (1-16), 2 (17-32), 3 (33-48) e 4 (49-64) con LED indicatori per comporre pattern lunghi ed evolutivi.' },
+        { title: 'Editing di Nota, Accento & Legato', desc: 'Seleziona ciascuno step per regolare nota, ottava, velocity, accenti e legature continue (Tie/Legato).' },
+        { title: 'Scale Quantizer & Preset Musicali', desc: 'Quantizzazione istantanea in tonalità (Minor, Dorian, Phrygian, Pentatonic) e preset pronti come Rolling Bass e Acid 303.' }
+      ],
+      tip: 'Premi SPACE sulla tastiera per avviare o fermare la riproduzione del sequencer in tempo reale.'
+    });
+    seqInfo.style.cssText = 'position: absolute; top: 14px; right: 36px; z-index: 50;';
+    elektronWrapper.appendChild(seqInfo);
 
     const innerLayout = document.createElement('div');
     innerLayout.style.cssText = 'display: flex; flex-direction: column; gap: 14px; align-items: center; margin-top: 24px; width: 100%; box-sizing: border-box; z-index: 1; padding-bottom: 70px;';
@@ -13508,8 +13931,20 @@ function exportCurrentPatchSyx() {
     elektronWrapper.appendChild(tlScrew);
     elektronWrapper.appendChild(trScrew);
     elektronWrapper.appendChild(blScrew);
-    elektronWrapper.appendChild(brScrew);
     elektronWrapper.appendChild(logo);
+
+    const songInfo = createSectionInfoElement({
+      title: 'SONG MODE ARRANGIATORE',
+      badge: 'SONG',
+      steps: [
+        { title: 'Costruzione Scene & Blocchi', desc: 'Concatena pattern e parti in una successione ordinata di scene (Intro, Verse, Chorus, Drop, Outro).' },
+        { title: 'Automazione Mute & Transizioni', desc: 'Programma l\'entrata e l\'uscita delle 4 parti del Virus TI per creare variazioni ritmiche e stacchi dinamici.' },
+        { title: 'Master Clock & Sincronizzazione', desc: 'Controlla il BPM globale e trasmette il MIDI Clock continuo al sintetizzatore per allineare delay, LFO e arpeggiatori.' }
+      ],
+      tip: 'Salva il progetto completo in formato JSON per conservare l\'arrangiamento e tutti i suoni delle 4 parti.'
+    });
+    songInfo.style.cssText = 'position: absolute; top: 14px; right: 36px; z-index: 50;';
+    elektronWrapper.appendChild(songInfo);
 
     const innerLayout = document.createElement('div');
     innerLayout.style.display = 'flex';
@@ -13813,6 +14248,7 @@ function exportCurrentPatchSyx() {
   buildArpView();
   buildSeqView();
   buildSongView();
+  if (typeof initSectionInfoPopups === 'function') initSectionInfoPopups();
 
   // Inizializza i profili sonori di tutte le 4 parti
   for (let i = 0; i < NUM_PARTS; i++) {
