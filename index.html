@@ -6792,6 +6792,16 @@ function updateSingleOledDisplay() {
 }
 window.updateSingleOledDisplay = updateSingleOledDisplay;
 
+window.setMockMidiConnection = function(name = 'Access Virus TI (USB)') {
+  selectedOutput = { id: 'mock-out', name: name, state: 'connected', send: () => {} };
+  selectedInput = { id: 'mock-in', name: name, state: 'connected' };
+  updateConnectionIndicator();
+  setLastAction('READY: SYNTH CONNECTED');
+  if (typeof updateSingleOledDisplay === 'function') updateSingleOledDisplay();
+  if (window.seqEngine && typeof window.seqEngine.updateDisplay === 'function') window.seqEngine.updateDisplay();
+  if (window.arpEngine && typeof window.arpEngine.updateDisplay === 'function') window.arpEngine.updateDisplay();
+};
+
 function setSingleEditingPart(partIndex) {
   currentPartIndex = partIndex;
   window.activeSinglePartIndex = partIndex;
@@ -11266,6 +11276,7 @@ function exportCurrentPatchSyx() {
     }
     if (btnToggleKbd && btnToggleKbd.classList) btnToggleKbd.classList.toggle('active', !!show);
   }
+  window.setKeyboardDockVisible = setKeyboardDockVisible;
 
   btnToggleKbd?.addEventListener('click', () => {
     const isVisible = kbdDock && kbdDock.style.display !== 'none';
