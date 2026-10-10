@@ -4319,6 +4319,7 @@
     <button class="theme-toggle" id="themeToggle" style="margin: 0;">○</button>
     <button class="settings-trigger" id="btnToggleKeyboard" type="button" title="Tastiera virtuale per provare i suoni" style="margin: 0;">🎹 KEYS</button>
     <button class="settings-trigger" id="btnSettings" type="button" aria-haspopup="dialog" aria-controls="settingsModal" aria-expanded="false" title="MIDI settings">MIDI</button>
+    <button class="settings-trigger" id="btnFeedback" type="button" aria-haspopup="dialog" aria-controls="feedbackModal" aria-expanded="false" title="Note sicurezza & suggerimenti per la community Synth Cafe" style="margin: 0; font-weight: 700; color: #ffca3a; border-color: rgba(255, 202, 58, 0.4);">💬 FEEDBACK</button>
   </div>
 </div>
 
@@ -4410,6 +4411,53 @@
       • Collega le <b>cuffie</b> all'uscita <b>PHONES</b> del Virus TI (oppure l'uscita <b>OUT 1 L/R</b> a casse monitor o scheda audio).<br>
       • Assicurati che la manopola fisica <b>MASTER VOLUME</b> sul frontale del Virus TI sia alzata.<br>
       • Puoi disattivare il sintetizzatore Web Audio del Mac in fondo alla schermata (tasto <b>AUDIO MAC: OFF</b>) per ascoltare esclusivamente il Virus TI reale.
+    </div>
+  </div>
+</div>
+
+<div class="modal-overlay" id="feedbackModal">
+  <div class="modal-content" style="max-width: 580px; max-height: 85vh; overflow-y: auto;">
+    <button class="modal-close" id="btnCloseFeedback">×</button>
+    <div style="display: flex; align-items: center; gap: 8px; margin-bottom: 14px;">
+      <span style="font-family: monospace; font-size: 10px; font-weight: 800; background: var(--accent); color: #fff; padding: 2px 7px; border-radius: 3px; letter-spacing: 0.08em;">COMMUNITY</span>
+      <h2 style="margin: 0; font-size: 16px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.06em;">Feedback & Sicurezza Synth Cafe</h2>
+    </div>
+
+    <!-- BOX SICUREZZA HARDWARE -->
+    <div style="background: rgba(46, 204, 113, 0.1); border: 1px solid rgba(46, 204, 113, 0.35); border-radius: 6px; padding: 12px; margin-bottom: 16px;">
+      <div style="display: flex; align-items: center; gap: 6px; font-weight: bold; color: #2ecc71; font-size: 12px; margin-bottom: 4px;">
+        <span>🛡️</span>
+        <span>100% SICURO PER IL TUO HARDWARE (EDIT BUFFER SAFE)</span>
+      </div>
+      <div style="font-size: 11px; line-height: 1.5; color: var(--fg); opacity: 0.9;">
+        • <b>Nessun rischio per la memoria del synth</b>: Tutte le modifiche, sequenze e messaggi SysEx lavorano esclusivamente sull'<b>Edit Buffer volatile</b>. La memoria permanente (RAM/ROM) non viene mai sovrascritta a meno che tu non prema fisicamente <em>STORE</em> sul pannello del Virus.<br>
+        • <b>Privacy Totale & Client-Side</b>: L'app gira al 100% nel tuo browser (Web MIDI API). Nessun dato, preset o segnale audio viene inviato a server esterni.<br>
+        • <b>Browser consigliati</b>: Google Chrome, Microsoft Edge, Brave, Opera (con supporto completo Web MIDI SysEx).
+      </div>
+    </div>
+
+    <!-- SEZIONE SUGGERIMENTI & CANALI -->
+    <div style="display: flex; flex-direction: column; gap: 10px; margin-bottom: 16px;">
+      <div style="font-weight: 700; font-size: 11.5px; text-transform: uppercase; letter-spacing: 0.05em; color: var(--accent);">Dove condividere pareri o segnalare bug:</div>
+      
+      <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+        <a href="https://www.facebook.com/groups/synthcafe/" target="_blank" rel="noopener noreferrer" style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px; background: rgba(24, 119, 242, 0.15); border: 1px solid rgba(24, 119, 242, 0.4); border-radius: 5px; color: #4da3ff; font-weight: 700; font-size: 11px; text-decoration: none; text-align: center; transition: all 0.2s ease;">
+          <span>👥 Gruppo Synth Cafe</span>
+        </a>
+        <a href="https://github.com/guerriericreativi-pixel/soundmachina/issues" target="_blank" rel="noopener noreferrer" style="display: flex; align-items: center; justify-content: center; gap: 8px; padding: 10px; background: rgba(255, 255, 255, 0.08); border: 1px solid var(--border); border-radius: 5px; color: var(--fg); font-weight: 700; font-size: 11px; text-decoration: none; text-align: center; transition: all 0.2s ease;">
+          <span>🐙 GitHub Issues</span>
+        </a>
+      </div>
+    </div>
+
+    <!-- BOX DIAGNOSTICA RAPIDA (COPIA PER REPORT) -->
+    <div style="background: rgba(0,0,0,0.25); border: 1px solid var(--border); border-radius: 6px; padding: 12px;">
+      <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+        <div style="font-weight: 700; font-size: 11px; letter-spacing: 0.05em;">REPORT DIAGNOSTICO PER ASSISTENZA:</div>
+        <button id="btnCopyDiagReport" type="button" style="padding: 4px 10px; font-size: 10px; font-weight: 800; cursor: pointer; border-radius: 4px; background: var(--accent); color: #fff; border: none;">📋 COPIA REPORT</button>
+      </div>
+      <textarea id="diagReportText" readonly style="width: 100%; height: 75px; font-family: monospace; font-size: 10px; background: rgba(0,0,0,0.4); color: var(--fg); border: 1px solid var(--border); border-radius: 4px; padding: 6px; box-sizing: border-box; resize: none;"></textarea>
+      <div id="diagReportCopyConfirm" style="font-size: 10px; color: #2ecc71; margin-top: 4px; display: none;">✓ Report copiato negli appunti! Puoi incollarlo direttamente nei commenti su Synth Cafe.</div>
     </div>
   </div>
 </div>
@@ -5633,6 +5681,80 @@
       }
     });
   }
+
+  // ---------------------------------------------------------------------
+  // Feedback & Community Modal (Synth Cafe / GitHub Support)
+  // ---------------------------------------------------------------------
+  const feedbackModal = document.getElementById('feedbackModal');
+  const btnFeedback = document.getElementById('btnFeedback');
+  const btnCloseFeedback = document.getElementById('btnCloseFeedback');
+  const btnCopyDiagReport = document.getElementById('btnCopyDiagReport');
+  const diagReportText = document.getElementById('diagReportText');
+  const diagReportCopyConfirm = document.getElementById('diagReportCopyConfirm');
+
+  function generateDiagReport() {
+    const isDark = document.documentElement.getAttribute('data-skin') === 'elektron';
+    const themeName = isDark ? 'Access Virus TI2 Dark Star' : 'Access Virus TI Snow';
+    const midiOut = selectedOutput ? selectedOutput.name : 'Nessuna porta connessa';
+    const midiIn = selectedInput ? selectedInput.name : 'Nessuna porta connessa';
+    const activeTab = document.querySelector('.segmented-tab.active')?.textContent.trim() || 'TI-SNOW';
+    const ch = (typeof getActiveMidiChannel === 'function' ? getActiveMidiChannel() + 1 : 1);
+    const pIdx = (typeof currentPartIndex !== 'undefined' ? currentPartIndex + 1 : 1);
+    const osInfo = (navigator.userAgent.match(/\(([^)]+)\)/) || [])[1] || 'Web Browser';
+
+    return `--- VIRUS-H DIAG REPORT (Synth Cafe) ---
+• Piattaforma: ${osInfo}
+• Tema: ${themeName}
+• Vista attiva: ${activeTab} [Parte P${pIdx}, MIDI Ch ${ch}]
+• MIDI OUT: ${midiOut}
+• MIDI IN: ${midiIn}
+• Web Audio Mac: ${webAudioEnabled ? 'Attivo' : 'Off'}
+• Generato: ${new Date().toLocaleString('it-IT')}`;
+  }
+
+  function openFeedbackModal() {
+    if (!feedbackModal) return;
+    if (diagReportText) diagReportText.value = generateDiagReport();
+    if (diagReportCopyConfirm) diagReportCopyConfirm.style.display = 'none';
+    feedbackModal.classList.add('open');
+    btnFeedback?.setAttribute('aria-expanded', 'true');
+  }
+
+  function closeFeedbackModal() {
+    if (!feedbackModal) return;
+    feedbackModal.classList.remove('open');
+    btnFeedback?.setAttribute('aria-expanded', 'false');
+  }
+
+  btnFeedback?.addEventListener('click', openFeedbackModal);
+  btnCloseFeedback?.addEventListener('click', closeFeedbackModal);
+  feedbackModal?.addEventListener('click', (event) => {
+    if (event.target === feedbackModal) closeFeedbackModal();
+  });
+  window.addEventListener('keydown', (event) => {
+    if (event.key === 'Escape' && feedbackModal?.classList.contains('open')) {
+      closeFeedbackModal();
+    }
+  });
+
+  btnCopyDiagReport?.addEventListener('click', () => {
+    if (!diagReportText) return;
+    try {
+      navigator.clipboard.writeText(diagReportText.value).then(() => {
+        if (diagReportCopyConfirm) {
+          diagReportCopyConfirm.style.display = 'block';
+          setTimeout(() => { if (diagReportCopyConfirm) diagReportCopyConfirm.style.display = 'none'; }, 4000);
+        }
+      });
+    } catch (e) {
+      diagReportText.select();
+      document.execCommand('copy');
+      if (diagReportCopyConfirm) {
+        diagReportCopyConfirm.style.display = 'block';
+        setTimeout(() => { if (diagReportCopyConfirm) diagReportCopyConfirm.style.display = 'none'; }, 4000);
+      }
+    }
+  });
 
   function updateConnectionIndicator(){
     const outConnected = !!(selectedOutput && (!selectedOutput.state || selectedOutput.state === 'connected' || selectedOutput.state === 'opened'));
