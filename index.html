@@ -2,7 +2,12 @@
 <html lang="en">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="Virus TI Snow">
+<meta name="theme-color" content="#111317">
+<meta name="format-detection" content="telephone=no">
 <title>virus ti snow // editor</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>❄️</text></svg>">
 <style>
@@ -4640,12 +4645,409 @@
     animation: pulseBpm 0.5s infinite ease-in-out;
   }
 
+  /* ==========================================================================
+     TABLET & TOUCH ERGONOMICS (iPad / Touchscreen & Safe-Areas)
+     ========================================================================== */
+  #knobTouchBubble {
+    position: fixed;
+    z-index: 100000;
+    pointer-events: none;
+    display: none;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    background: rgba(14, 16, 22, 0.94);
+    border: 1px solid rgba(255, 255, 255, 0.22);
+    border-radius: 8px;
+    padding: 6px 14px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.7), 0 0 14px var(--accent, #e02424);
+    transform: translate(-50%, -100%);
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    transition: opacity 0.08s ease;
+    min-width: 90px;
+    text-align: center;
+  }
+  #knobTouchBubble .bubble-label {
+    font-size: 9.5px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    color: #94a3b8;
+    text-transform: uppercase;
+  }
+  #knobTouchBubble .bubble-val {
+    font-size: 18px;
+    font-weight: 900;
+    font-family: 'JetBrains Mono', monospace;
+    color: #ffffff;
+    margin-top: 1px;
+    letter-spacing: 0.02em;
+  }
+  #knobTouchBubble .bubble-sub {
+    font-size: 8.5px;
+    font-weight: 600;
+    color: #64748b;
+    margin-top: 1px;
+  }
+
+  /* Universal Touch Enhancements */
+  .chassis-knob-outer, .snow-front-knob, .knob-container, .snow-knob-unit, 
+  .knob-tick-dial, .part-main .vol-knob, .fx-rack-knob-unit, .xy-pad-surface {
+    touch-action: none !important;
+    user-select: none !important;
+    -webkit-user-select: none !important;
+    -webkit-touch-callout: none !important;
+  }
+
+  /* Minimum 44px Touch Targets for Controls */
+  .segmented-tab, .transport-btn, .fx-rack-btn, .preset-chip {
+    min-height: 40px;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    touch-action: manipulation;
+  }
+
+  /* Tablet / iPad Landscape & Portrait Layout */
+  @media (max-width: 1180px) {
+    .segmented-control {
+      overflow-x: auto;
+      -webkit-overflow-scrolling: touch;
+      white-space: nowrap;
+      padding-bottom: 2px;
+      scrollbar-width: none;
+    }
+    .segmented-control::-webkit-scrollbar {
+      display: none;
+    }
+  }
+  @media (max-width: 820px) {
+    .fx-rack-grid {
+      grid-template-columns: 1fr !important;
+    }
+  }
+
+  /* ==========================================================================
+     STUDIO FX RACK & MACRO PERFORMANCE STYLES
+     ========================================================================== */
+  .fx-rack-chassis {
+    background: linear-gradient(180deg, #181b22 0%, #12141a 50%, #0d0f14 100%);
+    border: 1px solid #2d3342;
+    border-radius: 8px;
+    padding: 18px 24px 32px 24px;
+    box-shadow: 0 20px 50px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.1);
+    position: relative;
+    max-width: 1200px;
+    margin: 0 auto;
+  }
+  html[data-skin="te"] .fx-rack-chassis {
+    background: linear-gradient(180deg, #e9ebf0 0%, #dedfe4 50%, #d2d4dc 100%);
+    border-color: #bcc1ce;
+    box-shadow: 0 16px 40px rgba(0,0,0,0.18), inset 0 1px 0 rgba(255,255,255,0.9);
+  }
+
+  .fx-rack-topbar {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 16px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid rgba(255,255,255,0.08);
+  }
+  html[data-skin="te"] .fx-rack-topbar {
+    border-bottom-color: rgba(0,0,0,0.12);
+  }
+
+  .fx-rack-title-box {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .fx-rack-title {
+    font-size: 16px;
+    font-weight: 900;
+    letter-spacing: 0.14em;
+    color: #f1f5f9;
+    text-transform: uppercase;
+  }
+  html[data-skin="te"] .fx-rack-title {
+    color: #1e293b;
+  }
+  .fx-rack-badge {
+    font-size: 10px;
+    font-weight: 800;
+    background: var(--accent, #e02424);
+    color: #fff;
+    padding: 2px 8px;
+    border-radius: 4px;
+    letter-spacing: 0.1em;
+    box-shadow: 0 0 10px var(--accent, #e02424);
+  }
+
+  .fx-target-selector {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    background: rgba(0,0,0,0.3);
+    padding: 4px 8px;
+    border-radius: 6px;
+    border: 1px solid rgba(255,255,255,0.1);
+  }
+  html[data-skin="te"] .fx-target-selector {
+    background: rgba(255,255,255,0.6);
+    border-color: rgba(0,0,0,0.12);
+  }
+  .fx-part-btn {
+    padding: 4px 10px;
+    font-size: 10px;
+    font-weight: 800;
+    border-radius: 4px;
+    border: 1px solid transparent;
+    background: transparent;
+    color: #94a3b8;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .fx-part-btn.active {
+    background: var(--accent, #e02424);
+    color: #fff;
+    box-shadow: 0 0 8px var(--accent, #e02424);
+  }
+
+  /* Rack Units Layout */
+  .fx-rack-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
+  }
+
+  .fx-unit {
+    background: linear-gradient(180deg, #1e222c 0%, #161920 100%);
+    border: 1px solid #2a3040;
+    border-radius: 8px;
+    padding: 16px 18px;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.06), 0 6px 16px rgba(0,0,0,0.4);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 14px;
+  }
+  html[data-skin="te"] .fx-unit {
+    background: linear-gradient(180deg, #f8f9fa 0%, #edf0f5 100%);
+    border-color: #cfd4e0;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.9), 0 4px 12px rgba(0,0,0,0.08);
+  }
+
+  .fx-unit-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    border-bottom: 1px solid rgba(255,255,255,0.06);
+    padding-bottom: 8px;
+  }
+  html[data-skin="te"] .fx-unit-header {
+    border-bottom-color: rgba(0,0,0,0.08);
+  }
+  .fx-unit-name {
+    font-size: 11px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    color: #e2e8f0;
+    text-transform: uppercase;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  html[data-skin="te"] .fx-unit-name {
+    color: #1e293b;
+  }
+  .fx-unit-led {
+    width: 7px;
+    height: 7px;
+    border-radius: 50%;
+    background: var(--accent, #e02424);
+    box-shadow: 0 0 8px var(--accent, #e02424);
+  }
+
+  .fx-knobs-row {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  .fx-rack-knob-unit {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+    min-width: 60px;
+  }
+  .fx-knob-label {
+    font-size: 8.5px;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    color: #94a3b8;
+    text-transform: uppercase;
+  }
+  html[data-skin="te"] .fx-knob-label {
+    color: #475569;
+  }
+  .fx-knob-val {
+    font-size: 10px;
+    font-weight: 700;
+    font-family: 'JetBrains Mono', monospace;
+    color: #f1f5f9;
+  }
+  html[data-skin="te"] .fx-knob-val {
+    color: #0f172a;
+  }
+
+  /* Vacuum Tube Visualizer (Module 2) */
+  .tube-container {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 20px;
+    background: rgba(0,0,0,0.35);
+    border: 1px solid rgba(255,255,255,0.06);
+    border-radius: 6px;
+    padding: 12px;
+  }
+  html[data-skin="te"] .tube-container {
+    background: rgba(0,0,0,0.04);
+    border-color: rgba(0,0,0,0.08);
+  }
+  .vacuum-tube {
+    width: 44px;
+    height: 80px;
+    border-radius: 22px 22px 6px 6px;
+    background: linear-gradient(135deg, rgba(255,255,255,0.15) 0%, rgba(255,255,255,0.02) 50%, rgba(0,0,0,0.3) 100%);
+    border: 1.5px solid rgba(255,255,255,0.25);
+    box-shadow: inset 0 0 10px rgba(255,255,255,0.1), 0 4px 12px rgba(0,0,0,0.5);
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+  }
+  .tube-glow {
+    position: absolute;
+    width: 22px;
+    height: 48px;
+    border-radius: 12px;
+    background: radial-gradient(circle, rgba(255, 140, 20, 0.9) 0%, rgba(230, 40, 10, 0.4) 60%, transparent 100%);
+    box-shadow: 0 0 25px rgba(255, 120, 20, 0.85);
+    transition: all 0.1s ease;
+  }
+  .tube-plate {
+    position: absolute;
+    width: 28px;
+    height: 52px;
+    border: 1px solid rgba(200, 200, 210, 0.3);
+    border-radius: 4px;
+    background: repeating-linear-gradient(0deg, transparent, transparent 4px, rgba(255,255,255,0.08) 5px);
+    z-index: 2;
+  }
+
+  /* Tape Visualizer Canvas */
+  .fx-scope-canvas {
+    width: 100%;
+    height: 64px;
+    background: #090a0d;
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 4px;
+    display: block;
+  }
+  html[data-skin="te"] .fx-scope-canvas {
+    background: #1e222b;
+  }
+
+  /* X/Y Touch Pad (Module 4) */
+  .xy-pad-surface {
+    height: 180px;
+    background: radial-gradient(circle at center, #161a24 0%, #0d0f14 100%);
+    border: 1.5px solid #2d3546;
+    border-radius: 6px;
+    position: relative;
+    cursor: crosshair;
+    overflow: hidden;
+    box-shadow: inset 0 2px 10px rgba(0,0,0,0.6);
+  }
+  html[data-skin="te"] .xy-pad-surface {
+    background: radial-gradient(circle at center, #f1f3f7 0%, #e2e5eb 100%);
+    border-color: #bac0ce;
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.12);
+  }
+  .xy-crosshair-x {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    background: var(--accent, #e02424);
+    opacity: 0.65;
+    pointer-events: none;
+  }
+  .xy-crosshair-y {
+    position: absolute;
+    left: 0;
+    right: 0;
+    height: 1px;
+    background: var(--accent, #e02424);
+    opacity: 0.65;
+    pointer-events: none;
+  }
+  .xy-pointer-puck {
+    position: absolute;
+    width: 24px;
+    height: 24px;
+    border-radius: 50%;
+    background: radial-gradient(circle, #fff 10%, var(--accent, #e02424) 80%);
+    border: 2px solid #ffffff;
+    box-shadow: 0 0 16px var(--accent, #e02424), 0 0 28px var(--accent, #e02424);
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    transition: transform 0.04s ease-out;
+  }
+  .xy-coords-badge {
+    position: absolute;
+    bottom: 8px;
+    right: 8px;
+    font-size: 9.5px;
+    font-family: 'JetBrains Mono', monospace;
+    font-weight: bold;
+    background: rgba(0,0,0,0.7);
+    color: #38bdf8;
+    padding: 3px 8px;
+    border-radius: 4px;
+    border: 1px solid rgba(255,255,255,0.1);
+    pointer-events: none;
+  }
+
+  /* 8 Large Macro Performance Encoders */
+  .macro-encoders-grid {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 16px;
+    margin-top: 10px;
+  }
+  @media (max-width: 768px) {
+    .macro-encoders-grid {
+      grid-template-columns: repeat(2, 1fr);
+    }
+  }
+
 </style>
 </head>
 <body>
 
-
-<div class="app-header">
+<!-- Floating Touch Bubble to eliminate touch occlusion on iPad/Touchscreen -->
+<div id="knobTouchBubble">
+  <div class="bubble-label" id="bubbleLabel">CUTOFF</div>
+  <div class="bubble-val" id="bubbleVal">64</div>
+  <div class="bubble-sub" id="bubbleSub">CC 40 • 50%</div>
+</div>
   <div class="app-header-left">
     <div style="display: flex; align-items: center; gap: 8px; position: relative;">
       <h1 style="margin: 0; font-size: 24px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap;">VIRUS-H</h1>
@@ -4727,11 +5129,12 @@
     <div class="segmented-control" id="partTabs">
       <button class="segmented-tab active" id="btnTabSnow">TI-SNOW</button>
       <button class="segmented-tab" id="btnTabMultipart">MULTI</button>
+      <button class="segmented-tab" id="btnTabSynth">SINGLE</button>
+      <button class="segmented-tab" id="btnTabFxRack">🎛 FX RACK</button>
       <button class="segmented-tab" id="btnTabPatchManager">PATCH</button>
       <button class="segmented-tab" id="btnTabArp">ARP</button>
       <button class="segmented-tab" id="btnTabSequencer">SEQ</button>
       <button class="segmented-tab" id="btnTabSong">SONG</button>
-      <button class="segmented-tab" id="btnTabSynth">SINGLE</button>
     </div>
   </div>
 
@@ -5039,6 +5442,9 @@
 <!-- 64-STEP SEQUENCER -->
 <div id="sequencerContent" class="main-content single-view" style="display: none; padding-bottom: 240px;"></div>
 <div id="songContent" class="main-content" style="display: none;"></div>
+
+<!-- STUDIO FX RACK & MACRO PERFORMANCE -->
+<div id="fxRackContent" class="main-content" style="display: none; padding-bottom: 240px;"></div>
 
 <!-- FRONTALE HARDWARE ACCESS VIRUS TI SNOW -->
 <div id="snowFrontView" class="main-content" style="display: block;">
@@ -5687,12 +6093,29 @@
     if (snow) snow.style.display = 'none';
     document.getElementById('singleView').style.display = 'none';
     document.getElementById('multiView').style.display = 'none';
+    const fx = document.getElementById('fxRackContent');
+    if (fx) fx.style.display = 'none';
     document.getElementById('patchManagerContent').style.display = 'none';
     document.getElementById('arpContent').style.display = 'none';
     document.getElementById('sequencerContent').style.display = 'none';
     document.getElementById('songContent').style.display = 'none';
 
     document.querySelectorAll('.segmented-tab').forEach(btn => btn.classList.remove('active'));
+  }
+
+  const btnTabFxRack = document.getElementById('btnTabFxRack');
+  if (btnTabFxRack) {
+    btnTabFxRack.addEventListener('click', () => {
+      hideAllViews();
+      updateTopPanelsVisibility('fx');
+      const v = document.getElementById('fxRackContent');
+      if (v) v.style.display = 'block';
+      btnTabFxRack.classList.add('active');
+      if (typeof triggerHapticFeedback === 'function') triggerHapticFeedback();
+      updateControlRoomStatus();
+      if (typeof renderFxRackView === 'function') renderFxRackView();
+      if (typeof updateKeyboardPartDisplay === 'function') updateKeyboardPartDisplay();
+    });
   }
 
   const btnTabSnow = document.getElementById('btnTabSnow');
@@ -14918,8 +15341,740 @@ function exportCurrentPatchSyx() {
     }
   }
 
+  // ==========================================================================
+  // TABLET & TOUCH ERGONOMICS (Floating Touch Bubble, Haptics, Double-tap Reset)
+  // ==========================================================================
+  function triggerHapticFeedback(duration = 8) {
+    if (typeof navigator !== 'undefined' && navigator.vibrate) {
+      try { navigator.vibrate(duration); } catch (_) {}
+    }
+  }
+  window.triggerHapticFeedback = triggerHapticFeedback;
+
+  function initTouchErgonomics() {
+    const bubble = document.getElementById('knobTouchBubble');
+    const bubbleLabel = document.getElementById('bubbleLabel');
+    const bubbleVal = document.getElementById('bubbleVal');
+    const bubbleSub = document.getElementById('bubbleSub');
+    if (!bubble) return;
+
+    let activeTouchKnob = null;
+
+    function showBubble(label, val, sub, clientX, clientY) {
+      if (!bubble) return;
+      if (bubbleLabel) bubbleLabel.textContent = label || 'PARAM';
+      if (bubbleVal) bubbleVal.textContent = String(val);
+      if (bubbleSub) bubbleSub.textContent = sub || '';
+      bubble.style.left = `${clientX}px`;
+      bubble.style.top = `${Math.max(10, clientY - 48)}px`;
+      bubble.style.display = 'flex';
+      bubble.style.opacity = '1';
+    }
+
+    function hideBubble() {
+      if (!bubble) return;
+      bubble.style.opacity = '0';
+      setTimeout(() => {
+        if (bubble.style.opacity === '0') bubble.style.display = 'none';
+      }, 100);
+      activeTouchKnob = null;
+    }
+
+    window.showTouchKnobBubble = showBubble;
+    window.hideTouchKnobBubble = hideBubble;
+
+    // Attach global touch listener for floating bubble on any knob
+    document.addEventListener('touchstart', (e) => {
+      const knob = e.target.closest('.chassis-knob-outer, .snow-front-knob, .knob-container, .fx-rack-knob-unit');
+      if (knob && e.touches && e.touches[0]) {
+        activeTouchKnob = knob;
+        triggerHapticFeedback(10);
+        const t = e.touches[0];
+        const label = knob.getAttribute('title') || knob.querySelector('.snow-knob-top-label, .knob-label, .fx-knob-label')?.textContent || 'KNOB';
+        const val = knob.dataset.val || knob.querySelector('.snow-front-val, .knob-value, .fx-knob-val')?.textContent || '64';
+        showBubble(label, val, 'TOUCH CONTROL', t.clientX, t.clientY);
+      }
+    }, { passive: true });
+
+    document.addEventListener('touchmove', (e) => {
+      if (activeTouchKnob && e.touches && e.touches[0]) {
+        const t = e.touches[0];
+        const val = activeTouchKnob.dataset.val || activeTouchKnob.querySelector('.snow-front-val, .knob-value, .fx-knob-val')?.textContent || '';
+        if (bubbleVal && val) bubbleVal.textContent = String(val);
+        bubble.style.left = `${t.clientX}px`;
+        bubble.style.top = `${Math.max(10, t.clientY - 48)}px`;
+      }
+    }, { passive: true });
+
+    document.addEventListener('touchend', hideBubble, { passive: true });
+    document.addEventListener('touchcancel', hideBubble, { passive: true });
+
+    // Double-tap to reset on touch devices
+    let lastTapTime = 0;
+    document.addEventListener('touchend', (e) => {
+      const knob = e.target.closest('.chassis-knob-outer, .snow-front-knob, .fx-rack-knob-unit');
+      if (!knob) return;
+      const now = Date.now();
+      if (now - lastTapTime < 300 && e.changedTouches && e.changedTouches[0]) {
+        triggerHapticFeedback(20);
+        const defaultVal = knob.dataset.defaultVal !== undefined ? parseInt(knob.dataset.defaultVal, 10) : 64;
+        if (typeof knob._setValue === 'function') {
+          knob._setValue(defaultVal, true);
+        } else if (knob.id && typeof setFrontKnob === 'function') {
+          const indId = knob.id + 'Ind';
+          const valId = knob.id.replace('Knob', 'Val');
+          setFrontKnob(knob.id, indId, valId, defaultVal);
+        }
+        showBubble('RESET', defaultVal, 'DEFAULT VALUE', e.changedTouches[0].clientX, e.changedTouches[0].clientY);
+        setTimeout(hideBubble, 600);
+      }
+      lastTapTime = now;
+    }, { passive: true });
+  }
+
+  // ==========================================================================
+  // STUDIO FX RACK & MACRO PERFORMANCE CONTROLLER
+  // ==========================================================================
+  window.fxTargetPart = 0; // 0=P1, 1=P2, 2=P3, 3=P4, -1=ALL
+  let fxCanvasesInitialized = false;
+
+  function sendFxCC(cc, val) {
+    if (!selectedOutput) return;
+    if (window.fxTargetPart === -1) {
+      for (let p = 0; p < NUM_PARTS; p++) {
+        const ch = multiParts[p] ? multiParts[p].channel : p;
+        sendCC(ch, cc, val);
+      }
+    } else {
+      const p = Math.max(0, Math.min(NUM_PARTS - 1, window.fxTargetPart || 0));
+      const ch = multiParts[p] ? multiParts[p].channel : p;
+      sendCC(ch, cc, val);
+    }
+  }
+
+  function buildFxRackView() {
+    const container = document.getElementById('fxRackContent');
+    if (!container) return;
+
+    container.innerHTML = `
+      <div class="hardware-chassis fx-rack-chassis">
+        <div class="chassis-screw screw-tl"></div>
+        <div class="chassis-screw screw-tr"></div>
+        <div class="chassis-screw screw-bl"></div>
+        <div class="chassis-screw screw-br"></div>
+
+        <!-- Top Header & Target Part Selector -->
+        <div class="fx-rack-topbar">
+          <div class="fx-rack-title-box">
+            <span class="fx-rack-badge">STUDIO RACK</span>
+            <span class="fx-rack-title">VIRUS-TI MULTI-EFFECTS &amp; MACRO PROCESSOR</span>
+          </div>
+          <div class="fx-target-selector">
+            <span style="font-size: 9px; font-weight: 800; color: #94a3b8; margin-right: 4px;">TARGET PART:</span>
+            <button class="fx-part-btn active" data-part="0">P1</button>
+            <button class="fx-part-btn" data-part="1">P2</button>
+            <button class="fx-part-btn" data-part="2">P3</button>
+            <button class="fx-part-btn" data-part="3">P4</button>
+            <button class="fx-part-btn" data-part="-1">ALL</button>
+          </div>
+        </div>
+
+        <div class="fx-rack-grid">
+          <!-- MODULE 1: VINTAGE TAPE DELAY & REVERB SPACE -->
+          <div class="fx-unit">
+            <div class="fx-unit-header">
+              <div class="fx-unit-name">
+                <span class="fx-unit-led"></span>
+                <span>TAPE DELAY &amp; REVERBERATION SPACE</span>
+              </div>
+              <div style="font-size: 8.5px; font-weight: 700; color: #64748b; font-family: monospace;">UNIT 01 // DSP</div>
+            </div>
+
+            <!-- Tape Reels Visualizer Canvas -->
+            <canvas id="fxTapeCanvas" class="fx-scope-canvas" height="64"></canvas>
+
+            <div class="fx-knobs-row">
+              <div class="fx-rack-knob-unit" data-cc="88" data-min="0" data-max="127" data-val="48" title="Delay Time (CC 88)">
+                <span class="fx-knob-label">TIME</span>
+                <div class="chassis-knob-outer fx-rack-knob" style="width: 46px; height: 46px; cursor: grab;">
+                  <div class="chassis-knob-inner" style="width: 40px; height: 40px;">
+                    <div class="chassis-knob-top" style="width: 30px; height: 30px;">
+                      <div class="chassis-knob-indicator-container" style="transform: rotate(-35deg);"><div class="chassis-knob-indicator" style="height: 10px; width: 2px;"></div></div>
+                    </div>
+                  </div>
+                </div>
+                <span class="fx-knob-val">375ms</span>
+              </div>
+
+              <div class="fx-rack-knob-unit" data-cc="90" data-min="0" data-max="127" data-val="55" title="Delay Feedback (CC 90)">
+                <span class="fx-knob-label">FEEDBACK</span>
+                <div class="chassis-knob-outer fx-rack-knob" style="width: 46px; height: 46px; cursor: grab;">
+                  <div class="chassis-knob-inner" style="width: 40px; height: 40px;">
+                    <div class="chassis-knob-top" style="width: 30px; height: 30px;">
+                      <div class="chassis-knob-indicator-container" style="transform: rotate(10deg);"><div class="chassis-knob-indicator" style="height: 10px; width: 2px;"></div></div>
+                    </div>
+                  </div>
+                </div>
+                <span class="fx-knob-val">55%</span>
+              </div>
+
+              <div class="fx-rack-knob-unit" data-cc="91" data-min="0" data-max="127" data-val="40" title="Delay Mix (CC 91)">
+                <span class="fx-knob-label">DELAY MIX</span>
+                <div class="chassis-knob-outer fx-rack-knob" style="width: 46px; height: 46px; cursor: grab;">
+                  <div class="chassis-knob-inner" style="width: 40px; height: 40px;">
+                    <div class="chassis-knob-top" style="width: 30px; height: 30px;">
+                      <div class="chassis-knob-indicator-container" style="transform: rotate(-45deg);"><div class="chassis-knob-indicator" style="height: 10px; width: 2px;"></div></div>
+                    </div>
+                  </div>
+                </div>
+                <span class="fx-knob-val">31%</span>
+              </div>
+
+              <div class="fx-rack-knob-unit" data-cc="92" data-min="0" data-max="127" data-val="65" title="Reverb Decay (CC 92)">
+                <span class="fx-knob-label">REV DECAY</span>
+                <div class="chassis-knob-outer fx-rack-knob" style="width: 46px; height: 46px; cursor: grab;">
+                  <div class="chassis-knob-inner" style="width: 40px; height: 40px;">
+                    <div class="chassis-knob-top" style="width: 30px; height: 30px;">
+                      <div class="chassis-knob-indicator-container" style="transform: rotate(25deg);"><div class="chassis-knob-indicator" style="height: 10px; width: 2px;"></div></div>
+                    </div>
+                  </div>
+                </div>
+                <span class="fx-knob-val">3.2s</span>
+              </div>
+
+              <div class="fx-rack-knob-unit" data-cc="94" data-min="0" data-max="127" data-val="35" title="Reverb Mix (CC 94)">
+                <span class="fx-knob-label">REV MIX</span>
+                <div class="chassis-knob-outer fx-rack-knob" style="width: 46px; height: 46px; cursor: grab;">
+                  <div class="chassis-knob-inner" style="width: 40px; height: 40px;">
+                    <div class="chassis-knob-top" style="width: 30px; height: 30px;">
+                      <div class="chassis-knob-indicator-container" style="transform: rotate(-55deg);"><div class="chassis-knob-indicator" style="height: 10px; width: 2px;"></div></div>
+                    </div>
+                  </div>
+                </div>
+                <span class="fx-knob-val">28%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- MODULE 2: VACUUM TUBE DRIVE & SATURATION -->
+          <div class="fx-unit">
+            <div class="fx-unit-header">
+              <div class="fx-unit-name">
+                <span class="fx-unit-led" style="background: #f97316; box-shadow: 0 0 8px #f97316;"></span>
+                <span>VACUUM TUBE DRIVE &amp; SATURATION</span>
+              </div>
+              <div style="font-size: 8.5px; font-weight: 700; color: #64748b; font-family: monospace;">UNIT 02 // ANALOG TUBE</div>
+            </div>
+
+            <!-- Interactive 12AX7 Vacuum Tube Visualizer -->
+            <div class="tube-container">
+              <div class="vacuum-tube" id="tubeVisualizer">
+                <div class="tube-glow" id="tubeGlow" style="opacity: 0.55; transform: scale(1);"></div>
+                <div class="tube-plate"></div>
+              </div>
+              <canvas id="fxTubeCurveCanvas" class="fx-scope-canvas" style="width: 170px; height: 74px;"></canvas>
+            </div>
+
+            <div class="fx-knobs-row">
+              <div class="fx-rack-knob-unit" data-cc="75" data-min="0" data-max="127" data-val="32" title="Distortion Drive (CC 75)">
+                <span class="fx-knob-label">DRIVE</span>
+                <div class="chassis-knob-outer fx-rack-knob" style="width: 46px; height: 46px; cursor: grab;">
+                  <div class="chassis-knob-inner" style="width: 40px; height: 40px;">
+                    <div class="chassis-knob-top" style="width: 30px; height: 30px;">
+                      <div class="chassis-knob-indicator-container" style="transform: rotate(-60deg);"><div class="chassis-knob-indicator" style="height: 10px; width: 2px; background: #f97316;"></div></div>
+                    </div>
+                  </div>
+                </div>
+                <span class="fx-knob-val" id="fxTubeDriveVal">32</span>
+              </div>
+
+              <div class="fx-rack-knob-unit" data-cc="72" data-min="0" data-max="5" data-val="1" title="Curve Type (CC 72)">
+                <span class="fx-knob-label">CURVE</span>
+                <div class="chassis-knob-outer fx-rack-knob" style="width: 46px; height: 46px; cursor: grab;">
+                  <div class="chassis-knob-inner" style="width: 40px; height: 40px;">
+                    <div class="chassis-knob-top" style="width: 30px; height: 30px;">
+                      <div class="chassis-knob-indicator-container" style="transform: rotate(-90deg);"><div class="chassis-knob-indicator" style="height: 10px; width: 2px;"></div></div>
+                    </div>
+                  </div>
+                </div>
+                <span class="fx-knob-val" id="fxTubeCurveVal">TUBE</span>
+              </div>
+
+              <div class="fx-rack-knob-unit" data-cc="76" data-min="0" data-max="127" data-val="70" title="Distortion Tone (CC 76)">
+                <span class="fx-knob-label">TONE</span>
+                <div class="chassis-knob-outer fx-rack-knob" style="width: 46px; height: 46px; cursor: grab;">
+                  <div class="chassis-knob-inner" style="width: 40px; height: 40px;">
+                    <div class="chassis-knob-top" style="width: 30px; height: 30px;">
+                      <div class="chassis-knob-indicator-container" style="transform: rotate(30deg);"><div class="chassis-knob-indicator" style="height: 10px; width: 2px;"></div></div>
+                    </div>
+                  </div>
+                </div>
+                <span class="fx-knob-val">70</span>
+              </div>
+
+              <div class="fx-rack-knob-unit" data-cc="77" data-min="0" data-max="127" data-val="50" title="Dry / Wet Mix">
+                <span class="fx-knob-label">DRY/WET</span>
+                <div class="chassis-knob-outer fx-rack-knob" style="width: 46px; height: 46px; cursor: grab;">
+                  <div class="chassis-knob-inner" style="width: 40px; height: 40px;">
+                    <div class="chassis-knob-top" style="width: 30px; height: 30px;">
+                      <div class="chassis-knob-indicator-container" style="transform: rotate(0deg);"><div class="chassis-knob-indicator" style="height: 10px; width: 2px;"></div></div>
+                    </div>
+                  </div>
+                </div>
+                <span class="fx-knob-val">50%</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- MODULE 3: STEREO CHORUS & 6-STAGE PHASER -->
+          <div class="fx-unit">
+            <div class="fx-unit-header">
+              <div class="fx-unit-name">
+                <span class="fx-unit-led" style="background: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
+                <span>STEREO CHORUS &amp; 6-STAGE PHASER</span>
+              </div>
+              <div style="font-size: 8.5px; font-weight: 700; color: #64748b; font-family: monospace;">UNIT 03 // MODULATION</div>
+            </div>
+
+            <!-- Stereo Lissajous Canvas -->
+            <canvas id="fxStereoCanvas" class="fx-scope-canvas" height="64"></canvas>
+
+            <div class="fx-knobs-row">
+              <div class="fx-rack-knob-unit" data-cc="85" data-min="0" data-max="127" data-val="60" title="Chorus Depth (CC 85)">
+                <span class="fx-knob-label">CHORUS DEPTH</span>
+                <div class="chassis-knob-outer fx-rack-knob" style="width: 46px; height: 46px; cursor: grab;">
+                  <div class="chassis-knob-inner" style="width: 40px; height: 40px;">
+                    <div class="chassis-knob-top" style="width: 30px; height: 30px;">
+                      <div class="chassis-knob-indicator-container" style="transform: rotate(20deg);"><div class="chassis-knob-indicator" style="height: 10px; width: 2px;"></div></div>
+                    </div>
+                  </div>
+                </div>
+                <span class="fx-knob-val">60%</span>
+              </div>
+
+              <div class="fx-rack-knob-unit" data-cc="86" data-min="0" data-max="127" data-val="35" title="Chorus Rate (CC 86)">
+                <span class="fx-knob-label">RATE</span>
+                <div class="chassis-knob-outer fx-rack-knob" style="width: 46px; height: 46px; cursor: grab;">
+                  <div class="chassis-knob-inner" style="width: 40px; height: 40px;">
+                    <div class="chassis-knob-top" style="width: 30px; height: 30px;">
+                      <div class="chassis-knob-indicator-container" style="transform: rotate(-55deg);"><div class="chassis-knob-indicator" style="height: 10px; width: 2px;"></div></div>
+                    </div>
+                  </div>
+                </div>
+                <span class="fx-knob-val">1.2Hz</span>
+              </div>
+
+              <div class="fx-rack-knob-unit" data-cc="87" data-min="0" data-max="127" data-val="45" title="Chorus / Phaser Mix (CC 87)">
+                <span class="fx-knob-label">MOD MIX</span>
+                <div class="chassis-knob-outer fx-rack-knob" style="width: 46px; height: 46px; cursor: grab;">
+                  <div class="chassis-knob-inner" style="width: 40px; height: 40px;">
+                    <div class="chassis-knob-top" style="width: 30px; height: 30px;">
+                      <div class="chassis-knob-indicator-container" style="transform: rotate(-25deg);"><div class="chassis-knob-indicator" style="height: 10px; width: 2px;"></div></div>
+                    </div>
+                  </div>
+                </div>
+                <span class="fx-knob-val">35%</span>
+              </div>
+
+              <div class="fx-rack-knob-unit" data-cc="96" data-min="0" data-max="127" data-val="90" title="Stereo Spread (CC 96)">
+                <span class="fx-knob-label">SPREAD</span>
+                <div class="chassis-knob-outer fx-rack-knob" style="width: 46px; height: 46px; cursor: grab;">
+                  <div class="chassis-knob-inner" style="width: 40px; height: 40px;">
+                    <div class="chassis-knob-top" style="width: 30px; height: 30px;">
+                      <div class="chassis-knob-indicator-container" style="transform: rotate(65deg);"><div class="chassis-knob-indicator" style="height: 10px; width: 2px;"></div></div>
+                    </div>
+                  </div>
+                </div>
+                <span class="fx-knob-val">WIDE</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- MODULE 4: TOUCH X/Y MACRO PERFORMANCE PAD -->
+          <div class="fx-unit">
+            <div class="fx-unit-header">
+              <div class="fx-unit-name">
+                <span class="fx-unit-led" style="background: #a855f7; box-shadow: 0 0 8px #a855f7;"></span>
+                <span>TOUCH X/Y KAOSS SURFACE &amp; MACRO PERFORMANCE</span>
+              </div>
+              <div style="font-size: 8.5px; font-weight: 700; color: #64748b; font-family: monospace;">UNIT 04 // LIVE EXPRESSION</div>
+            </div>
+
+            <!-- X/Y Touch Surface with Crosshairs and Puck -->
+            <div class="xy-pad-surface" id="fxXySurface" title="Trascina il dito/mouse per modulare Cutoff (X) e Resonance/Reverb (Y)">
+              <div class="xy-crosshair-x" id="xyCrosshairX" style="left: 50%;"></div>
+              <div class="xy-crosshair-y" id="xyCrosshairY" style="top: 50%;"></div>
+              <div class="xy-pointer-puck" id="xyPointerPuck" style="left: 50%; top: 50%;"></div>
+              <div class="xy-coords-badge" id="xyCoordsBadge">CUTOFF: 50% | RESO: 50%</div>
+            </div>
+
+            <!-- 4 Macro Knobs -->
+            <div class="macro-encoders-grid">
+              <div class="fx-rack-knob-unit" data-cc="40" data-min="0" data-max="127" data-val="64" title="Macro 1: Filter Cutoff (CC 40)">
+                <span class="fx-knob-label">1: CUTOFF</span>
+                <div class="chassis-knob-outer fx-rack-knob" style="width: 46px; height: 46px; cursor: grab;">
+                  <div class="chassis-knob-inner" style="width: 40px; height: 40px;">
+                    <div class="chassis-knob-top" style="width: 30px; height: 30px;"><div class="chassis-knob-indicator-container" style="transform: rotate(0deg);"><div class="chassis-knob-indicator" style="height: 10px; width: 2px;"></div></div></div>
+                  </div>
+                </div>
+                <span class="fx-knob-val">64</span>
+              </div>
+
+              <div class="fx-rack-knob-unit" data-cc="41" data-min="0" data-max="127" data-val="32" title="Macro 2: Filter Resonance (CC 41)">
+                <span class="fx-knob-label">2: RESO</span>
+                <div class="chassis-knob-outer fx-rack-knob" style="width: 46px; height: 46px; cursor: grab;">
+                  <div class="chassis-knob-inner" style="width: 40px; height: 40px;">
+                    <div class="chassis-knob-top" style="width: 30px; height: 30px;"><div class="chassis-knob-indicator-container" style="transform: rotate(-60deg);"><div class="chassis-knob-indicator" style="height: 10px; width: 2px;"></div></div></div>
+                  </div>
+                </div>
+                <span class="fx-knob-val">32</span>
+              </div>
+
+              <div class="fx-rack-knob-unit" data-cc="75" data-min="0" data-max="127" data-val="32" title="Macro 3: Tube Drive (CC 75)">
+                <span class="fx-knob-label">3: DRIVE</span>
+                <div class="chassis-knob-outer fx-rack-knob" style="width: 46px; height: 46px; cursor: grab;">
+                  <div class="chassis-knob-inner" style="width: 40px; height: 40px;">
+                    <div class="chassis-knob-top" style="width: 30px; height: 30px;"><div class="chassis-knob-indicator-container" style="transform: rotate(-60deg);"><div class="chassis-knob-indicator" style="height: 10px; width: 2px; background: #f97316;"></div></div></div>
+                  </div>
+                </div>
+                <span class="fx-knob-val">32</span>
+              </div>
+
+              <div class="fx-rack-knob-unit" data-cc="94" data-min="0" data-max="127" data-val="35" title="Macro 4: Reverb Mix (CC 94)">
+                <span class="fx-knob-label">4: REVERB</span>
+                <div class="chassis-knob-outer fx-rack-knob" style="width: 46px; height: 46px; cursor: grab;">
+                  <div class="chassis-knob-inner" style="width: 40px; height: 40px;">
+                    <div class="chassis-knob-top" style="width: 30px; height: 30px;"><div class="chassis-knob-indicator-container" style="transform: rotate(-55deg);"><div class="chassis-knob-indicator" style="height: 10px; width: 2px;"></div></div></div>
+                  </div>
+                </div>
+                <span class="fx-knob-val">35</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    `;
+
+    initFxRackInteractions();
+    initFxRackCanvases();
+  }
+
+  function initFxRackInteractions() {
+    // Target Part Selector
+    document.querySelectorAll('.fx-part-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        triggerHapticFeedback(12);
+        document.querySelectorAll('.fx-part-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        window.fxTargetPart = parseInt(btn.dataset.part, 10);
+      });
+    });
+
+    // Knob drag logic for FX Rack
+    document.querySelectorAll('.fx-rack-knob-unit').forEach(unit => {
+      const knob = unit.querySelector('.fx-rack-knob');
+      const ind = unit.querySelector('.chassis-knob-indicator-container');
+      const valEl = unit.querySelector('.fx-knob-val');
+      const cc = parseInt(unit.dataset.cc, 10);
+      const minVal = parseInt(unit.dataset.min, 10) || 0;
+      const maxVal = parseInt(unit.dataset.max, 10) || 127;
+
+      let isDragging = false;
+      let startY = 0;
+      let startVal = parseInt(unit.dataset.val, 10) || 0;
+
+      const onPointerMove = (e) => {
+        if (!isDragging) return;
+        if (e.cancelable) e.preventDefault();
+        const clientY = e.clientY ?? (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+        const delta = startY - clientY;
+        let newVal = Math.round(startVal + delta * ((maxVal - minVal) / 100));
+        newVal = Math.max(minVal, Math.min(maxVal, newVal));
+        unit.dataset.val = String(newVal);
+
+        // Update rotation (-135deg to +135deg)
+        const angle = -135 + ((newVal - minVal) / (maxVal - minVal)) * 270;
+        if (ind) ind.style.transform = `rotate(${angle}deg)`;
+
+        // Formatted display
+        if (valEl) {
+          if (cc === 72) {
+            const types = ['OFF', 'TUBE', 'HARD', 'FOLD', 'CRUSH', 'RECT'];
+            valEl.textContent = types[newVal] || String(newVal);
+          } else if (cc === 88) {
+            valEl.textContent = `${Math.round(20 + newVal * 7.5)}ms`;
+          } else if (cc === 92) {
+            valEl.textContent = `${(0.2 + newVal * 0.08).toFixed(1)}s`;
+          } else if (cc === 86) {
+            valEl.textContent = `${(0.1 + newVal * 0.04).toFixed(1)}Hz`;
+          } else if (cc === 96) {
+            valEl.textContent = newVal > 64 ? 'WIDE' : 'NARROW';
+          } else {
+            valEl.textContent = `${newVal}`;
+          }
+        }
+
+        // Send MIDI CC
+        sendFxCC(cc, newVal);
+
+        // Special visual reaction for Vacuum Tube Drive
+        if (cc === 75) {
+          const glow = document.getElementById('tubeGlow');
+          if (glow) {
+            const intensity = 0.3 + (newVal / 127) * 0.7;
+            glow.style.opacity = intensity.toFixed(2);
+            glow.style.transform = `scale(${1 + (newVal / 127) * 0.35})`;
+          }
+        }
+      };
+
+      const onPointerUp = () => {
+        if (!isDragging) return;
+        isDragging = false;
+        window.removeEventListener('mousemove', onPointerMove);
+        window.removeEventListener('mouseup', onPointerUp);
+        window.removeEventListener('touchmove', onPointerMove);
+        window.removeEventListener('touchend', onPointerUp);
+      };
+
+      const onPointerDown = (e) => {
+        if (e.cancelable) e.preventDefault();
+        isDragging = true;
+        startY = e.clientY ?? (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+        startVal = parseInt(unit.dataset.val, 10) || 0;
+        window.addEventListener('mousemove', onPointerMove);
+        window.addEventListener('mouseup', onPointerUp);
+        window.addEventListener('touchmove', onPointerMove, { passive: false });
+        window.addEventListener('touchend', onPointerUp);
+      };
+
+      if (knob) {
+        knob.addEventListener('mousedown', onPointerDown);
+        knob.addEventListener('touchstart', onPointerDown, { passive: false });
+      }
+    });
+
+    // Touch X/Y Kaoss Pad Surface
+    const pad = document.getElementById('fxXySurface');
+    const crossX = document.getElementById('xyCrosshairX');
+    const crossY = document.getElementById('xyCrosshairY');
+    const puck = document.getElementById('xyPointerPuck');
+    const badge = document.getElementById('xyCoordsBadge');
+
+    if (pad) {
+      let isPadActive = false;
+
+      const handlePadCoord = (clientX, clientY) => {
+        const rect = pad.getBoundingClientRect();
+        const normX = Math.max(0, Math.min(1, (clientX - rect.left) / rect.width));
+        const normY = Math.max(0, Math.min(1, (clientY - rect.top) / rect.height));
+
+        const posX = Math.round(normX * 100);
+        const posY = Math.round(normY * 100);
+
+        if (crossX) crossX.style.left = `${posX}%`;
+        if (crossY) crossY.style.top = `${posY}%`;
+        if (puck) {
+          puck.style.left = `${posX}%`;
+          puck.style.top = `${posY}%`;
+        }
+
+        const cutVal = Math.round(normX * 127);
+        const resVal = Math.round((1 - normY) * 127);
+
+        if (badge) badge.textContent = `CUTOFF: ${cutVal} | RESO: ${resVal}`;
+
+        // Send MIDI CC: Cutoff (CC 40) on X, Resonance (CC 41) on Y
+        sendFxCC(40, cutVal);
+        sendFxCC(41, resVal);
+
+        // Update single editor knob indicators if present
+        const f1Cut = document.getElementById('frontKnobCutoff');
+        if (f1Cut && typeof setFrontKnob === 'function') {
+          setFrontKnob('frontKnobCutoff', 'frontKnobCutoffInd', 'frontValCutoff', cutVal);
+        }
+      };
+
+      const onPadDown = (e) => {
+        if (e.cancelable) e.preventDefault();
+        isPadActive = true;
+        triggerHapticFeedback(12);
+        const clientX = e.clientX ?? (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+        const clientY = e.clientY ?? (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+        handlePadCoord(clientX, clientY);
+      };
+
+      const onPadMove = (e) => {
+        if (!isPadActive) return;
+        if (e.cancelable) e.preventDefault();
+        const clientX = e.clientX ?? (e.touches && e.touches[0] ? e.touches[0].clientX : 0);
+        const clientY = e.clientY ?? (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
+        handlePadCoord(clientX, clientY);
+      };
+
+      const onPadUp = () => {
+        isPadActive = false;
+      };
+
+      pad.addEventListener('mousedown', onPadDown);
+      window.addEventListener('mousemove', onPadMove);
+      window.addEventListener('mouseup', onPadUp);
+
+      pad.addEventListener('touchstart', onPadDown, { passive: false });
+      window.addEventListener('touchmove', onPadMove, { passive: false });
+      window.addEventListener('touchend', onPadUp);
+    }
+  }
+
+  function initFxRackCanvases() {
+    if (fxCanvasesInitialized) return;
+    fxCanvasesInitialized = true;
+
+    // Tape Reels Animation
+    const tapeCv = document.getElementById('fxTapeCanvas');
+    let tapeAngle = 0;
+
+    function renderTape() {
+      if (tapeCv && tapeCv.offsetParent !== null) {
+        const ctx = tapeCv.getContext('2d');
+        const w = tapeCv.width = tapeCv.clientWidth;
+        const h = tapeCv.height = 64;
+
+        ctx.clearRect(0, 0, w, h);
+        tapeAngle += 0.04;
+
+        // Draw Left Reel
+        const r1x = w * 0.28;
+        const r2x = w * 0.72;
+        const ry = h * 0.5;
+        const radius = 22;
+
+        [r1x, r2x].forEach((rx, idx) => {
+          ctx.save();
+          ctx.translate(rx, ry);
+          ctx.rotate(idx === 0 ? tapeAngle : -tapeAngle * 0.95);
+
+          // Reel outer flange
+          ctx.beginPath();
+          ctx.arc(0, 0, radius, 0, Math.PI * 2);
+          ctx.strokeStyle = '#475569';
+          ctx.lineWidth = 2;
+          ctx.stroke();
+
+          // 3 Spokes
+          for (let i = 0; i < 3; i++) {
+            ctx.save();
+            ctx.rotate((Math.PI * 2 / 3) * i);
+            ctx.beginPath();
+            ctx.moveTo(0, 0);
+            ctx.lineTo(radius - 2, 0);
+            ctx.strokeStyle = '#64748b';
+            ctx.lineWidth = 2.5;
+            ctx.stroke();
+            ctx.restore();
+          }
+
+          // Center Hub
+          ctx.beginPath();
+          ctx.arc(0, 0, 6, 0, Math.PI * 2);
+          ctx.fillStyle = '#94a3b8';
+          ctx.fill();
+          ctx.restore();
+        });
+
+        // Tape path line
+        ctx.beginPath();
+        ctx.moveTo(r1x, ry + radius);
+        ctx.lineTo(r2x, ry + radius);
+        ctx.strokeStyle = '#94a3b8';
+        ctx.lineWidth = 1.5;
+        ctx.stroke();
+      }
+      requestAnimationFrame(renderTape);
+    }
+    requestAnimationFrame(renderTape);
+
+    // Tube Transfer Saturation Curve
+    function drawTubeCurve(driveVal = 32) {
+      const tubeCv = document.getElementById('fxTubeCurveCanvas');
+      if (!tubeCv) return;
+      const ctx = tubeCv.getContext('2d');
+      if (!ctx) return;
+      const w = tubeCv.width = 170;
+      const h = tubeCv.height = 74;
+
+      ctx.fillStyle = '#0a0c10';
+      ctx.fillRect(0, 0, w, h);
+
+      // Grid
+      ctx.strokeStyle = 'rgba(255,255,255,0.08)';
+      ctx.lineWidth = 1;
+      ctx.beginPath();
+      ctx.moveTo(0, h / 2); ctx.lineTo(w, h / 2);
+      ctx.moveTo(w / 2, 0); ctx.lineTo(w / 2, h);
+      ctx.stroke();
+
+      // Dynamic sigmoid curve responding to Drive
+      ctx.beginPath();
+      ctx.strokeStyle = '#f97316';
+      ctx.lineWidth = 2.4;
+      const driveFactor = 0.8 + (driveVal / 127) * 3.8;
+      for (let x = 0; x < w; x++) {
+        const normX = (x / w) * 4 - 2;
+        const normY = Math.tanh(normX * driveFactor);
+        const y = h / 2 - normY * (h * 0.42);
+        if (x === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.stroke();
+    }
+    window.drawTubeCurve = drawTubeCurve;
+    setTimeout(() => drawTubeCurve(32), 150);
+
+    // Stereo Scope
+    const stCv = document.getElementById('fxStereoCanvas');
+    let scopePhase = 0;
+    function renderStereoScope() {
+      if (stCv) {
+        const w = stCv.clientWidth || 380;
+        const h = stCv.clientHeight || 64;
+        if (stCv.width !== w && w > 0) stCv.width = w;
+        if (stCv.height !== h && h > 0) stCv.height = h;
+
+        const ctx = stCv.getContext('2d');
+        if (ctx && w > 0) {
+          ctx.fillStyle = '#090a0d';
+          ctx.fillRect(0, 0, w, h);
+
+          scopePhase += 0.05;
+          ctx.beginPath();
+          ctx.strokeStyle = '#38bdf8';
+          ctx.lineWidth = 1.8;
+
+          for (let i = 0; i < 60; i++) {
+            const t = i * 0.1 + scopePhase;
+            const x = (w / 2) + Math.sin(t * 1.5) * (w * 0.35);
+            const y = (h / 2) + Math.sin(t * 2.0) * (h * 0.35);
+            if (i === 0) ctx.moveTo(x, y);
+            else ctx.lineTo(x, y);
+          }
+          ctx.stroke();
+        }
+      }
+      requestAnimationFrame(renderStereoScope);
+    }
+    requestAnimationFrame(renderStereoScope);
+  }
+
+  window.renderFxRackView = () => {
+    buildFxRackView();
+    if (typeof window.drawTubeCurve === 'function') setTimeout(window.drawTubeCurve, 60);
+  };
+
   buildSnowFrontView();
   buildMultiView();
+  buildFxRackView();
+  initTouchErgonomics();
   buildArpView();
   buildSeqView();
   buildSongView();
