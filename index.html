@@ -4314,7 +4314,7 @@
   }
 
   /* ===================================================================== */
-  /* MANOPOLE ORIGINALI ACCESS MUSIC VIRUS TI SNOW (OEM SOFT-TOUCH MATTE) */
+  /* MANOPOLE ORIGINALI ACCESS MUSIC VIRUS TI SNOW (OEM FLUTED SOFT-TOUCH) */
   /* ===================================================================== */
   .snow-front-knob.chassis-knob-outer {
     background: radial-gradient(circle at 35% 30%, #e2e5ec 0%, #bcc1cc 60%, #959ba7 100%) !important;
@@ -4325,34 +4325,38 @@
     border: 1px solid rgba(135, 140, 150, 0.45) !important;
   }
   .snow-front-knob .chassis-knob-inner {
-    /* Cilindro plastico satinato soft-touch Access OEM liscio senza zigrinature */
-    background: radial-gradient(circle at 35% 30%, #eff2f7 0%, #d5d9e3 38%, #b2b7c2 72%, #8e93a0 100%) !important;
+    /* Scanalature fluted verticali per il grip tactile Access OEM come da foto hardware */
+    background: repeating-conic-gradient(
+      from 0deg,
+      #c4c8d3 0deg 6deg,
+      #9ca0ad 6deg 12deg
+    ) !important;
     box-shadow:
-      inset 0 1.5px 2px rgba(255, 255, 255, 0.8),
-      inset 0 -2px 3px rgba(0, 0, 0, 0.25),
-      0 1px 2px rgba(0, 0, 0, 0.12) !important;
+      inset 0 1.5px 2px rgba(255, 255, 255, 0.85),
+      inset 0 -2px 3px rgba(0, 0, 0, 0.3),
+      0 2px 4px rgba(0, 0, 0, 0.18) !important;
     border: none !important;
   }
   .snow-front-knob .chassis-knob-top {
     /* Calotta superiore con smussatura a 45° morbida satinata e finitura opaca */
-    background: radial-gradient(circle at 45% 40%, #e2e5eb 0%, #c6cad4 55%, #b1b5c0 100%) !important;
+    background: radial-gradient(circle at 45% 40%, #e2e5eb 0%, #c4c8d2 60%, #aeb2bd 100%) !important;
     box-shadow:
       inset 0 1.5px 2px rgba(255, 255, 255, 0.95),
-      inset 0 -1px 2px rgba(0, 0, 0, 0.2),
+      inset 0 -1px 2px rgba(0, 0, 0, 0.25),
       0 1px 2px rgba(0, 0, 0, 0.15) !important;
     border: 1px solid rgba(145, 150, 160, 0.45) !important;
   }
   .snow-front-knob .chassis-knob-indicator {
-    /* Tacca di puntamento bianca a filo incisa originale Access */
-    top: 0px !important;
-    width: 2.8px !important;
-    height: 11px !important;
+    /* Ala / cresta di puntamento a rilievo con striscia bianca pura */
+    top: -2px !important;
+    width: 3.2px !important;
+    height: 13px !important;
     background: #ffffff !important;
-    border-radius: 1.5px 1.5px 0 0 !important;
+    border-radius: 2px 2px 0 0 !important;
     box-shadow:
-      0 0 1px rgba(0, 0, 0, 0.45),
+      0 1px 3px rgba(0, 0, 0, 0.6),
       inset 0 0.5px 1px #ffffff,
-      0 1px 2px rgba(0, 0, 0, 0.25) !important;
+      -1px 0 2px rgba(0, 0, 0, 0.25) !important;
   }
 
   /* MANOPOLE ACCESS VIRUS TI2 DARK STAR (OEM MATTE ANTHRACITE / CARBON) */
@@ -4365,11 +4369,15 @@
     border: 1px solid #14151b !important;
   }
   html[data-skin="elektron"] .snow-front-knob .chassis-knob-inner {
-    background: radial-gradient(circle at 35% 30%, #3a3e4a 0%, #242630 40%, #171820 75%, #0c0d11 100%) !important;
+    background: repeating-conic-gradient(
+      from 0deg,
+      #2f323c 0deg 6deg,
+      #181920 6deg 12deg
+    ) !important;
     box-shadow:
-      inset 0 1px 1.5px rgba(255, 255, 255, 0.12),
+      inset 0 1px 1.5px rgba(255, 255, 255, 0.15),
       inset 0 -2px 3px rgba(0, 0, 0, 0.7),
-      0 1px 2px rgba(0, 0, 0, 0.4) !important;
+      0 2px 4px rgba(0, 0, 0, 0.4) !important;
     border: none !important;
   }
   html[data-skin="elektron"] .snow-front-knob .chassis-knob-top {
@@ -4381,11 +4389,11 @@
     border: 1px solid rgba(40, 44, 54, 0.6) !important;
   }
   html[data-skin="elektron"] .snow-front-knob .chassis-knob-indicator {
-    top: 0px !important;
-    width: 2.8px !important;
-    height: 11px !important;
+    top: -2px !important;
+    width: 3.2px !important;
+    height: 13px !important;
     background: #ff2a3b !important;
-    box-shadow: 0 0 4px #ff2a3b, 0 0 8px rgba(255, 42, 59, 0.7) !important;
+    box-shadow: 0 0 5px #ff2a3b, 0 0 10px rgba(255, 42, 59, 0.8) !important;
   }
 
   /* RIGA ORIZZONTALE DELLE 4 MANOPOLE SOTTO IL DISPLAY (Volume, Value 1, 2, 3) */
@@ -4562,43 +4570,306 @@
     border-color: #b91c1c !important;
   }
 
-  /* Fila 3 Tasti Larghi: EDIT/SHIFT, PART, BANK/SEARCH */
-  .snow-bottom-3btns {
-    display: grid;
-    grid-template-columns: 1fr 1fr 1.2fr;
-    gap: 6px;
-    margin-top: 2px;
-  }
-  .snow-wide-tactile-btn {
-    font-size: 9.5px;
-    font-weight: 800;
-    letter-spacing: 0.05em;
-    padding: 6px 6px;
-    text-align: center;
-  }
-
-  /* MODULO FILTRO HARDWARE SAGOMATO (CUTOFF & RESONANCE) */
-  .snow-filter-module {
-    background: linear-gradient(180deg, rgba(255,255,255,0.5) 0%, rgba(220,225,235,0.3) 100%);
-    border: 1px solid rgba(170,175,190,0.5);
-    border-radius: 6px;
-    padding: 8px 12px 10px 12px;
+  /* VIEWPORT 3D E PROSPETTIVA INCLINATA REALE HARDWARE TI SNOW */
+  .snow-perspective-viewport {
+    perspective: 1300px;
+    perspective-origin: 50% 30%;
+    padding: 12px 0 28px 0;
     display: flex;
     flex-direction: column;
+    align-items: center;
+    overflow: visible;
+    width: 100%;
+  }
+  .snow-hardware-front {
+    transition: transform 0.4s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease;
+    transform-origin: 50% 85%;
+  }
+  .snow-hardware-front.tilted {
+    transform: rotateX(6.8deg) translateZ(0);
+    box-shadow:
+      0 34px 65px rgba(0, 0, 0, 0.38),
+      0 14px 24px rgba(0, 0, 0, 0.22),
+      0 2px 4px rgba(0, 0, 0, 0.15),
+      inset 0 1px 1px rgba(255, 255, 255, 0.9) !important;
+  }
+  html[data-skin="elektron"] .snow-hardware-front.tilted {
+    box-shadow:
+      0 42px 85px rgba(0, 0, 0, 0.85),
+      0 16px 32px rgba(0, 0, 0, 0.65),
+      0 2px 4px rgba(0, 0, 0, 0.5),
+      inset 0 1px 1px rgba(255, 255, 255, 0.18) !important;
+  }
+
+  /* TOGGLE INCLINAZIONE 3D IN HEADER CHASSIS */
+  .snow-tilt-quick-switch {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    background: linear-gradient(180deg, #ffffff 0%, #edf1f7 100%);
+    border: 1px solid #b2b8c4;
+    border-top: 1px solid #ffffff;
+    border-bottom: 2px solid #8e95a3;
+    border-radius: 4px;
+    font-size: 9.5px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    color: #1e293b;
+    cursor: pointer;
+    box-shadow: 0 1px 3px rgba(0,0,0,0.12), inset 0 1px 0 #fff;
+    transition: all 0.12s ease;
+    user-select: none;
+  }
+  .snow-tilt-quick-switch:hover {
+    filter: brightness(1.05);
+    border-color: #3b82f6;
+    color: #1d4ed8;
+  }
+  .snow-tilt-quick-switch.active {
+    background: linear-gradient(180deg, #e0edff 0%, #cfe3fc 100%);
+    border-color: #3b82f6;
+    border-bottom-width: 1px;
+    color: #1d4ed8;
+    box-shadow: inset 0 1px 2px rgba(59,130,246,0.3);
+    transform: translateY(1px);
+  }
+  html[data-skin="elektron"] .snow-tilt-quick-switch {
+    background: linear-gradient(180deg, #2c303c 0%, #171822 100%) !important;
+    border: 1px solid #14161f !important;
+    border-top: 1px solid rgba(255,255,255,0.2) !important;
+    border-bottom: 2px solid #090a0d !important;
+    color: #e2e8f0 !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08) !important;
+  }
+  html[data-skin="elektron"] .snow-tilt-quick-switch.active {
+    background: linear-gradient(180deg, #3d151c 0%, #250b10 100%) !important;
+    border-color: #ff2a3b !important;
+    color: #ff8591 !important;
+    box-shadow: 0 0 8px rgba(255,42,59,0.5), inset 0 1px 1px rgba(255,42,59,0.2) !important;
+  }
+
+  /* APPOGGIO DESK IN LEGNO (BAMBOO/ROVERE COME DA FOTO UTENTE) */
+  .snow-desk-wooden-rest {
+    width: calc(100% - 24px);
+    max-width: 1056px;
+    margin: -4px auto 0 auto;
+    height: 30px;
+    border-radius: 0 0 12px 12px;
+    background:
+      linear-gradient(180deg, rgba(0,0,0,0.22) 0%, rgba(0,0,0,0.02) 20%, rgba(255,255,255,0.18) 55%, rgba(0,0,0,0.3) 100%),
+      repeating-linear-gradient(90deg, #d4a366 0px, #c38f51 12px, #deb075 24px, #ba8444 36px, #caa068 48px);
+    box-shadow:
+      0 10px 22px rgba(0, 0, 0, 0.4),
+      inset 0 2px 3px rgba(0, 0, 0, 0.4),
+      inset 0 -1px 2px rgba(0, 0, 0, 0.45);
+    border: 1px solid #946833;
+    border-top: 1px solid rgba(0,0,0,0.4);
+    position: relative;
+    z-index: 10;
+  }
+  html[data-skin="elektron"] .snow-desk-wooden-rest {
+    background:
+      linear-gradient(180deg, rgba(0,0,0,0.45) 0%, rgba(0,0,0,0.08) 20%, rgba(255,255,255,0.06) 55%, rgba(0,0,0,0.55) 100%),
+      repeating-linear-gradient(90deg, #222630 0px, #181a22 12px, #2a2e3a 24px, #14161d 36px, #1f222b 48px) !important;
+    border-color: #0d0e12 !important;
+    border-top: 1px solid rgba(0,0,0,0.7) !important;
+    box-shadow: 0 12px 28px rgba(0, 0, 0, 0.75), inset 0 2px 3px rgba(0, 0, 0, 0.7) !important;
+  }
+
+  /* BARRA SUB-LABEL OLIVA / BRONZO VALORI SOTTO VALUE 1-3 */
+  .snow-values-pill-bar {
+    width: 100%;
+    margin-top: 5px;
+    background: #736d52;
+    color: #ede9dc;
+    border-radius: 3px 3px 6px 6px;
+    font-size: 7.5px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    text-align: center;
+    padding: 2.5px 4px;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,0.35), 0 1px 0 rgba(255,255,255,0.4);
+    box-sizing: border-box;
+  }
+  html[data-skin="elektron"] .snow-values-pill-bar {
+    background: #332f26 !important;
+    color: #ded7c4 !important;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.05) !important;
+  }
+  .snow-value-scale-box {
+    position: relative;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
+  .snow-val-scale-svg {
+    position: absolute;
+    pointer-events: none;
+    z-index: 0;
+    width: 58px;
+    height: 58px;
+  }
+  .snow-val-scale-svg circle {
+    fill: #555b68;
+    transition: fill 0.15s ease;
+  }
+  html[data-skin="elektron"] .snow-val-scale-svg circle {
+    fill: #ff2a3b !important;
+    filter: drop-shadow(0 0 2px rgba(255,42,59,0.7));
+  }
+
+  /* RIGA INFERIORE MATRICE ACCESS OEM: TASTI NAV (EDIT/SHIFT, PART, BANK) + FILTRI (CUTOFF, RESONANCE) */
+  .snow-matrix-bottom-row {
+    display: grid;
+    grid-template-columns: 148px 1fr;
+    gap: 10px;
+    align-items: start;
+    margin-top: 6px;
+    padding-top: 6px;
+    border-top: 1px solid rgba(0,0,0,0.08);
+  }
+  html[data-skin="elektron"] .snow-matrix-bottom-row {
+    border-top-color: rgba(255,255,255,0.08) !important;
+  }
+
+  /* BLOCCO 3 TASTI NAVIGAZIONE QUADRATI */
+  .snow-nav-keys-block {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+  }
+  .snow-nav-3keys-row {
+    display: grid;
+    grid-template-columns: 1fr 1fr 1fr;
+    gap: 5px;
+    align-items: end;
+  }
+  .snow-nav-key-col {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+  }
+  .snow-sq-nav-btn {
+    width: 38px;
+    height: 34px;
+    background: linear-gradient(180deg, #ffffff 0%, #edf0f5 55%, #d8dde6 100%);
+    border: 1px solid #b6bbc5;
+    border-top: 1px solid #ffffff;
+    border-bottom: 2px solid #8e939e;
+    border-radius: 4px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.95);
+    color: #1e293b;
+    cursor: pointer;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 0.04em;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    text-align: center;
+    transition: all 0.08s ease;
+    user-select: none;
+    padding: 0;
+  }
+  .snow-sq-nav-btn:hover {
+    filter: brightness(1.06);
+    color: #0f172a;
+  }
+  .snow-sq-nav-btn:active {
+    background: #d4d8e2;
+    border-bottom-width: 1px;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.25);
+    transform: translateY(1px);
+  }
+  html[data-skin="elektron"] .snow-sq-nav-btn {
+    background: linear-gradient(180deg, #2b2f3d 0%, #191a24 100%) !important;
+    border: 1px solid #14151e !important;
+    border-top: 1px solid rgba(255,255,255,0.18) !important;
+    border-bottom: 2px solid #08090d !important;
+    color: #dbe1ee !important;
+    box-shadow: 0 2px 6px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.08) !important;
+  }
+  html[data-skin="elektron"] .snow-sq-nav-btn:hover {
+    border-color: #ff2a3b !important;
+    color: #ffffff !important;
+  }
+  html[data-skin="elektron"] .snow-sq-nav-btn:active {
+    background: #15161f !important;
+    border-bottom-width: 1px !important;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.6) !important;
+    transform: translateY(1px);
+  }
+
+  /* SERIGRAFIE E BRACKET SOTTO I TASTI EDIT/SHIFT, PART, BANK */
+  .snow-nav-sub-labels {
+    display: grid;
+    grid-template-columns: 2fr 1fr;
     gap: 4px;
-    box-shadow: inset 0 1px 2px rgba(255,255,255,0.8), 0 1px 3px rgba(0,0,0,0.04);
+    margin-top: 2px;
+    font-size: 7px;
+    font-weight: 800;
+    color: #555b68;
+    letter-spacing: 0.05em;
+    text-align: center;
   }
-  html[data-skin="elektron"] .snow-filter-module {
-    background: linear-gradient(180deg, rgba(30,34,44,0.6) 0%, rgba(18,20,28,0.7) 100%) !important;
-    border-color: rgba(255,255,255,0.08) !important;
-    box-shadow: inset 0 1px 1px rgba(255,255,255,0.05), inset 0 -1px 2px rgba(0,0,0,0.5) !important;
+  .snow-power-bracket {
+    border-left: 1px solid #717784;
+    border-right: 1px solid #717784;
+    border-bottom: 1px solid #717784;
+    padding-top: 1px;
+    margin-top: 1px;
+    line-height: 1.2;
   }
-  .snow-filter-knobs-row {
+  html[data-skin="elektron"] .snow-nav-key-col span {
+    color: #e2e8f0 !important;
+  }
+  html[data-skin="elektron"] .snow-nav-sub-labels {
+    color: #8b96a8 !important;
+  }
+  html[data-skin="elektron"] .snow-power-bracket {
+    border-color: #555d6e !important;
+  }
+
+  /* BLOCCO FILTRI INTEGRATO (CUTOFF & RESONANCE) */
+  .snow-matrix-filters-block {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 3px;
+  }
+  .snow-matrix-filters-knobs {
     display: flex;
     justify-content: space-around;
     align-items: center;
-    margin-top: 2px;
+    width: 100%;
   }
+
+  /* BARRA SUB-LABEL OLIVA / BRONZO SOTTO I FILTRI */
+  .snow-sub-pill-bar {
+    width: 100%;
+    margin-top: 4px;
+    background: #736d52;
+    color: #ede9dc;
+    border-radius: 3px 3px 6px 6px;
+    font-size: 7.5px;
+    font-weight: 800;
+    letter-spacing: 0.06em;
+    display: flex;
+    justify-content: space-around;
+    padding: 2.5px 8px;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,0.35), 0 1px 0 rgba(255,255,255,0.4);
+    box-sizing: border-box;
+  }
+  html[data-skin="elektron"] .snow-sub-pill-bar {
+    background: #332f26 !important;
+    color: #ded7c4 !important;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,0.6), 0 1px 0 rgba(255,255,255,0.05) !important;
+  }
+
   .snow-filter-scale-box {
     position: relative;
     display: flex;
@@ -5493,213 +5764,260 @@
 
 <!-- FRONTALE HARDWARE ACCESS VIRUS TI SNOW -->
 <div id="snowFrontView" class="main-content" style="display: block;">
-  <div class="hardware-chassis snow-hardware-front">
-    <div class="chassis-screw screw-tl"></div>
-    <div class="chassis-screw screw-tr"></div>
-    <div class="chassis-screw screw-bl"></div>
-    <div class="chassis-screw screw-br"></div>
+  <div class="snow-perspective-viewport" id="snowPerspectiveViewport">
+    <div class="hardware-chassis snow-hardware-front tilted" id="snowHardwareChassis">
+      <div class="chassis-screw screw-tl"></div>
+      <div class="chassis-screw screw-tr"></div>
+      <div class="chassis-screw screw-bl"></div>
+      <div class="chassis-screw screw-br"></div>
 
-    <div class="chassis-logo" style="top: 13px; left: 32px; font-size: 19px; letter-spacing: 0.12em; font-weight: 900;">VIRUS | TI SNOW</div>
-    <!-- Quick Theme Switcher on Chassis -->
-    <div style="position: absolute; top: 10px; left: 240px; z-index: 45;">
-      <button id="frontThemeToggleBtn" class="snow-theme-quick-switch" type="button" title="Commuta al volo tra finitura Access Virus TI Snow e Virus TI2 Dark Star">
-        <span class="theme-switch-indicator"></span>
-        <span id="frontThemeSwitchText">TI SNOW // BIANCO PERLATO OEM</span>
-      </button>
-    </div>
-    <div class="chassis-access-logo" style="position: absolute; top: 13px; right: 32px; font-weight: 800; font-size: 15px; letter-spacing: 0.1em; color: #333; display: flex; align-items: center; gap: 6px; font-family: 'Inter', sans-serif;">
-      <span style="font-size: 18px; color: #222;">❖</span> access
-    </div>
-    <!-- Section Info Pop-up for Snow Front Panel -->
-    <div class="section-info-container align-right" style="position: absolute; top: 11px; right: 130px; z-index: 50;">
-      <button class="section-info-btn" aria-label="Info e Guida Pannello TI Snow" title="Guida e comandi: Pannello Frontale TI Snow">ℹ</button>
-      <div class="section-info-popup">
-        <div class="section-info-header">
-          <div class="section-info-title">
-            <span class="section-info-logo-badge">TI-SNOW</span>
-            <span>PANNELLO VIRUS TI SNOW</span>
-          </div>
-          <button class="section-info-close" type="button" title="Chiudi">✕</button>
-        </div>
-        <div class="section-info-body">
-          <div class="section-info-step">
-            <div class="section-info-step-num">1</div>
-            <div class="section-info-step-content">
-              <div class="section-info-step-title">Replica Hardware 1:1</div>
-              <div class="section-info-step-desc">Interfaccia fedele allo chassis del Virus TI Snow bianco con acrilico trasparente, viti a brugola e manopole analogiche graduate.</div>
-            </div>
-          </div>
-          <div class="section-info-step">
-            <div class="section-info-step-num">2</div>
-            <div class="section-info-step-content">
-              <div class="section-info-step-title">Master Cutoff, Reso & Volume</div>
-              <div class="section-info-step-desc">Controlla all'istante i filtri principali e il volume master con trasmissione MIDI CC continua ad alta risoluzione.</div>
-            </div>
-          </div>
-          <div class="section-info-step">
-            <div class="section-info-step-num">3</div>
-            <div class="section-info-step-content">
-              <div class="section-info-step-title">Navigazione & Soft Knobs</div>
-              <div class="section-info-step-desc">I pulsanti <code>PARAM &lt; / &gt;</code> e le 3 manopole <code>SOFT 1-3</code> sotto lo schermo LCD permettono di modificare i parametri secondari del suono.</div>
-            </div>
-          </div>
-          <div class="section-info-step">
-            <div class="section-info-step-num">4</div>
-            <div class="section-info-step-content">
-              <div class="section-info-step-title">Tap Tempo & Panic Istantaneo</div>
-              <div class="section-info-step-desc">Tasto <code>TAP TEMPO</code> per impostare la velocità dei delay/arp; doppio clic su <code>PANIC</code> per zittire subito eventuali note MIDI bloccate.</div>
-            </div>
-          </div>
-        </div>
-        <div class="section-info-footer">
-          <div style="font-weight: 700; display: flex; align-items: center; gap: 4px;">
-            <span>💡</span> <span>SUGGERIMENTO</span>
-          </div>
-          <div>Clicca sui pulsanti della matrice destra (OSC, FILTER, ARP, MULTI) per saltare direttamente alle sezioni corrispondenti dell'app.</div>
-        </div>
+      <div class="chassis-logo" style="top: 13px; left: 32px; font-size: 19px; letter-spacing: 0.12em; font-weight: 900;">VIRUS | TI SNOW</div>
+      <!-- Quick Theme & 3D Tilt Switchers on Chassis Header -->
+      <div style="position: absolute; top: 10px; left: 265px; z-index: 45; display: flex; align-items: center; gap: 6px;">
+        <button id="frontThemeToggleBtn" class="snow-theme-quick-switch" type="button" title="Commuta al volo tra finitura Access Virus TI Snow e Virus TI2 Dark Star">
+          <span class="theme-switch-indicator"></span>
+          <span id="frontThemeSwitchText">TI SNOW // OEM</span>
+        </button>
+        <button id="frontTiltToggleBtn" class="snow-tilt-quick-switch active" type="button" title="Commuta al volo tra vista 3D prospettica inclinata hardware e vista 2D frontale">
+          <span class="tilt-switch-icon">📐</span>
+          <span id="frontTiltSwitchText">📐 VISTA 3D INCLINATA</span>
+        </button>
       </div>
-    </div>
-
-    <!-- Griglia a 3 sezioni (Sinistra: 2 tasti verticali, Centro: Schermo su acrilico trasparente + 4 manopole, Destra: Matrice tasti con LED + modulo Filtro) -->
-    <div class="snow-front-grid">
-      <!-- 1. COLONNA SINISTRA: TAP TEMPO / PANIC & EXIT / MODE -->
-      <div class="snow-front-col snow-col-left">
-        <div class="snow-vert-btn-unit">
-          <button id="frontBtnTapPanic" class="snow-sq-btn" title="Tap Tempo / Invia All Notes Off (PANIC)">
-            <span style="font-size: 8.5px; font-weight: 900;">TAP</span>
-            <span style="font-size: 8px; font-weight: 800; opacity: 0.85;">TEMPO</span>
-          </button>
-          <span style="font-size: 7.5px; font-weight: 900; color: #c53030; letter-spacing: 0.08em; text-transform: uppercase;">PANIC</span>
-        </div>
-
-        <div class="snow-vert-btn-unit">
-          <button id="frontBtnExitMode" class="snow-sq-btn" title="Exit / Commuta modalità Single/Multi">
-            <span style="font-size: 9px; font-weight: 900;">EXIT</span>
-          </button>
-          <span style="font-size: 7.5px; font-weight: 900; color: #444; letter-spacing: 0.08em; text-transform: uppercase;">MODE</span>
+      <div class="chassis-access-logo" style="position: absolute; top: 13px; right: 32px; font-weight: 800; font-size: 15px; letter-spacing: 0.1em; color: #333; display: flex; align-items: center; gap: 6px; font-family: 'Inter', sans-serif;">
+        <span style="font-size: 18px; color: #222;">❖</span> access
+      </div>
+      <!-- Section Info Pop-up for Snow Front Panel -->
+      <div class="section-info-container align-right" style="position: absolute; top: 11px; right: 130px; z-index: 50;">
+        <button class="section-info-btn" aria-label="Info e Guida Pannello TI Snow" title="Guida e comandi: Pannello Frontale TI Snow">ℹ</button>
+        <div class="section-info-popup">
+          <div class="section-info-header">
+            <div class="section-info-title">
+              <span class="section-info-logo-badge">TI-SNOW</span>
+              <span>PANNELLO VIRUS TI SNOW</span>
+            </div>
+            <button class="section-info-close" type="button" title="Chiudi">✕</button>
+          </div>
+          <div class="section-info-body">
+            <div class="section-info-step">
+              <div class="section-info-step-num">1</div>
+              <div class="section-info-step-content">
+                <div class="section-info-step-title">Replica Hardware 1:1</div>
+                <div class="section-info-step-desc">Interfaccia fedele allo chassis del Virus TI Snow bianco con acrilico trasparente, viti a brugola e manopole analogiche graduate.</div>
+              </div>
+            </div>
+            <div class="section-info-step">
+              <div class="section-info-step-num">2</div>
+              <div class="section-info-step-content">
+                <div class="section-info-step-title">Master Cutoff, Reso & Volume</div>
+                <div class="section-info-step-desc">Controlla all'istante i filtri principali e il volume master con trasmissione MIDI CC continua ad alta risoluzione.</div>
+              </div>
+            </div>
+            <div class="section-info-step">
+              <div class="section-info-step-num">3</div>
+              <div class="section-info-step-content">
+                <div class="section-info-step-title">Navigazione & Soft Knobs</div>
+                <div class="section-info-step-desc">I pulsanti <code>PARAM &lt; / &gt;</code> e le 3 manopole <code>SOFT 1-3</code> sotto lo schermo LCD permettono di modificare i parametri secondari del suono.</div>
+              </div>
+            </div>
+            <div class="section-info-step">
+              <div class="section-info-step-num">4</div>
+              <div class="section-info-step-content">
+                <div class="section-info-step-title">Tap Tempo & Panic Istantaneo</div>
+                <div class="section-info-step-desc">Tasto <code>TAP TEMPO</code> per impostare la velocità dei delay/arp; doppio clic su <code>PANIC</code> per zittire subito eventuali note MIDI bloccate.</div>
+              </div>
+            </div>
+          </div>
+          <div class="section-info-footer">
+            <div style="font-weight: 700; display: flex; align-items: center; gap: 4px;">
+              <span>💡</span> <span>SUGGERIMENTO</span>
+            </div>
+            <div>Clicca sui pulsanti della matrice destra (OSC, FILTER, ARP, MULTI) per saltare direttamente alle sezioni corrispondenti dell'app.</div>
+          </div>
         </div>
       </div>
 
-      <!-- 2. COLONNA CENTRO: LASTRA ACRILICA TRASPARENTE + 4 MANOPOLE ORIZZONTALI -->
-      <div class="snow-front-col snow-col-center">
-        <!-- Lastra trasparente acrilica con 4 viti metalliche ai 4 angoli -->
-        <div class="snow-front-acrylic-window">
-          <div class="acrylic-screw" style="top: 6px; left: 6px;"></div>
-          <div class="acrylic-screw" style="top: 6px; right: 6px;"></div>
-          <div class="acrylic-screw" style="bottom: 6px; left: 6px;"></div>
-          <div class="acrylic-screw" style="bottom: 6px; right: 6px;"></div>
-
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; padding: 0 8px;">
-            <div style="display: flex; align-items: center; gap: 6px;">
-              <span class="pulse-bpm" style="width: 7px; height: 7px; border-radius: 50%; background: #ff3b4b; box-shadow: 0 0 7px #ff3b4b; display: inline-block;"></span>
-              <span style="font-size: 8.5px; font-weight: 800; letter-spacing: 0.12em; color: #334155;">BPM / LFO</span>
-            </div>
-            <div style="font-weight: 900; font-size: 11px; letter-spacing: 0.14em; color: #1e293b; font-family: 'Inter', sans-serif;">
-              VIRUS <span style="font-weight: 300; opacity: 0.5;">|</span> TI SNOW
-            </div>
+      <!-- Griglia a 3 sezioni (Sinistra: 2 tasti verticali, Centro: Schermo su acrilico trasparente + 4 manopole, Destra: Matrice tasti con LED + modulo Filtro) -->
+      <div class="snow-front-grid">
+        <!-- 1. COLONNA SINISTRA: TAP TEMPO / PANIC & EXIT / MODE -->
+        <div class="snow-front-col snow-col-left">
+          <div class="snow-vert-btn-unit">
+            <button id="frontBtnTapPanic" class="snow-sq-btn" title="Tap Tempo / Invia All Notes Off (PANIC)">
+              <span style="font-size: 8.5px; font-weight: 900;">TAP</span>
+              <span style="font-size: 8px; font-weight: 800; opacity: 0.85;">TEMPO</span>
+            </button>
+            <span style="font-size: 7.5px; font-weight: 900; color: #c53030; letter-spacing: 0.08em; text-transform: uppercase;">PANIC</span>
           </div>
 
-          <!-- LCD Backlit Screen: fondo azzurro-ghiaccio, testi antracite scuri ad alto contrasto -->
-          <div id="frontLcdScreen" class="virus-snow-lcd-front">
-            <div class="lcd-header-bar">
-              <span id="frontLcdModeBadge" class="lcd-badge">MULTI</span>
-              <span id="frontLcdCategory" style="letter-spacing: 0.05em; color: #eaf3fa; font-weight: 800;">P1 • RAM-A</span>
-              <span style="display: flex; align-items: center; gap: 4px; color: #d7e9f5;">
-                <span style="font-size: 9px;">▤</span>
-                <span>🔒</span>
-                <span id="frontLcdMultiPrg" style="font-weight: 900;">01</span>
-              </span>
-            </div>
-            <div style="display: flex; align-items: baseline; gap: 12px; margin: 4px 0;">
-              <span id="frontLcdBankProg" class="lcd-bank-prog">A-01</span>
-              <span id="frontLcdPatchName" class="lcd-patch-name">SNOWFALL BC</span>
-            </div>
-            <div class="lcd-footer-bar">
-              <span id="frontLcdSoft1" style="flex: 1; text-align: left;">Transp: 0</span>
-              <span id="frontLcdSoft2" style="flex: 1; text-align: center; color: #142434; font-weight: 800;">Pan: Center</span>
-              <span id="frontLcdSoft3" style="flex: 1; text-align: right;">Assign: 20</span>
-            </div>
+          <div class="snow-vert-btn-unit">
+            <button id="frontBtnExitMode" class="snow-sq-btn" title="Exit / Commuta modalità Single/Multi">
+              <span style="font-size: 9px; font-weight: 900;">EXIT</span>
+            </button>
+            <span style="font-size: 7.5px; font-weight: 900; color: #444; letter-spacing: 0.08em; text-transform: uppercase;">MODE</span>
           </div>
         </div>
 
-        <!-- Fila delle 4 manopole rotative esattamente come il vero Snow -->
-        <div class="snow-front-4knobs">
-          <!-- 1. VOLUME / PART VOLUME -->
-          <div class="snow-knob-unit">
-            <span class="snow-knob-top-label">VOLUME</span>
-            <div class="knob-tick-dial" style="position: relative; display: flex; align-items: center; justify-content: center;">
-              <svg viewBox="0 0 64 64" class="snow-vol-arc-svg" style="width: 62px; height: 62px;">
-                <path d="M 14.5 46 A 23.5 23.5 0 1 1 42.5 13.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
-              </svg>
-              <div class="chassis-knob-outer snow-front-knob" id="frontKnobVolume" data-val="100" style="width: 44px; height: 44px; cursor: grab;" title="Volume Parte corrente (CC 7)">
-                <div class="chassis-knob-inner" style="width: 38px; height: 38px;">
-                  <div class="chassis-knob-top" style="width: 29px; height: 29px;">
-                    <div class="chassis-knob-indicator-container" id="frontKnobVolumeInd" style="transform: rotate(50deg);">
-                      <div class="chassis-knob-indicator" style="height: 10px; width: 2.6px; top: 0px;"></div>
-                    </div>
-                  </div>
-                </div>
+        <!-- 2. COLONNA CENTRO: LASTRA ACRILICA TRASPARENTE + 4 MANOPOLE ORIZZONTALI -->
+        <div class="snow-front-col snow-col-center">
+          <!-- Lastra trasparente acrilica con 4 viti metalliche ai 4 angoli -->
+          <div class="snow-front-acrylic-window">
+            <div class="acrylic-screw" style="top: 6px; left: 6px;"></div>
+            <div class="acrylic-screw" style="top: 6px; right: 6px;"></div>
+            <div class="acrylic-screw" style="bottom: 6px; left: 6px;"></div>
+            <div class="acrylic-screw" style="bottom: 6px; right: 6px;"></div>
+
+            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px; padding: 0 8px;">
+              <div style="display: flex; align-items: center; gap: 6px;">
+                <span class="pulse-bpm" style="width: 7px; height: 7px; border-radius: 50%; background: #ff3b4b; box-shadow: 0 0 7px #ff3b4b; display: inline-block;"></span>
+                <span style="font-size: 8.5px; font-weight: 800; letter-spacing: 0.12em; color: #334155;">BPM / LFO</span>
+              </div>
+              <div style="font-weight: 900; font-size: 11px; letter-spacing: 0.14em; color: #1e293b; font-family: 'Inter', sans-serif;">
+                VIRUS <span style="font-weight: 300; opacity: 0.5;">|</span> TI SNOW
               </div>
             </div>
-            <span class="snow-knob-sub-label">PART VOLUME</span>
-            <span id="frontValVolume" class="snow-front-val">100</span>
+
+            <!-- LCD Backlit Screen: fondo azzurro-ghiaccio, testi antracite scuri ad alto contrasto -->
+            <div id="frontLcdScreen" class="virus-snow-lcd-front">
+              <div class="lcd-header-bar">
+                <span id="frontLcdModeBadge" class="lcd-badge">MULTI</span>
+                <span id="frontLcdCategory" style="letter-spacing: 0.05em; color: #eaf3fa; font-weight: 800;">P1 • RAM-A</span>
+                <span style="display: flex; align-items: center; gap: 4px; color: #d7e9f5;">
+                  <span style="font-size: 9px;">▤</span>
+                  <span>🔒</span>
+                  <span id="frontLcdMultiPrg" style="font-weight: 900;">01</span>
+                </span>
+              </div>
+              <div style="display: flex; align-items: baseline; gap: 12px; margin: 4px 0;">
+                <span id="frontLcdBankProg" class="lcd-bank-prog">A-01</span>
+                <span id="frontLcdPatchName" class="lcd-patch-name">SNOWFALL BC</span>
+              </div>
+              <div class="lcd-footer-bar">
+                <span id="frontLcdSoft1" style="flex: 1; text-align: left;">Transp: 0</span>
+                <span id="frontLcdSoft2" style="flex: 1; text-align: center; color: #142434; font-weight: 800;">Pan: Center</span>
+                <span id="frontLcdSoft3" style="flex: 1; text-align: right;">Assign: 20</span>
+              </div>
+            </div>
           </div>
 
-          <!-- 2. VALUE 1 / TRANSPOSE -->
-          <div class="snow-knob-unit">
-            <span class="snow-knob-top-label">VALUE 1</span>
-            <div class="knob-tick-dial">
-              <div class="chassis-knob-outer snow-front-knob" id="frontKnobValue1" data-val="64" style="width: 44px; height: 44px; cursor: grab;" title="Value 1 / Transpose / Modulation (CC 1)">
-                <div class="chassis-knob-inner" style="width: 38px; height: 38px;">
-                  <div class="chassis-knob-top" style="width: 29px; height: 29px;">
-                    <div class="chassis-knob-indicator-container" id="frontKnobValue1Ind" style="transform: rotate(0deg);">
-                      <div class="chassis-knob-indicator" style="height: 9px; width: 2px; top: 1px;"></div>
+          <!-- Fila delle 4 manopole rotative esattamente come il vero Snow -->
+          <div class="snow-front-4knobs">
+            <!-- 1. VOLUME -->
+            <div class="snow-knob-unit">
+              <span class="snow-knob-top-label">VOLUME</span>
+              <div class="knob-tick-dial" style="position: relative; display: flex; align-items: center; justify-content: center;">
+                <svg viewBox="0 0 64 64" class="snow-vol-arc-svg" style="width: 62px; height: 62px;">
+                  <path d="M 14.5 46 A 23.5 23.5 0 1 1 42.5 13.5" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" />
+                </svg>
+                <div class="chassis-knob-outer snow-front-knob" id="frontKnobVolume" data-val="100" style="width: 44px; height: 44px; cursor: grab;" title="Volume Parte corrente (CC 7)">
+                  <div class="chassis-knob-inner" style="width: 38px; height: 38px;">
+                    <div class="chassis-knob-top" style="width: 29px; height: 29px;">
+                      <div class="chassis-knob-indicator-container" id="frontKnobVolumeInd" style="transform: rotate(50deg);">
+                        <div class="chassis-knob-indicator" style="height: 10px; width: 2.6px; top: 0px;"></div>
+                      </div>
                     </div>
                   </div>
                 </div>
               </div>
+              <span id="frontValVolume" class="snow-front-val">100</span>
             </div>
-            <span class="snow-knob-sub-label">TRANSPOSE</span>
-            <span id="frontValValue1" class="snow-front-val">0</span>
+
+            <!-- 2. VALUE 1 (con scala a 11 punti radiali) -->
+            <div class="snow-knob-unit">
+              <span class="snow-knob-top-label">VALUE 1</span>
+              <div class="snow-value-scale-box">
+                <svg viewBox="0 0 58 58" class="snow-val-scale-svg">
+                  <circle cx="11.7" cy="46.3" r="1.2" fill="currentColor" />
+                  <circle cx="5.7"  cy="36.6" r="1.2" fill="currentColor" />
+                  <circle cx="4.8"  cy="25.2" r="1.2" fill="currentColor" />
+                  <circle cx="9.2"  cy="14.6" r="1.2" fill="currentColor" />
+                  <circle cx="17.9" cy="7.2"  r="1.2" fill="currentColor" />
+                  <circle cx="29.0" cy="4.5"  r="1.2" fill="currentColor" />
+                  <circle cx="40.1" cy="7.2"  r="1.2" fill="currentColor" />
+                  <circle cx="48.8" cy="14.6" r="1.2" fill="currentColor" />
+                  <circle cx="53.2" cy="25.2" r="1.2" fill="currentColor" />
+                  <circle cx="52.3" cy="36.6" r="1.2" fill="currentColor" />
+                  <circle cx="46.3" cy="46.3" r="1.2" fill="currentColor" />
+                </svg>
+                <div class="chassis-knob-outer snow-front-knob" id="frontKnobValue1" data-val="64" style="width: 44px; height: 44px; cursor: grab;" title="Value 1 / Part Volume (CC 1)">
+                  <div class="chassis-knob-inner" style="width: 38px; height: 38px;">
+                    <div class="chassis-knob-top" style="width: 29px; height: 29px;">
+                      <div class="chassis-knob-indicator-container" id="frontKnobValue1Ind" style="transform: rotate(0deg);">
+                        <div class="chassis-knob-indicator" style="height: 9px; width: 2px; top: 1px;"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <span id="frontValValue1" class="snow-front-val">0</span>
+            </div>
+
+            <!-- 3. VALUE 2 (con scala a 11 punti radiali) -->
+            <div class="snow-knob-unit">
+              <span class="snow-knob-top-label">VALUE 2</span>
+              <div class="snow-value-scale-box">
+                <svg viewBox="0 0 58 58" class="snow-val-scale-svg">
+                  <circle cx="11.7" cy="46.3" r="1.2" fill="currentColor" />
+                  <circle cx="5.7"  cy="36.6" r="1.2" fill="currentColor" />
+                  <circle cx="4.8"  cy="25.2" r="1.2" fill="currentColor" />
+                  <circle cx="9.2"  cy="14.6" r="1.2" fill="currentColor" />
+                  <circle cx="17.9" cy="7.2"  r="1.2" fill="currentColor" />
+                  <circle cx="29.0" cy="4.5"  r="1.2" fill="currentColor" />
+                  <circle cx="40.1" cy="7.2"  r="1.2" fill="currentColor" />
+                  <circle cx="48.8" cy="14.6" r="1.2" fill="currentColor" />
+                  <circle cx="53.2" cy="25.2" r="1.2" fill="currentColor" />
+                  <circle cx="52.3" cy="36.6" r="1.2" fill="currentColor" />
+                  <circle cx="46.3" cy="46.3" r="1.2" fill="currentColor" />
+                </svg>
+                <div class="chassis-knob-outer snow-front-knob" id="frontKnobValue2" data-val="64" style="width: 44px; height: 44px; cursor: grab;" title="Value 2 / Transpose (CC 10)">
+                  <div class="chassis-knob-inner" style="width: 38px; height: 38px;">
+                    <div class="chassis-knob-top" style="width: 29px; height: 29px;">
+                      <div class="chassis-knob-indicator-container" id="frontKnobValue2Ind" style="transform: rotate(0deg);">
+                        <div class="chassis-knob-indicator" style="height: 9px; width: 2px; top: 1px;"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <span id="frontValValue2" class="snow-front-val">C</span>
+            </div>
+
+            <!-- 4. VALUE 3 (con scala a 11 punti radiali) -->
+            <div class="snow-knob-unit">
+              <span class="snow-knob-top-label">VALUE 3</span>
+              <div class="snow-value-scale-box">
+                <svg viewBox="0 0 58 58" class="snow-val-scale-svg">
+                  <circle cx="11.7" cy="46.3" r="1.2" fill="currentColor" />
+                  <circle cx="5.7"  cy="36.6" r="1.2" fill="currentColor" />
+                  <circle cx="4.8"  cy="25.2" r="1.2" fill="currentColor" />
+                  <circle cx="9.2"  cy="14.6" r="1.2" fill="currentColor" />
+                  <circle cx="17.9" cy="7.2"  r="1.2" fill="currentColor" />
+                  <circle cx="29.0" cy="4.5"  r="1.2" fill="currentColor" />
+                  <circle cx="40.1" cy="7.2"  r="1.2" fill="currentColor" />
+                  <circle cx="48.8" cy="14.6" r="1.2" fill="currentColor" />
+                  <circle cx="53.2" cy="25.2" r="1.2" fill="currentColor" />
+                  <circle cx="52.3" cy="36.6" r="1.2" fill="currentColor" />
+                  <circle cx="46.3" cy="46.3" r="1.2" fill="currentColor" />
+                </svg>
+                <div class="chassis-knob-outer snow-front-knob" id="frontKnobValue3" data-val="20" style="width: 44px; height: 44px; cursor: grab;" title="Value 3 / Panorama / FX Send (CC 91)">
+                  <div class="chassis-knob-inner" style="width: 38px; height: 38px;">
+                    <div class="chassis-knob-top" style="width: 29px; height: 29px;">
+                      <div class="chassis-knob-indicator-container" id="frontKnobValue3Ind" style="transform: rotate(-80deg);">
+                        <div class="chassis-knob-indicator" style="height: 9px; width: 2px; top: 1px;"></div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+              <span id="frontValValue3" class="snow-front-val">20</span>
+            </div>
           </div>
 
-          <!-- 3. VALUE 2 / PANORAMA -->
-          <div class="snow-knob-unit">
-            <span class="snow-knob-top-label">VALUE 2</span>
-            <div class="knob-tick-dial">
-              <div class="chassis-knob-outer snow-front-knob" id="frontKnobValue2" data-val="64" style="width: 44px; height: 44px; cursor: grab;" title="Value 2 / Panorama (CC 10)">
-                <div class="chassis-knob-inner" style="width: 38px; height: 38px;">
-                  <div class="chassis-knob-top" style="width: 29px; height: 29px;">
-                    <div class="chassis-knob-indicator-container" id="frontKnobValue2Ind" style="transform: rotate(0deg);">
-                      <div class="chassis-knob-indicator" style="height: 9px; width: 2px; top: 1px;"></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <span class="snow-knob-sub-label">PANORAMA</span>
-            <span id="frontValValue2" class="snow-front-val">C</span>
-          </div>
-
-          <!-- 4. VALUE 3 / ASSIGN -->
-          <div class="snow-knob-unit">
-            <span class="snow-knob-top-label">VALUE 3</span>
-            <div class="knob-tick-dial">
-              <div class="chassis-knob-outer snow-front-knob" id="frontKnobValue3" data-val="20" style="width: 44px; height: 44px; cursor: grab;" title="Value 3 / Parameter Assign (CC 91 / FX Send)">
-                <div class="chassis-knob-inner" style="width: 38px; height: 38px;">
-                  <div class="chassis-knob-top" style="width: 29px; height: 29px;">
-                    <div class="chassis-knob-indicator-container" id="frontKnobValue3Ind" style="transform: rotate(-80deg);">
-                      <div class="chassis-knob-indicator" style="height: 9px; width: 2px; top: 1px;"></div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-            <span class="snow-knob-sub-label">ASSIGN</span>
-            <span id="frontValValue3" class="snow-front-val">20</span>
+          <!-- Barra Sub-Label Oliva / Bronzo: PART VOLUME | TRANSPOSE | PANORAMA -->
+          <div class="snow-values-pill-bar">
+            <span>PART VOLUME</span>
+            <span>TRANSPOSE</span>
+            <span>PANORAMA</span>
           </div>
         </div>
-      </div>
 
       <!-- 3. COLONNA DESTRA: MATRICE TASTI CON LED + SEZIONE FILTRO -->
       <div class="snow-front-col snow-col-right">
@@ -5760,102 +6078,124 @@
               <button class="snow-matrix-btn" id="frontBtnValPlus" title="Patch successiva (Value +)">VALUE +</button>
               <button class="snow-matrix-btn" id="frontBtnParamPrev" title="Parametro precedente">◄ PARAM</button>
               <button class="snow-matrix-btn" id="frontBtnParamNext" title="Parametro successivo">PARAM ►</button>
-              <button class="snow-matrix-btn" id="frontBtnAudition" title="AUDITION: Tieni premuto o clicca per suonare la nota di prova!" style="font-weight: 900; color: #b75900; background: #fffaf0;">AUDITION 🎵</button>
+              <button class="snow-matrix-btn" id="frontBtnAudition" title="AUDITION: Tieni premuto o clicca per suonare la nota di prova!" style="font-weight: 900; color: #b75900; background: #fffaf0;">AUDITION</button>
               <button class="snow-matrix-btn" id="frontBtnMulti" title="Vista Multi / Mixer">MULTI</button>
               <button class="snow-matrix-btn" id="frontBtnConfig" title="Configurazione MIDI">CONFIG</button>
               <button class="snow-matrix-btn" id="frontBtnStore" title="Salva suono (STORE)" style="color: #c53030;">STORE</button>
             </div>
           </div>
 
-          <!-- Terza Fila: 3 Tasti Larghi EDIT/SHIFT, PART, BANK/SEARCH -->
-          <div class="snow-bottom-3btns">
-            <button class="snow-wide-tactile-btn" id="frontBtnEditShift" title="Edit / Parametri synth">
-              <div style="display: flex; align-items: center; justify-content: center; gap: 4px;">
-                <span class="snow-indicator-led active-green" style="width: 5px; height: 5px;"></span>
-                <span>EDIT / SHIFT</span>
-              </div>
-            </button>
-            <button class="snow-wide-tactile-btn" id="frontBtnPartCycle" title="Cicla parte attiva (Part 1 -> 2 -> 3 -> 4)">
-              PART ⟳
-            </button>
-            <button class="snow-wide-tactile-btn" id="frontBtnBankSearch" title="Cerca suoni e banchi (Patch Manager)">
-              BANK / SEARCH 🔍
-            </button>
-          </div>
-        </div>
+          <!-- Terza Fila: Tasti Navigazione EDIT/SHIFT, PART, BANK + CUTOFF e RESONANCE con Scala 0..12 -->
+          <div class="snow-matrix-bottom-row">
+            <!-- BLOCCO 3 TASTI NAVIGAZIONE QUADRATI IDENTICI ALL'HARDWARE ACCESS OEM -->
+            <div class="snow-nav-keys-block">
+              <div class="snow-nav-3keys-row">
+                <!-- 1. EDIT/SHIFT con LED rotondo sovrastante -->
+                <div class="snow-nav-key-col">
+                  <span class="snow-indicator-led active-amber" id="frontEditShiftLed" style="width: 5.5px; height: 5.5px; margin-bottom: 2px;" title="Edit/Shift LED"></span>
+                  <button class="snow-sq-nav-btn" id="frontBtnEditShift" title="Edit / Parametri Synth (Access Virus TI Snow)">
+                    <span></span>
+                  </button>
+                  <span style="font-size: 7.5px; font-weight: 900; letter-spacing: 0.04em; color: #222; text-transform: uppercase; margin-top: 2px;">EDIT/SHIFT</span>
+                </div>
 
-        <!-- Sezione Sagomata FILTER con CUTOFF e RESONANCE con scala graduata 0..12 -->
-        <div class="snow-filter-module">
-          <div style="display: flex; justify-content: space-between; align-items: center; padding: 0 4px;">
-            <span style="font-size: 9px; font-weight: 900; letter-spacing: 0.12em; color: #333; text-transform: uppercase;">FILTER</span>
-            <span style="font-size: 8px; font-weight: 700; color: #666; letter-spacing: 0.05em;">24dB / ANALOG</span>
-          </div>
+                <!-- 2. PART -->
+                <div class="snow-nav-key-col">
+                  <div style="height: 7.5px;"></div>
+                  <button class="snow-sq-nav-btn" id="frontBtnPartCycle" title="Cicla Parte attiva (Part 1 -> 2 -> 3 -> 4)">
+                    <span></span>
+                  </button>
+                  <span style="font-size: 7.5px; font-weight: 900; letter-spacing: 0.04em; color: #222; text-transform: uppercase; margin-top: 2px;">PART</span>
+                </div>
 
-          <div class="snow-filter-knobs-row">
-            <!-- CUTOFF Knob con scala serigrafata originale a 11 punti 0..10 -->
-            <div class="snow-knob-unit">
-              <span class="snow-knob-top-label" style="font-size: 9.5px; font-weight: 900;">CUTOFF</span>
-              <div class="snow-filter-scale-box">
-                <svg viewBox="0 0 80 80" class="snow-scale-svg" style="width: 78px; height: 78px;">
-                  <circle cx="16.7" cy="63.3" r="1.3" />
-                  <circle cx="8.6"  cy="50.2" r="1.3" />
-                  <circle cx="7.4"  cy="34.8" r="1.3" />
-                  <circle cx="13.3" cy="20.6" r="1.3" />
-                  <circle cx="25.0" cy="10.6" r="1.3" />
-                  <circle cx="40.0" cy="7.0"  r="1.4" />
-                  <circle cx="55.0" cy="10.6" r="1.3" />
-                  <circle cx="66.7" cy="20.6" r="1.3" />
-                  <circle cx="72.6" cy="34.8" r="1.3" />
-                  <circle cx="71.4" cy="50.2" r="1.3" />
-                  <circle cx="63.3" cy="63.3" r="1.3" />
-                  <text x="14" y="73" text-anchor="middle" font-size="7.5" font-family="'Inter', sans-serif" font-weight="800">0</text>
-                  <text x="66" y="73" text-anchor="middle" font-size="7.5" font-family="'Inter', sans-serif" font-weight="800">10</text>
-                </svg>
-                <div class="chassis-knob-outer snow-front-knob" id="frontKnobCutoff" data-val="64" style="width: 52px; height: 52px; cursor: grab;" title="Cutoff Filtro (CC 40)">
-                  <div class="chassis-knob-inner" style="width: 44px; height: 44px;">
-                    <div class="chassis-knob-top" style="width: 33px; height: 33px;">
-                      <div class="chassis-knob-indicator-container" id="frontKnobCutoffInd" style="transform: rotate(0deg);">
-                        <div class="chassis-knob-indicator" style="height: 11px; width: 2.8px; top: 0px;"></div>
-                      </div>
-                    </div>
-                  </div>
+                <!-- 3. BANK -->
+                <div class="snow-nav-key-col">
+                  <div style="height: 7.5px;"></div>
+                  <button class="snow-sq-nav-btn" id="frontBtnBankSearch" title="Cerca suoni e banchi (Bank & Patch Search)">
+                    <span></span>
+                  </button>
+                  <span style="font-size: 7.5px; font-weight: 900; letter-spacing: 0.04em; color: #222; text-transform: uppercase; margin-top: 2px;">BANK</span>
                 </div>
               </div>
-              <span class="snow-knob-sub-label">FILTER ENVELOPE</span>
-              <span id="frontValCutoff" class="snow-front-val">64</span>
+
+              <!-- Serigrafie sotto i tasti 1-2 (POWER ON/OFF) e tasto 3 (SEARCH) -->
+              <div class="snow-nav-sub-labels">
+                <div class="snow-power-bracket">└ POWER ON/OFF ┘</div>
+                <div style="margin-top: 2px;">SEARCH</div>
+              </div>
             </div>
 
-            <!-- RESONANCE Knob con scala serigrafata originale a 11 punti 0..10 -->
-            <div class="snow-knob-unit">
-              <span class="snow-knob-top-label" style="font-size: 9px; font-weight: 900;">RESONANCE</span>
-              <div class="snow-filter-scale-box">
-                <svg viewBox="0 0 74 74" class="snow-scale-svg" style="width: 72px; height: 72px;">
-                  <circle cx="15.8" cy="58.2" r="1.2" />
-                  <circle cx="8.5"  cy="46.3" r="1.2" />
-                  <circle cx="7.4"  cy="32.3" r="1.2" />
-                  <circle cx="12.7" cy="19.4" r="1.2" />
-                  <circle cx="23.4" cy="10.3" r="1.2" />
-                  <circle cx="37.0" cy="7.0"  r="1.3" />
-                  <circle cx="50.6" cy="10.3" r="1.2" />
-                  <circle cx="61.3" cy="19.4" r="1.2" />
-                  <circle cx="66.6" cy="32.3" r="1.2" />
-                  <circle cx="65.5" cy="46.3" r="1.2" />
-                  <circle cx="58.2" cy="58.2" r="1.2" />
-                  <text x="14" y="67" text-anchor="middle" font-size="7" font-family="'Inter', sans-serif" font-weight="800">0</text>
-                  <text x="60" y="67" text-anchor="middle" font-size="7" font-family="'Inter', sans-serif" font-weight="800">10</text>
-                </svg>
-                <div class="chassis-knob-outer snow-front-knob" id="frontKnobResonance" data-val="0" style="width: 46px; height: 46px; cursor: grab;" title="Risonanza Filtro (CC 42)">
-                  <div class="chassis-knob-inner" style="width: 40px; height: 40px;">
-                    <div class="chassis-knob-top" style="width: 30px; height: 30px;">
-                      <div class="chassis-knob-indicator-container" id="frontKnobResonanceInd" style="transform: rotate(-135deg);">
-                        <div class="chassis-knob-indicator" style="height: 10px; width: 2.6px; top: 0px;"></div>
+            <!-- BLOCCO FILTRI HARDWARE (CUTOFF & RESONANCE CON SCALA 0..12) -->
+            <div class="snow-matrix-filters-block">
+              <div class="snow-matrix-filters-knobs">
+                <!-- CUTOFF KNOB CON SCALA 0..12 -->
+                <div class="snow-knob-unit">
+                  <div class="snow-filter-scale-box">
+                    <svg viewBox="0 0 76 76" class="snow-scale-svg" style="width: 74px; height: 74px;">
+                      <circle cx="16.1" cy="59.9" r="1.3" />
+                      <circle cx="8.5"  cy="47.6" r="1.3" />
+                      <circle cx="7.4"  cy="33.2" r="1.3" />
+                      <circle cx="12.9" cy="19.8" r="1.3" />
+                      <circle cx="23.9" cy="10.4" r="1.3" />
+                      <circle cx="38.0" cy="7.0"  r="1.3" />
+                      <circle cx="52.1" cy="10.4" r="1.3" />
+                      <circle cx="63.1" cy="19.8" r="1.3" />
+                      <circle cx="68.6" cy="33.2" r="1.3" />
+                      <circle cx="67.5" cy="47.6" r="1.3" />
+                      <circle cx="59.9" cy="59.9" r="1.3" />
+                      <text x="14" y="66" text-anchor="middle" font-size="7.5" font-family="'Inter', sans-serif" font-weight="900">0</text>
+                      <text x="62" y="66" text-anchor="middle" font-size="7.5" font-family="'Inter', sans-serif" font-weight="900">12</text>
+                    </svg>
+                    <div class="chassis-knob-outer snow-front-knob" id="frontKnobCutoff" data-val="64" style="width: 48px; height: 48px; cursor: grab;" title="Cutoff Filtro Master (CC 40)">
+                      <div class="chassis-knob-inner" style="width: 40px; height: 40px;">
+                        <div class="chassis-knob-top" style="width: 30px; height: 30px;">
+                          <div class="chassis-knob-indicator-container" id="frontKnobCutoffInd" style="transform: rotate(0deg);">
+                            <div class="chassis-knob-indicator" style="height: 10px; width: 2.8px; top: 0px;"></div>
+                          </div>
+                        </div>
                       </div>
                     </div>
                   </div>
+                  <span class="snow-knob-top-label" style="font-size: 8.5px; font-weight: 900; margin-top: 5px;">CUTOFF</span>
+                </div>
+
+                <!-- RESONANCE KNOB CON SCALA 0..12 -->
+                <div class="snow-knob-unit">
+                  <div class="snow-filter-scale-box">
+                    <svg viewBox="0 0 76 76" class="snow-scale-svg" style="width: 74px; height: 74px;">
+                      <circle cx="16.1" cy="59.9" r="1.3" />
+                      <circle cx="8.5"  cy="47.6" r="1.3" />
+                      <circle cx="7.4"  cy="33.2" r="1.3" />
+                      <circle cx="12.9" cy="19.8" r="1.3" />
+                      <circle cx="23.9" cy="10.4" r="1.3" />
+                      <circle cx="38.0" cy="7.0"  r="1.3" />
+                      <circle cx="52.1" cy="10.4" r="1.3" />
+                      <circle cx="63.1" cy="19.8" r="1.3" />
+                      <circle cx="68.6" cy="33.2" r="1.3" />
+                      <circle cx="67.5" cy="47.6" r="1.3" />
+                      <circle cx="59.9" cy="59.9" r="1.3" />
+                      <text x="14" y="66" text-anchor="middle" font-size="7.5" font-family="'Inter', sans-serif" font-weight="900">0</text>
+                      <text x="62" y="66" text-anchor="middle" font-size="7.5" font-family="'Inter', sans-serif" font-weight="900">12</text>
+                    </svg>
+                    <div class="chassis-knob-outer snow-front-knob" id="frontKnobResonance" data-val="0" style="width: 48px; height: 48px; cursor: grab;" title="Risonanza Filtro Master (CC 42)">
+                      <div class="chassis-knob-inner" style="width: 40px; height: 40px;">
+                        <div class="chassis-knob-top" style="width: 30px; height: 30px;">
+                          <div class="chassis-knob-indicator-container" id="frontKnobResonanceInd" style="transform: rotate(-135deg);">
+                            <div class="chassis-knob-indicator" style="height: 10px; width: 2.8px; top: 0px;"></div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                  <span class="snow-knob-top-label" style="font-size: 8.5px; font-weight: 900; margin-top: 5px;">RESONANCE</span>
                 </div>
               </div>
-              <span class="snow-knob-sub-label">AMP ENVELOPE</span>
-              <span id="frontValResonance" class="snow-front-val">0</span>
+
+              <!-- Barra Sub-Label Oliva / Bronzo: FILTER ENVELOPE | AMP ENVELOPE -->
+              <div class="snow-sub-pill-bar">
+                <span>FILTER ENVELOPE</span>
+                <span>AMP ENVELOPE</span>
+              </div>
             </div>
           </div>
         </div>
@@ -5883,6 +6223,10 @@
 
     <div class="chassis-wood-strip"></div>
   </div>
+
+  <!-- Appoggio desk in legno naturale (bamboo / rovere come da foto utente) -->
+  <div class="snow-desk-wooden-rest"></div>
+</div>
 </div>
 
 <div id="singleView" class="main-content single-view" style="display: none;"></div>
@@ -6644,6 +6988,38 @@
     currentTheme = (currentTheme === 'te') ? 'elektron' : 'te';
     localStorage.setItem(THEME_KEY, currentTheme);
     applyTheme(currentTheme);
+  });
+
+  // ---------------------------------------------------------------------
+  // 3D Perspective Tilt per vista frontale Snow Hardware (Richiesta Utente)
+  // ---------------------------------------------------------------------
+  const TILT_KEY = 'virusTiSnow_tilted';
+  let isTilted = localStorage.getItem(TILT_KEY) !== 'false'; // Default true (vista 3D inclinata)
+
+  function updateTiltUI() {
+    const chassis = document.getElementById('snowHardwareChassis');
+    const tiltBtn = document.getElementById('frontTiltToggleBtn');
+    const tiltText = document.getElementById('frontTiltSwitchText');
+    if (chassis) {
+      chassis.classList.toggle('tilted', isTilted);
+    }
+    if (tiltBtn) {
+      tiltBtn.classList.toggle('active', isTilted);
+      tiltBtn.title = isTilted
+        ? 'Vista 3D prospettica inclinata attiva (clicca per passare alla vista 2D frontale)'
+        : 'Vista 2D frontale attiva (clicca per passare alla vista 3D inclinata)';
+    }
+    if (tiltText) {
+      tiltText.textContent = isTilted ? '📐 VISTA 3D INCLINATA' : '🔲 VISTA 2D FRONTALE';
+    }
+  }
+
+  updateTiltUI();
+
+  document.getElementById('frontTiltToggleBtn')?.addEventListener('click', () => {
+    isTilted = !isTilted;
+    localStorage.setItem(TILT_KEY, isTilted ? 'true' : 'false');
+    updateTiltUI();
   });
 
   // ---------------------------------------------------------------------
