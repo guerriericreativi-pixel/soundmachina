@@ -1911,6 +1911,28 @@
     initKnobs();
     initModMatrix();
     initPiano();
+
+    // Check URL parameters (e.g. ?part=0&name=Lead)
+    try {
+      const urlParams = new URLSearchParams(window.location.search);
+      const partParam = urlParams.get('part');
+      if (partParam !== null) {
+        const pIdx = parseInt(partParam, 10);
+        if (!isNaN(pIdx) && pIdx >= 0 && pIdx <= 3) {
+          const targetPill = document.querySelector(`.part-pill[data-part="${pIdx}"]`);
+          if (targetPill) targetPill.click();
+        }
+      }
+      const nameParam = urlParams.get('name');
+      if (nameParam) {
+        const nameEl = document.getElementById('patchName');
+        if (nameEl) {
+          nameEl.value = decodeURIComponent(nameParam);
+          patchData.name = nameEl.value;
+        }
+      }
+    } catch(e) {}
+
     drawOscilloscope();
     drawFilterBode();
     drawEnvelopes();

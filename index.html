@@ -685,6 +685,53 @@
   html[data-skin="elektron"] .part-1{ border-left-color: #e59500; }
   html[data-skin="elektron"] .part-2{ border-left-color: #c678dd; }
   html[data-skin="elektron"] .part-3{ border-left-color: #74c476; }
+
+  /* MULTI MIXER 2x2 COMPACT GRID MODE */
+  .part-list.grid-mode {
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 8px !important;
+  }
+  .part-list.grid-mode .part-row {
+    flex-wrap: wrap !important;
+    align-items: center !important;
+    padding: 7px 10px !important;
+    gap: 6px !important;
+  }
+  .part-list.grid-mode .part-row > :nth-child(1) { /* leftGroup */
+    order: 1;
+    flex: 0 0 auto;
+  }
+  .part-list.grid-mode .part-row > :nth-child(4) { /* actionsGroup */
+    order: 2;
+    margin-left: auto !important;
+    flex-direction: row !important;
+    gap: 4px !important;
+  }
+  .part-list.grid-mode .part-row > :nth-child(2) { /* centerGroup */
+    order: 3;
+    flex: 1 1 100% !important;
+    max-width: 100% !important;
+    width: 100% !important;
+  }
+  .part-list.grid-mode .part-row > :nth-child(3) { /* knobsGroup */
+    order: 4;
+    flex: 1 1 100% !important;
+    width: 100% !important;
+    margin-left: 0 !important;
+    justify-content: space-between !important;
+    padding-top: 5px;
+    border-top: 1px dotted rgba(0,0,0,0.12);
+  }
+  html[data-skin="elektron"] .part-list.grid-mode .part-row > :nth-child(3) {
+    border-top-color: rgba(255,255,255,0.08);
+  }
+  @media (max-width: 860px) {
+    .part-list.grid-mode {
+      grid-template-columns: 1fr !important;
+    }
+  }
+
   .part-header-bar{
     display: flex;
     justify-content: space-between;
@@ -5263,14 +5310,18 @@
             </div>
             <button id="btnSyncMultiInView" class="chassis-page-btn" style="padding: 4px 10px; font-size: 10px; font-weight: bold; color: #111; border-color: var(--accent); background: linear-gradient(to bottom, #fff, #e2e4e8);" title="Interroga le 4 parti attive del Virus">🔄 LEGGI 4 PARTI</button>
           </div>
-          <!-- ROUTING MULTI MIDI ACTION BAR -->
+          <!-- ROUTING MULTI MIDI & LAYOUT ACTION BAR -->
           <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px; padding-top: 5px; border-top: 1px dashed rgba(0,0,0,0.12);">
             <div style="display: flex; align-items: center; gap: 5px; flex-wrap: wrap;">
               <span style="font-size: 9.5px; font-weight: 800; letter-spacing: 0.05em; color: #444;">ROUTING MIDI CANALI:</span>
               <button id="btnSetMultiSplitChannels" class="chassis-page-btn" style="color: #0b7285; border-color: #0b7285; font-weight: 800; padding: 3px 8px; font-size: 9.5px;" title="Configura P1 su Ch 1, P2 su Ch 2, P3 su Ch 3, P4 su Ch 4 via SysEx sul Virus">⚡ MULTITIMBRICO (P1:Ch1 · P2:Ch2 · P3:Ch3 · P4:Ch4)</button>
               <button id="btnSetMultiLayerChannels" class="chassis-page-btn" style="color: #5f3dc4; border-color: #5f3dc4; font-weight: 800; padding: 3px 8px; font-size: 9.5px;" title="Assegna tutte e 4 le parti al Canale 1 per suonare insieme in Layer">🎛 LAYER (TUTTE SU CH 1)</button>
             </div>
-            <span style="font-size: 9px; opacity: 0.65; font-family: monospace;">SysEx Page C (0x72) Param 34</span>
+            <div style="display: flex; align-items: center; gap: 4px;">
+              <span style="font-size: 9.5px; font-weight: 800; color: #444;">VISTA:</span>
+              <button id="btnMultiLayoutGrid" class="chassis-page-btn" style="padding: 2px 7px; font-size: 9.5px; font-weight: bold;" title="Vista compatta Griglia 2x2 per visualizzare tutte le 4 parti insieme senza scroll">▦ 2x2 GRID</button>
+              <button id="btnMultiLayoutList" class="chassis-page-btn" style="padding: 2px 7px; font-size: 9.5px; font-weight: bold;" title="Vista a righe estese">☰ LISTA</button>
+            </div>
           </div>
           <div id="quickScanStatus" style="font-size: 10px; color: #666; font-family: monospace; min-height: 14px;"></div>
         </div>
@@ -7248,6 +7299,10 @@ function updateSingleOledDisplay() {
       midiOutEl.title = 'Nessuna interfaccia MIDI OUT selezionata. Clicca per aprire impostazioni MIDI.';
     }
   }
+  const btnOpenDed = document.getElementById('btnOpenDedicatedEditor');
+  if (btnOpenDed) {
+    btnOpenDed.href = `single_editor.html?part=${pIdx}&name=${encodeURIComponent(patchName || 'INIT')}`;
+  }
 }
 window.updateSingleOledDisplay = updateSingleOledDisplay;
 
@@ -7504,6 +7559,7 @@ function exportCurrentPatchSyx() {
     controlsBox.appendChild(btnExpSyx);
 
     const btnOpenDedicated = document.createElement('a');
+    btnOpenDedicated.id = 'btnOpenDedicatedEditor';
     btnOpenDedicated.className = 'arp-hw-preset-btn';
     btnOpenDedicated.href = 'single_editor.html';
     btnOpenDedicated.target = '_blank';
@@ -10182,6 +10238,14 @@ function exportCurrentPatchSyx() {
         : (getBankPatchName(part.values.bank, part.values.program) || 'INIT');
       patchNameEl.textContent = name.toUpperCase();
     }
+    const soft1El = document.getElementById('snowLcdSoft1');
+    const soft3El = document.getElementById('snowLcdSoft3');
+    if (soft1El) {
+      soft1El.textContent = window.multiRoutingMode === 'layer' ? '<layer ch1>' : '<multi 1-4>';
+    }
+    if (soft3El) {
+      soft3El.textContent = `P${pIdx + 1}: CH ${part.values.channel + 1}`;
+    }
     if (typeof updateVirusSnowFrontPanel === 'function') {
       updateVirusSnowFrontPanel(pIdx);
     }
@@ -10424,9 +10488,34 @@ function exportCurrentPatchSyx() {
     });
     actionsGroup.appendChild(editBtn);
 
+    const extLink = document.createElement('a');
+    extLink.className = 'chassis-page-btn';
+    extLink.style.cssText = 'padding: 2px 5px; font-size: 9.5px; height: 22px; color: #38bdf8; border-color: #38bdf8; text-decoration: none; display: inline-flex; align-items: center; justify-content: center;';
+    extLink.textContent = '↗️';
+    extLink.title = `Apri P${index + 1} direttamente nella pagina Editor Dedicato`;
+    extLink.target = '_blank';
+    extLink.href = `single_editor.html?part=${index}&name=${encodeURIComponent(part.name || 'INIT')}`;
+    actionsGroup.appendChild(extLink);
+
     row.appendChild(actionsGroup);
 
     return row;
+  }
+
+  function applyMultiLayout(mode) {
+    const partList = document.getElementById('partList');
+    const btnGrid = document.getElementById('btnMultiLayoutGrid');
+    const btnList = document.getElementById('btnMultiLayoutList');
+    if (!partList) return;
+    if (mode === 'grid') {
+      partList.classList.add('grid-mode');
+      if (btnGrid) btnGrid.classList.add('active');
+      if (btnList) btnList.classList.remove('active');
+    } else {
+      partList.classList.remove('grid-mode');
+      if (btnList) btnList.classList.add('active');
+      if (btnGrid) btnGrid.classList.remove('active');
+    }
   }
 
   function buildMultiView(){
@@ -10437,6 +10526,10 @@ function exportCurrentPatchSyx() {
     for (let i = 0; i < NUM_PARTS; i++){
       partList.appendChild(createPartRow(i));
     }
+
+    // Apply preferred layout mode (grid vs list)
+    const savedLayout = localStorage.getItem('virus_multi_layout') || 'grid';
+    applyMultiLayout(savedLayout);
 
     // Inizializza selettore banco veloce se non già popolato
     const quickScanSel = document.getElementById('quickBankScanSelect');
@@ -10449,9 +10542,35 @@ function exportCurrentPatchSyx() {
       });
     }
 
+    // Sync MIDI routing mode state
+    const isLayer = multiParts && multiParts.every(p => p.values && p.values.channel === 0);
+    window.multiRoutingMode = isLayer ? 'layer' : 'split';
+    const btnSplit = document.getElementById('btnSetMultiSplitChannels');
+    const btnLayer = document.getElementById('btnSetMultiLayerChannels');
+    const opsCh = document.getElementById('opsChannel');
+    if (isLayer) {
+      if (btnLayer) btnLayer.classList.add('active');
+      if (btnSplit) btnSplit.classList.remove('active');
+      if (opsCh) opsCh.textContent = 'layer (ch 1)';
+    } else {
+      if (btnSplit) btnSplit.classList.add('active');
+      if (btnLayer) btnLayer.classList.remove('active');
+      if (opsCh) opsCh.textContent = 'multi (ch 1-4)';
+    }
+
     selectPartRowUI(currentPartIndex || 0);
     updateVirusSnowMasterDisplay(currentPartIndex || 0);
   }
+
+  document.getElementById('btnMultiLayoutGrid')?.addEventListener('click', () => {
+    applyMultiLayout('grid');
+    localStorage.setItem('virus_multi_layout', 'grid');
+  });
+
+  document.getElementById('btnMultiLayoutList')?.addEventListener('click', () => {
+    applyMultiLayout('list');
+    localStorage.setItem('virus_multi_layout', 'list');
+  });
 
   // Quick Bank Scanner wiring
   document.getElementById('btnQuickScanBank')?.addEventListener('click', () => {
@@ -11245,7 +11364,15 @@ function exportCurrentPatchSyx() {
   document.getElementById('btnSyncMultiParts')?.addEventListener('click', syncAllMultiParts);
 
   function setMultiRouting(mode) {
+    window.multiRoutingMode = mode;
+    const btnSplit = document.getElementById('btnSetMultiSplitChannels');
+    const btnLayer = document.getElementById('btnSetMultiLayerChannels');
+    const opsCh = document.getElementById('opsChannel');
+
     if (mode === 'split') {
+      if (btnSplit) btnSplit.classList.add('active');
+      if (btnLayer) btnLayer.classList.remove('active');
+      if (opsCh) opsCh.textContent = 'multi (ch 1-4)';
       for (let i = 0; i < NUM_PARTS; i++) {
         multiParts[i].values.channel = i; // P1=0 (Ch 1), P2=1 (Ch 2), P3=2 (Ch 3), P4=3 (Ch 4)
         multiParts[i].enabled = true;
@@ -11263,10 +11390,14 @@ function exportCurrentPatchSyx() {
       buildMultiView();
       if (typeof renderMultiPartsOverview === 'function') renderMultiPartsOverview();
       if (typeof updateKeyboardPartDisplay === 'function') updateKeyboardPartDisplay();
+      if (typeof updateVirusSnowMasterDisplay === 'function') updateVirusSnowMasterDisplay(currentPartIndex || 0);
       setLastAction('⚡ Modalità Multitimbrica: P1->Ch1, P2->Ch2, P3->Ch3, P4->Ch4 sincronizzati');
       const st = document.getElementById('quickScanStatus');
       if (st) st.textContent = '⚡ Canali MIDI configurati via SysEx: P1=Ch1, P2=Ch2, P3=Ch3, P4=Ch4.';
     } else if (mode === 'layer') {
+      if (btnLayer) btnLayer.classList.add('active');
+      if (btnSplit) btnSplit.classList.remove('active');
+      if (opsCh) opsCh.textContent = 'layer (ch 1)';
       for (let i = 0; i < NUM_PARTS; i++) {
         multiParts[i].values.channel = 0; // Tutte su Canale 1
         multiParts[i].enabled = true;
@@ -11280,6 +11411,7 @@ function exportCurrentPatchSyx() {
       buildMultiView();
       if (typeof renderMultiPartsOverview === 'function') renderMultiPartsOverview();
       if (typeof updateKeyboardPartDisplay === 'function') updateKeyboardPartDisplay();
+      if (typeof updateVirusSnowMasterDisplay === 'function') updateVirusSnowMasterDisplay(currentPartIndex || 0);
       setLastAction('🎛 Modalità Layer 4 Parti: tutte le parti assegnate a Canale 1');
       const st = document.getElementById('quickScanStatus');
       if (st) st.textContent = '🎛 Tutte le 4 parti rispondono contemporaneamente su Canale 1 (Layer).';
