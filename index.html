@@ -7266,9 +7266,9 @@ function exportCurrentPatchSyx() {
         { title: 'Editing a 3 Oscillatori', desc: 'Naviga tra le pagine OSC 1, OSC 2, OSC 3/NOISE, FILTER, AMP, LFO 1 e FX per scolpire ogni dettaglio della parte attiva (P1..P4).' },
         { title: 'Display Grafico & Curve Filtro', desc: 'Visualizzazione OLED vettoriale con curve di filtro passa-basso/alto/banda, inviluppi ADSR e valori numerici precisi.' },
         { title: 'Strumenti Creativi (Random/Mutate)', desc: 'Genera patch musicali con <code>🎲 RANDOM</code>, crea variazioni sottili con <code>🧬 MUTATE</code> ed esporta il dump con <code>💾 SALVA .SYX</code>.' },
-        { title: 'Lettura Edit Buffer Hardware', desc: 'Clicca <code>📥 LEGGI SYNTH</code> per richiedere il dump SysEx della patch attiva dal Virus TI e visualizzarla su schermo.' }
+        { title: 'Pagina Editor Dedicata a Schermo Intero', desc: 'Clicca su <code>↗️ EDITOR DEDICATO</code> per aprire la suite espansa con oscilloscopio in tempo reale, curve Bode dei doppi filtri, editor ADSR interattivo e Modulation Matrix completa a 6 slot.' }
       ],
-      tip: 'Seleziona P1, P2, P3 o P4 nella barra superiore per passare all\'editing di un\'altra parte senza interrompere il suono.'
+      tip: 'Puoi usare la vista rapida integrata o aprire la pagina dedicata single_editor.html per una sessione di sound design approfondita.'
     });
     singleInfo.style.cssText = 'position: absolute; top: 14px; right: 36px; z-index: 50;';
     elektronWrapper.appendChild(singleInfo);
@@ -7382,6 +7382,15 @@ function exportCurrentPatchSyx() {
       exportCurrentPatchSyx();
     });
     controlsBox.appendChild(btnExpSyx);
+
+    const btnOpenDedicated = document.createElement('a');
+    btnOpenDedicated.className = 'arp-hw-preset-btn';
+    btnOpenDedicated.href = 'single_editor.html';
+    btnOpenDedicated.target = '_blank';
+    btnOpenDedicated.style.cssText = 'padding: 6px 11px; font-size: 11px; color: #38bdf8; border-color: #38bdf8; text-decoration: none; display: inline-flex; align-items: center; gap: 4px; font-weight: 800;';
+    btnOpenDedicated.innerHTML = '↗️ EDITOR DEDICATO (PAGINA)';
+    btnOpenDedicated.title = 'Apri l\'editor approfondito completo a tutta pagina (Wavetable, Dual Filter Bode Plot, ADSR Interattivi, LFO, Mod Matrix, FX)';
+    controlsBox.appendChild(btnOpenDedicated);
 
     topBar.appendChild(controlsBox);
 
