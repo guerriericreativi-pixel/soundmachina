@@ -27,3 +27,6 @@ check.js
 old_index.html
 index_head.html
 .netlify/
+
+# anteprime dei render Blender (--preview)
+assets/sprites/*-preview.webp

@@ -5381,6 +5381,1003 @@
       flex-wrap: wrap;
     }
   }
+
+  /* ==========================================================================
+     PHOTOREAL SKIN — fedele all'hardware reale (virus_ti_snow_hires.jpg):
+     scocca in alluminio verniciato grigio chiaro senza fianchi in legno,
+     tasti in gomma grigia senza scritte (serigrafia sotto), manopole in
+     plastica zigrinata con calotta chiara e indice bianco, cornice LCD in
+     alluminio spazzolato con viti a brugola. Texture procedurali SVG.
+     ========================================================================== */
+  :root {
+    --sm-grain: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.9' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 0 .08 0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23g)'/%3E%3C/svg%3E");
+    --sm-brush: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='1400' height='120'%3E%3Cfilter id='b'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='.0025 .9' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix values='0 0 0 0 1 0 0 0 0 1 0 0 0 0 1 .55 0 0 0 -.18'/%3E%3C/filter%3E%3Crect width='1400' height='120' filter='url(%23b)'/%3E%3C/svg%3E");
+    --hw-body-hi: #ebebe9;
+    --hw-body: #e2e2e0;
+    --hw-body-lo: #d8d8d5;
+    --hw-lip: #c4c4c1;
+    --hw-recess: #d2d1cd;
+    --hw-recess-edge: #b9b8b3;
+    --hw-key-hi: #ababa9;
+    --hw-key: #9e9e9c;
+    --hw-key-lo: #8f8f8d;
+    --hw-key-edge: #767674;
+    --hw-print: #48484a;
+    --hw-plate: #7b726c;
+    --hw-plate-text: #f2efea;
+    --hw-knob-skirt-hi: #8a8a88;
+    --hw-knob-skirt-lo: #5c5c5a;
+    --hw-knob-cap: #cdcdcb;
+    --hw-knob-pointer: #f6f6f4;
+    --hw-accent-print: #23345c;
+  }
+  html[data-skin="elektron"] {
+    --hw-body-hi: #55585d;
+    --hw-body: #46494e;
+    --hw-body-lo: #393c40;
+    --hw-lip: #1f2023;
+    --hw-recess: #2c2d30;
+    --hw-recess-edge: #18191b;
+    --hw-key-hi: #3c3d41;
+    --hw-key: #313236;
+    --hw-key-lo: #27282b;
+    --hw-key-edge: #111214;
+    --hw-print: #d3d4d7;
+    --hw-plate: #222326;
+    --hw-plate-text: #d9dadc;
+    --hw-knob-skirt-hi: #2e2f32;
+    --hw-knob-skirt-lo: #111113;
+    --hw-knob-cap: #26272a;
+    --hw-knob-pointer: #ff2a3b;
+    --hw-accent-print: #ff2a3b;
+  }
+
+  /* ---- Scocca: alluminio piegato a cuneo, bordo frontale arrotondato ---- */
+  #snowHardwareChassis {
+    background:
+      var(--sm-grain),
+      radial-gradient(140% 90% at 30% -20%, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0) 55%),
+      linear-gradient(180deg, var(--hw-body-hi) 0%, var(--hw-body) 50%, var(--hw-body-lo) 100%) !important;
+    border: 1px solid rgba(0,0,0,0.10) !important;
+    border-top-color: rgba(255,255,255,0.9) !important;
+    border-bottom: none !important;
+    border-radius: 10px 10px 16px 16px !important;
+    overflow: visible !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.85),
+      inset 0 -10px 14px -8px rgba(0,0,0,0.10),
+      0 9px 0 -1px var(--hw-lip),
+      0 10px 0 -1px rgba(0,0,0,0.18),
+      0 30px 50px -10px rgba(0,0,0,0.35),
+      0 12px 20px rgba(0,0,0,0.12) !important;
+  }
+  html[data-skin="elektron"] #snowHardwareChassis {
+    background:
+      var(--sm-brush),
+      var(--sm-grain),
+      radial-gradient(140% 90% at 30% -20%, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0) 55%),
+      linear-gradient(180deg, var(--hw-body-hi) 0%, var(--hw-body) 50%, var(--hw-body-lo) 100%) !important;
+    border-color: rgba(0,0,0,0.6) !important;
+    border-top-color: rgba(255,255,255,0.22) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.20),
+      inset 0 -10px 14px -8px rgba(0,0,0,0.35),
+      0 9px 0 -1px var(--hw-lip),
+      0 10px 0 -1px rgba(0,0,0,0.6),
+      0 30px 50px -10px rgba(0,0,0,0.85),
+      0 12px 20px rgba(0,0,0,0.45) !important;
+  }
+  /* Il vero Snow non ha fianchi in legno né supporto: il legno nella foto è il tavolo */
+  #snowHardwareChassis::after,
+  #snowHardwareChassis > .chassis-wood-strip,
+  .snow-desk-wooden-rest { display: none !important; }
+
+  /* ---- Serigrafia ---- */
+  #snowHardwareChassis .chassis-logo,
+  #snowHardwareChassis .snow-knob-top-label,
+  #snowHardwareChassis .snow-matrix-header-row,
+  #snowHardwareChassis .snow-matrix-header-row span,
+  #snowHardwareChassis .snow-nav-key-col > span,
+  #snowHardwareChassis .snow-nav-sub-labels,
+  #snowHardwareChassis .snow-nav-sub-labels *,
+  #snowHardwareChassis .snow-vert-btn-unit > span,
+  #snowHardwareChassis .snow-front-dock > span,
+  #snowHardwareChassis [style*="color: #444"]:not(.virus-snow-lcd-front *),
+  #snowHardwareChassis [style*="color: #555"]:not(.virus-snow-lcd-front *),
+  #snowHardwareChassis [style*="color: #222"]:not(.virus-snow-lcd-front *),
+  #snowHardwareChassis [style*="color: #334155"]:not(.virus-snow-lcd-front *) {
+    color: var(--hw-print) !important;
+    text-shadow: none !important;
+  }
+  #snowHardwareChassis .snow-front-val { color: var(--hw-print) !important; opacity: 0.75; }
+  #snowHardwareChassis .chassis-access-logo,
+  #snowHardwareChassis .chassis-access-logo span { color: var(--hw-accent-print) !important; }
+
+  /* ---- Pannelli ribassati ---- */
+  #snowHardwareChassis .snow-matrix-section,
+  #snowHardwareChassis .snow-front-dock {
+    background: var(--sm-grain), var(--hw-recess) !important;
+    border: 1px solid var(--hw-recess-edge) !important;
+    border-radius: 10px !important;
+    box-shadow:
+      inset 0 2px 3px rgba(0,0,0,0.10),
+      inset 0 -1px 0 rgba(255,255,255,0.35),
+      0 1px 0 rgba(255,255,255,0.65) !important;
+  }
+  html[data-skin="elektron"] #snowHardwareChassis .snow-matrix-section,
+  html[data-skin="elektron"] #snowHardwareChassis .snow-front-dock {
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.55), 0 1px 0 rgba(255,255,255,0.10) !important;
+  }
+  #snowHardwareChassis .snow-matrix-bottom-row { border-top-color: transparent !important; }
+
+  /* ---- Placche etichette ---- */
+  #snowHardwareChassis .snow-values-pill-bar,
+  #snowHardwareChassis .snow-sub-pill-bar {
+    background: var(--hw-plate) !important;
+    color: var(--hw-plate-text) !important;
+    border-radius: 2px 2px 9px 9px !important;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,0.25) !important;
+    text-shadow: none !important;
+  }
+
+  /* ---- Tasti in gomma grigia: nessuna scritta, nessuna luce ---- */
+  #snowHardwareChassis .snow-btn-row-8 .snow-matrix-btn,
+  #snowHardwareChassis .snow-sq-btn,
+  #snowHardwareChassis .snow-sq-nav-btn {
+    position: relative;
+    overflow: visible !important;
+    background:
+      radial-gradient(130% 80% at 50% 0%, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0) 70%),
+      linear-gradient(180deg, var(--hw-key-hi) 0%, var(--hw-key) 60%, var(--hw-key-lo) 100%) !important;
+    border: 1px solid var(--hw-key-edge) !important;
+    border-radius: 4px !important;
+    color: transparent !important;
+    text-shadow: none !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.30),
+      inset 0 -2px 2px rgba(0,0,0,0.12),
+      0 2px 0 var(--hw-key-edge),
+      0 3px 5px rgba(0,0,0,0.25) !important;
+    transition: transform 60ms ease, box-shadow 60ms ease !important;
+    filter: none !important;
+  }
+  #snowHardwareChassis .snow-btn-row-8 .snow-matrix-btn { aspect-ratio: 1 / 1; height: auto !important; padding: 0 !important; }
+  #snowHardwareChassis .snow-btn-row-8 { gap: 8px !important; padding-bottom: 15px; }
+  #snowHardwareChassis .snow-btn-row-8 .snow-matrix-btn:hover,
+  #snowHardwareChassis .snow-sq-btn:hover,
+  #snowHardwareChassis .snow-sq-nav-btn:hover {
+    background:
+      radial-gradient(130% 80% at 50% 0%, rgba(255,255,255,0.32) 0%, rgba(255,255,255,0) 70%),
+      linear-gradient(180deg, var(--hw-key-hi) 0%, var(--hw-key) 60%, var(--hw-key-lo) 100%) !important;
+  }
+  #snowHardwareChassis .snow-btn-row-8 .snow-matrix-btn:active,
+  #snowHardwareChassis .snow-sq-btn:active,
+  #snowHardwareChassis .snow-sq-nav-btn:active,
+  #snowHardwareChassis .snow-matrix-btn.audition-active {
+    transform: translateY(2px) !important;
+    box-shadow:
+      inset 0 1px 2px rgba(0,0,0,0.20),
+      0 0 0 var(--hw-key-edge),
+      0 1px 2px rgba(0,0,0,0.25) !important;
+  }
+  /* serigrafia sotto il tasto */
+  #snowHardwareChassis .hw-label {
+    position: absolute;
+    top: calc(100% + 5px);
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;
+    font-size: 8px;
+    font-weight: 600;
+    letter-spacing: 0.02em;
+    text-transform: uppercase;
+    color: var(--hw-print);
+    pointer-events: none;
+  }
+  #snowHardwareChassis .snow-sq-btn { width: 42px !important; height: 42px !important; margin-bottom: 14px; }
+  #snowHardwareChassis .snow-vert-btn-unit > span:last-child { font-size: 7px !important; font-weight: 600 !important; }
+
+  /* ---- LED 3mm trasparenti ---- */
+  #snowHardwareChassis .snow-indicator-led {
+    width: 7px !important; height: 7px !important;
+    background: radial-gradient(circle at 40% 35%, #f2eec6 0%, #bdb57a 55%, #8a8250 100%) !important;
+    border: 1px solid rgba(0,0,0,0.30) !important;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.6), inset 0 -1px 1px rgba(0,0,0,0.25) !important;
+  }
+  #snowHardwareChassis .snow-indicator-led.active-amber {
+    background: radial-gradient(circle at 40% 35%, #ffffff 0%, #fffbe2 35%, #f3e7a0 100%) !important;
+    border-color: rgba(160,150,90,0.6) !important;
+    box-shadow: 0 0 5px rgba(255,250,215,0.95), 0 0 12px rgba(255,240,170,0.65) !important;
+  }
+  html[data-skin="elektron"] #snowHardwareChassis .snow-indicator-led {
+    background: radial-gradient(circle at 40% 35%, #7a4040 0%, #401818 55%, #1c0909 100%) !important;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.10), inset 0 -1px 1px rgba(0,0,0,0.5) !important;
+  }
+  html[data-skin="elektron"] #snowHardwareChassis .snow-indicator-led.active-amber {
+    background: radial-gradient(circle at 40% 35%, #ffe6e6 0%, #ff5a64 35%, #d0101e 100%) !important;
+    box-shadow: 0 0 6px #ff2a3b, 0 0 14px rgba(255,42,59,0.6) !important;
+  }
+
+  /* ---- Manopole: plastica zigrinata, calotta chiara, indice bianco ---- */
+  #snowHardwareChassis .snow-front-knob.chassis-knob-outer {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: 0 6px 8px -2px rgba(0,0,0,0.35), 0 2px 3px rgba(0,0,0,0.25) !important;
+  }
+  /* Cutoff / Resonance hanno il collare bianco alla base */
+  #snowHardwareChassis #frontKnobCutoff,
+  #snowHardwareChassis #frontKnobResonance {
+    background: radial-gradient(circle, #f4f4f2 0%, #e2e2df 70%, #c9c9c6 100%) !important;
+    box-shadow: 0 2px 3px rgba(0,0,0,0.25), inset 0 -1px 1px rgba(0,0,0,0.15) !important;
+  }
+  html[data-skin="elektron"] #snowHardwareChassis #frontKnobCutoff,
+  html[data-skin="elektron"] #snowHardwareChassis #frontKnobResonance {
+    background: radial-gradient(circle, #3a3b3f 0%, #2a2b2e 70%, #1a1b1d 100%) !important;
+  }
+  #snowHardwareChassis .snow-front-knob .chassis-knob-inner {
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0) 40%, rgba(0,0,0,0.30) 100%),
+      repeating-conic-gradient(from 0deg, var(--hw-knob-skirt-hi) 0deg 4deg, var(--hw-knob-skirt-lo) 4deg 8deg) !important;
+    box-shadow: inset 0 0 0 1px rgba(0,0,0,0.30), 0 1px 1px rgba(0,0,0,0.25) !important;
+    border: none !important;
+  }
+  #snowHardwareChassis .snow-front-knob .chassis-knob-top {
+    background:
+      radial-gradient(110% 110% at 40% 25%, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0) 50%),
+      radial-gradient(circle, var(--hw-knob-cap) 0%, var(--hw-knob-cap) 60%, rgba(0,0,0,0.12) 100%),
+      var(--hw-knob-cap) !important;
+    border: none !important;
+    box-shadow:
+      inset 0 1px 1px rgba(255,255,255,0.7),
+      inset 0 -1px 2px rgba(0,0,0,0.20),
+      0 0 0 1px rgba(0,0,0,0.22),
+      0 1px 2px rgba(0,0,0,0.30) !important;
+  }
+  html[data-skin="elektron"] #snowHardwareChassis .snow-front-knob .chassis-knob-top {
+    background:
+      radial-gradient(110% 110% at 40% 25%, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 50%),
+      var(--hw-knob-cap) !important;
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.12), inset 0 -1px 2px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,0,0,0.6) !important;
+  }
+  #snowHardwareChassis .snow-front-knob .chassis-knob-indicator {
+    top: -5px !important;
+    width: 3px !important;
+    height: 20px !important;
+    border-radius: 2px !important;
+    background: var(--hw-knob-pointer) !important;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.35) !important;
+  }
+  html[data-skin="elektron"] #snowHardwareChassis .snow-front-knob .chassis-knob-indicator {
+    box-shadow: 0 0 4px #ff2a3b, 0 0 9px rgba(255,42,59,0.6) !important;
+  }
+  #snowHardwareChassis .snow-val-scale-svg circle,
+  #snowHardwareChassis .snow-scale-svg circle { fill: var(--hw-print) !important; filter: none !important; }
+  #snowHardwareChassis .snow-scale-svg text { fill: var(--hw-print) !important; }
+  #snowHardwareChassis .snow-vol-arc-svg { color: var(--hw-accent-print) !important; }
+
+  /* ---- Cornice LCD in alluminio spazzolato con viti a brugola ---- */
+  #snowHardwareChassis .snow-front-acrylic-window {
+    background:
+      var(--sm-brush),
+      linear-gradient(180deg, #dcdddf 0%, #c9cacd 100%) !important;
+    backdrop-filter: none !important;
+    border: 1px solid #9fa1a5 !important;
+    border-radius: 3px !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.85),
+      inset 0 -1px 0 rgba(0,0,0,0.15),
+      0 2px 0 #a9abaf,
+      0 4px 8px rgba(0,0,0,0.18) !important;
+  }
+  html[data-skin="elektron"] #snowHardwareChassis .snow-front-acrylic-window {
+    background: var(--sm-brush), linear-gradient(180deg, #3b3d41 0%, #2a2c2f 100%) !important;
+    border-color: #111214 !important;
+    box-shadow: inset 0 1px 0 rgba(255,255,255,0.15), 0 2px 0 #111214, 0 4px 8px rgba(0,0,0,0.5) !important;
+  }
+  #snowHardwareChassis .snow-front-acrylic-window > div:not(.acrylic-screw):not(.virus-snow-lcd-front),
+  #snowHardwareChassis .snow-front-acrylic-window > div:not(.acrylic-screw):not(.virus-snow-lcd-front) * { color: var(--hw-print) !important; }
+  #snowHardwareChassis .acrylic-screw,
+  #snowHardwareChassis .chassis-screw {
+    background: conic-gradient(from 30deg, #b8bcc2, #f6f7f8 60deg, #9da2a9 130deg, #e9ebed 200deg, #8e939a 280deg, #b8bcc2) !important;
+    border: 1px solid #6f737a !important;
+    box-shadow: 0 1px 1px rgba(255,255,255,0.6), 0 1px 2px rgba(0,0,0,0.35) !important;
+  }
+
+  /* ---- LCD STN bianco-azzurro retroilluminato ---- */
+  #snowHardwareChassis .virus-snow-lcd-front {
+    background:
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.10) 0 1px, transparent 1px 3px),
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.10) 0 1px, transparent 1px 3px),
+      radial-gradient(120% 140% at 50% 40%, #eef9fd 0%, #d6eef8 60%, #b9dff0 100%) !important;
+    border: 3px solid #23272c !important;
+    border-radius: 2px !important;
+    box-shadow:
+      inset 0 3px 6px rgba(0,0,0,0.35),
+      inset 0 0 20px rgba(120,190,230,0.35),
+      0 0 0 1px rgba(0,0,0,0.25) !important;
+  }
+  #snowHardwareChassis .virus-snow-lcd-front::after {
+    content: '';
+    position: absolute; inset: 0;
+    background: linear-gradient(160deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0.05) 32%, rgba(255,255,255,0) 33%);
+    pointer-events: none;
+    z-index: 3;
+  }
+  #snowHardwareChassis .lcd-patch-name,
+  #snowHardwareChassis .lcd-bank-prog {
+    font-family: 'VT323', monospace !important;
+    font-weight: 400 !important;
+    font-size: 27px !important;
+    letter-spacing: 0.04em !important;
+    line-height: 1 !important;
+    color: #22323d !important;
+    text-shadow: 0 0 1px rgba(20,40,60,0.35) !important;
+  }
+  html[data-skin="elektron"] #snowHardwareChassis .virus-snow-lcd-front {
+    background:
+      repeating-linear-gradient(90deg, rgba(0,0,0,0.22) 0 1px, transparent 1px 3px),
+      repeating-linear-gradient(0deg, rgba(0,0,0,0.22) 0 1px, transparent 1px 3px),
+      radial-gradient(120% 140% at 50% 35%, #6a0a14 0%, #3a040a 55%, #1c0104 100%) !important;
+    border-color: #0b0b0c !important;
+    box-shadow: inset 0 3px 10px rgba(0,0,0,0.85), inset 0 0 24px rgba(255,30,45,0.18), 0 0 18px rgba(224,36,36,0.22) !important;
+  }
+  html[data-skin="elektron"] #snowHardwareChassis .virus-snow-lcd-front::after {
+    background: linear-gradient(160deg, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0.02) 32%, rgba(255,255,255,0) 33%);
+  }
+  html[data-skin="elektron"] #snowHardwareChassis .lcd-patch-name { color: #ffffff !important; text-shadow: 0 0 8px rgba(255,255,255,0.5), 0 0 18px rgba(255,30,45,0.45) !important; }
+  html[data-skin="elektron"] #snowHardwareChassis .lcd-bank-prog { color: #ff2a3b !important; text-shadow: 0 0 8px rgba(255,42,59,0.7) !important; }
+  html[data-skin="elektron"] #snowHardwareChassis .lcd-footer-bar span { color: #ffb3ba !important; }
+
+  /* ---- Selettori tema/vista discreti ---- */
+  #snowHardwareChassis .snow-theme-quick-switch,
+  #snowHardwareChassis .snow-tilt-quick-switch {
+    background: rgba(0,0,0,0.05) !important;
+    border: 1px solid rgba(0,0,0,0.14) !important;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.10) !important;
+    color: var(--hw-print) !important;
+    font-size: 9px !important;
+    padding: 3px 9px !important;
+  }
+
+  /* ==========================================================================
+     PHOTOREAL SKIN — altre viste (MULTI, SINGLE, FX, PATCH, ARP, SEQ, SONG):
+     stessi materiali del pannello frontale.
+     ========================================================================== */
+  .hardware-chassis:not(#snowHardwareChassis) {
+    background:
+      var(--sm-grain),
+      radial-gradient(140% 70% at 30% -10%, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0) 55%),
+      linear-gradient(180deg, var(--hw-body-hi) 0%, var(--hw-body) 50%, var(--hw-body-lo) 100%) !important;
+    border: 1px solid rgba(0,0,0,0.10) !important;
+    border-top-color: rgba(255,255,255,0.9) !important;
+    border-radius: 10px 10px 16px 16px !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.85),
+      inset 0 -10px 14px -8px rgba(0,0,0,0.10),
+      0 9px 0 -1px var(--hw-lip),
+      0 10px 0 -1px rgba(0,0,0,0.18),
+      0 30px 50px -10px rgba(0,0,0,0.30),
+      0 12px 20px rgba(0,0,0,0.10) !important;
+  }
+  html[data-skin="elektron"] .hardware-chassis:not(#snowHardwareChassis) {
+    background:
+      var(--sm-brush),
+      var(--sm-grain),
+      linear-gradient(180deg, var(--hw-body-hi) 0%, var(--hw-body) 50%, var(--hw-body-lo) 100%) !important;
+    border-color: rgba(0,0,0,0.6) !important;
+    border-top-color: rgba(255,255,255,0.22) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.20),
+      0 9px 0 -1px var(--hw-lip),
+      0 10px 0 -1px rgba(0,0,0,0.6),
+      0 30px 50px -10px rgba(0,0,0,0.85) !important;
+  }
+  .hardware-chassis:not(#snowHardwareChassis)::after,
+  .hardware-chassis .chassis-wood-strip { display: none !important; }
+
+  /* Titoli serigrafati */
+  .hardware-chassis .chassis-logo,
+  .hardware-chassis .fx-rack-title,
+  .hardware-chassis .chassis-knob-label,
+  .hardware-chassis .fx-knob-label { color: var(--hw-print) !important; text-shadow: none !important; }
+
+  /* Pannelli ribassati */
+  .hardware-chassis .chassis-hardware-topbar,
+  .hardware-chassis .multi-routing-control-bar,
+  .hardware-chassis .virus-snow-display-panel,
+  .hardware-chassis .single-macros,
+  .hardware-chassis .fx-unit,
+  .hardware-chassis .fx-target-selector,
+  .hardware-chassis .part-row,
+  .hardware-chassis div[style*="background: rgba(0, 0, 0, 0."] {
+    background: var(--sm-grain), var(--hw-recess) !important;
+    border: 1px solid var(--hw-recess-edge) !important;
+    border-radius: 10px !important;
+    box-shadow:
+      inset 0 2px 3px rgba(0,0,0,0.10),
+      inset 0 -1px 0 rgba(255,255,255,0.35),
+      0 1px 0 rgba(255,255,255,0.65) !important;
+  }
+  html[data-skin="elektron"] .hardware-chassis .chassis-hardware-topbar,
+  html[data-skin="elektron"] .hardware-chassis .multi-routing-control-bar,
+  html[data-skin="elektron"] .hardware-chassis .virus-snow-display-panel,
+  html[data-skin="elektron"] .hardware-chassis .single-macros,
+  html[data-skin="elektron"] .hardware-chassis .fx-unit,
+  html[data-skin="elektron"] .hardware-chassis .fx-target-selector,
+  html[data-skin="elektron"] .hardware-chassis .part-row,
+  html[data-skin="elektron"] .hardware-chassis div[style*="background: rgba(0, 0, 0, 0."] {
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.55), 0 1px 0 rgba(255,255,255,0.10) !important;
+  }
+  /* la barra colorata della parte (P1..P4) resta come filetto a sinistra */
+  .hardware-chassis .part-row { border-left-width: 4px !important; }
+
+  /* Manopole Virus: gonna zigrinata, calotta chiara, indice bianco */
+  .hardware-chassis:not(#snowHardwareChassis) .chassis-knob-outer {
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+  .hardware-chassis:not(#snowHardwareChassis) .chassis-knob-inner {
+    background:
+      linear-gradient(180deg, rgba(255,255,255,0.28) 0%, rgba(255,255,255,0) 40%, rgba(0,0,0,0.30) 100%),
+      repeating-conic-gradient(from 0deg, var(--hw-knob-skirt-hi) 0deg 4deg, var(--hw-knob-skirt-lo) 4deg 8deg) !important;
+    border: none !important;
+    box-shadow:
+      inset 0 0 0 1px rgba(0,0,0,0.30),
+      0 5px 7px -2px rgba(0,0,0,0.35),
+      0 2px 3px rgba(0,0,0,0.25) !important;
+  }
+  .hardware-chassis:not(#snowHardwareChassis) .chassis-knob-top {
+    background:
+      radial-gradient(110% 110% at 40% 25%, rgba(255,255,255,0.55) 0%, rgba(255,255,255,0) 50%),
+      var(--hw-knob-cap) !important;
+    border: none !important;
+    box-shadow:
+      inset 0 1px 1px rgba(255,255,255,0.7),
+      inset 0 -1px 2px rgba(0,0,0,0.20),
+      0 0 0 1px rgba(0,0,0,0.22),
+      0 1px 2px rgba(0,0,0,0.30) !important;
+  }
+  html[data-skin="elektron"] .hardware-chassis:not(#snowHardwareChassis) .chassis-knob-top {
+    background: radial-gradient(110% 110% at 40% 25%, rgba(255,255,255,0.12) 0%, rgba(255,255,255,0) 50%), var(--hw-knob-cap) !important;
+    box-shadow: inset 0 1px 1px rgba(255,255,255,0.12), inset 0 -1px 2px rgba(0,0,0,0.5), 0 0 0 1px rgba(0,0,0,0.6) !important;
+  }
+  .hardware-chassis:not(#snowHardwareChassis) .chassis-knob-indicator {
+    background: var(--hw-knob-pointer) !important;
+    width: 3px !important;
+    border-radius: 2px !important;
+    box-shadow: 0 1px 1px rgba(0,0,0,0.35) !important;
+  }
+  html[data-skin="elektron"] .hardware-chassis:not(#snowHardwareChassis) .chassis-knob-indicator {
+    box-shadow: 0 0 4px #ff2a3b, 0 0 9px rgba(255,42,59,0.6) !important;
+  }
+  /* anello valore: sottile arco serigrafato invece del disco pieno */
+  .hardware-chassis .chassis-knob-ring {
+    -webkit-mask: radial-gradient(circle, transparent 64%, #000 66%, #000 72%, transparent 74%);
+            mask: radial-gradient(circle, transparent 64%, #000 66%, #000 72%, transparent 74%);
+    filter: saturate(0) brightness(0.45);
+  }
+  html[data-skin="elektron"] .hardware-chassis .chassis-knob-ring { filter: none; }
+
+  /* Tasti testuali: gomma grigio chiaro con serigrafia scura */
+  .hardware-chassis .chassis-page-btn:not([style*="background"]),
+  .hardware-chassis .arp-hw-preset-btn,
+  .hardware-chassis .seq-page-btn,
+  .hardware-chassis .part-stepper-btn,
+  .hardware-chassis .seq-subtoolbar-btn,
+  .hardware-chassis .fx-part-btn,
+  .hardware-chassis .seq-trk-btn,
+  .hardware-chassis .seq-trk-mute-btn,
+  .hardware-chassis .seq-trk-solo-btn,
+  .hardware-chassis .arp-hw-btn-hold,
+  .hardware-chassis .arp-hw-step-pad {
+    background:
+      radial-gradient(130% 80% at 50% 0%, rgba(255,255,255,0.35) 0%, rgba(255,255,255,0) 70%),
+      linear-gradient(180deg, #d3d3d0 0%, #c6c6c3 60%, #b9b9b6 100%) !important;
+    border: 1px solid #8e8e8b !important;
+    border-radius: 4px !important;
+    color: #2e2e30 !important;
+    text-shadow: 0 1px 0 rgba(255,255,255,0.4) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.55),
+      inset 0 -2px 2px rgba(0,0,0,0.08),
+      0 2px 0 #8e8e8b,
+      0 3px 5px rgba(0,0,0,0.20) !important;
+    transition: transform 60ms ease, box-shadow 60ms ease !important;
+  }
+  /* pad degli step: tasti grigi Virus */
+  .hardware-chassis .arp-hw-step-pad {
+    background:
+      radial-gradient(130% 80% at 50% 0%, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0) 70%),
+      linear-gradient(180deg, var(--hw-key-hi) 0%, var(--hw-key) 60%, var(--hw-key-lo) 100%) !important;
+    border-color: var(--hw-key-edge) !important;
+    color: #f2f2f0 !important;
+    text-shadow: 0 -1px 0 rgba(0,0,0,0.3) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.30),
+      inset 0 -2px 2px rgba(0,0,0,0.12),
+      0 2px 0 var(--hw-key-edge),
+      0 3px 5px rgba(0,0,0,0.25) !important;
+  }
+  html[data-skin="elektron"] .hardware-chassis .chassis-page-btn:not([style*="background"]),
+  html[data-skin="elektron"] .hardware-chassis .arp-hw-preset-btn,
+  html[data-skin="elektron"] .hardware-chassis .seq-page-btn,
+  html[data-skin="elektron"] .hardware-chassis .part-stepper-btn,
+  html[data-skin="elektron"] .hardware-chassis .seq-subtoolbar-btn,
+  html[data-skin="elektron"] .hardware-chassis .fx-part-btn,
+  html[data-skin="elektron"] .hardware-chassis .seq-trk-btn,
+  html[data-skin="elektron"] .hardware-chassis .seq-trk-mute-btn,
+  html[data-skin="elektron"] .hardware-chassis .seq-trk-solo-btn,
+  html[data-skin="elektron"] .hardware-chassis .arp-hw-btn-hold {
+    background:
+      radial-gradient(130% 80% at 50% 0%, rgba(255,255,255,0.10) 0%, rgba(255,255,255,0) 70%),
+      linear-gradient(180deg, var(--hw-key-hi) 0%, var(--hw-key) 60%, var(--hw-key-lo) 100%) !important;
+    border-color: var(--hw-key-edge) !important;
+    color: #d3d4d7 !important;
+    text-shadow: 0 -1px 0 rgba(0,0,0,0.6) !important;
+    box-shadow:
+      inset 0 1px 0 rgba(255,255,255,0.10),
+      0 2px 0 var(--hw-key-edge),
+      0 3px 6px rgba(0,0,0,0.5) !important;
+  }
+  /* premuto / attivo: tasto abbassato con LED ambra (rosso su Dark Star) */
+  .hardware-chassis .chassis-page-btn:not([style*="background"]):active,
+  .hardware-chassis .arp-hw-preset-btn:active,
+  .hardware-chassis .seq-page-btn:active,
+  .hardware-chassis .part-stepper-btn:active,
+  .hardware-chassis .seq-subtoolbar-btn:active,
+  .hardware-chassis .fx-part-btn:active,
+  .hardware-chassis .seq-trk-btn:active,
+  .hardware-chassis .seq-trk-mute-btn:active,
+  .hardware-chassis .seq-trk-solo-btn:active,
+  .hardware-chassis .arp-hw-btn-hold:active,
+  .hardware-chassis .arp-hw-step-pad:active,
+  .hardware-chassis .chassis-page-btn.active:not([style*="background"]),
+  .hardware-chassis .arp-hw-preset-btn.active,
+  .hardware-chassis .seq-page-btn.active,
+  .hardware-chassis .fx-part-btn.active,
+  .hardware-chassis .seq-trk-btn.active,
+  .hardware-chassis .seq-trk-mute-btn.active,
+  .hardware-chassis .seq-trk-solo-btn.active,
+  .hardware-chassis .arp-hw-btn-hold.active,
+  .hardware-chassis .arp-hw-step-pad.active {
+    transform: translateY(2px) !important;
+    box-shadow:
+      inset 0 1px 2px rgba(0,0,0,0.20),
+      inset 0 0 0 1px rgba(255,190,60,0.55),
+      0 0 8px rgba(255,180,40,0.35),
+      0 1px 2px rgba(0,0,0,0.25) !important;
+  }
+  html[data-skin="elektron"] .hardware-chassis .chassis-page-btn.active:not([style*="background"]),
+  html[data-skin="elektron"] .hardware-chassis .arp-hw-preset-btn.active,
+  html[data-skin="elektron"] .hardware-chassis .seq-page-btn.active,
+  html[data-skin="elektron"] .hardware-chassis .fx-part-btn.active,
+  html[data-skin="elektron"] .hardware-chassis .seq-trk-btn.active,
+  html[data-skin="elektron"] .hardware-chassis .seq-trk-mute-btn.active,
+  html[data-skin="elektron"] .hardware-chassis .seq-trk-solo-btn.active,
+  html[data-skin="elektron"] .hardware-chassis .arp-hw-btn-hold.active,
+  html[data-skin="elektron"] .hardware-chassis .arp-hw-step-pad.active {
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.5), inset 0 0 0 1px rgba(255,42,59,0.7), 0 0 10px rgba(255,42,59,0.45) !important;
+  }
+
+  /* Display di stato: LCD STN retroilluminato con riflesso */
+  .hardware-chassis .chassis-top-display-visor {
+    position: relative;
+    background:
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.10) 0 1px, transparent 1px 3px),
+      repeating-linear-gradient(0deg, rgba(255,255,255,0.10) 0 1px, transparent 1px 3px),
+      radial-gradient(120% 160% at 50% 40%, #eef9fd 0%, #d6eef8 60%, #b9dff0 100%) !important;
+    border: 3px solid #23272c !important;
+    border-radius: 3px !important;
+    box-shadow:
+      inset 0 3px 6px rgba(0,0,0,0.30),
+      inset 0 0 20px rgba(120,190,230,0.30),
+      0 0 0 1px rgba(255,255,255,0.5),
+      0 1px 0 rgba(255,255,255,0.7) !important;
+  }
+  html[data-skin="elektron"] .hardware-chassis .chassis-top-display-visor {
+    background:
+      repeating-linear-gradient(90deg, rgba(0,0,0,0.22) 0 1px, transparent 1px 3px),
+      repeating-linear-gradient(0deg, rgba(0,0,0,0.22) 0 1px, transparent 1px 3px),
+      radial-gradient(120% 160% at 50% 35%, #5a0811 0%, #33030a 55%, #1c0104 100%) !important;
+    border-color: #0b0b0c !important;
+    box-shadow: inset 0 3px 10px rgba(0,0,0,0.85), inset 0 0 24px rgba(255,30,45,0.15), 0 0 0 1px rgba(255,255,255,0.08) !important;
+  }
+
+  /* Snow: testi con colore chiaro inline sui pannelli ribassati (erano pensati per fondo scuro) */
+  html:not([data-skin="elektron"]) .hardware-chassis div[style*="background: rgba(0, 0, 0, 0."] [style*="color"]:not(button):not(button *):not(select):not(.chassis-top-display-visor *):not([style*="background"]),
+  html:not([data-skin="elektron"]) .hardware-chassis div[style*="background: rgba(0, 0, 0, 0."] > div:not([style*="background"]):not(.chassis-knob-container) {
+    color: var(--hw-print) !important;
+    text-shadow: none !important;
+  }
+
+  /* ==========================================================================
+     SPRITE RENDERIZZATI IN BLENDER (tools/render-sprites/virus_sprites.py)
+     Manopole: griglia 16x8 = 128 fotogrammi; --kx/--ky impostati da setKnobAngle().
+     La cella inquadra 1.6x il diametro della manopola (spazio per l'ombra).
+     Tasti: 2 fotogrammi (su, giu'), il tasto occupa 1/1.8 della cella.
+     ========================================================================== */
+  .chassis-knob-outer {
+    --knob-sprite: url("assets/sprites/knob-snow.webp");
+    background: transparent !important;
+    border: none !important;
+    box-shadow: none !important;
+  }
+  .chassis-knob-outer::after {
+    content: '';
+    position: absolute;
+    inset: -30%;
+    background: var(--knob-sprite) no-repeat;
+    background-size: 1600% 800%;
+    background-position: calc(var(--kx, 8) * 100% / 15) calc(var(--ky, 4) * 100% / 7);
+    pointer-events: none;
+    z-index: 2;
+  }
+  .chassis-knob-outer > .chassis-knob-inner { opacity: 0 !important; }
+  #frontKnobCutoff, #frontKnobResonance { --knob-sprite: url("assets/sprites/knob-snow-collar.webp"); }
+  html[data-skin="elektron"] .chassis-knob-outer { --knob-sprite: url("assets/sprites/knob-dark.webp"); }
+  html[data-skin="elektron"] #frontKnobCutoff,
+  html[data-skin="elektron"] #frontKnobResonance { --knob-sprite: url("assets/sprites/knob-dark-collar.webp"); }
+  /* l'arco del valore resta visibile attorno alla manopola */
+  .chassis-knob-ring { inset: -22% !important; }
+  .hardware-chassis .chassis-knob-ring {
+    -webkit-mask: radial-gradient(closest-side, transparent 88%, #000 90%, #000 97%, transparent 99%);
+            mask: radial-gradient(closest-side, transparent 88%, #000 90%, #000 97%, transparent 99%);
+  }
+
+  /* Tasti quadrati in gomma */
+  #snowHardwareChassis .snow-btn-row-8 .snow-matrix-btn,
+  #snowHardwareChassis .snow-sq-btn,
+  #snowHardwareChassis .snow-sq-nav-btn,
+  .hardware-chassis .arp-hw-step-pad {
+    --key-sprite: url("assets/sprites/key-snow.webp");
+    position: relative !important;
+    background: transparent !important;
+    border-color: transparent !important;
+    box-shadow: none !important;
+    isolation: isolate;
+    transform: none !important;
+  }
+  html[data-skin="elektron"] #snowHardwareChassis .snow-btn-row-8 .snow-matrix-btn,
+  html[data-skin="elektron"] #snowHardwareChassis .snow-sq-btn,
+  html[data-skin="elektron"] #snowHardwareChassis .snow-sq-nav-btn,
+  html[data-skin="elektron"] .hardware-chassis .arp-hw-step-pad { --key-sprite: url("assets/sprites/key-dark.webp"); }
+  #snowHardwareChassis .snow-btn-row-8 .snow-matrix-btn::before,
+  #snowHardwareChassis .snow-sq-btn::before,
+  #snowHardwareChassis .snow-sq-nav-btn::before,
+  .hardware-chassis .arp-hw-step-pad::before {
+    content: '';
+    position: absolute;
+    inset: -40%;
+    background: var(--key-sprite) 0 0 / 200% 100% no-repeat;
+    z-index: -1;
+    pointer-events: none;
+  }
+  #snowHardwareChassis .snow-btn-row-8 .snow-matrix-btn:active::before,
+  #snowHardwareChassis .snow-sq-btn:active::before,
+  #snowHardwareChassis .snow-sq-nav-btn:active::before,
+  #snowHardwareChassis .snow-matrix-btn.audition-active::before,
+  .hardware-chassis .arp-hw-step-pad:active::before,
+  .hardware-chassis .arp-hw-step-pad.active::before { background-position: 100% 0; }
+  .hardware-chassis .arp-hw-step-pad,
+  .hardware-chassis .arp-hw-step-pad:active,
+  .hardware-chassis .arp-hw-step-pad.active { border-color: transparent !important; box-shadow: none !important; transform: none !important; }
+  .hardware-chassis .arp-hw-step-pad { color: #f4f4f2 !important; }
+  .hardware-chassis .arp-hw-step-pad.active { color: #ffd76a !important; text-shadow: 0 0 6px rgba(255,200,80,0.8) !important; }
+  html[data-skin="elektron"] .hardware-chassis .arp-hw-step-pad.active { color: #ff4d5a !important; text-shadow: 0 0 6px rgba(255,42,59,0.8) !important; }
+
+  /* LED degli step ARP/SEQ come i LED 3mm del pannello */
+  .hardware-chassis .arp-hw-led-well { background: transparent !important; border: none !important; box-shadow: none !important; }
+  .hardware-chassis .arp-hw-led {
+    width: 7px !important; height: 7px !important;
+    background: radial-gradient(circle at 40% 35%, #f2eec6 0%, #bdb57a 55%, #8a8250 100%) !important;
+    border: 1px solid rgba(0,0,0,0.30) !important;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.6), inset 0 -1px 1px rgba(0,0,0,0.25) !important;
+  }
+  .hardware-chassis .arp-hw-led.active {
+    background: radial-gradient(circle at 40% 35%, #ffffff 0%, #fffbe2 35%, #f3e7a0 100%) !important;
+    box-shadow: 0 0 5px rgba(255,250,215,0.95), 0 0 12px rgba(255,240,170,0.65) !important;
+  }
+  html[data-skin="elektron"] .hardware-chassis .arp-hw-led {
+    background: radial-gradient(circle at 40% 35%, #7a4040 0%, #401818 55%, #1c0909 100%) !important;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.10), inset 0 -1px 1px rgba(0,0,0,0.5) !important;
+  }
+  html[data-skin="elektron"] .hardware-chassis .arp-hw-led.active {
+    background: radial-gradient(circle at 40% 35%, #ffe6e6 0%, #ff5a64 35%, #d0101e 100%) !important;
+    box-shadow: 0 0 6px #ff2a3b, 0 0 14px rgba(255,42,59,0.6) !important;
+  }
+
+  /* ==========================================================================
+     SCOCCA RENDERIZZATA IN BLENDER (tools/render-sprites/virus_panels.py)
+     superficie: tile senza giunture 256px; cornici: 9-slice con parti piane trasparenti,
+     cosi' ogni pannello resta ridimensionabile. Valori slice/margini dallo script.
+     ========================================================================== */
+  :root {
+    --hw-surface: url("assets/sprites/surface-snow.webp");
+    --hw-chassis-frame: url("assets/sprites/chassis-snow.webp");
+    --hw-recess-frame: url("assets/sprites/recess-snow.webp");
+    --hw-bezel: url("assets/sprites/bezel-snow.webp");
+    --hw-screw: url("assets/sprites/screw-snow.webp");
+  }
+  html[data-skin="elektron"] {
+    --hw-surface: url("assets/sprites/surface-dark.webp");
+    --hw-chassis-frame: url("assets/sprites/chassis-dark.webp");
+    --hw-recess-frame: url("assets/sprites/recess-dark.webp");
+    --hw-bezel: url("assets/sprites/bezel-dark.webp");
+    --hw-screw: url("assets/sprites/screw-dark.webp");
+  }
+
+  /* scocca: texture renderizzata + luce morbida dall'alto; bordo e ombra dalla cornice */
+  .hardware-chassis,
+  html[data-skin="elektron"] .hardware-chassis {
+    background:
+      radial-gradient(130% 80% at 25% -10%, rgba(255,255,255,0.22) 0%, rgba(255,255,255,0) 60%),
+      linear-gradient(180deg, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0.05) 100%),
+      var(--hw-surface) 0 0 / 256px 256px repeat !important;
+    border: none !important;
+    border-radius: 13px !important;
+    box-shadow: none !important;
+    isolation: isolate;
+    position: relative;
+  }
+  .hardware-chassis::before,
+  html[data-skin] .hardware-chassis.hardware-chassis::before {   /* batte le vecchie regole dei fianchi in legno */
+    content: '' !important;
+    display: block !important;
+    position: absolute !important;
+    /* render inclinato: sotto al pannello sporge la faccia frontale piegata (margini da virus_panels.py) */
+    top: -36px !important; right: -36px !important; bottom: -49px !important; left: -36px !important;
+    width: auto !important; height: auto !important;
+    background: none !important;
+    box-shadow: none !important;
+    border-style: solid !important;
+    border-color: transparent !important;
+    border-width: 63px 63px 58px 63px !important;
+    border-radius: 0 !important;
+    border-image: var(--hw-chassis-frame) 126 126 116 126 / 63px 63px 58px 63px stretch !important;
+    z-index: -1 !important;
+    pointer-events: none !important;
+    transform: none !important;
+  }
+
+  /* incavi dei pannelli */
+  #snowHardwareChassis .snow-matrix-section,
+  #snowHardwareChassis .snow-front-dock,
+  .hardware-chassis .chassis-hardware-topbar,
+  .hardware-chassis .multi-routing-control-bar,
+  .hardware-chassis .virus-snow-display-panel,
+  .hardware-chassis .single-macros,
+  .hardware-chassis .fx-unit,
+  .hardware-chassis .fx-target-selector,
+  .hardware-chassis .part-row,
+  .hardware-chassis div[style*="background: rgba(0, 0, 0, 0."] {
+    border-color: transparent !important;
+    box-shadow: none !important;
+    position: relative;
+    isolation: isolate;
+  }
+  #snowHardwareChassis .snow-matrix-section::after,
+  #snowHardwareChassis .snow-front-dock::after,
+  .hardware-chassis .chassis-hardware-topbar::after,
+  .hardware-chassis .multi-routing-control-bar::after,
+  .hardware-chassis .virus-snow-display-panel::after,
+  .hardware-chassis .single-macros::after,
+  .hardware-chassis .fx-unit::after,
+  .hardware-chassis .fx-target-selector::after,
+  .hardware-chassis .part-row::after,
+  .hardware-chassis div[style*="background: rgba(0, 0, 0, 0."]::after {
+    content: '';
+    position: absolute;
+    inset: -16px;
+    border: 36px solid transparent;
+    border-image: var(--hw-recess-frame) 72 / 36px stretch;
+    z-index: -1;
+    pointer-events: none;
+  }
+
+  /* placche LCD in alluminio con viti (le viti CSS sono gia' nel render) */
+  #snowHardwareChassis .snow-front-acrylic-window,
+  .hardware-chassis .virus-snow-display-panel > div[style*="rgba(255,255,255,0.78)"],
+  html[data-skin] .single-chassis .chassis-screen-recess.single-screen-recess {
+    background: none !important;
+    border: 1px solid transparent !important;
+    box-shadow: none !important;
+    backdrop-filter: none !important;
+    border-image: var(--hw-bezel) 60 fill / 30px / 9px stretch !important;
+  }
+  #snowHardwareChassis .snow-front-acrylic-window .acrylic-screw,
+  .hardware-chassis .single-screen-recess .acrylic-screw,
+  .hardware-chassis .virus-snow-display-panel > div[style*="rgba(255,255,255,0.78)"] .chassis-screw { display: none !important; }
+
+  /* viti della scocca */
+  .hardware-chassis .chassis-screw {
+    background: var(--hw-screw) center / contain no-repeat !important;
+    border: none !important;
+    box-shadow: none !important;
+    width: 14px !important; height: 14px !important;
+  }
+  .hardware-chassis .chassis-screw::before,
+  .hardware-chassis .chassis-screw::after { display: none !important; }
+
+  /* ==========================================================================
+     PULSANTI CON TESTO: tasto in gomma renderizzato (9-slice, su / premuto).
+     slice e margini da virus_panels.py job_button (render inclinato: faccia frontale sotto).
+     ========================================================================== */
+  :root {
+    --hw-btn-up: url("assets/sprites/btn-snow-up.webp");
+    --hw-btn-down: url("assets/sprites/btn-snow-down.webp");
+    --hw-btn-text: #2f2f31;
+    --hw-btn-on: #8a5200;
+  }
+  html[data-skin="elektron"] {
+    --hw-btn-up: url("assets/sprites/btn-dark-up.webp");
+    --hw-btn-down: url("assets/sprites/btn-dark-down.webp");
+    --hw-btn-text: #d3d4d7;
+    --hw-btn-on: #ff4d5a;
+  }
+  .hardware-chassis .chassis-page-btn:not([style*="background"]),
+  .hardware-chassis .arp-hw-preset-btn,
+  .hardware-chassis .seq-page-btn,
+  .hardware-chassis .part-stepper-btn,
+  .hardware-chassis .seq-subtoolbar-btn,
+  .hardware-chassis .fx-part-btn,
+  .hardware-chassis .seq-trk-btn,
+  .hardware-chassis .seq-trk-mute-btn,
+  .hardware-chassis .seq-trk-solo-btn,
+  .hardware-chassis .arp-hw-btn-hold,
+  #snowHardwareChassis .snow-front-dock button:not([style*="background"]),
+  html[data-skin="elektron"] .hardware-chassis .chassis-page-btn:not([style*="background"]),
+  html[data-skin="elektron"] .hardware-chassis .arp-hw-preset-btn,
+  html[data-skin="elektron"] .hardware-chassis .seq-page-btn,
+  html[data-skin="elektron"] .hardware-chassis .part-stepper-btn,
+  html[data-skin="elektron"] .hardware-chassis .seq-subtoolbar-btn,
+  html[data-skin="elektron"] .hardware-chassis .fx-part-btn,
+  html[data-skin="elektron"] .hardware-chassis .seq-trk-btn,
+  html[data-skin="elektron"] .hardware-chassis .seq-trk-mute-btn,
+  html[data-skin="elektron"] .hardware-chassis .seq-trk-solo-btn,
+  html[data-skin="elektron"] .hardware-chassis .arp-hw-btn-hold,
+  html[data-skin="elektron"] #snowHardwareChassis .snow-front-dock button:not([style*="background"]) {
+    background: none !important;
+    box-shadow: none !important;
+    border: 1px solid transparent !important;
+    border-image: var(--hw-btn-up) 38 38 43 38 fill / 19px 19px 21.5px 19px / 13px 13px 16.5px 13px stretch !important;
+    color: var(--hw-btn-text) !important;
+    text-shadow: none !important;
+    transform: none !important;
+    transition: transform 60ms ease !important;
+  }
+  .hardware-chassis .chassis-page-btn:not([style*="background"]):active,
+  .hardware-chassis .arp-hw-preset-btn:active,
+  .hardware-chassis .seq-page-btn:active,
+  .hardware-chassis .part-stepper-btn:active,
+  .hardware-chassis .seq-subtoolbar-btn:active,
+  .hardware-chassis .fx-part-btn:active,
+  .hardware-chassis .seq-trk-btn:active,
+  .hardware-chassis .seq-trk-mute-btn:active,
+  .hardware-chassis .seq-trk-solo-btn:active,
+  .hardware-chassis .arp-hw-btn-hold:active,
+  #snowHardwareChassis .snow-front-dock button:not([style*="background"]):active,
+  .hardware-chassis .chassis-page-btn:not([style*="background"]).active,
+  .hardware-chassis .arp-hw-preset-btn.active,
+  .hardware-chassis .seq-page-btn.active,
+  .hardware-chassis .part-stepper-btn.active,
+  .hardware-chassis .seq-subtoolbar-btn.active,
+  .hardware-chassis .fx-part-btn.active,
+  .hardware-chassis .seq-trk-btn.active,
+  .hardware-chassis .seq-trk-mute-btn.active,
+  .hardware-chassis .seq-trk-solo-btn.active,
+  .hardware-chassis .arp-hw-btn-hold.active,
+  #snowHardwareChassis .snow-front-dock button:not([style*="background"]).active {
+    border-image: var(--hw-btn-down) 38 38 40 38 fill / 19px 19px 20px 19px / 13px 13px 15px 13px stretch !important;
+    transform: translateY(1.5px) !important;
+    box-shadow: none !important;
+    color: var(--hw-btn-on) !important;
+  }
+
+  /* ==========================================================================
+     UX: barra di stato compatta, comandi raggruppati, panic isolato,
+     pannello frontale utilizzabile al tocco su telefono
+     ========================================================================== */
+  .control-room-rail {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    gap: 0 !important;
+    align-items: stretch;
+    margin: 0 0 10px 0 !important;
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    background: color-mix(in srgb, var(--section-bg) 84%, transparent);
+    overflow-x: auto;
+    scrollbar-width: none;
+    cursor: pointer;
+  }
+  .control-room-rail::-webkit-scrollbar { display: none; }
+  .control-room-rail .ops-card {
+    min-height: 0 !important;
+    flex-direction: row !important;
+    align-items: baseline;
+    gap: 6px !important;
+    padding: 7px 14px !important;
+    border: none !important;
+    border-right: 1px solid var(--border) !important;
+    background: transparent !important;
+    flex: 0 0 auto;
+  }
+  .control-room-rail .ops-card:last-child { border-right: none !important; }
+  .control-room-rail .ops-value { font-size: 11px; }
+  .command-strip {
+    display: flex !important;
+    flex-wrap: nowrap !important;
+    align-items: center;
+    gap: 8px !important;
+    margin: 0 0 14px 0 !important;
+    position: relative;
+  }
+  .command-menu { display: flex; gap: 8px; }
+  .command-menu button, .command-strip #btnPanic { min-height: 34px; padding: 6px 16px; }
+  .command-more-btn { display: none; }
+  .command-state { flex: 1 1 auto; min-width: 0; white-space: nowrap !important; overflow: hidden; text-overflow: ellipsis; }
+  .command-strip #btnPanic {
+    flex: 0 0 auto;
+    margin-left: 8px;
+    background: #b42318 !important;
+    border-color: #8e1b12 !important;
+    color: #fff !important;
+    font-weight: 800;
+    letter-spacing: 0.08em;
+    text-transform: uppercase;
+    box-shadow: 0 0 0 3px color-mix(in srgb, #b42318 18%, transparent);
+  }
+  .command-strip #btnPanic:hover { background: #d92d20 !important; }
+
+  @media (max-width: 820px) {
+    /* stato: solo MIDI, modo e canale; il resto al tocco */
+    .control-room-rail:not(.expanded) .ops-card:nth-child(n+4) { display: none; }
+    .control-room-rail.expanded { flex-wrap: wrap !important; }
+    .control-room-rail .ops-card { padding: 7px 10px !important; }
+    /* comandi: menu a scomparsa */
+    .command-strip { display: flex !important; }
+    .command-more-btn { display: inline-flex; flex: 0 0 auto; white-space: nowrap; min-height: 44px; align-items: center; }
+    .command-menu {
+      display: none;
+      position: absolute;
+      top: calc(100% + 6px);
+      left: 0;
+      z-index: 60;
+      flex-direction: column;
+      min-width: 200px;
+      padding: 6px;
+      background: var(--section-bg, #fff);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      box-shadow: 0 12px 30px rgba(0,0,0,0.25);
+    }
+    .command-menu.open { display: flex; }
+    .command-menu button { flex: none !important; min-height: 44px; text-align: left; }
+    .command-state { flex: 1 1 auto !important; font-size: 9px; }
+    .command-strip #btnPanic { min-height: 44px; padding: 0 16px; }
+
+    /* pannello frontale al tocco: niente prospettiva, tasti grandi */
+    .snow-hardware-front.tilted { transform: none !important; }
+    #snowHardwareChassis .chassis-logo { font-size: 14px !important; }
+    #snowHardwareChassis .snow-col-left {
+      flex-direction: row !important;
+      justify-content: center;
+      gap: 48px !important;
+      padding-top: 6px !important;
+    }
+    #snowHardwareChassis .snow-btn-row-8 {
+      grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+      gap: 30px 18px !important;   /* spazio per la serigrafia sotto ogni tasto */
+      padding-bottom: 22px;
+    }
+    #snowHardwareChassis .snow-btn-row-8 .snow-matrix-btn { max-width: 60px; justify-self: center; width: 100%; }
+    #snowHardwareChassis .hw-label { font-size: 9px; }
+    /* numeri/LED 1-8 non si allineano a 4 colonne: la parte attiva resta sul display */
+    #snowHardwareChassis .snow-matrix-section .snow-matrix-header-row,
+    #snowHardwareChassis .snow-matrix-section .snow-led-row { display: none !important; }
+    #snowHardwareChassis .snow-sq-nav-btn { width: 48px !important; height: 48px !important; }
+  }
 </style>
 </head>
 <body>
@@ -5515,7 +6512,7 @@
   </div>
 </div>
 
-<div class="control-room-rail" aria-label="Virus TI Snow control room status">
+<div class="control-room-rail" id="statusRail" aria-label="Stato del Virus TI Snow (tocca per i dettagli)" role="button" tabindex="0" aria-expanded="false">
   <div class="ops-card">
     <div class="ops-label">MIDI</div>
     <div class="ops-value" id="opsMidi">unavailable</div>
@@ -5543,12 +6540,15 @@
 </div>
 
 <div class="command-strip" aria-label="Virus TI Snow command strip">
-  <button id="btnReceiveSingle" type="button">receive single</button>
-  <button id="btnSendCurrent" type="button">send current</button>
-  <button id="btnTestHwSound" type="button" style="font-weight: 800; color: #fff; background: linear-gradient(180deg, #2a3444 0%, #18202c 100%); border-color: #4b5d78;" title="Invia una nota di test C4 a C2MIDI Pro per verificare il suono del synth Virus">🔊 test virus</button>
-  <button id="btnPanic" class="danger" type="button">panic</button>
-  <button id="btnToggleDiagnostics" type="button">diagnostics</button>
+  <button id="btnCommandMore" class="command-more-btn" type="button" aria-expanded="false" aria-controls="commandMenu">⋯ azioni</button>
+  <div class="command-menu" id="commandMenu">
+    <button id="btnReceiveSingle" type="button">receive single</button>
+    <button id="btnSendCurrent" type="button">send current</button>
+    <button id="btnTestHwSound" type="button" title="Invia una nota di test C4 a C2MIDI Pro per verificare il suono del synth Virus">🔊 test virus</button>
+    <button id="btnToggleDiagnostics" type="button">diagnostics</button>
+  </div>
   <div class="command-state" id="opsLastAction">idle</div>
+  <button id="btnPanic" class="danger" type="button" title="All Notes Off su tutti i canali">panic</button>
 </div>
 
 <div class="midi-diagnostics hidden" id="midiDiagnostics" aria-label="MIDI diagnostics">
@@ -5869,15 +6869,14 @@
         <div class="snow-front-col snow-col-left">
           <div class="snow-vert-btn-unit">
             <button id="frontBtnTapPanic" class="snow-sq-btn" title="Tap Tempo / Invia All Notes Off (PANIC)">
-              <span style="font-size: 8.5px; font-weight: 900;">TAP</span>
-              <span style="font-size: 8px; font-weight: 800; opacity: 0.85;">TEMPO</span>
+              <span class="hw-label">TAP TEMPO</span>
             </button>
             <span style="font-size: 7.5px; font-weight: 900; color: #c53030; letter-spacing: 0.08em; text-transform: uppercase;">PANIC</span>
           </div>
 
           <div class="snow-vert-btn-unit">
             <button id="frontBtnExitMode" class="snow-sq-btn" title="Exit / Commuta modalità Single/Multi">
-              <span style="font-size: 9px; font-weight: 900;">EXIT</span>
+              <span class="hw-label">&#9666; EXIT</span>
             </button>
             <span style="font-size: 7.5px; font-weight: 900; color: #444; letter-spacing: 0.08em; text-transform: uppercase;">MODE</span>
           </div>
@@ -6070,14 +7069,14 @@
             </div>
             <!-- 8 Tasti Fila Superiore -->
             <div class="snow-btn-row-8">
-              <button class="snow-matrix-btn" id="frontBtnOsc1" title="Oscillatore 1">OSC 1</button>
-              <button class="snow-matrix-btn" id="frontBtnOsc2" title="Oscillatore 2">OSC 2</button>
-              <button class="snow-matrix-btn" id="frontBtnFilters" title="Filtri">FILTERS</button>
-              <button class="snow-matrix-btn" id="frontBtnMod" title="Matrice di Modulazione / LFO">MOD</button>
-              <button class="snow-matrix-btn" id="frontBtnEnv" title="Inviluppi">ENV</button>
-              <button class="snow-matrix-btn" id="frontBtnEffects" title="Effetti Delay, Reverb...">EFFECTS</button>
-              <button class="snow-matrix-btn" id="frontBtnArp" title="Arpeggiatore">ARP</button>
-              <button class="snow-matrix-btn" id="frontBtnCommon" title="Parametri Comuni">COMMON</button>
+              <button class="snow-matrix-btn" id="frontBtnOsc1" title="Oscillatore 1"><span class="hw-label">OSC 1</span></button>
+              <button class="snow-matrix-btn" id="frontBtnOsc2" title="Oscillatore 2"><span class="hw-label">OSC 2</span></button>
+              <button class="snow-matrix-btn" id="frontBtnFilters" title="Filtri"><span class="hw-label">FILTERS</span></button>
+              <button class="snow-matrix-btn" id="frontBtnMod" title="Matrice di Modulazione / LFO"><span class="hw-label">MOD</span></button>
+              <button class="snow-matrix-btn" id="frontBtnEnv" title="Inviluppi"><span class="hw-label">ENV</span></button>
+              <button class="snow-matrix-btn" id="frontBtnEffects" title="Effetti Delay, Reverb..."><span class="hw-label">EFFECTS</span></button>
+              <button class="snow-matrix-btn" id="frontBtnArp" title="Arpeggiatore"><span class="hw-label">ARP</span></button>
+              <button class="snow-matrix-btn" id="frontBtnCommon" title="Parametri Comuni"><span class="hw-label">COMMON</span></button>
             </div>
           </div>
 
@@ -6101,14 +7100,14 @@
             </div>
             <!-- 8 Tasti Seconda Fila -->
             <div class="snow-btn-row-8">
-              <button class="snow-matrix-btn" id="frontBtnValMinus" title="Patch precedente (Value -)">VALUE -</button>
-              <button class="snow-matrix-btn" id="frontBtnValPlus" title="Patch successiva (Value +)">VALUE +</button>
-              <button class="snow-matrix-btn" id="frontBtnParamPrev" title="Parametro precedente">◄ PARAM</button>
-              <button class="snow-matrix-btn" id="frontBtnParamNext" title="Parametro successivo">PARAM ►</button>
-              <button class="snow-matrix-btn" id="frontBtnAudition" title="AUDITION: Tieni premuto o clicca per suonare la nota di prova!" style="font-weight: 900; color: #b75900; background: #fffaf0;">AUDITION</button>
-              <button class="snow-matrix-btn" id="frontBtnMulti" title="Vista Multi / Mixer">MULTI</button>
-              <button class="snow-matrix-btn" id="frontBtnConfig" title="Configurazione MIDI">CONFIG</button>
-              <button class="snow-matrix-btn" id="frontBtnStore" title="Salva suono (STORE)" style="color: #c53030;">STORE</button>
+              <button class="snow-matrix-btn" id="frontBtnValMinus" title="Patch precedente (Value -)"><span class="hw-label">VALUE -</span></button>
+              <button class="snow-matrix-btn" id="frontBtnValPlus" title="Patch successiva (Value +)"><span class="hw-label">VALUE +</span></button>
+              <button class="snow-matrix-btn" id="frontBtnParamPrev" title="Parametro precedente"><span class="hw-label">◄ PARAM</span></button>
+              <button class="snow-matrix-btn" id="frontBtnParamNext" title="Parametro successivo"><span class="hw-label">PARAM ►</span></button>
+              <button class="snow-matrix-btn" id="frontBtnAudition" title="AUDITION: Tieni premuto o clicca per suonare la nota di prova!"><span class="hw-label">AUDITION</span></button>
+              <button class="snow-matrix-btn" id="frontBtnMulti" title="Vista Multi / Mixer"><span class="hw-label">MULTI</span></button>
+              <button class="snow-matrix-btn" id="frontBtnConfig" title="Configurazione MIDI"><span class="hw-label">CONFIG</span></button>
+              <button class="snow-matrix-btn" id="frontBtnStore" title="Salva suono (STORE)"><span class="hw-label">STORE</span></button>
             </div>
           </div>
 
@@ -6524,6 +7523,24 @@
 </div>
 
 <script>
+// Manopole fotorealistiche: oltre a ruotare l'indice CSS sceglie il fotogramma
+// dello sprite renderizzato in Blender (128 fotogrammi, griglia 16x8, -135..+135 gradi).
+function setKnobAngle(ind, angle) {
+  ind.style.transform = `rotate(${angle}deg)`;
+  const knob = ind.closest('.chassis-knob-outer');
+  if (!knob) return;
+  const f = Math.max(0, Math.min(127, Math.round((angle + 135) / 270 * 127)));
+  knob.style.setProperty('--kx', f % 16);
+  knob.style.setProperty('--ky', Math.floor(f / 16));
+}
+// allinea gli sprite alle rotazioni scritte nell'HTML (markup statico o ricostruito con innerHTML)
+function syncKnobSprites(root = document) {
+  root.querySelectorAll('.chassis-knob-indicator-container').forEach(ind => {
+    const m = /rotate\((-?[\d.]+)deg\)/.exec(ind.style.transform);
+    setKnobAngle(ind, m ? parseFloat(m[1]) : 0);
+  });
+}
+document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
 (function(){
   function updateTopPanelsVisibility(view) {
     const rail = document.querySelector('.control-room-rail');
@@ -8201,7 +9218,7 @@
       const value = opts.getValue();
       const pct = value / 127;
       const angle = -135 + (pct * 270);
-      indicatorContainer.style.transform = `rotate(${angle}deg)`;
+      setKnobAngle(indicatorContainer, angle);
 
       const startAngle = 225;
       const fillAngle = pct * 270;
@@ -11878,7 +12895,7 @@ function exportCurrentPatchSyx() {
     if (!knob) return;
     knob.dataset.val = String(val);
     const angle = -135 + (val / 127) * 270;
-    if (ind) ind.style.transform = `rotate(${angle}deg)`;
+    if (ind) setKnobAngle(ind, angle);
     if (valEl) valEl.textContent = String(val);
   }
 
@@ -12378,6 +13395,24 @@ function exportCurrentPatchSyx() {
   // ---------------------------------------------------------------------
   // Init
   // ---------------------------------------------------------------------
+  // Barra di stato compatta: tocco/Invio mostra i dettagli; menu azioni a scomparsa (mobile)
+  const statusRail = document.getElementById('statusRail');
+  const toggleRail = () => statusRail.setAttribute('aria-expanded', String(statusRail.classList.toggle('expanded')));
+  statusRail?.addEventListener('click', toggleRail);
+  statusRail?.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); toggleRail(); } });
+  const btnMore = document.getElementById('btnCommandMore');
+  const commandMenu = document.getElementById('commandMenu');
+  btnMore?.addEventListener('click', e => {
+    e.stopPropagation();
+    btnMore.setAttribute('aria-expanded', String(commandMenu.classList.toggle('open')));
+  });
+  commandMenu?.addEventListener('click', () => { commandMenu.classList.remove('open'); btnMore.setAttribute('aria-expanded', 'false'); });
+  document.addEventListener('click', e => {
+    if (commandMenu?.classList.contains('open') && !commandMenu.contains(e.target)) {
+      commandMenu.classList.remove('open'); btnMore.setAttribute('aria-expanded', 'false');
+    }
+  });
+
   document.getElementById('btnToggleDiagnostics').addEventListener('click', () => {
     midiDiagnostics.classList.toggle('hidden');
     setLastAction(midiDiagnostics.classList.contains('hidden') ? 'diagnostics hidden' : 'diagnostics visible');
@@ -16282,7 +17317,7 @@ function exportCurrentPatchSyx() {
 
         // Update rotation (-135deg to +135deg)
         const angle = -135 + ((newVal - minVal) / (maxVal - minVal)) * 270;
-        if (ind) ind.style.transform = `rotate(${angle}deg)`;
+        if (ind) setKnobAngle(ind, angle);
 
         // Formatted display
         if (valEl) {
@@ -16557,6 +17592,7 @@ function exportCurrentPatchSyx() {
 
   window.renderFxRackView = () => {
     buildFxRackView();
+    syncKnobSprites(document.getElementById('fxRackContent') || document);
     if (typeof window.drawTubeCurve === 'function') setTimeout(window.drawTubeCurve, 60);
   };
 
