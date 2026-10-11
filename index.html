@@ -13,11 +13,13 @@
     --section-bg: #e6e6e6;
     --border: #cccccc;
     --dot-color: #d8d8d8;
-    --accent: #888888;
-    --light-limit: 0.72;
-    --led-halo: 6px;
-    --led-halo-soft: 14px;
-    --led-halo-small: 3px;
+    --accent: #e02424;
+    --light-limit: 0.65;
+    --led-intensity: 1.15;
+    --led-halo: 26px;
+    --led-halo-soft: 55px;
+    --led-halo-wide: 93px;
+    --led-halo-small: 10px;
     --led-core: 0.9;
     --font-ui: 'Inter', sans-serif;
   }
@@ -140,23 +142,32 @@
   .dot{
     width: 10px;
     height: 10px;
-    border: 1px solid var(--border);
     border-radius: 50%;
+    border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border));
     background:
-      radial-gradient(circle at 35% 30%, rgba(255,255,255,0.88), var(--accent) 28%, color-mix(in srgb, var(--accent) 48%, #111111) 70%);
-    opacity: 0.28;
+      radial-gradient(circle at 38% 32%, rgba(255,255,255,0.7) 0%, color-mix(in srgb, var(--accent) 30%, #ffffff) 25%, color-mix(in srgb, var(--accent) 40%, #111111) 75%, #050505 100%);
+    opacity: 0.38;
     box-shadow:
-      inset 0 -1px 2px rgba(0,0,0,0.55),
-      0 0 var(--led-halo-small) color-mix(in srgb, var(--accent) 50%, transparent);
-    transition: transform 100ms ease, opacity 160ms ease, box-shadow 160ms ease, filter 160ms ease;
+      inset 0 1px 1px rgba(255,255,255,0.35),
+      inset 0 -1px 2px rgba(0,0,0,0.7),
+      0 0 calc(var(--led-halo-small) * 0.5) color-mix(in srgb, var(--accent) 30%, transparent);
+    transition: transform 120ms ease, opacity 180ms ease, box-shadow 180ms ease, filter 180ms ease;
   }
   .dot.on{
-    opacity: calc(0.45 + (var(--light-limit) * 0.5));
-    filter: brightness(calc(0.8 + (var(--light-limit) * 0.35))) saturate(1.1);
+    opacity: 1;
+    border-color: rgba(255,255,255,0.85);
+    background:
+      radial-gradient(circle at 36% 32%, #ffffff 0%, #ffffff 22%, color-mix(in srgb, var(--accent) 50%, #ffffff) 42%, var(--accent) 70%, color-mix(in srgb, var(--accent) 60%, #000000) 100%);
+    filter: brightness(calc(1.05 + (var(--light-limit) * 0.45))) saturate(1.25);
     box-shadow:
-      inset 0 -1px 2px rgba(0,0,0,0.5),
-      0 0 var(--led-halo) color-mix(in srgb, var(--accent) 55%, transparent),
-      0 0 var(--led-halo-soft) color-mix(in srgb, var(--accent) 22%, transparent);
+      0 0 0 1px rgba(255,255,255,0.9),
+      0 0 0 2px color-mix(in srgb, var(--accent) 60%, #000000),
+      0 0 calc(var(--led-halo-small) * 1.1) #ffffff,
+      0 0 var(--led-halo) var(--accent),
+      0 0 var(--led-halo-soft) var(--accent),
+      0 0 var(--led-halo-wide) color-mix(in srgb, var(--accent) 55%, transparent),
+      inset 0 1px 1.5px rgba(255,255,255,0.9),
+      inset 0 -1.5px 2px rgba(0,0,0,0.7);
   }
   .dot.pulse{
     animation: ledBounce 400ms ease-out;
@@ -176,81 +187,174 @@
     height: auto;
   }
   .accent-picker{
-    display: flex;
+    display: inline-flex;
     align-items: center;
     gap: 8px;
+    padding: 3px 8px;
+    background: rgba(0, 0, 0, 0.12);
+    border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+    border-radius: 14px;
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.22);
+  }
+  html[data-skin="elektron"] .accent-picker{
+    background: rgba(0, 0, 0, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: inset 0 1.5px 3px rgba(0, 0, 0, 0.65);
   }
   .accent-dot{
     --led-color: var(--accent);
     width: 17px;
     height: 17px;
-    min-width: 0;
-    min-height: 0;
+    min-width: 17px;
+    min-height: 17px;
     padding: 0;
-    border: 1px solid color-mix(in srgb, var(--led-color) 45%, var(--border));
+    margin: 0;
+    border: 1px solid rgba(255, 255, 255, 0.42);
     border-radius: 50%;
     cursor: pointer;
+    position: relative;
+    outline: none;
+    border: 1px solid color-mix(in srgb, var(--led-color) 60%, rgba(0,0,0,0.6));
     background:
-      radial-gradient(circle at 34% 28%, rgba(255,255,255,0.7) 0 10%, color-mix(in srgb, var(--led-color) 85%, #ffffff) 20%, var(--led-color) 55%, color-mix(in srgb, var(--led-color) 45%, #151515) 100%) !important;
+      radial-gradient(circle at 35% 30%,
+        rgba(255,255,255,0.95) 0%,
+        rgba(255,255,255,0.7) 4%,
+        var(--led-color) 22%,
+        color-mix(in srgb, var(--led-color) 75%, #000000) 75%,
+        #050508 100%
+      ) !important;
+    opacity: calc(0.8 + (var(--light-limit) * 0.2));
+    filter: brightness(calc(0.95 + (var(--light-limit) * 0.2))) saturate(1.3);
     box-shadow:
-      inset 0 -1px 2px rgba(0,0,0,0.5),
-      inset 0 1px 1px rgba(255,255,255,0.4),
-      0 0 var(--led-halo-small) color-mix(in srgb, var(--led-color) 30%, transparent);
-    filter: brightness(calc(0.75 + (var(--light-limit) * 0.25))) saturate(1.1);
-    opacity: calc(0.65 + (var(--light-limit) * 0.3));
-    transition: box-shadow 140ms ease, filter 140ms ease, opacity 140ms ease, transform 100ms ease;
+      /* High-intensity contact glow */
+      0 0 calc(var(--led-halo-small) * 0.8) var(--led-color),
+      /* Emissive corona */
+      0 0 var(--led-halo) color-mix(in srgb, var(--led-color) 75%, transparent),
+      /* Soft atmospheric aura */
+      0 0 var(--led-halo-soft) color-mix(in srgb, var(--led-color) 40%, transparent),
+      /* Internal lens refraction */
+      inset 0 1px 1.5px rgba(255, 255, 255, 0.65),
+      inset 0 -1.5px 2px rgba(0, 0, 0, 0.7);
+    transition: transform 120ms cubic-bezier(0.34, 1.56, 0.64, 1),
+                box-shadow 150ms ease,
+                filter 150ms ease,
+                opacity 150ms ease;
   }
   .accent-dot:hover{
-    transform: translateY(-1px);
+    transform: scale(1.15) translateY(-1px);
+    opacity: 1;
+    filter: brightness(calc(1.1 + (var(--light-limit) * 0.25))) saturate(1.4);
+    box-shadow:
+      0 0 calc(var(--led-halo-small) * 1.1) var(--led-color),
+      0 0 calc(var(--led-halo) * 1.2) var(--led-color),
+      0 0 var(--led-halo-soft) color-mix(in srgb, var(--led-color) 80%, transparent),
+      0 0 var(--led-halo-wide) color-mix(in srgb, var(--led-color) 40%, transparent),
+      inset 0 1.5px 2px rgba(255, 255, 255, 0.8),
+      inset 0 -1.5px 2px rgba(0, 0, 0, 0.7);
+    z-index: 2;
   }
   .accent-dot.selected{
+    transform: scale(1.22);
     opacity: 1;
-    filter: brightness(calc(0.92 + (var(--light-limit) * 0.2))) saturate(1.15);
+    z-index: 3;
+    border: 1.5px solid color-mix(in srgb, var(--led-color) 70%, #ffffff);
+    filter: brightness(calc(1.1 + (var(--light-limit) * 0.3))) saturate(1.45);
+    background:
+      radial-gradient(circle at 35% 30%,
+        #ffffff 0%,
+        rgba(255,255,255,0.85) 6%,
+        var(--led-color) 24%,
+        color-mix(in srgb, var(--led-color) 80%, #000000) 80%,
+        #000000 100%
+      ) !important;
     box-shadow:
-      0 0 0 2px var(--bg),
-      0 0 0 4px var(--fg),
-      0 0 var(--led-halo) color-mix(in srgb, var(--led-color) 60%, transparent),
-      0 0 var(--led-halo-soft) color-mix(in srgb, var(--led-color) 25%, transparent),
-      inset 0 -1px 2px rgba(0,0,0,0.4),
-      inset 0 1px 1px rgba(255,255,255,0.5);
+      /* Dark socket collar */
+      0 0 0 2px rgba(0, 0, 0, 0.65),
+      /* Brilliant colored contact corona */
+      0 0 calc(var(--led-halo-small) * 1.2) var(--led-color),
+      /* Saturated luminous corona */
+      0 0 calc(var(--led-halo) * 1.3) var(--led-color),
+      /* Deep atmospheric bloom */
+      0 0 calc(var(--led-halo-soft) * 1.25) var(--led-color),
+      /* Ambient scatter */
+      0 0 calc(var(--led-halo-wide) * 1.2) color-mix(in srgb, var(--led-color) 65%, transparent),
+      /* Internal lens refraction */
+      inset 0 1.5px 2px rgba(255, 255, 255, 0.9),
+      inset 0 -1.5px 2px rgba(0, 0, 0, 0.8);
   }
   .light-limiter{
-    display: inline-grid;
-    grid-template-columns: repeat(3, 18px);
+    display: inline-flex;
     align-items: center;
-    gap: 3px;
-    padding: 3px;
-    border: 1px solid var(--border);
-    background: color-mix(in srgb, var(--section-bg) 82%, transparent);
+    gap: 4px;
+    padding: 3px 6px;
+    border-radius: 12px;
+    border: 1px solid color-mix(in srgb, var(--border) 70%, transparent);
+    background: rgba(0, 0, 0, 0.12);
+    box-shadow: inset 0 1px 2px rgba(0, 0, 0, 0.22);
+  }
+  html[data-skin="elektron"] .light-limiter{
+    background: rgba(0, 0, 0, 0.45);
+    border: 1px solid rgba(255, 255, 255, 0.08);
+    box-shadow: inset 0 1.5px 3px rgba(0, 0, 0, 0.65);
+  }
+  .light-limiter-label{
+    font-size: 8.5px;
+    font-weight: 800;
+    font-family: monospace;
+    letter-spacing: 0.08em;
+    color: var(--fg);
+    opacity: 0.65;
+    margin-right: 2px;
+    user-select: none;
+    text-transform: uppercase;
   }
   .light-limit-step{
-    width: 18px;
+    width: 19px;
     height: 18px;
-    min-width: 0;
-    min-height: 0;
-    padding: 0;
-    border: 1px solid color-mix(in srgb, var(--border) 78%, #000000);
-    background: transparent;
+    min-width: 19px;
+    min-height: 18px;
+    padding: 2px;
+    border-radius: 4px;
+    border: 1px solid color-mix(in srgb, var(--border) 75%, #000000);
+    background: rgba(0, 0, 0, 0.22);
     cursor: pointer;
     position: relative;
+    display: inline-flex;
+    align-items: flex-end;
+    justify-content: center;
+    gap: 1.5px;
+    transition: all 120ms ease;
   }
-  .light-limit-step::before{
-    content: '';
-    position: absolute;
-    left: 4px;
-    right: 4px;
-    bottom: 4px;
-    height: var(--limit-fill, 4px);
+  .step-bar{
+    width: 3px;
+    border-radius: 1px;
+    background: var(--fg);
+    opacity: 0.25;
+    transition: all 120ms ease;
+  }
+  .step-bar.bar-1{ height: 5px; }
+  .step-bar.bar-2{ height: 8px; }
+  .step-bar.bar-3{ height: 11px; }
+
+  .light-limit-step:hover{
+    border-color: rgba(255, 255, 255, 0.6);
+    transform: translateY(-1px);
+  }
+  .light-limit-step:hover .step-bar{
+    opacity: 0.65;
     background: var(--accent);
-    opacity: calc(0.35 + (var(--light-limit) * 0.45));
-    box-shadow: 0 0 var(--led-halo-small) color-mix(in srgb, var(--accent) 42%, transparent);
   }
-  .light-limit-step[data-limit="0.35"]{ --limit-fill: 4px; }
-  .light-limit-step[data-limit="0.65"]{ --limit-fill: 8px; }
-  .light-limit-step[data-limit="1"]{ --limit-fill: 12px; }
   .light-limit-step.active{
-    border-color: var(--accent);
-    background: color-mix(in srgb, var(--accent) 12%, transparent);
+    border-color: rgba(255, 255, 255, 0.9);
+    background: color-mix(in srgb, var(--accent) 22%, rgba(0,0,0,0.5));
+    box-shadow:
+      0 0 calc(var(--led-halo-small) * 0.9) color-mix(in srgb, var(--accent) 75%, transparent),
+      inset 0 1px 1px rgba(255, 255, 255, 0.4);
+  }
+  .light-limit-step.active .step-bar{
+    opacity: 1;
+    background: linear-gradient(180deg, #ffffff 0%, var(--accent) 40%, color-mix(in srgb, var(--accent) 70%, #000) 100%);
+    box-shadow: 0 0 calc(var(--led-halo-small) * 0.8) var(--accent);
   }
   .control-room-rail{
     display: grid;
@@ -1453,10 +1557,11 @@
   /* NEW HEADER */
   .app-header {
     display: flex; justify-content: space-between; align-items: center;
-    padding: 16px 24px; border-bottom: 1px solid var(--border);
+    padding: 12px 20px; border-bottom: 1px solid var(--border);
+    flex-wrap: wrap; gap: 12px;
   }
-  .app-header-left { display: flex; align-items: center; gap: 24px; }
-  .app-header-right { display: flex; align-items: center; gap: 16px; }
+  .app-header-left { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .app-header-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 
   /* CHASSIS */
 
@@ -3236,10 +3341,11 @@
   /* NEW HEADER */
   .app-header {
     display: flex; justify-content: space-between; align-items: center;
-    padding: 16px 24px; border-bottom: 1px solid var(--border);
+    padding: 12px 20px; border-bottom: 1px solid var(--border);
+    flex-wrap: wrap; gap: 12px;
   }
-  .app-header-left { display: flex; align-items: center; gap: 24px; }
-  .app-header-right { display: flex; align-items: center; gap: 16px; }
+  .app-header-left { display: flex; align-items: center; gap: 16px; flex-wrap: wrap; }
+  .app-header-right { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
 
   /* CHASSIS */
 
@@ -4373,18 +4479,25 @@
       <span id="connLabel" style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em;">disconnected</span>
     </div>
 
-    <div class="accent-picker" id="accentPicker">
-      <button class="accent-dot" data-accent="#e02424" style="--led-color:#e02424" title="Dark Star red"></button>
-      <button class="accent-dot" data-accent="#888888" style="--led-color:#888888" title="grey"></button>
-      <button class="accent-dot" data-accent="#74c476" style="--led-color:#74c476" title="sage green"></button>
-      <button class="accent-dot" data-accent="#56b6c2" style="--led-color:#56b6c2" title="soft cyan"></button>
-      <button class="accent-dot" data-accent="#c678dd" style="--led-color:#c678dd" title="soft mauve"></button>
-      <button class="accent-dot" data-accent="#e59500" style="--led-color:#e59500" title="warm amber"></button>
+    <div class="accent-picker" id="accentPicker" title="Selettore Colore LED Accent">
+      <button class="accent-dot" data-accent="#e02424" style="--led-color:#e02424" title="Dark Star Red (LED 660nm)"></button>
+      <button class="accent-dot" data-accent="#888888" style="--led-color:#888888" title="Ice White / Grey"></button>
+      <button class="accent-dot" data-accent="#74c476" style="--led-color:#74c476" title="Sage Green (LED 525nm)"></button>
+      <button class="accent-dot" data-accent="#56b6c2" style="--led-color:#56b6c2" title="Soft Cyan (LED 490nm)"></button>
+      <button class="accent-dot" data-accent="#c678dd" style="--led-color:#c678dd" title="Soft Mauve / UV"></button>
+      <button class="accent-dot" data-accent="#e59500" style="--led-color:#e59500" title="Warm Amber (LED 590nm)"></button>
     </div>
-    <div class="light-limiter" id="lightLimiter" aria-label="light limiter">
-      <button class="light-limit-step" data-limit="0.35" title="low light"></button>
-      <button class="light-limit-step" data-limit="0.65" title="medium light"></button>
-      <button class="light-limit-step" data-limit="1" title="full light"></button>
+    <div class="light-limiter" id="lightLimiter" aria-label="Selettore Potenza & Alone LED" title="Potenza LED & Alone Luminoso">
+      <span class="light-limiter-label">LED</span>
+      <button class="light-limit-step" data-limit="0.35" title="Potenza LED: Bassa (35% - Alone delicato)">
+        <span class="step-bar bar-1"></span>
+      </button>
+      <button class="light-limit-step" data-limit="0.65" title="Potenza LED: Media (65% - Standard bilanciato)">
+        <span class="step-bar bar-1"></span><span class="step-bar bar-2"></span>
+      </button>
+      <button class="light-limit-step" data-limit="1" title="Potenza LED: Massima (100% - Alone pieno & Bloom)">
+        <span class="step-bar bar-1"></span><span class="step-bar bar-2"></span><span class="step-bar bar-3"></span>
+      </button>
     </div>
     <button class="theme-toggle" id="themeToggle" style="margin: 0;">○</button>
     <button class="settings-trigger" id="btnToggleKeyboard" type="button" title="Tastiera virtuale per provare i suoni" style="margin: 0;">🎹 KEYS</button>
@@ -5705,11 +5818,19 @@
 
   function applyLightLimit(limit){
     currentLightLimit = Math.max(0.25, Math.min(1, Number(limit) || 0.65));
-    const halo = Math.round(5 + currentLightLimit * 15);
+    const ratio = currentLightLimit;
+    const haloSmall = Math.round(3 + ratio * 10);
+    const halo = Math.round(8 + Math.pow(ratio, 1.3) * 32);
+    const haloSoft = Math.round(18 + Math.pow(ratio, 1.3) * 65);
+    const haloWide = Math.round(30 + Math.pow(ratio, 1.3) * 110);
+    const intensity = (0.55 + ratio * 1.0).toFixed(2);
+
     document.documentElement.style.setProperty('--light-limit', currentLightLimit.toFixed(2));
+    document.documentElement.style.setProperty('--led-intensity', intensity);
+    document.documentElement.style.setProperty('--led-halo-small', haloSmall + 'px');
     document.documentElement.style.setProperty('--led-halo', halo + 'px');
-    document.documentElement.style.setProperty('--led-halo-soft', Math.round(halo * 2.2) + 'px');
-    document.documentElement.style.setProperty('--led-halo-small', Math.max(2, Math.round(halo * 0.45)) + 'px');
+    document.documentElement.style.setProperty('--led-halo-soft', haloSoft + 'px');
+    document.documentElement.style.setProperty('--led-halo-wide', haloWide + 'px');
     document.documentElement.style.setProperty('--led-core', currentLightLimit.toFixed(2));
     lightLimitSteps.forEach(step => {
       const stepValue = parseFloat(step.getAttribute('data-limit') || '0');
@@ -5737,7 +5858,6 @@
   const ACCENT_MIGRATION = {
     '#aaff00': '#74c476',
     '#00ffff': '#888888',
-    '#56b6c2': '#888888',
     '#ff00ff': '#c678dd',
     '#ff3300': '#888888',
     '#f57b20': '#e59500'
