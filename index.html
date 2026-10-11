@@ -6378,6 +6378,81 @@
     #snowHardwareChassis .snow-matrix-section .snow-led-row { display: none !important; }
     #snowHardwareChassis .snow-sq-nav-btn { width: 48px !important; height: 48px !important; }
   }
+
+  /* ==========================================================================
+     Guida al collegamento MIDI + manopole accessibili
+     ========================================================================== */
+  .midi-setup {
+    margin: 0 0 16px 0;
+    padding: 14px 16px;
+    border: 1px solid var(--border);
+    border-radius: 10px;
+    background: color-mix(in srgb, var(--section-bg) 92%, transparent);
+    box-shadow: 0 6px 18px rgba(0,0,0,0.08);
+    max-width: 980px;
+  }
+  .midi-setup[hidden] { display: none; }
+  .midi-setup-head { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+  .midi-setup-head h2 { margin: 0; font-size: 15px; letter-spacing: 0.04em; }
+  .midi-setup-close { min-width: 36px; min-height: 36px; }
+  .midi-setup-steps { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+  .midi-setup-steps li {
+    display: grid;
+    grid-template-columns: 12px 1fr auto;
+    gap: 12px;
+    align-items: center;
+    padding: 8px 10px;
+    border-radius: 8px;
+    font-size: 12px;
+  }
+  .midi-setup-steps li[data-state="current"] { background: color-mix(in srgb, #f3c64a 16%, transparent); }
+  .midi-setup-steps li[data-state="error"] { background: color-mix(in srgb, #d92d20 12%, transparent); }
+  .midi-setup-steps li[data-state="todo"] { opacity: 0.55; }
+  .ms-body { display: flex; flex-direction: column; gap: 2px; min-width: 0; }
+  .ms-body strong { font-size: 12.5px; }
+  .ms-body span { color: var(--muted); line-height: 1.35; }
+  .ms-led { width: 10px; height: 10px; border-radius: 50%; background: #9b9a92; box-shadow: inset 0 -1px 1px rgba(0,0,0,0.3); }
+  [data-state="done"] .ms-led { background: #3bb54a; box-shadow: 0 0 6px #3bb54a; }
+  [data-state="current"] .ms-led { background: #f3b929; box-shadow: 0 0 6px #f3b929; animation: msPulse 1.4s ease-in-out infinite; }
+  [data-state="error"] .ms-led { background: #d92d20; box-shadow: 0 0 6px #d92d20; }
+  @keyframes msPulse { 50% { opacity: 0.45; } }
+  .midi-setup-steps button, .midi-setup-steps select { min-height: 40px; padding: 0 14px; font-weight: 700; }
+  .midi-setup-steps select { max-width: 220px; }
+  @media (max-width: 640px) {
+    .midi-setup-steps li { grid-template-columns: 12px 1fr; }
+    .midi-setup-steps li > button, .midi-setup-steps li > select { grid-column: 2; justify-self: start; }
+  }
+
+  /* manopole: focus da tastiera visibile + tooltip valore */
+  .chassis-knob-outer:focus { outline: none; }
+  .chassis-knob-outer:focus-visible::before {
+    content: '';
+    position: absolute;
+    inset: -8px;
+    border-radius: 50%;
+    box-shadow: 0 0 0 2px #2f6fe4, 0 0 0 5px rgba(47,111,228,0.25);
+    pointer-events: none;
+    z-index: 3;
+  }
+  .chassis-knob-outer.dragging { cursor: ns-resize !important; }
+  .knob-tip {
+    position: absolute;
+    transform: translate(-50%, -100%);
+    padding: 3px 8px;
+    border-radius: 4px;
+    background: #1d2228;
+    color: #e8f4fb;
+    font: 600 11px/1.3 ui-monospace, monospace;
+    pointer-events: none;
+    opacity: 0;
+    transition: opacity 120ms ease;
+    z-index: 9999;
+    white-space: nowrap;
+  }
+  .knob-tip.on { opacity: 1; }
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after { animation-duration: 0.01ms !important; animation-iteration-count: 1 !important; transition-duration: 0.01ms !important; }
+  }
 </style>
 </head>
 <body>
@@ -6550,6 +6625,34 @@
   <div class="command-state" id="opsLastAction">idle</div>
   <button id="btnPanic" class="danger" type="button" title="All Notes Off su tutti i canali">panic</button>
 </div>
+
+<section class="midi-setup" id="midiSetup" hidden aria-labelledby="midiSetupTitle">
+  <div class="midi-setup-head">
+    <h2 id="midiSetupTitle">Collega il tuo Virus</h2>
+    <button class="midi-setup-close" id="midiSetupClose" type="button" aria-label="Nascondi la guida">✕</button>
+  </div>
+  <ol class="midi-setup-steps">
+    <li data-step="access">
+      <span class="ms-led" aria-hidden="true"></span>
+      <div class="ms-body"><strong>Consenti l'accesso MIDI</strong><span id="msAccessText">Il browser chiederà il permesso di usare i dispositivi MIDI.</span></div>
+      <button id="msAllow" type="button">Abilita MIDI</button>
+    </li>
+    <li data-step="usb">
+      <span class="ms-led" aria-hidden="true"></span>
+      <div class="ms-body"><strong>Collega il Virus via USB</strong><span id="msUsbText">Accendi il Virus e collegalo al computer con il cavo USB.</span></div>
+    </li>
+    <li data-step="port">
+      <span class="ms-led" aria-hidden="true"></span>
+      <div class="ms-body"><strong>Scegli la porta del Virus</strong><span>Di solito si chiama «Virus TI» o «C2MIDI».</span></div>
+      <select id="msPort" aria-label="Porta MIDI di uscita"></select>
+    </li>
+    <li data-step="test">
+      <span class="ms-led" aria-hidden="true"></span>
+      <div class="ms-body"><strong>Prova il suono</strong><span>Suona un Do sul Virus per verificare il collegamento.</span></div>
+      <button id="msTest" type="button">▶ Nota di test</button>
+    </li>
+  </ol>
+</section>
 
 <div class="midi-diagnostics hidden" id="midiDiagnostics" aria-label="MIDI diagnostics">
   <div class="diag-cell">
@@ -7534,6 +7637,70 @@ function setKnobAngle(ind, angle) {
   knob.style.setProperty('--ky', Math.floor(f / 16));
 }
 // allinea gli sprite alle rotazioni scritte nell'HTML (markup statico o ricostruito con innerHTML)
+// Comportamento unico per tutte le manopole (come nei VST): trascinamento verticale,
+// Shift = regolazione fine, rotellina, frecce/PagSu/PagGiu'/Home/Fine, doppio clic = default,
+// tooltip col valore, role="slider" + ARIA. Ogni manopola fornisce solo get/set del valore.
+function bindKnob(el, { get, set, min = 0, max = 127, def = null, label = '', format = v => String(v) }) {
+  const clamp = v => Math.max(min, Math.min(max, Math.round(v)));
+  el.tabIndex = 0;
+  el.setAttribute('role', 'slider');
+  el.setAttribute('aria-valuemin', min);
+  el.setAttribute('aria-valuemax', max);
+  if (label) el.setAttribute('aria-label', label);
+  let tip = null, tipTimer = 0;
+  const sync = () => {
+    const v = get();
+    el.setAttribute('aria-valuenow', v);
+    el.setAttribute('aria-valuetext', format(v));
+  };
+  const showTip = () => {
+    if (!tip) { tip = document.createElement('div'); tip.className = 'knob-tip'; document.body.appendChild(tip); }
+    const r = el.getBoundingClientRect();
+    tip.textContent = format(get());
+    tip.style.left = `${r.left + r.width / 2 + scrollX}px`;
+    tip.style.top = `${r.top + scrollY - 8}px`;
+    tip.classList.add('on');
+    clearTimeout(tipTimer);
+    tipTimer = setTimeout(() => tip.classList.remove('on'), 900);
+  };
+  const apply = v => { v = clamp(v); if (v !== get()) set(v); sync(); showTip(); };
+
+  let dragging = false, lastY = 0, acc = 0;
+  el.addEventListener('pointerdown', e => {
+    if (e.button > 0) return;
+    e.preventDefault();
+    el.focus({ preventScroll: true });
+    dragging = true; lastY = e.clientY; acc = get();
+    el.setPointerCapture(e.pointerId);
+    el.classList.add('dragging');
+  });
+  el.addEventListener('pointermove', e => {
+    if (!dragging) return;
+    const sens = (e.shiftKey ? 0.12 : 0.75) * (max - min) / 127;
+    acc = Math.max(min, Math.min(max, acc + (lastY - e.clientY) * sens));
+    lastY = e.clientY;
+    apply(acc);
+  });
+  const end = () => { dragging = false; el.classList.remove('dragging'); };
+  el.addEventListener('pointerup', end);
+  el.addEventListener('pointercancel', end);
+  el.addEventListener('wheel', e => {
+    e.preventDefault();
+    const step = e.shiftKey ? 1 : Math.max(1, Math.round((max - min) / 64));
+    apply(get() + (e.deltaY < 0 ? step : -step));
+  }, { passive: false });
+  el.addEventListener('keydown', e => {
+    const big = Math.max(1, Math.round((max - min) / 10));
+    const d = { ArrowUp: 1, ArrowRight: 1, ArrowDown: -1, ArrowLeft: -1, PageUp: big, PageDown: -big }[e.key];
+    if (d !== undefined) { e.preventDefault(); apply(get() + (e.shiftKey ? d * 10 : d)); }
+    else if (e.key === 'Home') { e.preventDefault(); apply(min); }
+    else if (e.key === 'End') { e.preventDefault(); apply(max); }
+  });
+  if (def !== null) el.addEventListener('dblclick', () => apply(def));
+  el._knobSync = sync;
+  sync();
+}
+
 function syncKnobSprites(root = document) {
   root.querySelectorAll('.chassis-knob-indicator-container').forEach(ind => {
     const m = /rotate\((-?[\d.]+)deg\)/.exec(ind.style.transform);
@@ -8200,6 +8367,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
   }
 
   function updateControlRoomStatus(){
+    renderMidiSetup();
     const outConnected = !!(selectedOutput && selectedOutput.state === 'connected');
     const inConnected = !!(selectedInput && selectedInput.state === 'connected');
     const activeTab = document.querySelector('.segmented-tab.active');
@@ -9004,8 +9172,67 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
   chanSelect.addEventListener('change', updateControlRoomStatus);
   devIdSelect.addEventListener('change', updateControlRoomStatus);
 
+  // ---------------------------------------------------------------------
+  // Guida al primo collegamento: visibile finche' non c'e' una porta di uscita attiva
+  // ---------------------------------------------------------------------
+  let midiStatus = 'pending';   // pending | unsupported | denied | granted
+  let midiSetupDismissed = false;
+  try { midiSetupDismissed = sessionStorage.getItem('virusMidiSetupHidden') === '1'; } catch (e) {}
+
+  function renderMidiSetup(){
+    const box = document.getElementById('midiSetup');
+    if (!box) return;
+    const outOk = !!(selectedOutput && (!selectedOutput.state || selectedOutput.state === 'connected'));
+    box.hidden = outOk || midiSetupDismissed;
+    if (box.hidden) return;
+    const step = (name, state) => { const li = box.querySelector(`[data-step="${name}"]`); li.dataset.state = state; };
+    const outCount = midiAccess ? midiAccess.outputs.size : 0;
+    const accessText = document.getElementById('msAccessText');
+    const allow = document.getElementById('msAllow');
+    if (midiStatus === 'unsupported') {
+      step('access', 'error');
+      accessText.textContent = 'Questo browser non supporta Web MIDI. Usa Chrome o Edge su computer (Safari, iPhone e iPad non sono supportati).';
+      allow.hidden = true;
+    } else if (midiStatus === 'denied') {
+      step('access', 'error');
+      accessText.textContent = 'Permesso negato. Clicca sul lucchetto accanto all’indirizzo → Impostazioni sito → MIDI → Consenti, poi premi Riprova.';
+      allow.hidden = false; allow.textContent = 'Riprova';
+    } else if (midiStatus === 'granted') {
+      step('access', 'done');
+      accessText.textContent = 'Accesso MIDI consentito.';
+      allow.hidden = true;
+    } else {
+      step('access', 'current');
+      allow.hidden = false; allow.textContent = 'Abilita MIDI';
+    }
+    const usbText = document.getElementById('msUsbText');
+    if (midiStatus !== 'granted') step('usb', 'todo');
+    else if (outCount) { step('usb', 'done'); usbText.textContent = `${outCount} dispositivo/i MIDI trovato/i.`; }
+    else { step('usb', 'current'); usbText.textContent = 'Nessun dispositivo trovato: controlla il cavo USB e che il Virus sia acceso. Si aggiorna da solo.'; }
+    const port = document.getElementById('msPort');
+    port.innerHTML = outSelect.innerHTML;
+    port.value = outSelect.value;
+    port.disabled = !outCount;
+    step('port', outCount ? (selectedOutput ? 'done' : 'current') : 'todo');
+    document.getElementById('msTest').disabled = !selectedOutput;
+    step('test', selectedOutput ? 'current' : 'todo');
+  }
+
+  document.getElementById('msAllow')?.addEventListener('click', () => initWebMidi());
+  document.getElementById('msPort')?.addEventListener('change', e => {
+    outSelect.value = e.target.value;
+    outSelect.dispatchEvent(new Event('change'));
+  });
+  document.getElementById('msTest')?.addEventListener('click', () => document.getElementById('btnTestHwSound')?.click());
+  document.getElementById('midiSetupClose')?.addEventListener('click', () => {
+    midiSetupDismissed = true;
+    try { sessionStorage.setItem('virusMidiSetupHidden', '1'); } catch (e) {}
+    renderMidiSetup();
+  });
+
   function initWebMidi(){
     if (!navigator.requestMIDIAccess){
+      midiStatus = 'unsupported';
       connLabel.textContent = 'web midi non supportato';
       updateControlRoomStatus();
       setLastAction('⚠️ Usa Google Chrome o Edge (Safari non supporta Web MIDI)');
@@ -9014,6 +9241,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
 
     const onAccessSuccess = (access) => {
       midiAccess = access;
+      midiStatus = 'granted';
       refreshPorts();
       midiAccess.onstatechange = refreshPorts;
       updateControlRoomStatus();
@@ -9025,6 +9253,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
     navigator.requestMIDIAccess({ sysex: true }).then(onAccessSuccess).catch(err => {
       console.warn('Richiesta SysEx non autorizzata, provo con MIDI standard...', err);
       navigator.requestMIDIAccess({ sysex: false }).then(onAccessSuccess).catch(err2 => {
+        midiStatus = 'denied';
         connLabel.textContent = 'midi non autorizzato';
         updateControlRoomStatus();
         setLastAction('⚠️ Abilita i permessi MIDI nel browser per comunicare col Virus');
@@ -9219,6 +9448,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
       const pct = value / 127;
       const angle = -135 + (pct * 270);
       setKnobAngle(indicatorContainer, angle);
+      if (outer._knobSync) outer._knobSync();
 
       const startAngle = 225;
       const fillAngle = pct * 270;
@@ -9232,34 +9462,11 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
       render();
     }
 
-    // drag interaction
-    let dragging = false;
-    let startY = 0;
-    let startVal = 0;
-
-    outer.addEventListener('pointerdown', (e) => {
-      dragging = true;
-      startY = e.clientY;
-      startVal = opts.getValue();
-      outer.setPointerCapture(e.pointerId);
-      e.preventDefault();
-    });
-
-    outer.addEventListener('pointermove', (e) => {
-      if (!dragging) return;
-      const dy = startY - e.clientY;
-      setValue(startVal + dy * 0.7, true);
-    });
-
-    function endDrag(e){
-      dragging = false;
-    }
-    outer.addEventListener('pointerup', endDrag);
-    outer.addEventListener('pointercancel', endDrag);
-
-    // double-click resets to default
-    outer.addEventListener('dblclick', () => {
-      setValue(opts.default, true);
+    bindKnob(outer, {
+      get: () => opts.getValue(),
+      set: v => setValue(v, true),
+      def: opts.default ?? null,
+      label: opts.label,
     });
 
     container._render = render;
@@ -12897,58 +13104,19 @@ function exportCurrentPatchSyx() {
     const angle = -135 + (val / 127) * 270;
     if (ind) setKnobAngle(ind, angle);
     if (valEl) valEl.textContent = String(val);
+    if (knob._knobSync) knob._knobSync();
   }
 
   function setupFrontKnob(knobId, indId, valId, initialVal, onChange) {
     const knob = document.getElementById(knobId);
     if (!knob) return;
     setFrontKnob(knobId, indId, valId, initialVal);
-
-    let startY = 0;
-    let startVal = initialVal;
-    let isDragging = false;
-
-    const onPointerMove = (e) => {
-      if (!isDragging) return;
-      const clientY = e.clientY ?? (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
-      const deltaY = startY - clientY;
-      let newVal = Math.round(startVal + deltaY * 0.75);
-      newVal = Math.max(0, Math.min(127, newVal));
-      setFrontKnob(knobId, indId, valId, newVal);
-      if (onChange) onChange(newVal);
-    };
-
-    const onPointerUp = () => {
-      if (!isDragging) return;
-      isDragging = false;
-      window.removeEventListener('mousemove', onPointerMove);
-      window.removeEventListener('mouseup', onPointerUp);
-      window.removeEventListener('touchmove', onPointerMove);
-      window.removeEventListener('touchend', onPointerUp);
-    };
-
-    const onPointerDown = (e) => {
-      e.preventDefault();
-      isDragging = true;
-      startY = e.clientY ?? (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
-      startVal = parseInt(knob.dataset.val, 10) || 0;
-      window.addEventListener('mousemove', onPointerMove);
-      window.addEventListener('mouseup', onPointerUp);
-      window.addEventListener('touchmove', onPointerMove, { passive: false });
-      window.addEventListener('touchend', onPointerUp);
-    };
-
-    knob.addEventListener('mousedown', onPointerDown);
-    knob.addEventListener('touchstart', onPointerDown, { passive: false });
-
-    knob.addEventListener('wheel', (e) => {
-      e.preventDefault();
-      let cur = parseInt(knob.dataset.val, 10) || 0;
-      const delta = e.deltaY < 0 ? 2 : -2;
-      cur = Math.max(0, Math.min(127, cur + delta));
-      setFrontKnob(knobId, indId, valId, cur);
-      if (onChange) onChange(cur);
-    }, { passive: false });
+    bindKnob(knob, {
+      get: () => parseInt(knob.dataset.val, 10) || 0,
+      set: v => { setFrontKnob(knobId, indId, valId, v); if (onChange) onChange(v); },
+      def: initialVal,
+      label: knob.title || knobId,
+    });
   }
 
   function updateVirusSnowFrontPanel(activePartIdx = 0) {
@@ -17302,44 +17470,23 @@ function exportCurrentPatchSyx() {
       const minVal = parseInt(unit.dataset.min, 10) || 0;
       const maxVal = parseInt(unit.dataset.max, 10) || 127;
 
-      let isDragging = false;
-      let startY = 0;
-      let startVal = parseInt(unit.dataset.val, 10) || 0;
+      const fxFormat = v => {
+        if (cc === 72) return ['OFF', 'TUBE', 'HARD', 'FOLD', 'CRUSH', 'RECT'][v] || String(v);
+        if (cc === 88) return `${Math.round(20 + v * 7.5)}ms`;
+        if (cc === 92) return `${(0.2 + v * 0.08).toFixed(1)}s`;
+        if (cc === 86) return `${(0.1 + v * 0.04).toFixed(1)}Hz`;
+        if (cc === 96) return v > 64 ? 'WIDE' : 'NARROW';
+        return String(v);
+      };
 
-      const onPointerMove = (e) => {
-        if (!isDragging) return;
-        if (e.cancelable) e.preventDefault();
-        const clientY = e.clientY ?? (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
-        const delta = startY - clientY;
-        let newVal = Math.round(startVal + delta * ((maxVal - minVal) / 100));
-        newVal = Math.max(minVal, Math.min(maxVal, newVal));
+      const applyFx = (newVal) => {
         unit.dataset.val = String(newVal);
-
         // Update rotation (-135deg to +135deg)
         const angle = -135 + ((newVal - minVal) / (maxVal - minVal)) * 270;
         if (ind) setKnobAngle(ind, angle);
-
-        // Formatted display
-        if (valEl) {
-          if (cc === 72) {
-            const types = ['OFF', 'TUBE', 'HARD', 'FOLD', 'CRUSH', 'RECT'];
-            valEl.textContent = types[newVal] || String(newVal);
-          } else if (cc === 88) {
-            valEl.textContent = `${Math.round(20 + newVal * 7.5)}ms`;
-          } else if (cc === 92) {
-            valEl.textContent = `${(0.2 + newVal * 0.08).toFixed(1)}s`;
-          } else if (cc === 86) {
-            valEl.textContent = `${(0.1 + newVal * 0.04).toFixed(1)}Hz`;
-          } else if (cc === 96) {
-            valEl.textContent = newVal > 64 ? 'WIDE' : 'NARROW';
-          } else {
-            valEl.textContent = `${newVal}`;
-          }
-        }
-
+        if (valEl) valEl.textContent = fxFormat(newVal);
         // Send MIDI CC
         sendFxCC(cc, newVal);
-
         // Special visual reaction for Vacuum Tube Drive
         if (cc === 75) {
           const glow = document.getElementById('tubeGlow');
@@ -17351,29 +17498,15 @@ function exportCurrentPatchSyx() {
         }
       };
 
-      const onPointerUp = () => {
-        if (!isDragging) return;
-        isDragging = false;
-        window.removeEventListener('mousemove', onPointerMove);
-        window.removeEventListener('mouseup', onPointerUp);
-        window.removeEventListener('touchmove', onPointerMove);
-        window.removeEventListener('touchend', onPointerUp);
-      };
-
-      const onPointerDown = (e) => {
-        if (e.cancelable) e.preventDefault();
-        isDragging = true;
-        startY = e.clientY ?? (e.touches && e.touches[0] ? e.touches[0].clientY : 0);
-        startVal = parseInt(unit.dataset.val, 10) || 0;
-        window.addEventListener('mousemove', onPointerMove);
-        window.addEventListener('mouseup', onPointerUp);
-        window.addEventListener('touchmove', onPointerMove, { passive: false });
-        window.addEventListener('touchend', onPointerUp);
-      };
-
       if (knob) {
-        knob.addEventListener('mousedown', onPointerDown);
-        knob.addEventListener('touchstart', onPointerDown, { passive: false });
+        bindKnob(knob, {
+          get: () => parseInt(unit.dataset.val, 10) || 0,
+          set: applyFx,
+          min: minVal, max: maxVal,
+          def: parseInt(unit.dataset.val, 10) || 0,
+          label: unit.title || (unit.querySelector('.fx-knob-label') || {}).textContent || 'FX',
+          format: fxFormat,
+        });
       }
     });
 
