@@ -56,7 +56,7 @@
     transition: background-color 200ms ease, color 200ms ease;
   }
   body.keyboard-dock-open {
-    padding-bottom: 165px !important;
+    padding-bottom: 220px !important;
   }
 
   /* ------------------------------------------------------------------ */
@@ -11116,6 +11116,15 @@ function exportCurrentPatchSyx() {
       sendCC(ch, 123, 0); // All Notes Off
     }
     setLastAction('panic sent on 16 channels');
+  });
+
+  window.addEventListener('keydown', (e) => {
+    if (e.key === 'Escape' && !e.target.matches('input, textarea, select')) {
+      const btnPanic = document.getElementById('btnPanic');
+      if (btnPanic) btnPanic.click();
+      if (typeof stopAllArpNotes === 'function') stopAllArpNotes();
+      if (typeof stopSequencerClock === 'function' && window.seqRunning) stopSequencerClock();
+    }
   });
 
   document.getElementById('btnSavePatch').addEventListener('click', () => {

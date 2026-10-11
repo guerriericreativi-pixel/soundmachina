@@ -4,6 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>VIRUS-H // Dedicated Single Sound Editor</title>
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🎛️</text></svg>">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@500;600;700;800&display=swap');
 
@@ -55,7 +56,7 @@
     min-height: 100vh;
     display: flex;
     flex-direction: column;
-    padding: 18px 24px 110px 24px;
+    padding: 18px 24px 135px 24px;
     user-select: none;
     overflow-x: hidden;
   }
@@ -1434,6 +1435,18 @@
     else led.classList.add('off');
   }
 
+  const CC_MAP = {
+    'f1_cutoff': 40, 'f1_resonance': 42, 'f2_cutoff': 41, 'f2_resonance': 44,
+    'flt_balance': 45, 'f1_mode': 39, 'osc1_shape': 19, 'osc1_pw': 18,
+    'osc1_semitone': 20, 'osc2_shape': 26, 'osc2_pw': 25, 'osc2_semitone': 27,
+    'osc_detune': 30, 'osc_balance': 31, 'osc3_semi': 100, 'mix_osc3': 111,
+    'mix_sub': 113, 'mix_noise': 112, 'mix_ring': 114, 'noise_color': 107,
+    'amp_attack': 59, 'amp_decay': 60, 'amp_sustain': 61, 'amp_release': 63,
+    'amp_pan': 10, 'amp_vel': 62, 'lfo1_rate': 67, 'lfo1_shape': 68,
+    'fx_reverb_mix': 88, 'fx_reverb_decay': 89, 'fx_chorus_mix': 105,
+    'com_sync': 104, 'com_porta': 5
+  };
+
   function sendMidiParam(paramId, value) {
     patchData.params[paramId] = value;
     drawOscilloscope();
@@ -1443,22 +1456,9 @@
     if (!selectedOutput) return;
     const ch = patchData.activePart & 0x0F;
 
-    // Send MIDI CC where mapped
-    const ccMap = {
-      'f1_cutoff': 40, 'f1_resonance': 42, 'f2_cutoff': 41, 'f2_resonance': 44,
-      'flt_balance': 45, 'f1_mode': 39, 'osc1_shape': 19, 'osc1_pw': 18,
-      'osc1_semitone': 20, 'osc2_shape': 26, 'osc2_pw': 25, 'osc2_semitone': 27,
-      'osc_detune': 30, 'osc_balance': 31, 'osc3_semi': 100, 'mix_osc3': 111,
-      'mix_sub': 113, 'mix_noise': 112, 'mix_ring': 114, 'noise_color': 107,
-      'amp_attack': 59, 'amp_decay': 60, 'amp_sustain': 61, 'amp_release': 63,
-      'amp_pan': 10, 'amp_vel': 62, 'lfo1_rate': 67, 'lfo1_shape': 68,
-      'fx_reverb_mix': 88, 'fx_reverb_decay': 89, 'fx_chorus_mix': 105,
-      'com_sync': 104, 'com_porta': 5
-    };
-
-    if (ccMap[paramId] !== undefined) {
+    if (CC_MAP[paramId] !== undefined) {
       try {
-        selectedOutput.send(new Uint8Array([0xB0 | ch, ccMap[paramId], value & 0x7F]));
+        selectedOutput.send(new Uint8Array([0xB0 | ch, CC_MAP[paramId], value & 0x7F]));
       } catch(e) {}
     }
   }
@@ -1532,6 +1532,12 @@
       }
 
       updateUI(defVal);
+
+      if (CC_MAP[paramId] !== undefined) {
+        const titleEl = unit.querySelector('.knob-title');
+        const label = titleEl ? titleEl.textContent : paramId;
+        unit.setAttribute('title', `${label} (Access Virus CC ${CC_MAP[paramId]})`);
+      }
 
       let isDragging = false;
       let startY = 0;
@@ -1755,7 +1761,18 @@
   };
 
   window.addEventListener('keydown', (e) => {
-    if (e.target.tagName === 'INPUT') return;
+    if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT') return;
+    if (e.key === 'Escape') {
+      if (selectedOutput) {
+        for (let c = 0; c < 16; c++) {
+          try {
+            selectedOutput.send(new Uint8Array([0xB0 | c, 120, 0])); // All Sound Off
+            selectedOutput.send(new Uint8Array([0xB0 | c, 123, 0])); // All Notes Off
+          } catch(err) {}
+        }
+      }
+      return;
+    }
     if (e.code === 'KeyZ') {
       patchData.octave = Math.max(0, patchData.octave - 1);
       document.getElementById('octDisplay').textContent = patchData.octave;
