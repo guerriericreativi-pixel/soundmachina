@@ -5310,20 +5310,23 @@
             </div>
             <button id="btnSyncMultiInView" class="chassis-page-btn" style="padding: 4px 10px; font-size: 10px; font-weight: bold; color: #111; border-color: var(--accent); background: linear-gradient(to bottom, #fff, #e2e4e8);" title="Interroga le 4 parti attive del Virus">🔄 LEGGI 4 PARTI</button>
           </div>
-          <!-- ROUTING MULTI MIDI & LAYOUT ACTION BAR -->
-          <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 6px; padding-top: 5px; border-top: 1px dashed rgba(0,0,0,0.12);">
-            <div style="display: flex; align-items: center; gap: 5px; flex-wrap: wrap;">
-              <span style="font-size: 9.5px; font-weight: 800; letter-spacing: 0.05em; color: #444;">ROUTING MIDI CANALI:</span>
-              <button id="btnSetMultiSplitChannels" class="chassis-page-btn" style="color: #0b7285; border-color: #0b7285; font-weight: 800; padding: 3px 8px; font-size: 9.5px;" title="Configura P1 su Ch 1, P2 su Ch 2, P3 su Ch 3, P4 su Ch 4 via SysEx sul Virus">⚡ MULTITIMBRICO (P1:Ch1 · P2:Ch2 · P3:Ch3 · P4:Ch4)</button>
-              <button id="btnSetMultiLayerChannels" class="chassis-page-btn" style="color: #5f3dc4; border-color: #5f3dc4; font-weight: 800; padding: 3px 8px; font-size: 9.5px;" title="Assegna tutte e 4 le parti al Canale 1 per suonare insieme in Layer">🎛 LAYER (TUTTE SU CH 1)</button>
+          <!-- ROUTING MULTI MIDI & DIAGNOSTIC ACTION BAR -->
+          <div class="multi-routing-control-bar" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; padding: 7px 10px; margin-top: 6px; background: rgba(0,0,0,0.03); border: 1px solid var(--border); border-radius: 5px;">
+            <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
+              <span style="font-size: 10px; font-weight: 900; letter-spacing: 0.04em; color: var(--text-heading); display: flex; align-items: center; gap: 4px;">
+                <span>🔀</span> ROUTING:
+              </span>
+              <button id="btnSetMultiSplitChannels" class="chassis-page-btn" style="color: #0b7285; border-color: #0b7285; font-weight: 800; padding: 4px 10px; font-size: 10px; background: rgba(11, 114, 133, 0.08);" title="Invia sequenza SysEx Page C (Param 34) e CC MIDI per configurare P1=Ch1, P2=Ch2, P3=Ch3, P4=Ch4 e sbloccare i volumi">⚡ 4 CANALI INDIPENDENTI (P1:Ch1 · P2:Ch2 · P3:Ch3 · P4:Ch4)</button>
+              <button id="btnSetMultiLayerChannels" class="chassis-page-btn" style="color: #5f3dc4; border-color: #5f3dc4; font-weight: 800; padding: 4px 9px; font-size: 10px; background: rgba(95, 61, 196, 0.08);" title="Assegna tutte e 4 le parti al Canale 1 per suonare insieme in Layer">🎛 LAYER (TUTTE SU CH 1)</button>
+              <button id="btnMultiRoutingHelp" class="chassis-page-btn" style="color: #d97706; border-color: #d97706; font-weight: 800; padding: 4px 9px; font-size: 10px; background: rgba(217, 119, 6, 0.08);" title="Spiegazione: perché P1 suona tutti e 4 i suoni e come passare a SEQUENCER MODE su Access Virus TI Snow">❓ GUIDA HARDWARE / PERCHÉ P1 SUONA TUTTO?</button>
             </div>
-            <div style="display: flex; align-items: center; gap: 4px;">
-              <span style="font-size: 9.5px; font-weight: 800; color: #444;">VISTA:</span>
-              <button id="btnMultiLayoutGrid" class="chassis-page-btn" style="padding: 2px 7px; font-size: 9.5px; font-weight: bold;" title="Vista compatta Griglia 2x2 per visualizzare tutte le 4 parti insieme senza scroll">▦ 2x2 GRID</button>
-              <button id="btnMultiLayoutList" class="chassis-page-btn" style="padding: 2px 7px; font-size: 9.5px; font-weight: bold;" title="Vista a righe estese">☰ LISTA</button>
+            <div style="display: flex; align-items: center; gap: 6px;">
+              <span style="font-size: 9.5px; font-weight: 800; color: #555;">VISTA:</span>
+              <button id="btnMultiLayoutGrid" class="chassis-page-btn" style="padding: 3px 8px; font-size: 10px; font-weight: bold;" title="Vista compatta Griglia 2x2 per visualizzare tutte le 4 parti insieme senza scroll">▦ 2x2 GRID</button>
+              <button id="btnMultiLayoutList" class="chassis-page-btn" style="padding: 3px 8px; font-size: 10px; font-weight: bold;" title="Vista a righe estese">☰ LISTA</button>
             </div>
           </div>
-          <div id="quickScanStatus" style="font-size: 10px; color: #666; font-family: monospace; min-height: 14px;"></div>
+          <div id="quickScanStatus" style="font-size: 10.5px; color: #555; font-family: monospace; min-height: 16px; margin-top: 4px; padding: 2px 4px;"></div>
         </div>
       </div>
 
@@ -5389,6 +5392,57 @@
         <button id="btnCancelBankNamesModal" class="chassis-page-btn" style="font-size: 11px;">ANNULLA</button>
         <button id="btnSaveBankNamesModal" class="chassis-page-btn" style="color: var(--accent); border-color: var(--accent); font-weight: bold; font-size: 11px;">💾 APPLICA AL BANCO</button>
       </div>
+    </div>
+  </div>
+</div>
+
+<!-- Modal Guida Hardware & Routing Multi Virus TI Snow -->
+<div id="multiRoutingHelpModal" style="display: none; position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; background: rgba(0,0,0,0.85); z-index: 99999; justify-content: center; align-items: center; padding: 20px; box-sizing: border-box;">
+  <div style="background: #141418; border: 2px solid var(--accent); border-radius: 8px; width: 100%; max-width: 680px; max-height: 90vh; display: flex; flex-direction: column; overflow: hidden; box-shadow: 0 10px 40px rgba(0,0,0,0.9); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, monospace; color: #ddd;">
+    <div style="display: flex; justify-content: space-between; align-items: center; padding: 12px 18px; border-bottom: 1px solid var(--border); background: #1a1a22;">
+      <span style="color: var(--accent); font-weight: 800; font-size: 13px; display: flex; align-items: center; gap: 8px;">
+        <span>⚡</span> GUIDA ROUTING MULTI: 4 CANALI INDIPENDENTI (VIRUS TI SNOW)
+      </span>
+      <button id="btnCloseMultiRoutingHelpModal" style="background: transparent; border: none; color: #aaa; font-size: 18px; cursor: pointer; padding: 2px 6px;">✕</button>
+    </div>
+    <div style="padding: 16px 20px; font-size: 12px; color: #ccc; line-height: 1.6; overflow-y: auto; display: flex; flex-direction: column; gap: 14px;">
+      <div style="background: rgba(255,184,108,0.1); border-left: 3px solid #ffb86c; padding: 10px 14px; border-radius: 4px;">
+        <b style="color: #ffb86c; font-size: 13px;">🔍 Perché su P1 suonavano tutti e 4 i suoni e P2, P3, P4 erano muti?</b>
+        <p style="margin: 6px 0 0 0; color: #ddd;">
+          Nel sintetizzatore reale <b>Access Virus TI Snow</b>, i preset memorizzati nella memoria <b>MULTI</b> nascono quasi sempre configurati come <b>LAYER</b> (sovrapposizione timbrica): tutte le 4 parti sono assegnate ad ascoltare sul medesimo canale (<b>Canale MIDI 1</b>).<br>
+          Pertanto, quando l'app o la master keyboard inviava una nota su Canale 1 (P1), il processore del Virus attivava tutte e 4 le parti contemporaneamente! Al contempo, i Canali MIDI 2, 3 e 4 non avevano alcuna parte assegnata, risultando completamente silenziosi.
+        </p>
+      </div>
+
+      <div style="background: rgba(0,230,118,0.08); border-left: 3px solid #00e676; padding: 10px 14px; border-radius: 4px;">
+        <b style="color: #00e676; font-size: 13px;">🎛 Soluzione 1 (Hardware istantanea sul Synth): SEQUENCER MODE</b>
+        <p style="margin: 6px 0 0 0; color: #ddd;">
+          Sul frontalino reale del tuo <b>Access Virus TI Snow</b>:<br>
+          👉 <b>Premi contemporaneamente i due pulsanti [MULTI] e [SINGLE]</b>.<br>
+          Sul display LCD del synth apparirà la scritta <b>SEQUENCER</b>.<br>
+          In questa modalità ufficiale, il sistema operativo del Virus blocca nativamente:<br>
+          • <b>Parte 1</b> ➔ Canale MIDI 1<br>
+          • <b>Parte 2</b> ➔ Canale MIDI 2<br>
+          • <b>Parte 3</b> ➔ Canale MIDI 3<br>
+          • <b>Parte 4</b> ➔ Canale MIDI 4<br>
+          Nessuna sovrapposizione è possibile: ogni parte risponde esclusivamente al proprio canale per suonare e sequenziare 4 tracce separate!
+        </p>
+      </div>
+
+      <div style="background: rgba(11,114,133,0.15); border-left: 3px solid #0b7285; padding: 10px 14px; border-radius: 4px;">
+        <b style="color: #38d9a9; font-size: 13px;">⚡ Soluzione 2 (Software con 1 click dall'app)</b>
+        <p style="margin: 6px 0 0 0; color: #ddd;">
+          Clicca sul pulsante <b>"⚡ FORZA 4 CANALI INDIPENDENTI"</b> qui sotto o nella barra Multi.<br>
+          L'app invierà al Virus la sequenza completa di comandi SysEx <i>Page C (Param 34)</i> e messaggi MIDI CC cadenzati per:<br>
+          1. Assegnare P1➔Ch1, P2➔Ch2, P3➔Ch3, P4➔Ch4 nel buffer di memoria attiva del Virus.<br>
+          2. Abilitare tutte e 4 le parti (Part Enable On) e impostare il volume a 127.<br>
+          3. Indirizzare tutte le 4 parti sull'uscita principale Out 1 L+R (Main/Cuffie).
+        </p>
+      </div>
+    </div>
+    <div style="display: flex; justify-content: flex-end; padding: 12px 18px; border-top: 1px solid var(--border); background: #1a1a22; gap: 10px;">
+      <button id="btnApplyFixFromModal" class="chassis-page-btn" style="background: var(--accent); color: #fff; border-color: var(--accent); font-weight: bold; font-size: 11px; padding: 6px 14px; box-shadow: 0 0 10px rgba(var(--accent-rgb), 0.4);">⚡ FORZA 4 CANALI ADESSO</button>
+      <button id="btnDismissMultiRoutingHelpModal" class="chassis-page-btn" style="font-size: 11px; padding: 6px 12px;">CHIUDI</button>
     </div>
   </div>
 </div>
@@ -5469,15 +5523,9 @@
       partDisplays.forEach(d => { if (d && d._render) d._render(); });
     }
     updateControlRoomStatus();
-    if (typeof updateKeyboardPartDisplay === 'function') updateKeyboardPartDisplay();
     if (selectedOutput) {
-      sendVirusMode(1); // Commuta il Virus hardware in Multi Mode
-      for (let i = 0; i < NUM_PARTS; i++) {
-        setTimeout(() => {
-          if (multiParts[i] && multiParts[i].values && typeof sendMultiPartParam === 'function') {
-            sendMultiPartParam(i, 34, multiParts[i].values.channel);
-          }
-        }, i * 25);
+      if (typeof forceMulti4ChannelRouting === 'function' && window.multiRoutingMode !== 'layer') {
+        forceMulti4ChannelRouting(false);
       }
     }
   });
@@ -5640,7 +5688,8 @@
   const NUM_PARTS = 4;
   const SYSEX_CMD_MULTI = 0x72;  // page C: per-part mixer params
   const SYSEX_CMD_STORE = 0x70;  // store/write request
-  const PART_ENABLE_PARAM = 0xC0;
+  const PART_ENABLE_PARAM = 72;  // Page C Param 72 = Part Enable (0=off, 1=on)
+  const PART_VOL_ENABLE_PARAM = 73; // Page C Param 73 = Part Volume Enable
 
   const PART_PARAMS = [
     { id:'channel',   name:'MIDI Channel', short:'ch',   cc:34,  kind:'channel', default:0 },
@@ -5741,6 +5790,7 @@
     const initName = INIT_NAMES[values.program] || 'Init';
     multiParts.push({ enabled: true, name: initName, values, sound });
   }
+  window.multiParts = multiParts;
 
   // Stato globale minimo per i parametri filtro condivisi (usato dal motore Web Audio)
   const state = { values: { f1_cutoff: 85, f1_resonance: 0 } };
@@ -7351,6 +7401,7 @@ function setSingleEditingPart(partIndex) {
     requestPartDump(partIndex);
   }
 }
+window.setSingleEditingPart = setSingleEditingPart;
 
 function randomizePatch() {
   PARAMS.forEach(p => {
@@ -9462,7 +9513,7 @@ function exportCurrentPatchSyx() {
       h = Math.max(1, Math.floor(rect.height));
       canvas.width = w * dpr;
       canvas.height = h * dpr;
-      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      if (ctx) ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       render();
     }
 
@@ -9598,6 +9649,14 @@ function exportCurrentPatchSyx() {
       }
 
       sendMultiPartParam(i, PART_ENABLE_PARAM, isEffectivelyMuted ? 0 : 1);
+      // Invia anche CC 7 (Volume) immediato per risposta istantanea sul synth
+      if (selectedOutput) {
+        const ch = (multiParts[i] && multiParts[i].values && multiParts[i].values.channel !== undefined) ? (multiParts[i].values.channel & 0x0F) : i;
+        const targetVol = isEffectivelyMuted ? 0 : ((multiParts[i] && multiParts[i].values && multiParts[i].values.volume !== undefined) ? multiParts[i].values.volume : 127);
+        try {
+          selectedOutput.send(new Uint8Array([0xB0 | ch, 7, targetVol & 0x7F]));
+        } catch(e) {}
+      }
     }
     renderKeyboardSplitVisualizer();
   }
@@ -9645,8 +9704,17 @@ function exportCurrentPatchSyx() {
 
     if (selectedOutput) {
       try {
+        // 1. Assicura volume al massimo ed Expression al massimo per questo canale
+        selectedOutput.send(new Uint8Array([0xB0 | ch, 7, 127])); // CC 7 Volume
+        selectedOutput.send(new Uint8Array([0xB0 | ch, 11, 127])); // CC 11 Expression
+        // 2. Se in modalità 4 canali, sincronizza canale e stato di abilitazione per questa parte
+        if (window.multiRoutingMode !== 'layer') {
+          sendMultiPartParam(index, 34, ch);
+          sendMultiPartParam(index, PART_ENABLE_PARAM, 1);
+        }
+        // 3. Invia Note-On
         selectedOutput.send(new Uint8Array([0x90 | ch, note, vel]));
-        recordMidiTx('audition P' + (index + 1), [0x90 | ch, note, vel]);
+        recordMidiTx('audition P' + (index + 1) + ' (ch ' + (ch + 1) + ')', [0x90 | ch, note, vel]);
         setTimeout(() => {
           try { selectedOutput.send(new Uint8Array([0x80 | ch, note, 0])); } catch(e) {}
         }, 450);
@@ -9661,6 +9729,7 @@ function exportCurrentPatchSyx() {
     }
     setLastAction(`audition P${index + 1} (ch ${ch + 1})`);
   }
+  window.auditionPart = auditionPart;
 
   function editPartInSingleView(index) {
     setSingleEditingPart(index);
@@ -11363,49 +11432,114 @@ function exportCurrentPatchSyx() {
   document.getElementById('btnSyncMultiInView')?.addEventListener('click', syncAllMultiParts);
   document.getElementById('btnSyncMultiParts')?.addEventListener('click', syncAllMultiParts);
 
-  function setMultiRouting(mode) {
-    window.multiRoutingMode = mode;
+  function forceMulti4ChannelRouting(verbose = true) {
+    window.multiRoutingMode = 'split';
     const btnSplit = document.getElementById('btnSetMultiSplitChannels');
     const btnLayer = document.getElementById('btnSetMultiLayerChannels');
     const opsCh = document.getElementById('opsChannel');
+    if (btnSplit) btnSplit.classList.add('active');
+    if (btnLayer) btnLayer.classList.remove('active');
+    if (opsCh) opsCh.textContent = 'multi (ch 1-4)';
 
-    if (mode === 'split') {
-      if (btnSplit) btnSplit.classList.add('active');
-      if (btnLayer) btnLayer.classList.remove('active');
-      if (opsCh) opsCh.textContent = 'multi (ch 1-4)';
-      for (let i = 0; i < NUM_PARTS; i++) {
-        multiParts[i].values.channel = i; // P1=0 (Ch 1), P2=1 (Ch 2), P3=2 (Ch 3), P4=3 (Ch 4)
-        multiParts[i].enabled = true;
-        if (typeof sendMultiPartParam === 'function') {
-          setTimeout(() => {
-            sendMultiPartParam(i, 34, i); // Param 34: Part MIDI Channel (0-15)
-            sendMultiPartParam(i, PART_ENABLE_PARAM, 1);
-            if (!multiParts[i].values.volume || multiParts[i].values.volume < 20) {
-              multiParts[i].values.volume = 127;
-              sendMultiPartParam(i, 39, 127);
-            }
-          }, i * 20);
-        }
+    const queue = [];
+    const devId = typeof deviceId === 'function' ? deviceId() : 16;
+
+    for (let i = 0; i < NUM_PARTS; i++) {
+      multiParts[i].values.channel = i; // P1=0 (Ch 1), P2=1 (Ch 2), P3=2 (Ch 3), P4=3 (Ch 4)
+      multiParts[i].enabled = true;
+      if (typeof partMuteState !== 'undefined' && partMuteState[i] !== undefined) {
+        partMuteState[i] = false;
       }
-      buildMultiView();
-      if (typeof renderMultiPartsOverview === 'function') renderMultiPartsOverview();
-      if (typeof updateKeyboardPartDisplay === 'function') updateKeyboardPartDisplay();
-      if (typeof updateVirusSnowMasterDisplay === 'function') updateVirusSnowMasterDisplay(currentPartIndex || 0);
-      setLastAction('⚡ Modalità Multitimbrica: P1->Ch1, P2->Ch2, P3->Ch3, P4->Ch4 sincronizzati');
+      if (!multiParts[i].values.volume || multiParts[i].values.volume < 20) {
+        multiParts[i].values.volume = 127;
+      }
+
+      const curBank = (multiParts[i].values && multiParts[i].values.bank !== undefined) ? multiParts[i].values.bank : 0;
+      const curProg = (multiParts[i].values && multiParts[i].values.program !== undefined) ? multiParts[i].values.program : 0;
+
+      // SysEx Page C (0x72) per la parte i
+      queue.push({ type: 'sysex', devId, part: i, param: 34, val: i });                  // Param 34: Part MIDI Channel (0-15)
+      queue.push({ type: 'sysex', devId, part: i, param: PART_ENABLE_PARAM, val: 1 });   // Param 72: Part Enable (1=On)
+      queue.push({ type: 'sysex', devId, part: i, param: PART_VOL_ENABLE_PARAM, val: 1 }); // Param 73: Part Volume Enable
+      queue.push({ type: 'sysex', devId, part: i, param: 39, val: 127 });                // Param 39: Part Volume 127
+      queue.push({ type: 'sysex', devId, part: i, param: 40, val: 64 });                 // Param 40: Part Pan Center
+      queue.push({ type: 'sysex', devId, part: i, param: 41, val: 0 });                  // Param 41: Output Select = Out 1 L+R (Main)
+      queue.push({ type: 'sysex', devId, part: i, param: 35, val: 0 });                  // Param 35: Low Key 0
+      queue.push({ type: 'sysex', devId, part: i, param: 36, val: 127 });                // Param 36: High Key 127
+      queue.push({ type: 'sysex', devId, part: i, param: 31, val: curBank & 0x7F });     // Param 31: Bank Select
+      queue.push({ type: 'sysex', devId, part: i, param: 33, val: curProg & 0x7F });     // Param 33: Program Select
+
+      // Standard MIDI CCs sul canale i (0 = Ch 1, 1 = Ch 2, 2 = Ch 3, 3 = Ch 4)
+      queue.push({ type: 'midi', bytes: [0xB0 | i, 7, 127] });                           // CC 7: Volume 127
+      queue.push({ type: 'midi', bytes: [0xB0 | i, 11, 127] });                          // CC 11: Expression 127
+      queue.push({ type: 'midi', bytes: [0xB0 | i, 10, 64] });                           // CC 10: Pan Center 64
+      queue.push({ type: 'midi', bytes: [0xB0 | i, 0, 0] });                             // Bank MSB 0
+      queue.push({ type: 'midi', bytes: [0xB0 | i, 32, curBank & 0x7F] });               // Bank LSB
+      queue.push({ type: 'midi', bytes: [0xC0 | i, curProg & 0x7F] });                   // Program Change
+      queue.push({ type: 'midi', bytes: [0xB0 | i, 123, 0] });                           // All Notes Off
+    }
+
+    if (selectedOutput) {
+      let delay = 0;
+      queue.forEach(item => {
+        setTimeout(() => {
+          if (!selectedOutput) return;
+          try {
+            if (item.type === 'sysex') {
+              const bytes = new Uint8Array([
+                ...SYSEX_PREFIX, item.devId, 0x72, item.part & 0x7F, item.param & 0x7F, item.val & 0x7F, 0xF7
+              ]);
+              selectedOutput.send(bytes);
+              if (item.devId !== 0) {
+                const bytesAlt = new Uint8Array([
+                  ...SYSEX_PREFIX, 0x00, 0x72, item.part & 0x7F, item.param & 0x7F, item.val & 0x7F, 0xF7
+                ]);
+                selectedOutput.send(bytesAlt);
+              }
+            } else if (item.type === 'midi') {
+              selectedOutput.send(new Uint8Array(item.bytes));
+            }
+          } catch(e) {}
+        }, delay);
+        delay += 25; // 25ms cadenzati per non sovraccaricare il buffer MIDI
+      });
+    }
+
+    buildMultiView();
+    if (typeof renderMultiPartsOverview === 'function') renderMultiPartsOverview();
+    if (typeof updateKeyboardPartDisplay === 'function') updateKeyboardPartDisplay();
+    if (typeof updateVirusSnowMasterDisplay === 'function') updateVirusSnowMasterDisplay(currentPartIndex || 0);
+
+    if (verbose) {
+      setLastAction('⚡ 4 Canali Indipendenti: P1->Ch1, P2->Ch2, P3->Ch3, P4->Ch4 sincronizzati');
       const st = document.getElementById('quickScanStatus');
-      if (st) st.textContent = '⚡ Canali MIDI configurati via SysEx: P1=Ch1, P2=Ch2, P3=Ch3, P4=Ch4.';
+      if (st) st.innerHTML = '<b style="color:#00705a;">⚡ 4 Canali configurati via SysEx: P1=Ch1, P2=Ch2, P3=Ch3, P4=Ch4 (Volumi & Out Main sbloccati)</b>';
+      const dbg = document.getElementById('midi-debug');
+      if (dbg) dbg.innerHTML = '<span style="color:#00e676; font-weight:bold;">⚡ ROUTING 4 CANALI INVIATO AL VIRUS TI: P1➔Ch1 · P2➔Ch2 · P3➔Ch3 · P4➔Ch4</span>';
+    }
+  }
+
+  function setMultiRouting(mode) {
+    if (mode === 'split') {
+      forceMulti4ChannelRouting(true);
     } else if (mode === 'layer') {
+      window.multiRoutingMode = 'layer';
+      const btnSplit = document.getElementById('btnSetMultiSplitChannels');
+      const btnLayer = document.getElementById('btnSetMultiLayerChannels');
+      const opsCh = document.getElementById('opsChannel');
       if (btnLayer) btnLayer.classList.add('active');
       if (btnSplit) btnSplit.classList.remove('active');
       if (opsCh) opsCh.textContent = 'layer (ch 1)';
+
+      const devId = typeof deviceId === 'function' ? deviceId() : 16;
       for (let i = 0; i < NUM_PARTS; i++) {
         multiParts[i].values.channel = 0; // Tutte su Canale 1
         multiParts[i].enabled = true;
-        if (typeof sendMultiPartParam === 'function') {
+        if (selectedOutput) {
           setTimeout(() => {
             sendMultiPartParam(i, 34, 0); // Param 34: Part MIDI Channel = 0 (Ch 1)
             sendMultiPartParam(i, PART_ENABLE_PARAM, 1);
-          }, i * 20);
+          }, i * 30);
         }
       }
       buildMultiView();
@@ -11418,8 +11552,27 @@ function exportCurrentPatchSyx() {
     }
   }
 
+  function openMultiRoutingHelpModal() {
+    const m = document.getElementById('multiRoutingHelpModal');
+    if (m) m.style.display = 'flex';
+  }
+
+  function closeMultiRoutingHelpModal() {
+    const m = document.getElementById('multiRoutingHelpModal');
+    if (m) m.style.display = 'none';
+  }
+
   document.getElementById('btnSetMultiSplitChannels')?.addEventListener('click', () => setMultiRouting('split'));
   document.getElementById('btnSetMultiLayerChannels')?.addEventListener('click', () => setMultiRouting('layer'));
+  document.getElementById('btnMultiRoutingHelp')?.addEventListener('click', openMultiRoutingHelpModal);
+  document.getElementById('btnCloseMultiRoutingHelpModal')?.addEventListener('click', closeMultiRoutingHelpModal);
+  document.getElementById('btnDismissMultiRoutingHelpModal')?.addEventListener('click', closeMultiRoutingHelpModal);
+  document.getElementById('btnApplyFixFromModal')?.addEventListener('click', () => {
+    closeMultiRoutingHelpModal();
+    forceMulti4ChannelRouting(true);
+  });
+  window.forceMulti4ChannelRouting = forceMulti4ChannelRouting;
+  window.setMultiRouting = setMultiRouting;
 
   // ---------------------------------------------------------------------
   // Virtual Keyboard & Audition Controller (Mac Keyboard Player)
@@ -11589,15 +11742,23 @@ function exportCurrentPatchSyx() {
       return (window.seqEngine.selectedTrack || 0) & 0x0F;
     }
 
-    const isSingleMode = isSnowView || isSingleView || isArpView || isSongView ||
-                         (window.currentSynthMode === 'single') || (modeBadge && modeBadge.textContent === 'SINGLE');
+    // Se ci troviamo nella vista SINGLE synth editor (con selettore P1..P4):
+    if (isSingleView) {
+      const pIdx = (typeof window.activeSinglePartIndex !== 'undefined') ? window.activeSinglePartIndex : 0;
+      if (typeof multiParts !== 'undefined' && multiParts && multiParts[pIdx] && multiParts[pIdx].values && multiParts[pIdx].values.channel !== undefined) {
+        return multiParts[pIdx].values.channel & 0x0F;
+      }
+      return pIdx & 0x0F;
+    }
+
+    const isSingleMode = isSnowView || (window.currentSynthMode === 'single') || (modeBadge && modeBadge.textContent === 'SINGLE');
 
     if (isSingleMode) {
-      // In modalità SINGLE o viste primarie, il Virus TI reale risponde sul suo Global Channel (default Ch 1)
+      // In modalità SINGLE nativa o vista frontale, risponde sul Global Channel (default Ch 1)
       return configuredGlobalCh;
     }
 
-    // In modalità MULTI, usa il canale assegnato alla parte attiva corrente
+    // In modalità MULTI o altre viste, usa il canale assegnato alla parte attiva corrente
     const pIdx = (typeof currentPartIndex !== 'undefined')
       ? currentPartIndex
       : ((typeof window.activeSinglePartIndex !== 'undefined') ? window.activeSinglePartIndex : 0);
@@ -11606,6 +11767,7 @@ function exportCurrentPatchSyx() {
     }
     return configuredGlobalCh;
   }
+  window.getActiveMidiChannel = getActiveMidiChannel;
 
   function updateKeyboardPartDisplay() {
     const el = document.getElementById('activeKbdPartDisplay');
@@ -11622,16 +11784,20 @@ function exportCurrentPatchSyx() {
     const isSnowView = document.getElementById('btnTabSnow')?.classList.contains('active');
     const isSingleView = document.getElementById('btnTabSynth')?.classList.contains('active');
     const modeBadge = document.getElementById('frontLcdModeBadge');
-    const isSingleMode = isSnowView || isSingleView || (modeBadge && modeBadge.textContent === 'SINGLE');
+    const isSingleMode = isSnowView || (modeBadge && modeBadge.textContent === 'SINGLE');
 
-    const pIdx = (typeof currentPartIndex !== 'undefined') ? currentPartIndex : 0;
+    const pIdx = isSingleView
+      ? ((typeof window.activeSinglePartIndex !== 'undefined') ? window.activeSinglePartIndex : 0)
+      : ((typeof currentPartIndex !== 'undefined') ? currentPartIndex : 0);
     const part = (typeof multiParts !== 'undefined' && multiParts && multiParts[pIdx]) ? multiParts[pIdx] : null;
     const pName = (part && part.name && part.name !== 'init' && !isDummyPatchName(part.name))
       ? part.name
       : (part ? getBankPatchName(part.values.bank, part.values.program) : 'Init');
 
     const ch = getActiveMidiChannel() + 1;
-    if (isSingleMode) {
+    if (isSingleView) {
+      el.textContent = `SINGLE P${pIdx + 1}: ${pName} (MIDI Ch ${ch})`;
+    } else if (isSingleMode) {
       el.textContent = `SINGLE: ${pName} (MIDI Ch ${ch})`;
     } else {
       el.textContent = `MULTI P${pIdx + 1}: ${pName} (ch ${ch})`;

@@ -1466,7 +1466,11 @@
   function sendNoteOn(note, velocity = 100) {
     if (selectedOutput) {
       const ch = patchData.activePart & 0x0F;
-      try { selectedOutput.send(new Uint8Array([0x90 | ch, note, velocity])); } catch(e) {}
+      try {
+        selectedOutput.send(new Uint8Array([0xB0 | ch, 7, 127])); // CC 7 Volume
+        selectedOutput.send(new Uint8Array([0xB0 | ch, 11, 127])); // CC 11 Expression
+        selectedOutput.send(new Uint8Array([0x90 | ch, note, velocity]));
+      } catch(e) {}
     }
     playSynthAudioNote(note);
   }
