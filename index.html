@@ -8806,7 +8806,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
       const curProg = multiParts[pIdx].values.program;
 
       // Memorizza il vero nome letto dal synth nella cache del banco per questo preset
-      if (name && (typeof isDummyPatchName === 'function' ? !isDummyPatchName(name) : true) && curBank !== undefined && curProg !== undefined) {
+      if (!window.__skipNameCache && name && (typeof isDummyPatchName === 'function' ? !isDummyPatchName(name) : true) && curBank !== undefined && curProg !== undefined) {
         if (typeof saveBankSoundName === 'function') {
           saveBankSoundName(curBank, curProg, name);
         }
@@ -8847,12 +8847,12 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
     const st = d[0], hi = st & 0xF0, ch = (st & 0x0F) + 1;
     if (st === 0xF0) {
       const isVirus = d[1] === 0x00 && d[2] === 0x20 && d[3] === 0x33;
-      if (!isVirus) return `SysEx ${d.length} byte`;
+      if (!isVirus) return `SysEx ${d.length} byte` + (d.length <= 32 ? `  [${d.map(b => b.toString(16).padStart(2, '0')).join(' ')}]` : '');
       const cmd = d[6], name = VIRUS_CMD[cmd] || ('cmd 0x' + (cmd ?? 0).toString(16));
       if (cmd === 0x10) return `SysEx ${name} bank ${d[7]} prog ${d[8] === 0x40 ? '0x40 (edit buffer Single)' : d[8]} · "${extractPatchName(d)}" (${d.length} byte)`;
       if (cmd === 0x30) return `SysEx ${name} bank ${d[7]} prog ${d[8] === 0x40 ? '0x40 (edit buffer Single)' : d[8]}`;
       if (cmd >= 0x70 && cmd <= 0x72) return `SysEx ${name} parte ${d[7] === 0x40 ? 'Single' : d[7] + 1} param ${d[8]} = ${d[9]}`;
-      return `SysEx ${name} (${d.length} byte)`;
+      return `SysEx ${name} (${d.length} byte)` + (d.length <= 32 ? `  [${d.map(b => b.toString(16).padStart(2, '0')).join(' ')}]` : '');
     }
     if (hi === 0x90 && d[2] > 0) return `ch${ch} Note On ${d[1]} vel ${d[2]}`;
     if (hi === 0x80 || hi === 0x90) return `ch${ch} Note Off ${d[1]}`;
@@ -9021,7 +9021,9 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
           window.virusSync = null;
           window.currentSynthMode = isSingle ? 'single' : 'multi';
           if (isSingle) { currentPartIndex = 0; window.activeSinglePartIndex = 0; }
+          window.__skipNameCache = true;   // l'edit buffer non dice banco/numero: non scrivere nella cache
           if (typeof applyDumpToActivePatch === 'function') applyDumpToActivePatch(msgBytes);
+          window.__skipNameCache = false;
           const part = multiParts[currentPartIndex || 0];
           if (part) part.name = patchName;
           updateVirusSnowFrontPanel(currentPartIndex || 0);
@@ -9171,9 +9173,8 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
           }
           const curBank = multiParts[pIdx].values.bank;
           const curProg = multiParts[pIdx].values.program;
-          if (typeof saveBankSoundName === 'function' && curBank !== undefined && curProg !== undefined && patchName) {
-            saveBankSoundName(curBank, curProg, patchName);
-          }
+          // non si salva il nome nella cache del banco: l'edit buffer non dice da quale
+          // banco/numero viene il suono (prima scriveva lo stesso nome su piu' patch)
           if (window.activeSinglePartIndex === pIdx) {
             window.lastReceivedDump = new Uint8Array(msgBytes);
             applyDumpToActivePatch(msgBytes);
@@ -9186,6 +9187,12 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
         // Caso 4: Ricezione Singola Patch (Editor o Librarian)
         window.lastReceivedDump = new Uint8Array(msgBytes);
         applyDumpToActivePatch(msgBytes);
+        if (msgBytes[7] === 0x00 && msgBytes[8] === 0x40) {          // edit buffer Single
+          if (window.currentSynthMode !== 'single') window.currentSynthMode = 'single';
+          const part = multiParts[currentPartIndex || 0];
+          if (part) part.name = patchName;
+          updateVirusSnowFrontPanel(currentPartIndex || 0);
+        }
 
         document.getElementById('midi-debug').innerHTML = `<span style="color:#80c090;">🔥 DUMP IMPORTATO: <b>${escapeHtml(patchName)}</b></span>`;
         setLastAction('single dump: ' + patchName);
@@ -11300,9 +11307,12 @@ function exportCurrentPatchSyx() {
       return;
     }
     try {
-      // 0x30 = Single Dump Request: F0 00 20 33 01 <deviceId> 30 00 <partIndex 0..3> F7
+      // 0x30 = Single Dump Request: F0 00 20 33 01 <deviceId> 30 00 <buffer> F7
+      // buffer 0x40 = edit buffer Single (Virus in SINGLE), 0..15 = parte del Multi.
+      // In SINGLE la parte 1 del Multi resta ferma: chiederla restituiva sempre lo stesso suono.
+      const buffer = window.currentSynthMode === 'single' ? 0x40 : (partIndex & 0x0F);
       const bytes = new Uint8Array([
-        ...SYSEX_PREFIX, deviceId(), 0x30, 0x00, partIndex & 0x0F, 0xF7
+        ...SYSEX_PREFIX, deviceId(), 0x30, 0x00, buffer, 0xF7
       ]);
       selectedOutput.send(bytes);
       recordMidiTx('request P' + (partIndex + 1) + ' dump', bytes);
@@ -12390,7 +12400,18 @@ function exportCurrentPatchSyx() {
     try {
       const raw = localStorage.getItem(`virusTiSnow_bank_${bankIndex}`);
       if (raw) {
-        const parsed = JSON.parse(raw);
+        let parsed = JSON.parse(raw);
+        // un vecchio errore scriveva lo stesso nome (es. "DM ARP1") su piu' patch:
+        // un nome ripetuto 3+ volte nello stesso banco non e' affidabile, si scarta
+        if (Array.isArray(parsed)) {
+          const count = {};
+          parsed.forEach(n => { if (n) count[n] = (count[n] || 0) + 1; });
+          const bad = Object.keys(count).filter(n => count[n] >= 3);
+          if (bad.length) {
+            parsed = parsed.map(n => (bad.includes(n) ? null : n));
+            try { localStorage.setItem(`virusTiSnow_bank_${bankIndex}`, JSON.stringify(parsed)); } catch (e) {}
+          }
+        }
         if (Array.isArray(parsed) && parsed.length >= 128) {
           const hasValid = parsed.some(item => item && !isDummyPatchName(item));
           if (!hasValid) return null;
@@ -12602,8 +12623,10 @@ function exportCurrentPatchSyx() {
     if (emitMidi) {
       const ch = (part.values && part.values.channel !== undefined) ? (part.values.channel & 0x0F) : (pIdx & 0x0F);
       // SysEx Multi Part Param (Bank = 31, Program = 33)
-      sendMultiPartParam(pIdx, 31, bank);
-      sendMultiPartParam(pIdx, 33, prog);
+      if (window.currentSynthMode !== 'single') {   // in SINGLE bastano Bank Select + Program Change
+        sendMultiPartParam(pIdx, 31, bank);
+        sendMultiPartParam(pIdx, 33, prog);
+      }
 
       // MIDI Bank Select (CC 0 MSB, CC 32 LSB) e Program Change (0xC0 | ch, prog)
       if (selectedOutput) {
