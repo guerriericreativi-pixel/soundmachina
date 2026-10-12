@@ -6987,7 +6987,21 @@
   .fx-part-btn .kbd-part-icon { margin-right: 5px; padding: 1px; }
   .fx-part-btn .kbd-part-icon svg { width: 16px !important; height: 16px !important; }
   .fx-part-btn { display: inline-flex !important; align-items: center; }
-  .fx-keys { position: absolute !important; right: 46px; bottom: 26px; margin: 0 !important; z-index: 3; }
+  .fx-keys { position: absolute !important; left: 46px; right: auto; bottom: 26px; margin: 0 !important; z-index: 3; }
+  /* display FX RACK con la grafica dell'LCD del PANEL */
+  #fxRackContent .fx-scope-canvas { width: 100% !important; height: 84px !important; border: 3px solid #1c252e !important; border-radius: 4px !important;
+    box-shadow: inset 0 2px 6px rgba(0,0,0,0.35) !important; background: #d9e8f4 !important; }
+  html[data-skin="elektron"] #fxRackContent .fx-scope-canvas { border-color: #1e0205 !important; background: #300206 !important;
+    box-shadow: inset 0 5px 14px rgba(0,0,0,0.9), 0 0 16px rgba(224,36,36,0.3) !important; }
+  #fxRackContent .tube-container { background: none !important; border: 0 !important; padding: 0 !important; display: block !important; }
+  #fxRackContent .xy-pad-surface { background: linear-gradient(180deg, #e4eff8, #d0e4f2) !important; border: 3px solid #1c252e !important; box-shadow: inset 0 2px 6px rgba(0,0,0,0.35) !important; }
+  html[data-skin="elektron"] #fxRackContent .xy-pad-surface { background: linear-gradient(180deg, #5c0710, #1c0003) !important; border-color: #1e0205 !important; }
+  #fxRackContent .xy-pad-surface { background-image: repeating-linear-gradient(0deg, rgba(28,42,56,0.06) 0 1px, transparent 1px 3px), repeating-linear-gradient(90deg, rgba(28,42,56,0.06) 0 1px, transparent 1px 3px), linear-gradient(180deg, #e4eff8, #d0e4f2) !important; }
+  html[data-skin="elektron"] #fxRackContent .xy-pad-surface { background-image: repeating-linear-gradient(0deg, rgba(0,0,0,0.3) 0 1px, transparent 1px 3px), repeating-linear-gradient(90deg, rgba(0,0,0,0.2) 0 1px, transparent 1px 3px), linear-gradient(180deg, #5c0710, #1c0003) !important; }
+  #fxRackContent .xy-coords-badge { background: #223446 !important; color: #d7e9f5 !important; border: 0 !important; font-family: "VT323", ui-monospace, monospace !important; font-size: 14px !important; letter-spacing: 0.04em; }
+  html[data-skin="elektron"] #fxRackContent .xy-coords-badge { background: #3f040a !important; color: #ffccd0 !important; }
+  #fxRackContent .xy-crosshair-x, #fxRackContent .xy-crosshair-y { background: rgba(28,42,56,0.45) !important; }
+  html[data-skin="elektron"] #fxRackContent .xy-crosshair-x, html[data-skin="elektron"] #fxRackContent .xy-crosshair-y { background: rgba(255,90,100,0.55) !important; }
 </style>
 </head>
 <body>
@@ -18257,6 +18271,7 @@ function exportCurrentPatchSyx() {
         if (cc === 116) return `${(0.2 + v * 0.08).toFixed(1)}s`;
         if (cc === 106) return `${(0.1 + v * 0.04).toFixed(1)}Hz`;
         if (cc === 36) return v < 64 ? `${v - 64}` : `SAT +${v - 64}`;
+        if ([113, 115, 117, 104, 107].includes(cc)) return `${Math.round(v / 127 * 100)}%`;
         return String(v);
       };
 
@@ -18280,6 +18295,7 @@ function exportCurrentPatchSyx() {
       };
 
       if (knob) {
+        unit._apply = applyFx;   // usata anche dai display interattivi e dal pad X/Y
         bindKnob(knob, {
           get: () => parseInt(unit.dataset.val, 10) || 0,
           set: applyFx,
@@ -18321,9 +18337,11 @@ function exportCurrentPatchSyx() {
 
         if (badge) badge.textContent = `CUTOFF: ${cutVal} | RESO: ${resVal}`;
 
-        // Send MIDI CC: Cutoff (CC 40) on X, Resonance (CC 41) on Y
-        sendFxCC(40, cutVal);
-        sendFxCC(41, resVal);
+        // Cutoff (CC 40) su X, Resonance (CC 42) su Y, tramite le macro 1/2 cosi' manopole e valori restano allineati
+        [[40, cutVal], [42, resVal]].forEach(([cc, v]) => {
+          const u = document.querySelector(`.macro-encoders-grid .fx-rack-knob-unit[data-cc="${cc}"]`);
+          u && u._apply ? u._apply(v) : sendFxCC(cc, v);
+        });
 
         // Update single editor knob indicators if present
         const f1Cut = document.getElementById('frontKnobCutoff');
@@ -18367,141 +18385,141 @@ function exportCurrentPatchSyx() {
     if (fxCanvasesInitialized) return;
     fxCanvasesInitialized = true;
 
-    // Tape Reels Animation
-    let tapeAngle = 0;
+    // Display della FX RACK con la grafica dell'LCD del PANEL (azzurro Snow / rosso Dark):
+    // seguono le manopole e si comandano trascinando (X/Y = due parametri del modulo).
+    const unitOf = cc => document.querySelector(`#fxRackContent .fx-rack-knob-unit[data-cc="${cc}"]`);
+    const val = (cc, d = 64) => { const u = unitOf(cc); return u ? (parseInt(u.dataset.val, 10) || 0) : d; };
+    // n = 0..1 sulla scala della manopola (es. CURVE va da 0 a 14)
+    const setNorm = (cc, n) => {
+      const u = unitOf(cc); if (!u || !u._apply) return;
+      const lo = parseInt(u.dataset.min, 10) || 0, hi = parseInt(u.dataset.max, 10) || 127;
+      u._apply(Math.round(lo + Math.max(0, Math.min(1, n)) * (hi - lo)));
+    };
+    const lcd = () => document.documentElement.getAttribute('data-skin') === 'elektron'
+      ? { bg0: '#5c0710', bg1: '#1c0003', ink: '#ff2a3b', hi: '#ffffff', dim: 'rgba(255,90,100,0.28)', grid: 'rgba(0,0,0,0.35)', glow: 'rgba(255,42,59,0.7)' }
+      : { bg0: '#e4eff8', bg1: '#d0e4f2', ink: '#1c2a38', hi: '#0f2233', dim: 'rgba(28,42,56,0.22)', grid: 'rgba(28,42,56,0.06)', glow: 'rgba(0,0,0,0)' };
+    const CURVES = ['OFF', 'LIGHT', 'SOFT', 'MIDDLE', 'HARD', 'DIGITAL', 'SHAPER', 'RECTIF', 'BITRED', 'RATERED', 'RATE+F', 'LOWPASS', 'LOW+F', 'HIGHPASS', 'HIGH+F'];
 
-    function renderTape() {
-      // re-query: buildFxRackView() replaces the canvas on every tab switch
-      const tapeCv = document.getElementById('fxTapeCanvas');
-      if (tapeCv && tapeCv.offsetParent !== null) {
-        const ctx = tapeCv.getContext('2d');
-        const w = tapeCv.width = tapeCv.clientWidth;
-        const h = tapeCv.height = 64;
-
-        ctx.clearRect(0, 0, w, h);
-        tapeAngle += 0.04;
-
-        // Draw Left Reel
-        const r1x = w * 0.28;
-        const r2x = w * 0.72;
-        const ry = h * 0.5;
-        const radius = 22;
-
-        [r1x, r2x].forEach((rx, idx) => {
-          ctx.save();
-          ctx.translate(rx, ry);
-          ctx.rotate(idx === 0 ? tapeAngle : -tapeAngle * 0.95);
-
-          // Reel outer flange
-          ctx.beginPath();
-          ctx.arc(0, 0, radius, 0, Math.PI * 2);
-          ctx.strokeStyle = '#475569';
-          ctx.lineWidth = 2;
-          ctx.stroke();
-
-          // 3 Spokes
-          for (let i = 0; i < 3; i++) {
-            ctx.save();
-            ctx.rotate((Math.PI * 2 / 3) * i);
-            ctx.beginPath();
-            ctx.moveTo(0, 0);
-            ctx.lineTo(radius - 2, 0);
-            ctx.strokeStyle = '#64748b';
-            ctx.lineWidth = 2.5;
-            ctx.stroke();
-            ctx.restore();
-          }
-
-          // Center Hub
-          ctx.beginPath();
-          ctx.arc(0, 0, 6, 0, Math.PI * 2);
-          ctx.fillStyle = '#94a3b8';
-          ctx.fill();
-          ctx.restore();
-        });
-
-        // Tape path line
-        ctx.beginPath();
-        ctx.moveTo(r1x, ry + radius);
-        ctx.lineTo(r2x, ry + radius);
-        ctx.strokeStyle = '#94a3b8';
-        ctx.lineWidth = 1.5;
-        ctx.stroke();
-      }
-      requestAnimationFrame(renderTape);
+    // prepara il canvas (nitido su schermi retina) e disegna il fondo LCD con la trama a pixel
+    function surface(cv) {
+      const dpr = window.devicePixelRatio || 1, w = cv.clientWidth, h = cv.clientHeight;
+      if (!w || !h) return null;
+      if (cv.width !== Math.round(w * dpr)) { cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
+      const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      const c = lcd(), g = ctx.createLinearGradient(0, 0, 0, h);
+      g.addColorStop(0, c.bg0); g.addColorStop(1, c.bg1); ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+      ctx.fillStyle = c.grid; for (let y = 0; y < h; y += 3) ctx.fillRect(0, y, w, 1); for (let x = 0; x < w; x += 3) ctx.fillRect(x, 0, 1, h);
+      ctx.font = '700 10px "VT323", ui-monospace, monospace'; ctx.textBaseline = 'top';
+      ctx.shadowColor = c.glow; ctx.shadowBlur = c.glow === 'rgba(0,0,0,0)' ? 0 : 6;
+      return { ctx, w, h, c };
     }
-    requestAnimationFrame(renderTape);
+    const label = (s, txt, x, y, align = 'left') => { s.ctx.fillStyle = s.c.ink; s.ctx.textAlign = align; s.ctx.font = '13px "VT323", ui-monospace, monospace'; s.ctx.fillText(txt, x, y); };
 
-    // Tube Transfer Saturation Curve
-    function drawTubeCurve(driveVal = 32) {
-      const tubeCv = document.getElementById('fxTubeCurveCanvas');
-      if (!tubeCv) return;
-      const ctx = tubeCv.getContext('2d');
-      if (!ctx) return;
-      const w = tubeCv.width = 170;
-      const h = tubeCv.height = 74;
-
-      ctx.fillStyle = '#0a0c10';
-      ctx.fillRect(0, 0, w, h);
-
-      // Grid
-      ctx.strokeStyle = 'rgba(255,255,255,0.08)';
-      ctx.lineWidth = 1;
-      ctx.beginPath();
-      ctx.moveTo(0, h / 2); ctx.lineTo(w, h / 2);
-      ctx.moveTo(w / 2, 0); ctx.lineTo(w / 2, h);
-      ctx.stroke();
-
-      // Dynamic sigmoid curve responding to Drive
-      ctx.beginPath();
-      ctx.strokeStyle = '#f97316';
-      ctx.lineWidth = 2.4;
-      const driveFactor = 0.8 + (driveVal / 127) * 3.8;
-      for (let x = 0; x < w; x++) {
-        const normX = (x / w) * 4 - 2;
-        const normY = Math.tanh(normX * driveFactor);
-        const y = h / 2 - normY * (h * 0.42);
-        if (x === 0) ctx.moveTo(x, y);
-        else ctx.lineTo(x, y);
-      }
-      ctx.stroke();
+    // trascinamento: X/Y del puntatore -> due parametri (cc dell'asse X e dell'asse Y)
+    function draggable(cv, ccX, ccY) {
+      if (!cv || cv._drag) return; cv._drag = true;
+      cv.style.cursor = 'crosshair'; cv.style.touchAction = 'none';
+      const move = e => {
+        const r = cv.getBoundingClientRect();
+        if (ccX != null) setNorm(ccX, (e.clientX - r.left) / r.width);
+        if (ccY != null) setNorm(ccY, 1 - (e.clientY - r.top) / r.height);
+      };
+      cv.addEventListener('pointerdown', e => { cv.setPointerCapture(e.pointerId); move(e); });
+      cv.addEventListener('pointermove', e => { if (cv.hasPointerCapture(e.pointerId)) move(e); });
     }
-    window.drawTubeCurve = drawTubeCurve;
-    setTimeout(() => drawTubeCurve(32), 150);
 
-    // Stereo Scope
-    let scopePhase = 0;
-    function renderStereoScope() {
-      const stCv = document.getElementById('fxStereoCanvas');
-      if (stCv && stCv.offsetParent !== null) {
-        const w = stCv.clientWidth || 380;
-        const h = stCv.clientHeight || 64;
-        if (stCv.width !== w && w > 0) stCv.width = w;
-        if (stCv.height !== h && h > 0) stCv.height = h;
+    let t0 = performance.now();
+    function frame(now) {
+      const t = (now - t0) / 1000;
 
-        const ctx = stCv.getContext('2d');
-        if (ctx && w > 0) {
-          ctx.fillStyle = '#090a0d';
-          ctx.fillRect(0, 0, w, h);
-
-          scopePhase += 0.05;
-          ctx.beginPath();
-          ctx.strokeStyle = '#38bdf8';
-          ctx.lineWidth = 1.8;
-
-          for (let i = 0; i < 60; i++) {
-            const t = i * 0.1 + scopePhase;
-            const x = (w / 2) + Math.sin(t * 1.5) * (w * 0.35);
-            const y = (h / 2) + Math.sin(t * 2.0) * (h * 0.35);
-            if (i === 0) ctx.moveTo(x, y);
-            else ctx.lineTo(x, y);
+      // DELAY · REVERB: impulso, ripetizioni (TIME = distanza, FEEDBACK = smorzamento, SEND = livello) e coda del riverbero
+      const dCv = document.getElementById('fxTapeCanvas');
+      if (dCv && dCv.offsetParent) {
+        draggable(dCv, 114, 115);
+        const s = surface(dCv);
+        if (s) {
+          const { ctx, w, h, c } = s, base = h - 8, x0 = 14;
+          const time = val(114, 48), fb = val(115, 55) / 127, send = Math.max(0.15, val(113, 40) / 127);
+          const gap = 10 + (time / 127) * (w * 0.32), decay = val(116, 65) / 127, size = val(117, 35) / 127;
+          // coda del riverbero
+          const tail = (0.15 + decay * 0.85) * (w - x0);
+          ctx.beginPath(); ctx.moveTo(x0, base);
+          for (let x = 0; x <= tail; x += 2) {
+            const env = Math.exp(-3 * x / tail) * (0.35 + size * 0.45);
+            ctx.lineTo(x0 + x, base - env * (h - 26) * (0.6 + 0.4 * Math.abs(Math.sin(x * 0.9 + t * 6))));
           }
-          ctx.stroke();
+          ctx.lineTo(x0 + tail, base); ctx.closePath(); ctx.fillStyle = c.dim; ctx.fill();
+          // impulso e ripetizioni; la "testina" scorre e accende la ripetizione che attraversa
+          const period = Math.max(0.6, (time / 127) * 2 + 0.4), head = ((t % period) / period) * (w - x0);
+          let amp = 1, x = x0, n = 0;
+          ctx.lineWidth = 3; ctx.lineCap = 'round';
+          while (x < w - 4 && amp > 0.04 && n < 40) {
+            const hot = Math.abs(x - x0 - head) < gap * 0.5;
+            ctx.strokeStyle = hot ? c.hi : c.ink;
+            ctx.beginPath(); ctx.moveTo(x, base); ctx.lineTo(x, base - amp * (h - 26) * (n ? send : 1)); ctx.stroke();
+            x += gap; amp *= fb * 0.98; n++;
+          }
+          ctx.fillStyle = c.ink; ctx.fillRect(x0, base, w - x0 - 4, 1);
+          label(s, `DLY ${unitOf(114)?.querySelector('.fx-knob-val')?.textContent || ''}  FB ${Math.round(fb * 100)}%`, 8, 4);
+          label(s, `REV ${unitOf(116)?.querySelector('.fx-knob-val')?.textContent || ''}`, w - 8, 4, 'right');
         }
       }
-      requestAnimationFrame(renderStereoScope);
+
+      // SATURATION: curva di trasferimento (forma = CURVE, intensita' = SATUR) e un'onda che la attraversa
+      const sCv = document.getElementById('fxTubeCurveCanvas');
+      if (sCv && sCv.offsetParent) {
+        draggable(sCv, 49, 36);
+        const s = surface(sCv);
+        if (s) {
+          const { ctx, w, h, c } = s, curveIdx = Math.min(14, val(49, 1));
+          const sat = Math.max(0, val(36, 32) - 64) / 63, k = 0.8 + sat * 6;
+          const shape = v => {
+            const ci = curveIdx;
+            if (ci === 0) return v;
+            if (ci === 4) return Math.max(-1, Math.min(1, v * k));                    // hard
+            if (ci === 5 || ci === 8) { const q = Math.max(2, 16 - sat * 13); return Math.round(Math.tanh(v * k) * q) / q; }   // digital / bit reduction
+            if (ci === 7) return Math.abs(Math.tanh(v * k)) * 2 - 1;                    // rectifier
+            if (ci === 6) return Math.sin(v * k * 1.6);                                 // shaper
+            return Math.tanh(v * k * (ci === 1 ? 0.5 : ci === 2 ? 0.8 : 1));          // light/soft/middle e filtri
+          };
+          const midY = h / 2 + 6, ax = w * 0.22, aw = w * 0.56;
+          ctx.fillStyle = c.dim; ctx.fillRect(ax, midY, aw, 1); ctx.fillRect(ax + aw / 2, 18, 1, h - 22);
+          ctx.strokeStyle = c.ink; ctx.lineWidth = 2.2; ctx.beginPath();
+          for (let i = 0; i <= aw; i++) { const v = (i / aw) * 2 - 1, y = midY - shape(v) * (h * 0.32); i ? ctx.lineTo(ax + i, y) : ctx.moveTo(ax + i, y); }
+          ctx.stroke();
+          // punto che percorre la curva al ritmo di un'onda
+          const v = Math.sin(t * 2.4), px = ax + (v + 1) / 2 * aw, py = midY - shape(v) * (h * 0.32);
+          ctx.fillStyle = c.hi; ctx.beginPath(); ctx.arc(px, py, 3.2, 0, Math.PI * 2); ctx.fill();
+          label(s, CURVES[curveIdx] || '', 8, 4);
+          label(s, val(36, 32) > 64 ? `SAT +${val(36, 32) - 64}` : 'SAT 0', w - 8, 4, 'right');
+        }
+      }
+
+      // CHORUS: due voci sfasate (DEPTH = ampiezza, RATE = velocita', MOD MIX = seconda voce, SPREAD = apertura stereo)
+      const cCv = document.getElementById('fxStereoCanvas');
+      if (cCv && cCv.offsetParent) {
+        draggable(cCv, 106, 107);
+        const s = surface(cCv);
+        if (s) {
+          const { ctx, w, h, c } = s, depth = val(107, 60) / 127, rate = 0.2 + (val(106, 30) / 127) * 3, mix = val(104, 45) / 127;
+          const mid = h / 2 + 6, A = 4 + depth * (h * 0.3);
+          [[0, c.ink, 2], [Math.PI * 0.6, c.dim === c.ink ? c.ink : c.hi, 1.4]].forEach(([ph, col, lw], vi) => {
+            if (vi && mix < 0.05) return;
+            ctx.strokeStyle = col; ctx.globalAlpha = vi ? 0.35 + mix * 0.65 : 1; ctx.lineWidth = lw; ctx.beginPath();
+            for (let x = 0; x <= w; x += 2) {
+              const y = mid + Math.sin(x * 0.045 + t * rate * 4 + ph) * A * (0.6 + 0.4 * Math.sin(t * rate + x * 0.01 + ph));
+              x ? ctx.lineTo(x, y) : ctx.moveTo(x, y);
+            }
+            ctx.stroke(); ctx.globalAlpha = 1;
+          });
+          label(s, `DEPTH ${Math.round(depth * 100)}%`, 8, 4);
+          label(s, `RATE ${unitOf(106)?.querySelector('.fx-knob-val')?.textContent || ''}`, w - 8, 4, 'right');
+        }
+      }
+      requestAnimationFrame(frame);
     }
-    requestAnimationFrame(renderStereoScope);
+    requestAnimationFrame(frame);
+    window.drawTubeCurve = () => {};   // la curva ora si ridisegna da sola a ogni frame
   }
 
   window.renderFxRackView = () => {
@@ -18567,6 +18585,7 @@ function exportCurrentPatchSyx() {
     btnTabFxRack: ['FX RACK — effetti della parte', [
       ['Parte', 'In alto scegli la parte (<b>p1–p4</b>) o <b>all</b> per tutte.'],
       ['Effetti', 'Delay (<b>TIME, FEEDBACK, SEND</b>), riverbero (<b>REV DECAY, SIZE</b>), saturazione (<b>SATUR, CURVE</b>), chorus (<b>DEPTH, RATE, MOD MIX, SPREAD</b>). Il pad X/Y muove Cutoff (orizzontale) e Resonance (verticale). Le manopole grigie con “·B” sono Page B: non inviano nulla.'],
+      ['Display', 'I display mostrano l’effetto e seguono le manopole. Puoi anche <b>trascinarci sopra</b>: delay X = TIME, Y = FEEDBACK; saturazione X = CURVE, Y = SATUR; chorus X = RATE, Y = DEPTH.'],
       ['Macro', '<b>1: CUTOFF, 2: RESO, 3: SATUR, 4: FX SEND</b>: comandi rapidi sui parametri principali della parte.'],
     ]],
     btnTabPatchManager: ['PATCH — libreria e file', [
