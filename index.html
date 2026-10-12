@@ -9230,6 +9230,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
       if (msgBytes[1] === 0x00 && msgBytes[2] === 0x20 && msgBytes[3] === 0x33 && msgBytes[5] < 0x10) window.virusDeviceId = msgBytes[5];
       // Play Mode annunciato dal Virus: F0 00 20 33 01 dd 73 pp 7A vv F7 (0 Single, 1 Sequencer, 2 Multi)
       if (msgBytes.length === 11 && msgBytes[6] === 0x73 && msgBytes[8] === 122) {
+        window.__virusPlayMode = msgBytes[9];
         window.currentSynthMode = msgBytes[9] === 0 ? 'single' : 'multi';
         if (window.virusSync && window.virusSync.step === 'global') window.virusSync.askDump(window.currentSynthMode);
         if (window.snowPanel && window.snowPanel.state === 'play') window.snowPanel.render();
@@ -9805,12 +9806,23 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
     window.currentSynthMode = mode === 0 ? 'single' : 'multi';
     if (!selectedOutput) return;
     try {
-      // Global Page D (0x73), param 122 = Play Mode; valori del Virus: 0 Single, 1 Sequencer (Multi Single), 2 Multi
-      const bytes = new Uint8Array([
-        ...SYSEX_PREFIX, deviceId(), 0x73, 0x00, 122, [0, 2, 1][mode] ?? 0, 0xF7
-      ]);
-      selectedOutput.send(bytes);
-      recordMidiTx(mode === 0 ? 'set synth mode: SINGLE' : 'set synth mode: MULTI', bytes);
+      // Global Page D (0x73), param 122 = Play Mode; valori del Virus: 0 Single, 1 Sequencer (Multi Single), 2 Multi.
+      // Il Virus ignora i parametri globali con ID OMNI (0x10): si manda anche col suo ID reale (letto dalle risposte) o 0x00.
+      const want = [0, 2, 1][mode] ?? 0, label = ['SINGLE', 'MULTI', 'SEQUENCER'][mode] || 'SINGLE';
+      new Set([deviceId(), window.virusDeviceId ?? 0x00]).forEach(id => {
+        const bytes = new Uint8Array([...SYSEX_PREFIX, id, 0x73, 0x00, 122, want, 0xF7]);
+        selectedOutput.send(bytes);
+        recordMidiTx(`set synth mode: ${label}`, bytes);
+      });
+      // verifica: rilegge dal Virus modo e suono attivo; il display segue cio' che il Virus conferma
+      window.__virusPlayMode = undefined;
+      setTimeout(() => window.syncWithVirus && window.syncWithVirus(false), 400);
+      setTimeout(() => {
+        const got = window.__virusPlayMode;
+        if (got === want) setLastAction(`Modo ${label}: confermato dal Virus`);
+        else if (got === undefined) setLastAction(`Modo ${label} inviato, ma il Virus non ha confermato (vedi Monitor MIDI)`);
+        else setLastAction(`Il Virus è rimasto in ${['SINGLE', 'SEQUENCER', 'MULTI'][got] || got}: il cambio a ${label} non è stato accettato`);
+      }, 2200);
     } catch(e) { console.error('sendVirusMode error', e); }
   }
 
