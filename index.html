@@ -9008,6 +9008,12 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
 
     // Processa ogni messaggio SysEx completo
     for (const msgBytes of sysexMessages) {
+      // Play Mode annunciato dal Virus: F0 00 20 33 01 dd 73 pp 7A vv F7 (0 Single, 1 Sequencer, 2 Multi)
+      if (msgBytes.length === 11 && msgBytes[6] === 0x73 && msgBytes[8] === 122) {
+        window.currentSynthMode = msgBytes[9] === 0 ? 'single' : 'multi';
+        if (window.snowPanel && window.snowPanel.state === 'play') window.snowPanel.render();
+        continue;
+      }
       // Un Single Patch Dump del Virus TI ha almeno 265 bytes (tipicamente 267 bytes)
       if (msgBytes.length >= 250) {
         const patchName = extractPatchName(msgBytes);
@@ -9566,9 +9572,9 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
     window.currentSynthMode = mode === 0 ? 'single' : 'multi';
     if (!selectedOutput) return;
     try {
-      // SysEx Global Param (0x73), Param 0 (Synth Mode), Value: 0 (Single) / 1 (Multi)
+      // Global Page D (0x73), param 122 = Play Mode; valori del Virus: 0 Single, 1 Sequencer (Multi Single), 2 Multi
       const bytes = new Uint8Array([
-        ...SYSEX_PREFIX, deviceId(), 0x73, 0x00, mode & 0x7F, 0xF7
+        ...SYSEX_PREFIX, deviceId(), 0x73, 0x00, 122, [0, 2, 1][mode] ?? 0, 0xF7
       ]);
       selectedOutput.send(bytes);
       recordMidiTx(mode === 0 ? 'set synth mode: SINGLE' : 'set synth mode: MULTI', bytes);
@@ -13571,7 +13577,9 @@ function exportCurrentPatchSyx() {
     const UPPER = ['frontBtnOsc1', 'frontBtnOsc2', 'frontBtnFilters', 'frontBtnMod', 'frontBtnEnv', 'frontBtnEffects', 'frontBtnArp', 'frontBtnCommon'];
     const LOWER = ['frontBtnValMinus', 'frontBtnValPlus', 'frontBtnParamPrev', 'frontBtnParamNext', 'frontBtnAudition', 'frontBtnMulti', 'frontBtnConfig', 'frontBtnStore'];
     const MODES = ['Single', 'Multi', 'Sequencer'];
-    const CATEGORIES = ['Off', 'Lead', 'Bass', 'Pad', 'Decay', 'Pluck', 'Acid', 'Classic', 'Arpeggiator', 'Effects', 'Drums', 'Percussion', 'Input', 'Vocoder', 'Favourite1', 'Favourite2', 'Favourite3'];
+    const CATEGORIES = ['--', 'Lead', 'Bass', 'Pad', 'Decay', 'Pluck', 'Acid', 'Classic', 'Arpeggiator', 'Effects', 'Drums', 'Percussion', 'Input', 'Vocoder', 'Favourite 1', 'Favourite 2', 'Favourite 3', 'Organ', 'Piano', 'String', 'FM', 'Digital', 'Atomizer'];
+    // nomi brevi dei soft knob (Single dump Page B #51-53), lista del firmware TI
+    const SOFTKNOB_NAMES = ['~Para', '+3rds', '+4ths', '+5ths', '+7ths', '+Octave', 'Access', 'ArpMode', 'ArpOct', 'Attack', 'Balance', 'Chorus', 'Cutoff', 'Decay', 'Delay', 'Depth', 'Destroy', 'Detune', 'Disolve', 'Distort', 'Dive', 'Effects', 'Elevate', 'Energy', 'EqHigh', 'EqLow', 'EqMid', 'Fast', 'Fear', 'Filter', 'FM', 'Glide', 'Hold', 'Hype', 'Infect', 'Length', 'Mix', 'Morph', 'Mutate', 'Noise', 'Open', 'Orbit', 'Pan', 'Phaser', 'Phatter', 'Pitch', 'Pulsate', 'Push', 'PWM', 'Rate', 'Release', 'Reso', 'Reverb', 'Scream', 'Shape', 'Sharpen', 'Slow', 'Soften', 'Speed', 'SubOsc', 'Sustain', 'Sweep', 'Swing', 'Tempo', 'Thinner', 'Tone', 'Tremolo', 'Vibrato', 'WahWah', 'Warmth', 'Warp', 'vf', 'Bite', 'Flanger', 'RingMod', 'Punch', 'Fuzz', 'Modulate', 'Party!', 'Interpolation', 'F-Shift', 'F-Spread', 'Bush', 'Muscle', 'Sack', 'Vowel', 'Comb', 'Speaker'];
 
     const panel = { state: 'play', menu: null, sel: 0, shift: false, modeIdx: 1, bankPrompt: false };
     window.snowPanel = panel;
@@ -13624,7 +13632,7 @@ function exportCurrentPatchSyx() {
       const soft = [1, 2, 3].map(i => document.getElementById('frontLcdSoft' + i));
       const single = window.currentSynthMode === 'single';
       // categoria come sul Virus: "CAT:Lead" (Category 1 = Single dump Page B #123)
-      const catTxt = 'CAT:' + (CATEGORIES[part.dump?.[9 + 251]] || 'Off');
+      const catTxt = 'CAT:' + (CATEGORIES[part.dump?.[9 + 251]] || '--');
       if (cat) cat.textContent = panel.state === 'menu' ? EASY_MENUS[panel.menu][0]
         : panel.state === 'mode' ? 'MODE' : single ? catTxt : `Part ${(currentPartIndex || 0) + 1}  ${catTxt}`;
       const prg = document.getElementById('frontLcdMultiPrg'); if (prg) prg.hidden = single;
@@ -13643,7 +13651,8 @@ function exportCurrentPatchSyx() {
       soft.forEach((el, i) => {
         if (!el) return;
         const prm = params[i]; const v = prm.cc === NO_CC ? null : getCC(prm.cc);
-        const txt = panel.state === 'menu' ? `${prm.n}: ${fmt(prm, v)}` : prm.n;   // in play solo i nomi, come il display reale
+        const sk = !panel.shift && part.dump && SOFTKNOB_NAMES[part.dump[9 + 128 + 51 + i]];
+        const txt = panel.state === 'menu' ? `${prm.n}: ${fmt(prm, v)}` : (sk || prm.n);   // in play solo i nomi, come il display reale
         el.textContent = panel.state === 'menu' && i === panel.sel ? `▸${txt}` : txt;
       });
       // manopole VALUE 1-3 mostrano il parametro a cui sono assegnate
@@ -13823,7 +13832,14 @@ function exportCurrentPatchSyx() {
     // VALUE 1-3: soft knob della pagina di edit; in play = serigrafia (Patch Volume / Transpose / Panorama)
     [1, 2, 3].forEach(i => setupFrontKnob(`frontKnobValue${i}`, `frontKnobValue${i}Ind`, 'none', 64, (v) => {
       if (panel.state === 'mode' && i === 1) { panel.modeIdx = Math.min(2, Math.floor(v / 43)); render(); return; }
-      consumeShift();
+      const shifted = consumeShift();
+      // play senza SHIFT: VALUE 1-3 = soft knob della patch (Page D #10-12), come sul synth
+      const sk = panel.state === 'play' && !shifted && curPart()?.dump && SOFTKNOB_NAMES[curPart().dump[9 + 128 + 51 + i - 1]];
+      if (sk && selectedOutput) {
+        const pt = window.currentSynthMode === 'single' ? 0x40 : (currentPartIndex || 0);
+        try { selectedOutput.send(new Uint8Array([...SYSEX_PREFIX, deviceId(), 0x73, pt, 9 + i, v & 0x7F, 0xF7])); } catch (e) {}
+        lcdFlash(sk, String(v)); setLastAction(`Soft knob ${i} (${sk}): ${v}`); return;
+      }
       const prm = softParams()[i - 1];
       if (prm.cc === NO_CC) { setLastAction(`${prm.n}: parametro Page B, non controllabile via CC`); return; }
       let val = v;
