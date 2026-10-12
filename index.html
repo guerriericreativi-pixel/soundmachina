@@ -6558,6 +6558,25 @@
     .faceplate { width: 860px; }
     .faceplate-rotate-hint { display: block; font-size: 11px; color: var(--muted); text-align: center; margin: 6px 0 0; }
   }
+
+  /* LED di serie: bianchi in entrambi i temi */
+  html[data-skin="elektron"] .faceplate .snow-indicator-led.active-amber,
+  html[data-skin="elektron"] #snowHardwareChassis .snow-indicator-led.active-amber,
+  html[data-skin="elektron"] .hardware-chassis .arp-hw-led.active {
+    background: radial-gradient(circle at 45% 40%, #ffffff 0%, #f4f6f8 45%, rgba(220,226,232,0.9) 75%) !important;
+    box-shadow: 0 0 0.5cqw rgba(255,255,255,0.95), 0 0 1.2cqw rgba(235,240,245,0.6) !important;
+    border-color: rgba(200,205,210,0.6) !important;
+  }
+  .faceplate .snow-indicator-led.active-amber,
+  .faceplate .snow-indicator-led.active-green,
+  .hardware-chassis .arp-hw-led.active {
+    background: radial-gradient(circle at 45% 40%, #ffffff 0%, #f6f8fa 45%, rgba(225,230,236,0.9) 75%) !important;
+    box-shadow: 0 0 0.5cqw rgba(255,255,255,0.95), 0 0 1.2cqw rgba(235,240,245,0.6) !important;
+  }
+  .hardware-chassis .arp-hw-led.active { box-shadow: 0 0 5px rgba(255,255,255,0.95), 0 0 12px rgba(235,240,245,0.6) !important; }
+
+  .faceplate .fp-lcd .lcd-footer-bar { gap: 0.8cqw; }
+  .faceplate .fp-lcd .lcd-footer-bar span { white-space: nowrap !important; font-size: 0.95cqw !important; }
 </style>
 </head>
 <body>
@@ -6665,14 +6684,7 @@
       <span id="connLabel" style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em;">disconnected</span>
     </div>
 
-    <div class="accent-picker" id="accentPicker" title="Selettore Colore LED Accent">
-      <button class="accent-dot" data-accent="#e02424" style="--led-color:#e02424" title="Dark Star Red (LED 660nm)"></button>
-      <button class="accent-dot" data-accent="#888888" style="--led-color:#888888" title="Ice White / Grey"></button>
-      <button class="accent-dot" data-accent="#74c476" style="--led-color:#74c476" title="Sage Green (LED 525nm)"></button>
-      <button class="accent-dot" data-accent="#56b6c2" style="--led-color:#56b6c2" title="Soft Cyan (LED 490nm)"></button>
-      <button class="accent-dot" data-accent="#c678dd" style="--led-color:#c678dd" title="Soft Mauve / UV"></button>
-      <button class="accent-dot" data-accent="#e59500" style="--led-color:#e59500" title="Warm Amber (LED 590nm)"></button>
-    </div>
+
     <div class="light-limiter" id="lightLimiter" aria-label="Selettore Potenza & Alone LED" title="Potenza LED & Alone Luminoso">
       <span class="light-limiter-label">LED</span>
       <button class="light-limit-step" data-limit="0.35" title="Potenza LED: Bassa (35% - Alone delicato)">
@@ -8026,12 +8038,9 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
     '#ff3300': '#888888',
     '#f57b20': '#e59500'
   };
-  let storedAccent = localStorage.getItem(ACCENT_KEY) || '#888888';
-  if (ACCENT_MIGRATION[storedAccent]) {
-    storedAccent = ACCENT_MIGRATION[storedAccent];
-    localStorage.setItem(ACCENT_KEY, storedAccent);
-  }
-  let currentAccent = storedAccent;
+  // LED bianchi di serie come sul Virus TI Snow: niente colori personalizzati
+  try { localStorage.removeItem(ACCENT_KEY); } catch (e) {}
+  let currentAccent = '#888888';
   applyLightLimit(currentLightLimit);
   applyAccent(currentAccent);
 
