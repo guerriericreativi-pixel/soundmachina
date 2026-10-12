@@ -7002,6 +7002,41 @@
   html[data-skin="elektron"] #fxRackContent .xy-coords-badge { background: #3f040a !important; color: #ffccd0 !important; }
   #fxRackContent .xy-crosshair-x, #fxRackContent .xy-crosshair-y { background: rgba(28,42,56,0.45) !important; }
   html[data-skin="elektron"] #fxRackContent .xy-crosshair-x, html[data-skin="elektron"] #fxRackContent .xy-crosshair-y { background: rgba(255,90,100,0.55) !important; }
+  /* riflesso del vetro su tutti i display LCD (PANEL, MULTI, FX RACK, pad X/Y); segue un poco il mouse */
+  :root { --glass-x: 0px; }
+  .lcd-glass { position: relative; border-radius: 4px; }
+  .virus-snow-lcd-front, .xy-pad-surface { position: relative; }
+  .virus-snow-lcd-front::after, .lcd-glass::after, #fxRackContent .xy-pad-surface::after {
+    content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 4;
+    background:
+      linear-gradient(112deg, rgba(255,255,255,0) 0 28%, rgba(255,255,255,0.26) 36%, rgba(255,255,255,0.07) 44%, rgba(255,255,255,0) 50%, rgba(255,255,255,0) 72%, rgba(255,255,255,0.10) 76%, rgba(255,255,255,0) 80%),
+      linear-gradient(180deg, rgba(255,255,255,0.20) 0, rgba(255,255,255,0.04) 22%, rgba(255,255,255,0) 45%),
+      radial-gradient(130% 120% at 50% 45%, rgba(0,0,0,0) 62%, rgba(0,0,0,0.14) 100%) !important;
+    background-size: 160% 100%, 100% 100%, 100% 100% !important;
+    background-position: calc(30% + var(--glass-x)) 0, 0 0, 0 0 !important;
+    mix-blend-mode: screen;
+  }
+  .virus-snow-lcd-front::after, #fxRackContent .xy-pad-surface::after { mix-blend-mode: normal; }
+  /* Snow: fondo chiaro, il riflesso deve essere piu' deciso per vedersi */
+  html:not([data-skin="elektron"]) .virus-snow-lcd-front::after, html:not([data-skin="elektron"]) .lcd-glass::after, html:not([data-skin="elektron"]) #fxRackContent .xy-pad-surface::after {
+    mix-blend-mode: normal;
+    background:
+      linear-gradient(112deg, rgba(255,255,255,0) 0 27%, rgba(255,255,255,0.62) 35%, rgba(255,255,255,0.18) 43%, rgba(255,255,255,0) 50%, rgba(255,255,255,0) 71%, rgba(255,255,255,0.30) 75%, rgba(255,255,255,0) 79%),
+      linear-gradient(180deg, rgba(255,255,255,0.45) 0, rgba(255,255,255,0.08) 20%, rgba(255,255,255,0) 42%),
+      radial-gradient(130% 120% at 50% 45%, rgba(0,0,0,0) 60%, rgba(10,30,50,0.16) 100%) !important;
+    background-size: 160% 100%, 100% 100%, 100% 100% !important;
+    background-position: calc(30% + var(--glass-x)) 0, 0 0, 0 0 !important;
+  }
+  html[data-skin="elektron"] .virus-snow-lcd-front::after, html[data-skin="elektron"] .lcd-glass::after, html[data-skin="elektron"] #fxRackContent .xy-pad-surface::after {
+    background:
+      linear-gradient(112deg, rgba(255,255,255,0) 0 28%, rgba(255,255,255,0.11) 36%, rgba(255,255,255,0.03) 44%, rgba(255,255,255,0) 50%, rgba(255,255,255,0) 72%, rgba(255,255,255,0.05) 76%, rgba(255,255,255,0) 80%),
+      linear-gradient(180deg, rgba(255,255,255,0.08) 0, rgba(255,255,255,0) 35%),
+      radial-gradient(130% 120% at 50% 45%, rgba(0,0,0,0) 60%, rgba(0,0,0,0.35) 100%) !important;
+    background-size: 160% 100%, 100% 100%, 100% 100% !important;
+    background-position: calc(30% + var(--glass-x)) 0, 0 0, 0 0 !important;
+  }
+  .lcd-glass > canvas { position: relative; z-index: 1; }
+  #fxRackContent .xy-pad-surface > * { z-index: 5; }
 </style>
 </head>
 <body>
@@ -17982,7 +18017,7 @@ function exportCurrentPatchSyx() {
             </div>
 
             <!-- Tape Reels Visualizer Canvas -->
-            <canvas id="fxTapeCanvas" class="fx-scope-canvas" height="64"></canvas>
+            <div class="lcd-glass"><canvas id="fxTapeCanvas" class="fx-scope-canvas" height="64"></canvas></div>
 
             <div class="fx-knobs-row">
               <div class="fx-rack-knob-unit" data-cc="114" data-min="0" data-max="127" data-val="48" title="Delay Time (CC 114)">
@@ -18058,7 +18093,7 @@ function exportCurrentPatchSyx() {
 
             <!-- curva di saturazione -->
             <div class="tube-container">
-              <canvas id="fxTubeCurveCanvas" class="fx-scope-canvas" style="width: 170px; height: 74px;"></canvas>
+              <div class="lcd-glass"><canvas id="fxTubeCurveCanvas" class="fx-scope-canvas"></canvas></div>
             </div>
 
             <div class="fx-knobs-row">
@@ -18122,7 +18157,7 @@ function exportCurrentPatchSyx() {
             </div>
 
             <!-- Stereo Lissajous Canvas -->
-            <canvas id="fxStereoCanvas" class="fx-scope-canvas" height="64"></canvas>
+            <div class="lcd-glass"><canvas id="fxStereoCanvas" class="fx-scope-canvas" height="64"></canvas></div>
 
             <div class="fx-knobs-row">
               <div class="fx-rack-knob-unit" data-cc="107" data-min="0" data-max="127" data-val="60" title="Chorus Depth (CC 107)">
@@ -18640,6 +18675,17 @@ function exportCurrentPatchSyx() {
     let seen = true; try { seen = !!localStorage.getItem('virusH_helpSeen_btnTabSnow'); localStorage.setItem('virusH_helpSeen_btnTabSnow', '1'); } catch (err) {}
     if (!seen) setTimeout(open, 800);
   });
+})();
+</script>
+<script>
+// riflesso dei display: la banda di luce si sposta un poco con il mouse (fermo con "riduci movimento")
+(function () {
+  if (matchMedia('(prefers-reduced-motion: reduce)').matches) return;
+  let raf = 0, x = 0;
+  addEventListener('pointermove', e => {
+    x = (e.clientX / innerWidth - 0.5) * 60;
+    if (!raf) raf = requestAnimationFrame(() => { raf = 0; document.documentElement.style.setProperty('--glass-x', `${x.toFixed(1)}px`); });
+  }, { passive: true });
 })();
 </script>
 <script>
