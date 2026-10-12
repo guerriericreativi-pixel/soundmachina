@@ -7112,6 +7112,28 @@
   .song-pages .chassis-page-btn.active-view { outline: 2px solid currentColor !important; outline-offset: -2px; font-weight: 900 !important; }
   .song-field { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 0; font: 700 9px/1 'Inter', sans-serif; letter-spacing: 0.08em; opacity: 0.85; }
   .song-field select { width: 100%; }
+  /* ---- testata: griglia unica, spazi e altezze uniformi ---- */
+  .app-header { display: grid !important; grid-template-columns: auto minmax(0, 1fr); column-gap: 18px; row-gap: 10px; align-items: center;
+    padding: 0 0 12px !important; margin: 0 0 14px !important; border-bottom: 1px solid var(--border); }
+  .app-header-left { display: contents !important; }
+  .app-header-left > div:first-child { grid-column: 1; }
+  #partTabs { grid-column: 2; justify-self: start; max-width: 100%; overflow-x: auto; scrollbar-width: none; flex-wrap: nowrap !important; }
+  #partTabs::-webkit-scrollbar { display: none; }
+  #partTabs .segmented-tab { flex: 0 0 auto; white-space: nowrap; }
+  .app-header-right { grid-column: 1 / -1; display: flex !important; align-items: center; flex-wrap: wrap; gap: 8px !important; margin: 0 !important; }
+  .app-header-right > * { margin: 0 !important; }
+  .app-header-right > *:not(.conn) { height: 30px !important; min-height: 30px !important; box-sizing: border-box; }
+  #patchNameDisplay { display: inline-flex; align-items: center; max-width: 380px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 13px !important; padding: 0 12px !important; }
+  .app-header-right .conn { display: inline-flex; align-items: center; gap: 6px; padding: 0 6px; }
+  #lightLimiter { margin-left: auto !important; display: inline-flex; align-items: center; }
+  .app-header-right .settings-trigger { padding: 0 10px !important; }
+  @media (max-width: 900px) {
+    .app-header { grid-template-columns: minmax(0, 1fr); }
+    #partTabs { grid-column: 1; justify-self: start; }
+    #partTabs.scrolls { justify-self: stretch; -webkit-mask-image: linear-gradient(90deg, #000 85%, transparent); mask-image: linear-gradient(90deg, #000 85%, transparent); }
+    #patchNameDisplay { flex: 1 1 100%; max-width: none; }
+    #lightLimiter { margin-left: 0 !important; }
+  }
 </style>
 </head>
 <body>
@@ -7122,6 +7144,7 @@
   <div class="bubble-val" id="bubbleVal">64</div>
   <div class="bubble-sub" id="bubbleSub">CC 40 • 50%</div>
 </div>
+<header class="app-header">
   <div class="app-header-left">
     <div style="display: flex; align-items: center; gap: 8px; position: relative;">
       <h1 style="margin: 0; font-size: 24px; font-weight: 800; letter-spacing: 0.1em; text-transform: uppercase; white-space: nowrap;">VIRUS-H</h1>
@@ -7214,7 +7237,7 @@
 
   <div class="app-header-right">
     <div style="font-weight: 600; font-size: 14px; letter-spacing: 0.05em; background: var(--section-bg); padding: 4px 12px; border-radius: 4px; border: 1px solid var(--border); white-space: nowrap;" id="patchNameDisplay">virus ti snow // [PATCH NAME]</div>
-    <div class="conn" style="margin-right: 16px;">
+    <div class="conn">
       <span class="dot" id="connDot"></span>
       <span id="connLabel" style="font-size: 10px; text-transform: uppercase; letter-spacing: 0.1em;">disconnected</span>
     </div>
@@ -7239,6 +7262,7 @@
   </div>
 </div>
 
+</header>
 <div class="control-room-rail" id="statusRail" aria-label="Stato del Virus TI Snow (tocca per i dettagli)" role="button" tabindex="0" aria-expanded="false">
   <div class="ops-card">
     <div class="ops-label">MIDI</div>
@@ -18797,6 +18821,14 @@ function exportCurrentPatchSyx() {
     x = (e.clientX / innerWidth - 0.5) * 60;
     if (!raf) raf = requestAnimationFrame(() => { raf = 0; document.documentElement.style.setProperty('--glass-x', `${x.toFixed(1)}px`); });
   }, { passive: true });
+})();
+</script>
+<script>
+// schede in alto: la sfumatura a destra compare solo se scorrono davvero
+(function () {
+  const t = document.getElementById('partTabs'); if (!t) return;
+  const check = () => t.classList.toggle('scrolls', t.scrollWidth > t.clientWidth + 2);
+  addEventListener('resize', check); addEventListener('load', check); check();
 })();
 </script>
 <script>
