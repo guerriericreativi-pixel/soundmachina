@@ -7053,6 +7053,31 @@
     background-size: 100% 100%, 100% 100%, 100% 100%, 170% 100% !important;
     background-position: 0 0, 0 0, 0 0, calc(30% + var(--glass-x)) 0 !important;
   }
+  /* PATCH: pannello che segue la finitura */
+  #patchManagerContent { --pm-bg: rgba(255,255,255,0.5); --pm-ink: #1d1f22; --pm-dim: #6b6e73; --pm-line: rgba(0,0,0,0.12); --pm-card: rgba(255,255,255,0.6); --pm-field: #fff; }
+  html[data-skin="elektron"] #patchManagerContent { --pm-bg: rgba(10,10,12,0.82); --pm-ink: #eef0f3; --pm-dim: #9a9ca2; --pm-line: rgba(255,255,255,0.1); --pm-card: rgba(255,255,255,0.04); --pm-field: rgba(0,0,0,0.45); }
+  .patch-panel { width: 100%; max-width: 860px; box-sizing: border-box; padding: 24px 24px 64px; border-radius: 6px; position: relative;
+    background: var(--pm-bg); border: 1px solid var(--pm-line); color: var(--pm-ink); box-shadow: inset 0 1px 3px rgba(0,0,0,0.12); }
+  .patch-panel h2 { margin: 0; font: 800 12px/1 'Inter', sans-serif; letter-spacing: 0.1em; color: var(--pm-ink); text-transform: uppercase !important; }
+  .patch-panel h2 span { color: var(--pm-dim); font-weight: 600; margin-left: 6px; }
+  .pm-head { display: flex; justify-content: space-between; align-items: center; padding-bottom: 10px; margin-bottom: 12px; border-bottom: 1px solid var(--pm-line); }
+  .pm-parts { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin-bottom: 22px; }
+  .pm-parts > div { background: var(--pm-card) !important; border-color: var(--pm-line) !important; font-family: 'Inter', sans-serif !important; }
+  .pm-parts > div div { color: var(--pm-ink) !important; }
+  .pm-part-badge { display: inline-flex; align-items: center; font: 800 12px/1 monospace; color: var(--pm-ink); }
+  .pm-part-badge .kbd-part-icon svg { width: 18px !important; height: 18px !important; }
+  .pm-box { padding: 12px; border: 1px solid var(--pm-line); border-radius: 5px; margin-bottom: 22px; background: var(--pm-card); }
+  .pm-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-bottom: 8px; }
+  .pm-grow { flex: 1 1 220px; min-width: 0; }
+  .pm-field { height: 32px; box-sizing: border-box; padding: 0 10px !important; border: 1px solid var(--pm-line) !important; border-radius: 4px; background: var(--pm-field) !important; color: var(--pm-ink) !important; font: 13px/1 'Inter', sans-serif; }
+  .pm-hint { margin: 2px 0 0; font-size: 11.5px; color: var(--pm-dim); }
+  .pm-title { margin-top: 22px !important; margin-bottom: 10px !important; }
+  .patch-panel .chassis-page-btn { height: 32px; padding: 0 12px; }
+  .patch-panel .lib-list { max-height: 260px; }
+  .patch-panel .lib-item .name, .patch-panel .lib-list .small { color: var(--pm-ink) !important; }
+  .pm-bank { border: 1px dashed var(--pm-line); border-radius: 4px; min-height: 48px; }
+  .pm-empty { color: var(--pm-dim); font-size: 12px; text-align: center; padding: 16px; }
+  .pm-keys { position: absolute !important; left: 24px; bottom: 16px; margin: 0 !important; }
 </style>
 </head>
 <body>
@@ -7416,67 +7441,49 @@
       </div>
     </div>
     <div style="z-index: 1; width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 40px; padding: 0 40px;">
-      <div class="section section-lib" style="width: 100%; max-width: 800px; background: rgba(10,10,12,0.85); border: 1px solid var(--border); border-radius: 6px; padding: 24px; box-shadow: inset 0 2px 10px rgba(0,0,0,0.8), 0 1px 0 rgba(255,255,255,0.05); color: #fff;">
-  <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; border-bottom: 1px solid rgba(255,255,255,0.1); padding-bottom: 8px;">
-    <h2 style="color: var(--accent); font-family: monospace; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin: 0;">suoni attivi nel multi (p1 - p4)</h2>
-    <button id="btnSyncMultiParts" class="chassis-page-btn" style="color: #fff; font-size: 11px; padding: 4px 10px;">leggi parti dal synth</button>
-  </div>
-  <div id="multiPartsOverview" style="display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 10px; margin-bottom: 24px;"></div>
+      <div class="section section-lib patch-panel">
+        <div class="pm-head">
+          <h2>SUONI ATTIVI <span>P1–P4</span></h2>
+          <button id="btnSyncMultiParts" class="chassis-page-btn" type="button">leggi parti dal synth</button>
+        </div>
+        <div id="multiPartsOverview" class="pm-parts"></div>
 
-  <div style="background: rgba(255,255,255,0.02); border: 1px solid rgba(255,255,255,0.08); border-radius: 4px; padding: 12px; margin-bottom: 24px; display: flex; flex-direction: column; gap: 10px;">
-    <div style="display: flex; gap: 8px; flex-wrap: wrap; align-items: center;">
-      <input type="text" id="libSearchInput" placeholder="🔍 Cerca patch o preset per nome..." style="flex: 2; min-width: 200px; background: rgba(0,0,0,0.6); color: #fff; border: 1px solid var(--border); border-radius: 4px; padding: 6px 12px; font-family: monospace; font-size: 12px;">
-      <button id="btnImportSyx" class="chassis-page-btn" style="color: #fff; font-size: 11px; padding: 5px 10px;">📂 importa .syx / .mid</button>
-      <input type="file" id="fileSyxInput" accept=".syx,.mid,.midi" style="display:none" multiple>
-      <button id="btnExportBackup" class="chassis-page-btn" style="color: #fff; font-size: 11px; padding: 5px 10px;">💾 backup json</button>
-      <button id="btnRestoreBackup" class="chassis-page-btn" style="color: #fff; font-size: 11px; padding: 5px 10px;">📥 ripristina json</button>
-      <input type="file" id="fileBackupInput" accept=".json" style="display:none">
-    </div>
-    <div style="font-size: 11px; color: #888; font-family: monospace;">
-      💡 Puoi anche trascinare un file <b>.syx</b> o <b>.mid</b> direttamente in questa finestra per importarlo (Drag & Drop).
-    </div>
-  </div>
+        <div class="pm-box">
+          <div class="pm-row">
+            <input type="search" id="libSearchInput" class="pm-field pm-grow" placeholder="Cerca un suono o un multi per nome…" aria-label="Cerca nelle librerie">
+            <button id="btnImportSyx" class="chassis-page-btn" type="button">importa .syx / .mid</button>
+            <input type="file" id="fileSyxInput" accept=".syx,.mid,.midi" style="display:none" multiple>
+            <button id="btnExportBackup" class="chassis-page-btn" type="button" title="Salva libreria e impostazioni in un file">backup</button>
+            <button id="btnRestoreBackup" class="chassis-page-btn" type="button" title="Ricarica un backup">ripristina</button>
+            <input type="file" id="fileBackupInput" accept=".json" style="display:none">
+          </div>
+          <p class="pm-hint">Puoi anche trascinare un file <b>.syx</b> o <b>.mid</b> sulla pagina per importarlo.</p>
+        </div>
 
-  <h2 style="color: var(--accent); font-family: monospace; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px;">patch library</h2>
-  <div class="lib-row">
-    <input type="text" id="patchName" placeholder="patch name" style="color: #fff; border-bottom: 1px solid var(--accent); padding: 6px 4px; font-family: monospace;">
-    <button id="btnSavePatch" class="chassis-page-btn" style="color: #fff;">save dump</button>
-  </div>
-  <div class="lib-list" id="libList" style="margin-top: 8px;"></div>
+        <h2 class="pm-title">LIBRERIA SUONI</h2>
+        <div class="pm-row">
+          <input type="text" id="patchName" class="pm-field pm-grow" placeholder="nome del suono" aria-label="Nome del suono da salvare">
+          <button id="btnSavePatch" class="chassis-page-btn" type="button" title="Salva nella libreria il suono letto dal Virus">salva suono</button>
+        </div>
+        <div class="lib-list" id="libList"></div>
 
-  <h2 style="margin-top: 32px; color: var(--accent); font-family: monospace; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px;">multi presets</h2>
-  <div class="lib-row">
-    <input type="text" id="multiName" placeholder="multi name (eg. DM-Personal-Jesus)" style="color: #fff; border-bottom: 1px solid var(--accent); padding: 6px 4px; font-family: monospace;">
-    <button id="btnSaveMulti" class="chassis-page-btn" style="color: #fff;">fetch & save multi</button>
-  </div>
-  <div class="lib-list" id="multiLibList" style="margin-top: 8px;"></div>
+        <h2 class="pm-title">LIBRERIA MULTI</h2>
+        <div class="pm-row">
+          <input type="text" id="multiName" class="pm-field pm-grow" placeholder="nome del multi (es. DM-Personal-Jesus)" aria-label="Nome del multi da salvare">
+          <button id="btnSaveMulti" class="chassis-page-btn" type="button" title="Legge le 4 parti dal Virus e le salva come multi">leggi e salva multi</button>
+        </div>
+        <div class="lib-list" id="multiLibList"></div>
 
-  <h2 style="margin-top: 32px; color: var(--accent); font-family: monospace; font-size: 13px; font-weight: 700; text-transform: uppercase; letter-spacing: 0.1em; margin-bottom: 12px;">bank tools</h2>
-  <div class="lib-row">
-    <div style="display: flex; gap: 8px; flex: 1;">
-      <select id="bankTypeSelect" style="flex: 1; background: #222; color: #fff; border: 1px solid #444; padding: 6px;">
-        <option value="RAM">RAM</option>
-        <option value="ROM">ROM</option>
-      </select>
-      <select id="bankNumSelect" style="flex: 1; background: #222; color: #fff; border: 1px solid #444; padding: 6px;">
-        <option value="1">1</option>
-        <option value="2">2</option>
-        <option value="3">3</option>
-        <option value="4">4</option>
-        <option value="5">5</option>
-        <option value="6">6</option>
-        <option value="7">7</option>
-        <option value="8">8</option>
-      </select>
-    </div>
-    <div style="display: flex; gap: 8px;">
-      <button id="btnReadBank" class="chassis-page-btn" style="color: #fff;">leggi</button>
-      <button id="btnFetchBank" class="chassis-page-btn" style="color: #fff;">cattura</button>
-    </div>
-  </div>
-  <div class="lib-list" id="synthBankList" style="margin-top: 16px; border: 1px dashed var(--accent); background: rgba(0,0,0,0.4); border-radius: 4px;">
-    <div style="color: #aaa; font-size: 12px; text-align: center; padding: 16px; font-family: monospace;">nessun banco letto</div>
-  </div>
+        <h2 class="pm-title">BANCHI DEL VIRUS</h2>
+        <div class="pm-row">
+          <select id="bankPickSelect" class="pm-field pm-grow" aria-label="Banco del Virus"></select>
+          <button id="btnReadBank" class="chassis-page-btn" type="button" title="Mostra le 128 patch del banco">leggi</button>
+          <button id="btnFetchBank" class="chassis-page-btn" type="button" title="Salva tutte le 128 patch del banco nella libreria">cattura</button>
+        </div>
+        <div class="lib-list pm-bank" id="synthBankList">
+          <div class="pm-empty">nessun banco letto</div>
+        </div>
+        <div class="chassis-keys pm-keys"><button type="button" class="chassis-key fp-key" data-midi-key aria-expanded="false" title="Mostra / nascondi stato MIDI, azioni e guida di collegamento">MIDI</button></div>
       </div>
     </div>
     <div class="chassis-wood-strip"></div>
@@ -7964,7 +7971,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
     if (rail) rail.style.display = show ? 'grid' : 'none';
     if (strip) strip.style.display = show ? 'flex' : 'none';
     // in PANEL e SINGLE stato/azioni/guida MIDI stanno dietro il tasto MIDI della scocca
-    document.body.classList.toggle('panel-view', ['snow', 'single', 'multi', 'fx'].includes(view));
+    document.body.classList.toggle('panel-view', ['snow', 'single', 'multi', 'fx', 'patch'].includes(view));
     if (!show && diag) diag.classList.add('hidden');
   }
 
@@ -11397,10 +11404,10 @@ function exportCurrentPatchSyx() {
         <div style="color: var(--accent); font-weight: bold; margin-bottom: 8px;">
           LETTURA ${escapeHtml(bState.bankName)} IN CORSO...
         </div>
-        <div style="color: #fff; font-size: 14px; margin-bottom: 8px;">
+        <div style="color: var(--pm-ink); font-size: 14px; margin-bottom: 8px;">
           ${count} / 128 patch ricevute
         </div>
-        <div style="width: 80%; height: 6px; background: rgba(255,255,255,0.1); margin: 0 auto; border-radius: 3px; overflow: hidden;">
+        <div style="width: 80%; height: 6px; background: var(--pm-line); margin: 0 auto; border-radius: 3px; overflow: hidden;">
           <div style="width: ${(count / 128 * 100).toFixed(1)}%; height: 100%; background: var(--accent); transition: width 0.1s ease;"></div>
         </div>
       </div>
@@ -11429,7 +11436,7 @@ function exportCurrentPatchSyx() {
 
     // Header con pulsanti
     const header = document.createElement('div');
-    header.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: rgba(255,255,255,0.05); border-bottom: 1px solid rgba(255,255,255,0.1); font-family: monospace; font-size: 12px; gap: 8px; flex-wrap: wrap;';
+    header.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 10px 14px; background: rgba(255,255,255,0.05); border-bottom: 1px solid var(--pm-line); font-family: monospace; font-size: 12px; gap: 8px; flex-wrap: wrap;';
     header.innerHTML = `
       <span style="color: var(--accent); font-weight: bold;">BANCO ${escapeHtml(bState.bankName)} (${patches.length} PATCH)</span>
     `;
@@ -11439,7 +11446,7 @@ function exportCurrentPatchSyx() {
 
     const btnExportBank = document.createElement('button');
     btnExportBank.className = 'chassis-page-btn';
-    btnExportBank.style.cssText = 'font-size: 11px; padding: 4px 10px; color: #fff; background: rgba(255,255,255,0.1); cursor: pointer; border-radius: 3px;';
+    btnExportBank.style.cssText = 'font-size: 11px; padding: 4px 10px; color: var(--pm-ink); background: var(--pm-line); cursor: pointer; border-radius: 3px;';
     btnExportBank.textContent = '⬇ esporta banco .syx';
     btnExportBank.title = 'Scarica l\'intero banco in formato .syx';
     btnExportBank.addEventListener('click', () => {
@@ -11457,7 +11464,7 @@ function exportCurrentPatchSyx() {
 
     const btnSaveAll = document.createElement('button');
     btnSaveAll.className = 'chassis-page-btn';
-    btnSaveAll.style.cssText = 'font-size: 11px; padding: 4px 10px; color: #fff; background: var(--accent); border: none; cursor: pointer; border-radius: 3px;';
+    btnSaveAll.style.cssText = 'font-size: 11px; padding: 4px 10px; color: var(--pm-ink); background: var(--accent); border: none; cursor: pointer; border-radius: 3px;';
     btnSaveAll.textContent = 'salva tutte in libreria';
     btnSaveAll.addEventListener('click', () => {
       const lib = loadLibrary();
@@ -11479,17 +11486,17 @@ function exportCurrentPatchSyx() {
     patches.forEach(p => {
       const row = document.createElement('div');
       row.className = 'lib-item';
-      row.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 6px 14px; border-bottom: 1px solid rgba(255,255,255,0.03); font-family: monospace; font-size: 12px;';
+      row.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 6px 14px; border-bottom: 1px solid var(--pm-card); font-family: monospace; font-size: 12px;';
 
       const left = document.createElement('div');
       left.style.cssText = 'display: flex; align-items: center; gap: 10px; overflow: hidden;';
 
       const numBadge = document.createElement('span');
-      numBadge.style.cssText = 'color: #888; font-size: 11px; min-width: 32px;';
+      numBadge.style.cssText = 'color: var(--pm-dim); font-size: 11px; min-width: 32px;';
       numBadge.textContent = '#' + p.num.toString().padStart(3, '0');
 
       const nameSpan = document.createElement('span');
-      nameSpan.style.cssText = 'color: #fff; font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;';
+      nameSpan.style.cssText = 'color: var(--pm-ink); font-weight: 500; white-space: nowrap; overflow: hidden; text-overflow: ellipsis;';
       nameSpan.textContent = p.name || 'INIT';
 
       left.appendChild(numBadge);
@@ -11684,27 +11691,27 @@ function exportCurrentPatchSyx() {
     for (let i = 0; i < NUM_PARTS; i++) {
       const part = multiParts[i];
       const card = document.createElement('div');
-      card.style.cssText = 'background: rgba(255,255,255,0.03); border: 1px solid rgba(255,255,255,0.1); border-radius: 4px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; font-family: monospace; transition: border-color 0.2s;';
+      card.style.cssText = 'background: var(--pm-card); border: 1px solid var(--pm-line); border-radius: 4px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; font-family: monospace; transition: border-color 0.2s;';
       card.onmouseenter = () => card.style.borderColor = 'var(--accent)';
-      card.onmouseleave = () => card.style.borderColor = 'rgba(255,255,255,0.1)';
+      card.onmouseleave = () => card.style.borderColor = 'var(--pm-line)';
 
       const topRow = document.createElement('div');
       topRow.style.cssText = 'display: flex; justify-content: space-between; align-items: center;';
 
       const badge = document.createElement('span');
-      badge.style.cssText = 'font-weight: 700; color: var(--accent); font-size: 12px;';
-      badge.textContent = `P${i + 1}`;
+      badge.className = 'pm-part-badge';
+      badge.innerHTML = `${window.partIconHtml ? window.partIconHtml(i) : ''}P${i + 1}`;
 
       const chLabel = document.createElement('span');
-      chLabel.style.cssText = 'color: #888; font-size: 11px;';
+      chLabel.style.cssText = 'color: var(--pm-dim); font-size: 11px;';
       chLabel.textContent = `ch ${part.values.channel + 1}`;
 
       topRow.appendChild(badge);
       topRow.appendChild(chLabel);
 
       const nameEl = document.createElement('div');
-      nameEl.style.cssText = 'color: #fff; font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 4px 0;';
-      nameEl.textContent = (part.name || 'INIT').toUpperCase();
+      nameEl.style.cssText = 'color: var(--pm-ink); font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 4px 0;';
+      nameEl.textContent = part.name || 'Init';
       nameEl.title = part.name || 'INIT';
 
       const btnRow = document.createElement('div');
@@ -11774,7 +11781,7 @@ function exportCurrentPatchSyx() {
     if (names.length === 0){
       const empty = document.createElement('div');
       empty.className = 'small';
-      empty.textContent = 'no multi presets saved';
+      empty.textContent = 'nessun multi salvato';
       list.appendChild(empty);
       return;
     }
@@ -12082,7 +12089,7 @@ function exportCurrentPatchSyx() {
     if (names.length === 0){
       const empty = document.createElement('div');
       empty.className = 'small';
-      empty.style.cssText = 'color: #888; font-family: monospace; padding: 8px 0;';
+      empty.style.cssText = 'color: var(--pm-dim); font-family: monospace; padding: 8px 0;';
       empty.textContent = searchVal ? `nessuna patch trovata per "${searchVal}"` : 'nessuna patch salvata';
       list.appendChild(empty);
       return;
@@ -12091,11 +12098,11 @@ function exportCurrentPatchSyx() {
     names.forEach(name => {
       const item = document.createElement('div');
       item.className = 'lib-item';
-      item.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 6px 12px; border-bottom: 1px solid rgba(255,255,255,0.04); font-family: monospace; font-size: 12px;';
+      item.style.cssText = 'display: flex; justify-content: space-between; align-items: center; padding: 6px 12px; border-bottom: 1px solid var(--pm-line); font-family: monospace; font-size: 12px;';
 
       const nameEl = document.createElement('span');
       nameEl.className = 'name';
-      nameEl.style.cssText = 'color: #fff; font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;';
+      nameEl.style.cssText = 'color: var(--pm-ink); font-weight: 500; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;';
       nameEl.textContent = name;
 
       const btns = document.createElement('div');
@@ -14448,19 +14455,21 @@ function exportCurrentPatchSyx() {
     requestDump(0);
   });
 
+  (function fillBankPick() {
+    const sel = document.getElementById('bankPickSelect');
+    if (sel && !sel.options.length) BANK_NAMES.forEach((n, i) => sel.add(new Option(n, String(i))));
+  })();
+  document.querySelector('.pm-keys [data-midi-key]')?.addEventListener('click', () => window.toggleMidiPanel?.());
+
   async function startBankOperation(mode) {
     if (!selectedOutput) {
       uiAlert('MIDI Output non connesso!');
       return;
     }
-    const type = document.getElementById('bankTypeSelect').value;
-    const num = parseInt(document.getElementById('bankNumSelect').value, 10);
-    // Virus TI / Snow bank mapping:
-    // Bank 0 = Edit buffer
-    // Bank 1..4 = RAM A..D (RAM 1..4)
-    // Bank 5+ = ROM A+ (ROM 1+)
-    const bankIndex = (type === 'RAM' ? 1 : 5) + (num - 1);
-    const bankName = `${type} ${num}`;
+    // numero di banco del Virus: 0 = edit buffer, 1..4 = RAM-A..D, 5.. = ROM-A..Z (prima RAM 5-8 finivano sui ROM)
+    const pick = parseInt(document.getElementById('bankPickSelect').value, 10) || 0;
+    const bankIndex = pick + 1;
+    const bankName = BANK_NAMES[pick];
 
     const msg = mode === 'capture'
       ? `Vuoi estrarre e SALVARE nella libreria tutte le 128 patch dal banco ${bankName}?`
@@ -14476,8 +14485,8 @@ function exportCurrentPatchSyx() {
               <div style="color: var(--accent); font-weight: bold; margin-bottom: 8px;">
                 LETTURA ${escapeHtml(bankName)} IN CORSO...
               </div>
-              <div style="color: #aaa; font-size: 12px; margin-bottom: 8px;">In attesa di risposta dal synth...</div>
-              <div style="width: 80%; height: 6px; background: rgba(255,255,255,0.1); margin: 0 auto; border-radius: 3px; overflow: hidden;">
+              <div style="color: var(--pm-dim); font-size: 12px; margin-bottom: 8px;">In attesa di risposta dal synth...</div>
+              <div style="width: 80%; height: 6px; background: var(--pm-line); margin: 0 auto; border-radius: 3px; overflow: hidden;">
                 <div style="width: 5%; height: 100%; background: var(--accent);"></div>
               </div>
             </div>
@@ -18640,10 +18649,10 @@ function exportCurrentPatchSyx() {
       ['Macro', '<b>1: CUTOFF, 2: RESO, 3: SATUR, 4: FX SEND</b>: comandi rapidi sui parametri principali della parte.'],
     ]],
     btnTabPatchManager: ['PATCH — libreria e file', [
-      ['Suoni attivi', '<b>leggi</b> rilegge dal Virus il suono di una parte, <b>modifica</b> la apre in MULTI. <b>leggi parti dal synth</b> le rilegge tutte.'],
-      ['File', '<b>importa .syx / .mid</b> (o trascina il file nella pagina). <b>backup json</b> salva libreria e impostazioni in un file, <b>ripristina json</b> le ricarica.'],
-      ['Librerie', '<b>save dump</b> salva nella libreria il suono letto dal Virus, col nome scritto a sinistra. <b>fetch & save multi</b> fa lo stesso con il Multi.'],
-      ['Banchi', 'Scegli RAM/ROM e numero: <b>leggi</b> mostra le 128 patch del banco, <b>cattura</b> le salva tutte nella libreria.'],
+      ['Suoni attivi', 'Le 4 parti con icona, canale e nome. <b>leggi</b> rilegge dal Virus il suono di una parte, <b>modifica</b> la apre in MULTI. <b>leggi parti dal synth</b> le rilegge tutte.'],
+      ['File', '<b>importa .syx / .mid</b> (o trascina il file sulla pagina). <b>backup</b> salva librerie e impostazioni in un file, <b>ripristina</b> le ricarica. Il campo di ricerca filtra le librerie per nome.'],
+      ['Librerie', '<b>salva suono</b> mette nella libreria il suono letto dal Virus, con il nome che scrivi. <b>leggi e salva multi</b> legge le 4 parti e le salva come multi.'],
+      ['Banchi del Virus', 'Scegli il banco (RAM-A…D, ROM-A…Z): <b>leggi</b> mostra le 128 patch, <b>cattura</b> le salva tutte nella libreria.'],
     ]],
     btnTabArp: ['ARP — arpeggiatore', [
       ['Avvio', '<b>start arp</b> avvia/ferma. Suona le note dalla tastiera (<b>KEYS</b> in alto) o dal controller. <b>hold</b> tiene le note dopo che le rilasci.'],
