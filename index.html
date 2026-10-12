@@ -6964,6 +6964,21 @@
   .plp-colors button { min-width: 0 !important; min-height: 0 !important; flex: 0 0 22px; width: 22px !important; height: 22px !important; border-radius: 50%; border: 2px solid transparent; background: var(--c); cursor: pointer; padding: 0; }
   .plp-colors button.on { border-color: currentColor; box-shadow: 0 0 0 2px rgba(255,255,255,0.6) inset; }
   .plp-auto { border: 0; background: none; color: inherit; text-decoration: underline; font-size: 11px; cursor: pointer; padding: 0; opacity: 0.75; }
+  /* guida contestuale per sezione (pannello laterale) */
+  .virus-info-popup, .section-info-popup { display: none !important; }
+  .section-help { position: fixed; top: 0; right: 0; bottom: 0; z-index: 100001; width: min(400px, 100vw); overflow-y: auto; box-sizing: border-box;
+    padding: 18px 20px 24px; background: #f4f4f2; color: #222; border-left: 1px solid #c8c8c4; box-shadow: -12px 0 30px rgba(0,0,0,0.18); font: 13px/1.5 'Inter', sans-serif; }
+  .section-help[hidden] { display: none; }
+  html[data-skin="elektron"] .section-help { background: #1f2023; color: #e2e3e6; border-color: #3a3b3f; }
+  .sh-head { display: flex; justify-content: space-between; align-items: center; gap: 12px; margin-bottom: 12px; }
+  .sh-head h2 { margin: 0; font-size: 15px; font-weight: 800; letter-spacing: 0.02em; }
+  .sh-close { min-width: 32px !important; height: 32px; border: 1px solid currentColor; border-radius: 4px; background: none; color: inherit; cursor: pointer; opacity: 0.7; }
+  .section-help ol { margin: 0; padding-left: 20px; display: flex; flex-direction: column; gap: 12px; }
+  .section-help li span { display: block; margin-top: 2px; }
+  .sh-step { font-weight: 800; }
+  .section-help b { font-weight: 700; }
+  .sh-tip { margin: 16px 0 0; padding: 10px 12px; border-radius: 4px; background: rgba(0,0,0,0.06); font-size: 12.5px; }
+  html[data-skin="elektron"] .sh-tip { background: rgba(255,255,255,0.06); }
 </style>
 </head>
 <body>
@@ -18513,6 +18528,94 @@ function exportCurrentPatchSyx() {
   updateTopPanelsVisibility('snow');
 })();
 
+</script>
+<aside id="sectionHelp" class="section-help" hidden role="dialog" aria-labelledby="sectionHelpTitle">
+  <div class="sh-head"><h2 id="sectionHelpTitle"></h2><button type="button" class="sh-close" aria-label="Chiudi la guida">✕</button></div>
+  <div class="sh-body"></div>
+</aside>
+<script>
+// Guida contestuale: una per sezione. Si apre dalla "i" in alto o dalle "i" delle scocche,
+// e da sola la prima volta che entri in una sezione. Mostra sempre la guida della sezione attiva.
+(function () {
+  const H = {
+    btnTabSnow: ['PANEL — il frontale del Virus', [
+      ['Scegliere un suono', 'Con <b>EDIT/SHIFT spento</b>: la fila di tasti in alto sceglie il gruppo (1–8), quella in basso il suono dentro il gruppo. Per cambiare banco premi <b>BANK</b>, poi un tasto in alto (ROM 1–8) o in basso (RAM 1–8).'],
+      ['Modificare il suono', 'Premi <b>EDIT/SHIFT</b> (LED acceso) e poi <b>OSC 1 … COMMON</b>: il display mostra 3 parametri, li regoli con <b>VALUE 1–3</b>. <b>PARAMETERS &lt; &gt;</b> sceglie il parametro, <b>VALUE − / +</b> lo cambia. <b>EXIT</b> torna al suono.'],
+      ['Manopole', '<b>VALUE 1–3</b> muovono i soft knob della patch (i nomi sono in basso sul display). Con EDIT/SHIFT diventano Part Volume, Transpose, Panorama. <b>CUTOFF / RESONANCE</b>: filtro; con EDIT/SHIFT inviluppo filtro e amp.'],
+      ['Parti e modo', '<b>PART</b> sceglie la parte 1–4 (in Multi). Dal suono, <b>EXIT/MODE</b> apre la scelta Single / Multi / Sequencer: gira VALUE 1 e ripremi EXIT/MODE per confermare.'],
+      ['Tempo e panic', '<b>TAP TEMPO</b>: batti il tempo. <b>EDIT/SHIFT + TAP TEMPO</b> = PANIC (spegne tutte le note).'],
+      ['Tasti sotto il frontale', '<b>MIDI</b>: stato, azioni e guida di collegamento (lampeggia se il Virus non è collegato). <b>SOUNDS</b>: banco e lista suoni, leggi e scansiona. <b>WAVES</b>: modello oscillatore e wavetable.'],
+    ], 'All’apertura l’app chiede al Virus modo e suono attivo. Se il display mostra “No Sync”, apri MIDI.'],
+    btnTabMultipart: ['MULTI — 4 parti insieme', [
+      ['Display e Multi', 'Il display mostra la parte selezionata, la sua categoria, banco e suono. <b>MULTI − / +</b> sceglie il numero, <b>CARICA</b> lo legge dal Virus, <b>SALVA</b> lo scrive. <b>LEGGI 4 PARTI</b> rilegge i suoni delle parti.'],
+      ['La card di una parte', 'Clicca l’<b>icona</b> per scegliere strumento e colore (se non scegli, segue il suono). <b>ON / M / S</b>: attiva, muta, solo. <b>CH</b>: canale MIDI. Banco, <b>◀ suono ▶</b>, <b>↻</b> legge i nomi del banco. <b>PROVA</b> suona una nota, <b>EDIT</b> apre la parte in SINGLE, <b>↗</b> l’editor dedicato.'],
+      ['Manopole della parte', '<b>VOL, PAN, TRSP</b> (trasposizione), <b>CUT, RES</b> (filtro). Clicca una card per renderla la parte attiva (tastiera e display).'],
+      ['Tasti sulla scocca', '<b>MIDI</b>: stato e azioni. <b>BANKS</b>: legge i nomi di un banco, di RAM A–D, elenco nomi. <b>ROUTING</b>: 4 canali (P1–P4 su CH 1–4) oppure layer (tutte su CH 1). <b>VISTA</b>: 2×2 o lista.'],
+    ], 'Se P1 suona tutti e 4 i suoni insieme, usa ROUTING → 4 canali.'],
+    btnTabSynth: ['SINGLE — modifica di una parte', [
+      ['Scegli la parte', '<b>P1–P4</b> in alto: la parte da modificare, con icona e colore scelti in MULTI.'],
+      ['Pagine', 'I pulsanti sotto il display (<b>osc 1, osc 2, osc 3/noise, filter, amp, lfo 1, fx</b>) cambiano pagina; display e manopole a destra seguono la pagina. CUTOFF e RESONANCE sono sempre disponibili.'],
+      ['Manopole', 'Trascina su/giù; <b>Shift</b> + trascina per la regolazione fine; rotella del mouse; <b>doppio clic</b> = valore iniziale.'],
+      ['Tasti sulla scocca', '<b>MIDI</b>: stato e azioni. <b>TOOLS</b>: test synth, leggi synth, random, mutate 20%, salva .syx, editor dedicato e riepilogo stato. <b>WAVES</b>: wave browser.'],
+    ], 'I parametri marcati “n/d” sono Page B: il Virus non li accetta via CC, vanno cambiati sul synth.'],
+    btnTabFxRack: ['FX RACK — effetti della parte', [
+      ['Parte', 'In alto scegli la parte (<b>p1–p4</b>) o <b>all</b> per tutte.'],
+      ['Effetti', 'Delay (<b>TIME, FEEDBACK, SEND</b>), riverbero (<b>REV DECAY, SIZE</b>), saturazione (<b>SATUR, CURVE</b>), chorus (<b>DEPTH, RATE, MIX</b>). Le manopole grigie con “·B” sono Page B: non inviano nulla.'],
+      ['Macro', '<b>1: CUTOFF, 2: RESO, 3: SATUR, 4: FX SEND</b>: comandi rapidi sui parametri principali della parte.'],
+    ]],
+    btnTabPatchManager: ['PATCH — libreria e file', [
+      ['Suoni attivi', '<b>leggi</b> rilegge dal Virus il suono di una parte, <b>modifica</b> la apre in MULTI. <b>leggi parti dal synth</b> le rilegge tutte.'],
+      ['File', '<b>importa .syx / .mid</b> (o trascina il file nella pagina). <b>backup json</b> salva libreria e impostazioni in un file, <b>ripristina json</b> le ricarica.'],
+      ['Librerie', '<b>save dump</b> salva nella libreria il suono letto dal Virus, col nome scritto a sinistra. <b>fetch & save multi</b> fa lo stesso con il Multi.'],
+      ['Banchi', 'Scegli RAM/ROM e numero: <b>leggi</b> mostra le 128 patch del banco, <b>cattura</b> le salva tutte nella libreria.'],
+    ]],
+    btnTabArp: ['ARP — arpeggiatore', [
+      ['Avvio', '<b>start arp</b> avvia/ferma. Suona le note dalla tastiera (<b>KEYS</b> in alto) o dal controller. <b>hold</b> tiene le note dopo che le rilasci.'],
+      ['Destinazione', 'Il menu sceglie dove va l’arpeggio: CH 1 / P1, una parte del Multi, oppure <b>AUTO</b> (segue la pagina attiva).'],
+      ['Ritmo', '<b>TEMPO, ARP MODE, RESOLUTION, OCTAVES, GATE LENGTH, SWING</b>.'],
+      ['Step', 'I 16 pad accendono/spengono gli step. I pulsanti sotto caricano pattern pronti (tutti on, 4/4, ottavi, offbeat, trance, acid).'],
+    ]],
+    btnTabSequencer: ['SEQ — sequencer a 4 tracce', [
+      ['Tracce', '<b>p1–p4</b> sceglie la traccia (una per parte), con <b>mute</b> e <b>solo</b>. <b>start seq</b> avvia, <b>follow</b> segue la pagina in riproduzione.'],
+      ['Step', '<b>page 1–4</b> mostra gli step 1–16 … 49–64. Clicca uno step per selezionarlo: <b>−oct −1 +1 +oct</b> cambiano la nota, <b>tie</b> la lega alla successiva, <b>accent</b> la accentua, <b>audition</b> la fa sentire.'],
+      ['Traccia', '<b>TEMPO, RESOLUTION, TRK LENGTH, TRK GATE, SWING</b>. Tonalità e scala per <b>random in key</b>; pattern pronti; <b>shift</b>, <b>invert</b>, <b>clear trk</b>.'],
+      ['Pattern', 'Il menu <b>PATTERN P01–P64</b> con salva/carica memorizza i pattern da usare nella SONG.'],
+    ]],
+    btnTabSong: ['SONG — catena di pattern', [
+      ['Slot', 'Ogni slot suona un pattern salvato in SEQ (<b>P01–P64</b>), ripetuto <b>x1–x4</b>, con trasposizione. <b>1:16 … 49:64</b> sfoglia gli slot.'],
+      ['Riproduzione', '<b>play song</b> suona gli slot in ordine, <b>stop</b> ferma, <b>loop</b> ricomincia alla fine. Lo slot in riproduzione è evidenziato.'],
+      ['Salvataggio', '<b>save song</b> salva la catena, <b>clear</b> la svuota.'],
+    ], 'Prima crea e salva i pattern nella pagina SEQ.'],
+  };
+  const box = document.getElementById('sectionHelp');
+  const activeTab = () => document.querySelector('.segmented-tab.active')?.id || 'btnTabSnow';
+  function render() {
+    const [title, steps, tip] = H[activeTab()] || H.btnTabSnow;
+    document.getElementById('sectionHelpTitle').textContent = title;
+    box.querySelector('.sh-body').innerHTML = '<ol>' + steps.map(([t, d]) => `<li><b class="sh-step">${t}</b><span>${d}</span></li>`).join('') + '</ol>' + (tip ? `<p class="sh-tip">${tip}</p>` : '');
+  }
+  function open() { render(); box.hidden = false; box.querySelector('.sh-close').focus(); }
+  function close() { box.hidden = true; }
+  box.querySelector('.sh-close').addEventListener('click', close);
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && !box.hidden) close(); });
+  // la "i" in alto e le "i" delle scocche aprono questa guida al posto dei vecchi popup
+  document.addEventListener('click', e => {
+    if (e.target.closest('#virusInfoBtn, .section-info-btn')) { e.preventDefault(); e.stopImmediatePropagation(); box.hidden ? open() : close(); }
+  }, true);
+  // cambio sezione: la guida aperta segue la sezione; la prima volta in una sezione si apre da sola
+  document.addEventListener('click', e => {
+    if (!e.target.closest('.segmented-tab')) return;
+    setTimeout(() => {
+      const id = activeTab(), key = 'virusH_helpSeen_' + id;
+      let seen = true; try { seen = !!localStorage.getItem(key); localStorage.setItem(key, '1'); } catch (err) {}
+      if (!box.hidden) render(); else if (!seen) open();
+    }, 0);
+  });
+  document.addEventListener('DOMContentLoaded', () => {
+    let seen = true; try { seen = !!localStorage.getItem('virusH_helpSeen_btnTabSnow'); localStorage.setItem('virusH_helpSeen_btnTabSnow', '1'); } catch (err) {}
+    if (!seen) setTimeout(open, 800);
+  });
+})();
 </script>
 <script>
 // Marchi: "Access", "Virus TI Snow", "Virus TI2 Dark Star" e i loghi sono dei rispettivi proprietari
