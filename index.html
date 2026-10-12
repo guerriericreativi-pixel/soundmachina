@@ -4273,8 +4273,7 @@
     color: #ffffff !important;
     border-bottom: 1px solid #700a14 !important;
   }
-  html[data-skin="elektron"] .lcd-badge,
-  html[data-skin="elektron"] #virusSnowLcdScreen span:first-child {
+  html[data-skin="elektron"] .lcd-badge {
     background: #ff1e2d !important;
     color: #ffffff !important;
     box-shadow: 0 0 10px #ff1e2d !important;
@@ -6908,6 +6907,39 @@
   html[data-skin="te"] .wave-browser .wb-cell { border-color: rgba(0,0,0,0.12); background: rgba(0,0,0,0.03); }
   html[data-skin="te"] .wave-browser .wb-osc button { border-color: rgba(0,0,0,0.25); }
   html[data-skin="te"] .wave-browser .wb-osc button.active, html[data-skin="te"] .wave-browser .wb-cell.active { background: #2a2d33; color: #fff; }
+  /* ---- MULTI: testata (display + controlli essenziali), tasti scocca, cassetti ---- */
+  .multi-head { width: 100%; max-width: 1050px; display: grid; grid-template-columns: minmax(320px, 1.1fr) minmax(300px, 1fr); gap: 16px; align-items: center; }
+  @media (max-width: 860px) { .multi-head { grid-template-columns: 1fr; } }
+  .multi-lcd-frame { background: rgba(255,255,255,0.78); border: 2px solid #b8bac2; border-radius: 6px; padding: 6px 12px 10px; box-shadow: 0 2px 8px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.95); }
+  html[data-skin="elektron"] .multi-lcd-frame { background: #1d1e21; border-color: #333; box-shadow: 0 2px 8px rgba(0,0,0,0.5); }
+  .multi-lcd-top { display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; font: 800 8px/1 'Inter', sans-serif; letter-spacing: 0.1em; color: #555; }
+  .multi-lcd-brand { font-size: 11px; font-weight: 900; letter-spacing: 0.12em; color: #222; }
+  html[data-skin="elektron"] .multi-lcd-top, html[data-skin="elektron"] .multi-lcd-brand { color: #aaa; }
+  .multi-lcd-bpm { display: inline-flex; align-items: center; gap: 5px; }
+  #snowLcdBpmLed { width: 6px; height: 6px; border-radius: 50%; background: #e06c75; box-shadow: 0 0 5px #e06c75; display: inline-block; }
+  .multi-lcd-main { display: flex; align-items: baseline; gap: 12px; margin: 4px 0; white-space: nowrap; overflow: hidden; }
+  .multi-lcd .lcd-header-bar { display: flex; justify-content: space-between; align-items: center; }
+  .multi-lcd-right { display: inline-flex; align-items: center; gap: 6px; }
+  .multi-lcd .lcd-footer-bar { display: flex; justify-content: space-between; }
+  .multi-ctl { display: flex; flex-direction: column; gap: 10px; }
+  .mc-row { display: flex; align-items: center; flex-wrap: wrap; gap: 6px; }
+  .mc-label { font: 800 10px/1 'Inter', sans-serif; letter-spacing: 0.08em; color: #555; min-width: 44px; }
+  html[data-skin="elektron"] .mc-label { color: #c4c6cb !important; }
+  .mc-row .mc-label:not(:first-child) { margin-left: 10px; min-width: 0; }
+  .multi-ctl .chassis-page-btn, .multi-drawer .chassis-page-btn { height: 26px; padding: 0 10px; font-size: 10px; font-weight: 700; letter-spacing: 0.04em; }
+  .multi-ctl .mc-step { width: 26px; padding: 0; }
+  #multiProgramInput { width: 46px; height: 26px; text-align: center; font-weight: 700; font-size: 12px; border: 1px solid var(--border); border-radius: 3px; background: #fff; color: #111; }
+  html[data-skin="elektron"] #multiProgramInput { background: #26272a; color: #e2e3e6; }
+  .multi-keys { margin: 4px 0 0; }
+  .multi-drawer { width: 100%; max-width: 1050px; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; padding: 8px 10px; border: 1px solid var(--border); border-radius: 5px; background: rgba(0,0,0,0.03); box-sizing: border-box; }
+  .multi-drawer[hidden] { display: none !important; }
+  .multi-drawer select { height: 26px; font-size: 10px; font-weight: 700; }
+  .multi-drawer-status { flex-basis: 100%; font: 10.5px/1.3 monospace; color: #555; min-height: 0; }
+  .multi-drawer-status:empty { display: none; }
+  /* card delle parti: manopole dentro il bordo, CH in linea */
+  .part-list.grid-mode .part-row > :nth-child(3) { justify-content: space-around !important; padding: 6px 4px 0 !important; box-sizing: border-box; }
+  .part-row .part-ch { display: inline-flex !important; flex-direction: row !important; align-items: center; gap: 4px; }
+  .part-row .part-ch label, .part-row .part-ch > span:first-child { font: 800 9px/1 'Inter', sans-serif; letter-spacing: 0.08em; margin: 0 !important; }
 </style>
 </head>
 <body>
@@ -7506,91 +7538,70 @@
     </div>
 
     <div style="z-index: 1; width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 6px; padding: 0 8px; gap: 8px;">
-      <!-- Master Access Virus TI Snow LCD Display Unit (Fondo chiaro con testi e icone grigie come hardware) -->
-      <div class="virus-snow-display-panel" style="width: 100%; max-width: 1050px; background: rgba(0,0,0,0.02); border: 1px solid var(--border); border-radius: 6px; padding: 8px 12px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; box-shadow: inset 0 1px 3px rgba(0,0,0,0.04); position: relative;">
-        <!-- Acrylic Glass Frame con 4 viti a brugola -->
-        <div style="background: rgba(255,255,255,0.78); border: 2px solid #b8bac2; border-radius: 6px; padding: 6px 12px; box-shadow: 0 2px 8px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.95); position: relative; min-width: 320px; flex: 1 1 360px;">
-          <div class="chassis-screw" style="top: 5px; left: 5px; width: 8px; height: 8px;"></div>
-          <div class="chassis-screw" style="top: 5px; right: 5px; width: 8px; height: 8px;"></div>
-          <div class="chassis-screw" style="bottom: 5px; left: 5px; width: 8px; height: 8px;"></div>
-          <div class="chassis-screw" style="bottom: 5px; right: 5px; width: 8px; height: 8px;"></div>
-
-          <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 4px; padding: 0 4px;">
-            <div style="display: flex; align-items: center; gap: 5px;">
-              <span id="snowLcdBpmLed" style="width: 6px; height: 6px; border-radius: 50%; background: #e06c75; box-shadow: 0 0 5px #e06c75; display: inline-block;"></span>
-              <span style="font-size: 8px; font-weight: 800; letter-spacing: 0.1em; color: #555;">BPM / LFO</span>
-            </div>
-            <div style="font-weight: 900; font-size: 11px; letter-spacing: 0.12em; color: #222; font-family: 'Inter', sans-serif;">
-              VIRUS <span style="font-weight: 300; opacity: 0.5;">|</span> TI SNOW
-            </div>
+      <!-- Testata MULTI: display + programma Multi + lettura parti; banchi e routing dietro i tasti sulla scocca -->
+      <div class="multi-head">
+        <div class="multi-lcd-frame">
+          <div class="multi-lcd-top">
+            <span class="multi-lcd-bpm"><span id="snowLcdBpmLed"></span>BPM / LFO</span>
+            <span class="multi-lcd-brand">VIRUS H</span>
           </div>
-
-          <!-- LCD Backlit Screen identico alla foto reale del Virus TI Snow: fondo chiaro, testi e icone grigie -->
-          <div id="virusSnowLcdScreen" style="background: linear-gradient(180deg, #e4eff8 0%, #d0e4f2 100%); border: 3px solid #1c252e; border-radius: 4px; padding: 6px 10px; box-shadow: inset 0 2px 6px rgba(0,0,0,0.35); font-family: monospace; color: #1c2a38; position: relative; overflow: hidden;">
-            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 10px; font-weight: bold; background: #223446; color: #d7e9f5; padding: 2px 6px; border-radius: 2px; margin-bottom: 4px;">
-              <span style="background: #d7e9f5; color: #223446; padding: 0 4px; border-radius: 2px; font-weight: 900; letter-spacing: 0.05em;">MULTI</span>
-              <span id="snowLcdCategory" style="letter-spacing: 0.05em; color: #eaf3fa; font-weight: 800;">AlienArp</span>
-              <span style="display: flex; align-items: center; gap: 4px; color: #d7e9f5;">
-                <span style="font-size: 9px;">▤</span>
-                <span>🔒</span>
-                <span id="snowLcdMultiPrg" style="font-weight: 900;">02</span>
-              </span>
+          <div id="virusSnowLcdScreen" class="virus-snow-lcd-front multi-lcd">
+            <div class="lcd-header-bar">
+              <span class="lcd-badge">MULTI</span>
+              <span id="snowLcdCategory">Part 1  CAT:--</span>
+              <span class="multi-lcd-right"><span id="snowLcdMultiPrg">01</span><span class="lcd-cpx" title="Patch complexity"></span></span>
             </div>
-            <div style="display: flex; align-items: baseline; gap: 10px; margin: 4px 0 3px 0;">
-              <span id="snowLcdBankProg" style="font-size: 15px; font-weight: 900; color: #1c2a38; letter-spacing: 0.05em; min-width: 50px;">7-8</span>
-              <span id="snowLcdPatchName" style="font-size: 16px; font-weight: 900; letter-spacing: 0.06em; text-transform: uppercase; color: #1a2836; text-shadow: 0 1px 0 rgba(255,255,255,0.7);">SavePrayer</span>
+            <div class="multi-lcd-main">
+              <span id="snowLcdBankProg" class="lcd-bank-prog">RAM-A 1</span>
+              <span id="snowLcdPatchName" class="lcd-patch-name">Init</span>
             </div>
-            <div style="display: flex; justify-content: space-between; align-items: center; font-size: 9px; font-weight: 700; color: #3d5065; border-top: 1px dotted rgba(35, 52, 70, 0.35); padding-top: 2px; margin-top: 2px;">
-              <span id="snowLcdSoft1" style="flex: 1; text-align: left;">&lt;global&gt;</span>
-              <span id="snowLcdSoft2" style="flex: 1; text-align: center; color: #1c2a38; font-weight: 800;">Energy</span>
-              <span id="snowLcdSoft3" style="flex: 1; text-align: right;">&lt;global&gt;</span>
+            <div class="lcd-footer-bar">
+              <span id="snowLcdSoft1">&lt;multi 1-4&gt;</span>
+              <span id="snowLcdSoft2">Energy</span>
+              <span id="snowLcdSoft3">P1: CH 1</span>
             </div>
           </div>
         </div>
 
-        <!-- Strumenti Globali Multi & Scanner Banchi -->
-        <div style="display: flex; flex-direction: column; gap: 6px; min-width: 280px; flex: 1 1 300px;">
-          <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(0,0,0,0.03); border: 1px solid var(--border); border-radius: 4px; padding: 4px 8px;">
-            <span style="font-weight: 800; font-size: 10px; letter-spacing: 0.05em; color: #444;">MULTI PRG:</span>
-            <div style="display: flex; align-items: center; gap: 3px;">
-              <button id="btnMultiPrgDown" class="chassis-page-btn" style="padding: 1px 6px; font-size: 10px;">-</button>
-              <input type="number" id="multiProgramInput" min="0" max="127" value="1" style="width: 38px; text-align: center; font-weight: bold; font-size: 12px; background: #fff; color: #111; border: 1px solid var(--border); border-radius: 3px; padding: 1px 0;">
-              <button id="btnMultiPrgUp" class="chassis-page-btn" style="padding: 1px 6px; font-size: 10px;">+</button>
-            </div>
-            <div style="display: flex; gap: 3px;">
-              <button id="btnMultiLoad" class="chassis-page-btn" style="padding: 2px 7px; font-size: 9.5px;">CARICA</button>
-              <button id="btnMultiSave" class="chassis-page-btn" style="padding: 2px 7px; font-size: 9.5px;">SALVA</button>
-            </div>
+        <div class="multi-ctl">
+          <div class="mc-row">
+            <span class="mc-label">MULTI</span>
+            <button id="btnMultiPrgDown" class="chassis-page-btn mc-step" type="button" aria-label="Multi precedente">−</button>
+            <input type="number" id="multiProgramInput" min="0" max="127" value="1" aria-label="Numero Multi">
+            <button id="btnMultiPrgUp" class="chassis-page-btn mc-step" type="button" aria-label="Multi successivo">+</button>
+            <button id="btnMultiLoad" class="chassis-page-btn" type="button" title="Carica il Multi selezionato dal Virus">CARICA</button>
+            <button id="btnMultiSave" class="chassis-page-btn" type="button" title="Salva il Multi corrente nel Virus">SALVA</button>
           </div>
-
-          <div style="display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 6px;">
-            <div style="display: flex; align-items: center; gap: 4px;">
-              <span style="font-size: 10px; font-weight: 700; color: #555;">BANCO:</span>
-              <select id="quickBankScanSelect" style="padding: 3px 6px; font-size: 10px; font-weight: bold; background: #fff; color: #111; border: 1px solid var(--border); border-radius: 3px; cursor: pointer;"></select>
-              <button id="btnQuickScanBank" class="chassis-page-btn" style="color: #2b7a8a; border-color: #2b7a8a; font-weight: bold; padding: 3px 8px; font-size: 10px;" title="Interroga il Virus via SysEx per leggere e memorizzare tutti i 128 nomi">📥 SCANSIONA 128</button>
-              <button id="btnScanAllRam" class="chassis-page-btn" style="color: #1e6091; border-color: #1e6091; font-weight: bold; padding: 3px 8px; font-size: 10px;">⚡ RAM A-D</button>
-              <button id="btnOpenBankNamesModal" class="chassis-page-btn" style="padding: 3px 7px; font-size: 10px;">📋 NOMI</button>
-            </div>
-            <button id="btnSyncMultiInView" class="chassis-page-btn" style="padding: 4px 10px; font-size: 10px; font-weight: bold; color: #111; border-color: var(--accent); background: linear-gradient(to bottom, #fff, #e2e4e8);" title="Interroga le 4 parti attive del Virus">🔄 LEGGI 4 PARTI</button>
+          <div class="mc-row">
+            <span class="mc-label">PARTI</span>
+            <button id="btnSyncMultiInView" class="chassis-page-btn" type="button" title="Interroga le 4 parti attive del Virus">LEGGI 4 PARTI</button>
+            <span class="mc-label">VISTA</span>
+            <button id="btnMultiLayoutGrid" class="chassis-page-btn" type="button" title="Griglia 2x2: tutte le 4 parti insieme">2×2</button>
+            <button id="btnMultiLayoutList" class="chassis-page-btn" type="button" title="Righe estese">LISTA</button>
           </div>
-          <!-- ROUTING MULTI MIDI & DIAGNOSTIC ACTION BAR -->
-          <div class="multi-routing-control-bar" style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 8px; padding: 7px 10px; margin-top: 6px; background: rgba(0,0,0,0.03); border: 1px solid var(--border); border-radius: 5px;">
-            <div style="display: flex; align-items: center; gap: 6px; flex-wrap: wrap;">
-              <span style="font-size: 10px; font-weight: 900; letter-spacing: 0.04em; color: var(--text-heading); display: flex; align-items: center; gap: 4px;">
-                <span>🔀</span> ROUTING:
-              </span>
-              <button id="btnSetMultiSplitChannels" class="chassis-page-btn" style="color: #0b7285; border-color: #0b7285; font-weight: 800; padding: 4px 10px; font-size: 10px; background: rgba(11, 114, 133, 0.08);" title="Invia sequenza SysEx Page C (Param 34) e CC MIDI per configurare P1=Ch1, P2=Ch2, P3=Ch3, P4=Ch4 e sbloccare i volumi">⚡ 4 CANALI INDIPENDENTI (P1:Ch1 · P2:Ch2 · P3:Ch3 · P4:Ch4)</button>
-              <button id="btnSetMultiLayerChannels" class="chassis-page-btn" style="color: #5f3dc4; border-color: #5f3dc4; font-weight: 800; padding: 4px 9px; font-size: 10px; background: rgba(95, 61, 196, 0.08);" title="Assegna tutte e 4 le parti al Canale 1 per suonare insieme in Layer">🎛 LAYER (TUTTE SU CH 1)</button>
-              <button id="btnMultiRoutingHelp" class="chassis-page-btn" style="color: #d97706; border-color: #d97706; font-weight: 800; padding: 4px 9px; font-size: 10px; background: rgba(217, 119, 6, 0.08);" title="Spiegazione: perché P1 suona tutti e 4 i suoni e come passare a SEQUENCER MODE su Access Virus TI Snow">❓ GUIDA HARDWARE / PERCHÉ P1 SUONA TUTTO?</button>
-            </div>
-            <div style="display: flex; align-items: center; gap: 6px;">
-              <span style="font-size: 9.5px; font-weight: 800; color: #555;">VISTA:</span>
-              <button id="btnMultiLayoutGrid" class="chassis-page-btn" style="padding: 3px 8px; font-size: 10px; font-weight: bold;" title="Vista compatta Griglia 2x2 per visualizzare tutte le 4 parti insieme senza scroll">▦ 2x2 GRID</button>
-              <button id="btnMultiLayoutList" class="chassis-page-btn" style="padding: 3px 8px; font-size: 10px; font-weight: bold;" title="Vista a righe estese">☰ LISTA</button>
-            </div>
-          </div>
-          <div id="quickScanStatus" style="font-size: 10.5px; color: #555; font-family: monospace; min-height: 16px; margin-top: 4px; padding: 2px 4px;"></div>
         </div>
+      </div>
+
+      <div class="chassis-keys multi-keys">
+        <button type="button" class="chassis-key fp-key" data-midi-key aria-expanded="false" title="Mostra / nascondi stato MIDI, azioni e guida di collegamento">MIDI</button>
+        <button type="button" class="chassis-key fp-key" aria-controls="multiBanksBox" title="Banchi: scansione nomi dal Virus">BANKS</button>
+        <button type="button" class="chassis-key fp-key" aria-controls="multiRoutingBox" title="Canali MIDI delle 4 parti">ROUTING</button>
+      </div>
+
+      <div class="multi-drawer" id="multiBanksBox" hidden>
+        <span class="mc-label">BANCO</span>
+        <select id="quickBankScanSelect" aria-label="Banco da scansionare"></select>
+        <button id="btnQuickScanBank" class="chassis-page-btn" type="button" title="Legge dal Virus via SysEx i 128 nomi del banco">SCANSIONA 128</button>
+        <button id="btnScanAllRam" class="chassis-page-btn" type="button" title="Legge i nomi di RAM-A, B, C e D">RAM A–D</button>
+        <button id="btnOpenBankNamesModal" class="chassis-page-btn" type="button" title="Elenco dei nomi del banco">NOMI</button>
+        <div id="quickScanStatus" class="multi-drawer-status"></div>
+      </div>
+
+      <div class="multi-drawer" id="multiRoutingBox" hidden>
+        <span class="mc-label">ROUTING</span>
+        <button id="btnSetMultiSplitChannels" class="chassis-page-btn" type="button" title="Invia sequenza SysEx Page C (Param 34) e CC MIDI per configurare P1=Ch1, P2=Ch2, P3=Ch3, P4=Ch4 e sbloccare i volumi">4 CANALI (P1–P4 → CH 1–4)</button>
+        <button id="btnSetMultiLayerChannels" class="chassis-page-btn" type="button" title="Assegna tutte e 4 le parti al Canale 1 per suonare insieme in Layer">LAYER (TUTTE SU CH 1)</button>
+        <button id="btnMultiRoutingHelp" class="chassis-page-btn" type="button" title="Perché P1 suona tutti e 4 i suoni e come passare a Sequencer mode">? GUIDA</button>
       </div>
 
       <!-- Le 4 Parti Multi in Skin Virus TI Snow -->
@@ -7840,7 +7851,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
     if (rail) rail.style.display = show ? 'grid' : 'none';
     if (strip) strip.style.display = show ? 'flex' : 'none';
     // in PANEL e SINGLE stato/azioni/guida MIDI stanno dietro il tasto MIDI della scocca
-    document.body.classList.toggle('panel-view', view === 'snow' || view === 'single');
+    document.body.classList.toggle('panel-view', view === 'snow' || view === 'single' || view === 'multi');
     if (!show && diag) diag.classList.add('hidden');
   }
 
@@ -10229,6 +10240,9 @@ function exportCurrentPatchSyx() {
     // tasti sulla scocca (SOUNDS, WAVES): aprono/chiudono i pannelli sotto il frontale; lo stato resta in questo browser
     document.querySelectorAll('.faceplate .fp-wave[aria-controls]').forEach(btn => bindPanelKey(btn, document.getElementById(btn.getAttribute('aria-controls'))));
     document.getElementById('frontBtnMidi')?.addEventListener('click', toggleMidiPanel);
+    // MULTI: stessi tasti sulla scocca
+    document.querySelector('.multi-keys [data-midi-key]')?.addEventListener('click', toggleMidiPanel);
+    document.querySelectorAll('.multi-keys .chassis-key[aria-controls]').forEach(b => bindPanelKey(b, document.getElementById(b.getAttribute('aria-controls'))));
   }, 0);
 
   function buildSingleView(){
@@ -13086,8 +13100,8 @@ function exportCurrentPatchSyx() {
     const multiInput = document.getElementById('multiProgramInput');
 
     if (catEl) {
-      const bankName = BANK_NAMES[part.values.bank] || 'RAM-A';
-      catEl.textContent = `P${pIdx + 1} • ${bankName}`;
+      // come il display reale: parte + categoria della patch (Single dump Page B #123)
+      catEl.textContent = `Part ${pIdx + 1}  CAT:${(window.VIRUS_CATEGORIES || [])[part.dump?.[9 + 251]] || '--'}`;
     }
     if (prgEl) {
       const multiNum = multiInput ? parseInt(multiInput.value, 10) || (pIdx + 1) : (pIdx + 1);
@@ -13194,6 +13208,7 @@ function exportCurrentPatchSyx() {
     });
     chField.style.margin = '0';
     chField.style.flexShrink = '0';
+    chField.classList.add('part-ch');
     const chSel = chField.querySelector('select');
     if (chSel) chSel.style.cssText = 'font-size: 10px; padding: 1px 3px; height: 22px; min-width: 40px;';
     leftGroup.appendChild(chField);
@@ -13222,7 +13237,7 @@ function exportCurrentPatchSyx() {
     const btnSyncPartBank = document.createElement('button');
     btnSyncPartBank.className = 'chassis-page-btn';
     btnSyncPartBank.style.cssText = 'padding: 2px 5px; height: 22px; font-size: 9px; color: #1e6091; border-color: #b8bac2; cursor: pointer;';
-    btnSyncPartBank.textContent = '📥';
+    btnSyncPartBank.textContent = '↻';
     btnSyncPartBank.title = 'Scansiona via SysEx i 128 nomi di questo banco dal Virus TI';
     btnSyncPartBank.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -13344,7 +13359,7 @@ function exportCurrentPatchSyx() {
     const editBtn = document.createElement('button');
     editBtn.className = 'chassis-page-btn';
     editBtn.style.cssText = `padding: 2px 7px; font-size: 9.5px; height: 22px; font-weight: bold; color: ${partColor}; border-color: ${partColor}; background: rgba(0,0,0,0.05); white-space: nowrap;`;
-    editBtn.textContent = '✏️ SINGLE';
+    editBtn.textContent = 'EDIT';
     editBtn.title = `Apri P${index + 1} nell'editor Single per scolpirne tutti i dettagli`;
     editBtn.addEventListener('click', (e) => {
       e.stopPropagation();
@@ -13355,7 +13370,7 @@ function exportCurrentPatchSyx() {
     const extLink = document.createElement('a');
     extLink.className = 'chassis-page-btn';
     extLink.style.cssText = 'padding: 2px 5px; font-size: 9.5px; height: 22px; color: #38bdf8; border-color: #38bdf8; text-decoration: none; display: inline-flex; align-items: center; justify-content: center;';
-    extLink.textContent = '↗️';
+    extLink.textContent = '↗';
     extLink.title = `Apri P${index + 1} direttamente nella pagina Editor Dedicato`;
     extLink.target = '_blank';
     extLink.href = `single_editor.html?part=${index}&name=${encodeURIComponent(part.name || 'INIT')}`;
@@ -13785,6 +13800,7 @@ function exportCurrentPatchSyx() {
     const MODES = ['Single', 'Multi', 'Sequencer'];
     const CATEGORIES = ['--', 'Lead', 'Bass', 'Pad', 'Decay', 'Pluck', 'Acid', 'Classic', 'Arpeggiator', 'Effects', 'Drums', 'Percussion', 'Input', 'Vocoder', 'Favourite 1', 'Favourite 2', 'Favourite 3', 'Organ', 'Piano', 'String', 'FM', 'Digital', 'Atomizer'];
     // nomi brevi dei soft knob (Single dump Page B #51-53), lista del firmware TI
+    window.VIRUS_CATEGORIES = CATEGORIES;
     const SOFTKNOB_NAMES = ['~Para', '+3rds', '+4ths', '+5ths', '+7ths', '+Octave', 'Access', 'ArpMode', 'ArpOct', 'Attack', 'Balance', 'Chorus', 'Cutoff', 'Decay', 'Delay', 'Depth', 'Destroy', 'Detune', 'Disolve', 'Distort', 'Dive', 'Effects', 'Elevate', 'Energy', 'EqHigh', 'EqLow', 'EqMid', 'Fast', 'Fear', 'Filter', 'FM', 'Glide', 'Hold', 'Hype', 'Infect', 'Length', 'Mix', 'Morph', 'Mutate', 'Noise', 'Open', 'Orbit', 'Pan', 'Phaser', 'Phatter', 'Pitch', 'Pulsate', 'Push', 'PWM', 'Rate', 'Release', 'Reso', 'Reverb', 'Scream', 'Shape', 'Sharpen', 'Slow', 'Soften', 'Speed', 'SubOsc', 'Sustain', 'Sweep', 'Swing', 'Tempo', 'Thinner', 'Tone', 'Tremolo', 'Vibrato', 'WahWah', 'Warmth', 'Warp', 'vf', 'Bite', 'Flanger', 'RingMod', 'Punch', 'Fuzz', 'Modulate', 'Party!', 'Interpolation', 'F-Shift', 'F-Spread', 'Bush', 'Muscle', 'Sack', 'Vowel', 'Comb', 'Speaker'];
 
     const panel = { state: 'play', menu: null, sel: 0, shift: false, modeIdx: 1, bankPrompt: false };
