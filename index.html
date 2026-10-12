@@ -8077,7 +8077,6 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
       updateControlRoomStatus();
       if (typeof updateKeyboardPartDisplay === 'function') updateKeyboardPartDisplay();
       if (selectedOutput) {
-        unmuteAndSetVolume(getActiveMidiChannel());
         requestDump(0);
       }
     });
@@ -8095,7 +8094,6 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
     }
     if (typeof updateKeyboardPartDisplay === 'function') updateKeyboardPartDisplay();
     if (selectedOutput) {
-      unmuteAndSetVolume(getActiveMidiChannel());
     }
     if (typeof updateSingleOledDisplay === 'function') updateSingleOledDisplay();
     if (typeof initElektronLcd === 'function') setTimeout(initElektronLcd, 30);
@@ -8112,11 +8110,8 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
       partDisplays.forEach(d => { if (d && d._render) d._render(); });
     }
     updateControlRoomStatus();
-    if (selectedOutput) {
-      if (typeof forceMulti4ChannelRouting === 'function' && window.multiRoutingMode !== 'layer') {
-        forceMulti4ChannelRouting(false);
-      }
-    }
+    // aprire la pagina non deve cambiare il Virus: se e' in MULTI si legge il suo Multi (il routing si imposta solo da ROUTING)
+    if (selectedOutput && window.currentSynthMode === 'multi') syncAllMultiParts();
   });
 
   document.getElementById('btnTabPatchManager').addEventListener('click', () => {
@@ -8137,7 +8132,6 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
     updateControlRoomStatus();
     if (typeof updateKeyboardPartDisplay === 'function') updateKeyboardPartDisplay();
     if (selectedOutput) {
-      unmuteAndSetVolume(getActiveMidiChannel());
     }
     if (window.arpEngine) {
       window.arpEngine.updateUI();
@@ -9824,7 +9818,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
       selectedOutput.send(new Uint8Array([0xB0 | ch, 7, 127]));  // CC 7: Volume Max (127)
       selectedOutput.send(new Uint8Array([0xB0 | ch, 11, 127])); // CC 11: Expression Max (127)
       selectedOutput.send(new Uint8Array([0xB0 | ch, 10, 64]));  // CC 10: Pan Center (64)
-      selectedOutput.send(new Uint8Array([0xB0 | ch, 41, 0]));   // CC 41: Output Select = Out 1 L+R (Main/Phones)
+      // (niente CC 41: sul Virus TI e' Cutoff 2, non Output Select — azzerava il secondo filtro)
     } catch(e) {}
   }
 
@@ -14307,7 +14301,6 @@ function exportCurrentPatchSyx() {
         const m = panel.modeIdx;
         sendVirusMode(m);
         const badge = document.getElementById('frontLcdModeBadge'); if (badge) badge.textContent = m === 0 ? 'SINGLE' : 'MULTI';
-        if (m === 0) unmuteAndSetVolume(getActiveMidiChannel());
         setLastAction(`Mode: ${MODES[m]}`);
         if (typeof updateKeyboardPartDisplay === 'function') updateKeyboardPartDisplay();
         toPlay(); return;
@@ -14657,8 +14650,6 @@ function exportCurrentPatchSyx() {
         multiParts[i].values.volume = 127;
       }
 
-      const curBank = (multiParts[i].values && multiParts[i].values.bank !== undefined) ? multiParts[i].values.bank : 0;
-      const curProg = (multiParts[i].values && multiParts[i].values.program !== undefined) ? multiParts[i].values.program : 0;
 
       // SysEx Page C (0x72) per la parte i
       queue.push({ type: 'sysex', devId, part: i, param: 34, val: i });                  // Param 34: Part MIDI Channel (0-15)
@@ -14669,16 +14660,12 @@ function exportCurrentPatchSyx() {
       queue.push({ type: 'sysex', devId, part: i, param: 41, val: 0 });                  // Param 41: Output Select = Out 1 L+R (Main)
       queue.push({ type: 'sysex', devId, part: i, param: 35, val: 0 });                  // Param 35: Low Key 0
       queue.push({ type: 'sysex', devId, part: i, param: 36, val: 127 });                // Param 36: High Key 127
-      queue.push({ type: 'sysex', devId, part: i, param: 31, val: curBank & 0x7F });     // Param 31: Bank Select
-      queue.push({ type: 'sysex', devId, part: i, param: 33, val: curProg & 0x7F });     // Param 33: Program Select
+      // banco e programma NON si inviano: il routing non deve cambiare i suoni delle parti
 
       // Standard MIDI CCs sul canale i (0 = Ch 1, 1 = Ch 2, 2 = Ch 3, 3 = Ch 4)
       queue.push({ type: 'midi', bytes: [0xB0 | i, 7, 127] });                           // CC 7: Volume 127
       queue.push({ type: 'midi', bytes: [0xB0 | i, 11, 127] });                          // CC 11: Expression 127
       queue.push({ type: 'midi', bytes: [0xB0 | i, 10, 64] });                           // CC 10: Pan Center 64
-      queue.push({ type: 'midi', bytes: [0xB0 | i, 0, 0] });                             // Bank MSB 0
-      queue.push({ type: 'midi', bytes: [0xB0 | i, 32, curBank & 0x7F] });               // Bank LSB
-      queue.push({ type: 'midi', bytes: [0xC0 | i, curProg & 0x7F] });                   // Program Change
       queue.push({ type: 'midi', bytes: [0xB0 | i, 123, 0] });                           // All Notes Off
     }
 
