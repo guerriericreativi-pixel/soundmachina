@@ -301,8 +301,9 @@ def run(name, job):
         save_sheet(frames, 2, cell, name + ('-preview' if PREVIEW else ''))
 
 
-os.makedirs(OUT, exist_ok=True)
-for name, job in JOBS.items():
-    if ONLY and name not in ONLY:
-        continue
-    run(name, job)
+if __name__ == '__main__':   # importabile da virus_faceplate.py
+    os.makedirs(OUT, exist_ok=True)
+    for name, job in JOBS.items():
+        if ONLY and name not in ONLY:
+            continue
+        run(name, job)

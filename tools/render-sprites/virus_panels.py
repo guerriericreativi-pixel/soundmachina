@@ -405,8 +405,9 @@ for sk in ('snow', 'dark'):
     JOBS[f'screw-{sk}'] = (job_screw, sk)
     JOBS[f'btn-{sk}'] = (job_button, sk)
 
-os.makedirs(OUT, exist_ok=True)
-for name, (fn, sk) in JOBS.items():
-    if ONLY and name not in ONLY:
-        continue
-    fn(sk)
+if __name__ == '__main__':   # importabile da virus_faceplate.py
+    os.makedirs(OUT, exist_ok=True)
+    for name, (fn, sk) in JOBS.items():
+        if ONLY and name not in ONLY:
+            continue
+        fn(sk)

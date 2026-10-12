@@ -1,0 +1,222 @@
+{
+ "aspect": 1.7548941402926428,
+ "knobs": {
+  "frontKnobVolume": {
+   "x": 12.316,
+   "y": 64.621,
+   "d": 5.424
+  },
+  "frontKnobValue1": {
+   "x": 23.559,
+   "y": 64.621,
+   "d": 5.424
+  },
+  "frontKnobValue2": {
+   "x": 33.446,
+   "y": 64.621,
+   "d": 5.424
+  },
+  "frontKnobValue3": {
+   "x": 43.333,
+   "y": 64.621,
+   "d": 5.424
+  },
+  "frontKnobCutoff": {
+   "x": 77.288,
+   "y": 64.621,
+   "d": 5.424
+  },
+  "frontKnobResonance": {
+   "x": 87.175,
+   "y": 64.621,
+   "d": 5.424
+  }
+ },
+ "keys": {
+  "frontBtnTapPanic": {
+   "x": 12.316,
+   "y": 29.921,
+   "s": 4.237
+  },
+  "frontBtnExitMode": {
+   "x": 12.316,
+   "y": 47.082,
+   "s": 4.237
+  },
+  "frontBtnOsc1": {
+   "x": 54.407,
+   "y": 29.921,
+   "s": 4.237
+  },
+  "frontBtnOsc2": {
+   "x": 59.322,
+   "y": 29.921,
+   "s": 4.237
+  },
+  "frontBtnFilters": {
+   "x": 64.294,
+   "y": 29.921,
+   "s": 4.237
+  },
+  "frontBtnMod": {
+   "x": 69.266,
+   "y": 29.921,
+   "s": 4.237
+  },
+  "frontBtnEnv": {
+   "x": 74.181,
+   "y": 29.921,
+   "s": 4.237
+  },
+  "frontBtnEffects": {
+   "x": 79.153,
+   "y": 29.921,
+   "s": 4.237
+  },
+  "frontBtnArp": {
+   "x": 84.068,
+   "y": 29.921,
+   "s": 4.237
+  },
+  "frontBtnCommon": {
+   "x": 89.04,
+   "y": 29.921,
+   "s": 4.237
+  },
+  "frontBtnValMinus": {
+   "x": 54.407,
+   "y": 47.365,
+   "s": 4.237
+  },
+  "frontBtnValPlus": {
+   "x": 59.322,
+   "y": 47.365,
+   "s": 4.237
+  },
+  "frontBtnParamPrev": {
+   "x": 64.294,
+   "y": 47.365,
+   "s": 4.237
+  },
+  "frontBtnParamNext": {
+   "x": 69.266,
+   "y": 47.365,
+   "s": 4.237
+  },
+  "frontBtnAudition": {
+   "x": 74.181,
+   "y": 47.365,
+   "s": 4.237
+  },
+  "frontBtnMulti": {
+   "x": 79.153,
+   "y": 47.365,
+   "s": 4.237
+  },
+  "frontBtnConfig": {
+   "x": 84.068,
+   "y": 47.365,
+   "s": 4.237
+  },
+  "frontBtnStore": {
+   "x": 89.04,
+   "y": 47.365,
+   "s": 4.237
+  },
+  "frontBtnEditShift": {
+   "x": 54.52,
+   "y": 64.715,
+   "s": 4.237
+  },
+  "frontBtnPartCycle": {
+   "x": 59.435,
+   "y": 64.715,
+   "s": 4.237
+  },
+  "frontBtnBankSearch": {
+   "x": 64.407,
+   "y": 64.715,
+   "s": 4.237
+  }
+ },
+ "leds": {
+  "frontRomLed0": {
+   "x": 54.746,
+   "y": 24.263
+  },
+  "frontRomLed1": {
+   "x": 59.661,
+   "y": 24.263
+  },
+  "frontRomLed2": {
+   "x": 64.633,
+   "y": 24.263
+  },
+  "frontRomLed3": {
+   "x": 69.605,
+   "y": 24.263
+  },
+  "frontRomLed4": {
+   "x": 74.52,
+   "y": 24.263
+  },
+  "frontRomLed5": {
+   "x": 79.492,
+   "y": 24.263
+  },
+  "frontRomLed6": {
+   "x": 84.407,
+   "y": 24.263
+  },
+  "frontRomLed7": {
+   "x": 89.379,
+   "y": 24.263
+  },
+  "frontRamLed0": {
+   "x": 54.746,
+   "y": 41.708
+  },
+  "frontRamLed1": {
+   "x": 59.661,
+   "y": 41.708
+  },
+  "frontRamLed2": {
+   "x": 64.633,
+   "y": 41.708
+  },
+  "frontRamLed3": {
+   "x": 69.605,
+   "y": 41.708
+  },
+  "frontRamLed4": {
+   "x": 74.52,
+   "y": 41.708
+  },
+  "frontRamLed5": {
+   "x": 79.492,
+   "y": 41.708
+  },
+  "frontRamLed6": {
+   "x": 84.407,
+   "y": 41.708
+  },
+  "frontRamLed7": {
+   "x": 89.379,
+   "y": 41.708
+  },
+  "frontEditShiftLed": {
+   "x": 54.52,
+   "y": 59.058
+  },
+  "snowLcdBpmLed": {
+   "x": 21.751,
+   "y": 27.614
+  }
+ },
+ "lcd": {
+  "x": 19.492,
+  "y": 34.011,
+  "w": 27.401,
+  "h": 12.07
+ }
+}
