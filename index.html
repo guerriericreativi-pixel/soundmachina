@@ -6861,14 +6861,26 @@
   /* wave browser (scheda SINGLE) */
   .wave-browser { margin: 0 24px 28px; padding: 14px 16px; border-radius: 6px; background: rgba(0,0,0,0.28); border: 1px solid rgba(255,255,255,0.08); color: #d6dbe3; font: 12px/1.3 'Roboto Mono', ui-monospace, monospace; position: relative; z-index: 1; }
   #snowWaveBrowserSlot .wave-browser { margin: 16px 0 0; }
-  #snowWaveBrowserSlot[hidden], #snowSoundsDock[hidden], #frontThemeToggleBtn[hidden] { display: none !important; }
+  #snowWaveBrowserSlot[hidden], #snowSoundsDock[hidden], #frontThemeToggleBtn[hidden], #singleToolsBox[hidden], #singleWaveBox[hidden] { display: none !important; }
+  .single-tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; }
+  .single-tools > .chassis-top-display-visor { flex-basis: 100%; }
+  /* tasti rettangolari sulla scocca SINGLE (stesso stile dei tasti del PANEL) */
+  .chassis-keys { display: flex; gap: 10px; justify-content: center; margin: 0 0 22px; position: relative; z-index: 1; }
+  .chassis-keys .chassis-key { width: 64px !important; height: 24px !important; min-height: 0 !important; padding: 0 !important; border: 0 !important; border-radius: 3px !important; cursor: pointer;
+    background: linear-gradient(#a3a3a1, #8f8f8d) !important; color: #f2f2f0 !important; font: 700 9px/1 "Inter", sans-serif !important; letter-spacing: 0.08em !important; text-transform: uppercase !important;
+    box-shadow: 0 3px 0 #5f5f5d, 0 5px 7px rgba(0,0,0,0.35) !important; }
+  .chassis-keys .chassis-key:active, .chassis-keys .chassis-key[aria-expanded="true"] { transform: translateY(2px); box-shadow: 0 1px 0 #5f5f5d, 0 2px 4px rgba(0,0,0,0.35) !important; color: #fff !important; text-shadow: 0 0 5px rgba(255,255,255,0.9); }
+  .chassis-keys .chassis-key:focus-visible { outline: 2px solid #3b82f6; outline-offset: 2px; }
+  html[data-skin="elektron"] .chassis-keys .chassis-key { background: linear-gradient(#3a3b3e, #2b2c2f) !important; color: #c9cbd0 !important; box-shadow: 0 3px 0 #151617, 0 5px 7px rgba(0,0,0,0.5) !important; }
   body.panel-view:not(.midi-open) .command-strip,
   body.panel-view:not(.midi-open) .control-room-rail,
   body.panel-view:not(.midi-open) #midiSetup,
   body.panel-view:not(.midi-open) #midiDiagnostics { display: none !important; }
   @keyframes fpAlert { 50% { color: #ff6b5e; text-shadow: 0 0 0.5cqw rgba(255,80,60,0.9); } }
   .faceplate .fp-wave.alert:not([aria-expanded="true"]) { animation: fpAlert 1.2s ease-in-out infinite; }
-  @media (prefers-reduced-motion: reduce) { .faceplate .fp-wave.alert:not([aria-expanded="true"]) { animation: none; color: #ff6b5e; } }
+  @keyframes ckAlert { 50% { color: #ff6b5e !important; text-shadow: 0 0 5px rgba(255,80,60,0.9); } }
+  .chassis-keys .chassis-key.alert:not([aria-expanded="true"]) { animation: ckAlert 1.2s ease-in-out infinite; }
+  @media (prefers-reduced-motion: reduce) { .faceplate .fp-wave.alert:not([aria-expanded="true"]), .chassis-key.alert:not([aria-expanded="true"]) { animation: none; color: #ff6b5e; } }
   /* tasto rettangolare sulla scocca, sotto la fascia PART VOLUME / TRANSPOSE / PANORAMA */
   .faceplate .fp-wave { width: 4.237%; height: 2.3%; padding: 0; border: 0; border-radius: 0.25cqw; cursor: pointer;
     background: linear-gradient(#a3a3a1, #8f8f8d); color: #f2f2f0; font: 700 0.68cqw/1 "Inter", sans-serif; letter-spacing: 0.06em; text-transform: uppercase !important;
@@ -7385,7 +7397,7 @@
       <span class="snow-indicator-led" id="frontRamLed7" style="--x:89.379;--y:41.708"></span>
       <span class="snow-indicator-led active-amber" id="frontEditShiftLed" style="--x:54.52;--y:59.058"></span>
       <span class="fp-bpm pulse-bpm" style="--x:21.751;--y:27.614"></span>
-      <button class="fp-wave" id="frontBtnMidi" type="button" aria-expanded="false" title="Mostra / nascondi stato MIDI, azioni (receive, send, test, diagnostics, panic) e guida di collegamento" style="--x:12.316;--y:84.6">MIDI</button>
+      <button class="fp-wave" id="frontBtnMidi" data-midi-key type="button" aria-expanded="false" title="Mostra / nascondi stato MIDI, azioni (receive, send, test, diagnostics, panic) e guida di collegamento" style="--x:12.316;--y:84.6">MIDI</button>
       <button class="fp-wave" id="frontBtnSounds" type="button" aria-expanded="false" aria-controls="snowSoundsDock" title="Mostra / nascondi banco e lista suoni" style="--x:54.52;--y:84.6">SOUNDS</button>
       <button class="fp-wave" id="frontBtnWaves" type="button" aria-expanded="false" aria-controls="snowWaveBrowserSlot" title="Mostra / nascondi il Wave Browser" style="--x:59.435;--y:84.6">WAVES</button>
       <button class="fp-wave" id="frontBtnFinish" type="button" title="Finitura bianca / scura" style="--x:64.407;--y:84.6">FINISH</button>
@@ -7828,7 +7840,8 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
     const show = (view === 'multi' || view === 'snow');
     if (rail) rail.style.display = show ? 'grid' : 'none';
     if (strip) strip.style.display = show ? 'flex' : 'none';
-    document.body.classList.toggle('panel-view', view === 'snow');   // in PANEL stato/azioni/guida MIDI stanno dietro il tasto MIDI
+    // in PANEL e SINGLE stato/azioni/guida MIDI stanno dietro il tasto MIDI della scocca
+    document.body.classList.toggle('panel-view', view === 'snow' || view === 'single');
     if (!show && diag) diag.classList.add('hidden');
   }
 
@@ -9435,7 +9448,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
     if (!box) return;
     const outOk = !!(selectedOutput && (!selectedOutput.state || selectedOutput.state === 'connected'));
     box.hidden = outOk || midiSetupDismissed;
-    document.getElementById('frontBtnMidi')?.classList.toggle('alert', !outOk);
+    document.querySelectorAll('[data-midi-key]').forEach(k => k.classList.toggle('alert', !outOk));
     if (box.hidden) return;
     const step = (name, state) => { const li = box.querySelector(`[data-step="${name}"]`); li.dataset.state = state; };
     const outCount = midiAccess ? midiAccess.outputs.size : 0;
@@ -10189,31 +10202,34 @@ function exportCurrentPatchSyx() {
     return box;
   }
   const waveBrowsers = [];
+  // tasto MIDI (PANEL e SINGLE): mostra stato, azioni e guida di collegamento
+  function toggleMidiPanel() {
+    const open = document.body.classList.toggle('midi-open');
+    document.querySelectorAll('[data-midi-key]').forEach(k => k.setAttribute('aria-expanded', String(open)));
+    if (open) window.scrollTo({ top: 0, behavior: 'smooth' });
+  }
+  // tasto sulla scocca che apre/chiude un pannello; lo stato resta in questo browser
+  function bindPanelKey(btn, panel) {
+    const key = 'virusH_open_' + panel.id;
+    const show = open => {
+      panel.hidden = !open; btn.setAttribute('aria-expanded', String(open));
+      try { localStorage.setItem(key, open ? '1' : ''); } catch (e) {}
+    };
+    let saved = false; try { saved = !!localStorage.getItem(key); } catch (e) {}
+    show(saved);
+    btn.addEventListener('click', () => {
+      show(panel.hidden);
+      if (!panel.hidden) { window.waveBrowserRender(); panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+    });
+  }
   window.waveBrowserRender = () => waveBrowsers.forEach(b => b.isConnected && b._render());
   // anche sotto il frontale TI-SNOW (segue i tasti OSC 1 / OSC 2)
   setTimeout(() => {
     const slot = document.getElementById('snowWaveBrowserSlot');
     if (slot && !slot.firstChild) { window.snowWaveBrowser = buildWaveBrowser(); slot.appendChild(window.snowWaveBrowser); }
     // tasti sulla scocca (SOUNDS, WAVES): aprono/chiudono i pannelli sotto il frontale; lo stato resta in questo browser
-    document.querySelectorAll('.faceplate .fp-wave[aria-controls]').forEach(btn => {
-      const panel = document.getElementById(btn.getAttribute('aria-controls'));
-      const key = 'virusH_open_' + panel.id;
-      const show = open => {
-        panel.hidden = !open; btn.setAttribute('aria-expanded', String(open));
-        try { localStorage.setItem(key, open ? '1' : ''); } catch (e) {}
-      };
-      let saved = false; try { saved = !!localStorage.getItem(key); } catch (e) {}
-      show(saved);
-      btn.addEventListener('click', () => {
-        show(panel.hidden);
-        if (!panel.hidden) { window.waveBrowserRender(); panel.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
-      });
-    });
-    document.getElementById('frontBtnMidi')?.addEventListener('click', e => {
-      const open = document.body.classList.toggle('midi-open');
-      e.currentTarget.setAttribute('aria-expanded', String(open));
-      if (open) document.querySelector('.control-room-rail')?.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
-    });
+    document.querySelectorAll('.faceplate .fp-wave[aria-controls]').forEach(btn => bindPanelKey(btn, document.getElementById(btn.getAttribute('aria-controls'))));
+    document.getElementById('frontBtnMidi')?.addEventListener('click', toggleMidiPanel);
     document.getElementById('frontBtnFinish')?.addEventListener('click', () => document.getElementById('frontThemeToggleBtn')?.click());
   }, 0);
 
@@ -10255,7 +10271,7 @@ function exportCurrentPatchSyx() {
     // =========================================================================
     const topBar = document.createElement('div');
     topBar.className = 'chassis-hardware-topbar single-top-bar';
-    topBar.style.cssText = 'width: 100%; max-width: 960px; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 24px; padding: 10px 16px; border-radius: 6px; box-sizing: border-box; z-index: 2;';
+    topBar.style.cssText = 'width: fit-content; max-width: 960px; align-self: center; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 12px; margin-top: 24px; padding: 10px 16px; border-radius: 6px; box-sizing: border-box; z-index: 2;';
 
     const controlsBox = document.createElement('div');
     controlsBox.style.cssText = 'display: flex; align-items: center; gap: 8px; flex-wrap: wrap;';
@@ -10371,6 +10387,11 @@ function exportCurrentPatchSyx() {
     controlsBox.appendChild(btnOpenDedicated);
 
     topBar.appendChild(controlsBox);
+    // come in PANEL: gli strumenti (test, leggi, random, mutate, salva, editor dedicato) stanno dietro il tasto TOOLS
+    const singleTools = document.createElement('div');
+    singleTools.className = 'single-tools'; singleTools.id = 'singleToolsBox';
+    [...controlsBox.children].filter(c => c !== partBox).forEach(c => singleTools.appendChild(c));
+    topBar.appendChild(singleTools);
 
     // Digital OLED / LCD Readout Display (matching ARP and SEQ!)
     const lcdDisp = document.createElement('div');
@@ -10387,7 +10408,7 @@ function exportCurrentPatchSyx() {
         <span id="singleDisplayMidiOut" style="color: #e0e4ec; font-weight: bold;">...</span>
       </div>
     `;
-    topBar.appendChild(lcdDisp);
+    singleTools.appendChild(lcdDisp);
 
     elektronWrapper.appendChild(topBar);
 
@@ -10405,7 +10426,7 @@ function exportCurrentPatchSyx() {
     // 2. MAIN WORKSTATION LAYOUT: SCREEN (LEFT) + ENCODERS & MACROS (RIGHT)
     // =========================================================================
     const innerLayout = document.createElement('div');
-    innerLayout.style.cssText = 'display: flex; flex-direction: row; gap: 48px; align-items: flex-start; justify-content: center; flex-wrap: wrap; margin-top: 18px; width: 100%; box-sizing: border-box; z-index: 1; padding-bottom: 80px;';
+    innerLayout.style.cssText = 'display: flex; flex-direction: row; gap: 48px; align-items: flex-start; justify-content: center; flex-wrap: wrap; margin-top: 18px; width: 100%; box-sizing: border-box; z-index: 1; padding-bottom: 24px;';
 
     const leftCol = document.createElement('div');
     leftCol.style.cssText = 'display: flex; flex-direction: column; gap: 14px; align-items: center;';
@@ -10417,7 +10438,16 @@ function exportCurrentPatchSyx() {
     elektronWrapper.appendChild(innerLayout);
     innerLayout.appendChild(leftCol);
     innerLayout.appendChild(rightCol);
-    elektronWrapper.appendChild(buildWaveBrowser());
+    // .fp-key: li esclude dallo stile generico dei pulsanti della scocca (tutte le regole .fp-key sono sotto .faceplate)
+    const singleKeys = document.createElement('div');
+    singleKeys.className = 'chassis-keys';
+    singleKeys.innerHTML = `<button type="button" class="chassis-key fp-key" data-midi-key aria-expanded="${document.body.classList.contains('midi-open')}" title="Mostra / nascondi stato MIDI, azioni e guida di collegamento">MIDI</button><button type="button" class="chassis-key fp-key" aria-controls="singleToolsBox" title="Mostra / nascondi strumenti e stato">TOOLS</button><button type="button" class="chassis-key fp-key" aria-controls="singleWaveBox" title="Mostra / nascondi il Wave Browser">WAVES</button>`;
+    elektronWrapper.appendChild(singleKeys);
+    const singleWave = buildWaveBrowser(); singleWave.id = 'singleWaveBox';
+    elektronWrapper.appendChild(singleWave);
+    singleKeys.querySelector('[data-midi-key]').addEventListener('click', toggleMidiPanel);
+    if (typeof renderMidiSetup === 'function') renderMidiSetup();
+    singleKeys.querySelectorAll('.chassis-key[aria-controls]').forEach(b => bindPanelKey(b, b.getAttribute('aria-controls') === 'singleToolsBox' ? singleTools : singleWave));
 
     // --- Faceplate / LCD Visor Recess (Harmonized with Snow in Light Mode, Dark Star in Dark Mode) ---
     const screenRecess = document.createElement('div');
