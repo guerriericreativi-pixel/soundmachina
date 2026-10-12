@@ -6811,6 +6811,43 @@
   html[data-skin="elektron"] .hardware-chassis a:not(.fp-key)[class] {
     border-color: #18191b !important; background: linear-gradient(180deg, #3a3b3f 0%, #2e2f33 100%) !important; color: #d6d7da !important;
   }
+
+  .ui-dialog-overlay { position: fixed; inset: 0; z-index: 100000; display: flex; align-items: center; justify-content: center;
+    background: rgba(20,22,26,0.45); backdrop-filter: blur(2px); }
+  .ui-dialog { width: min(420px, calc(100vw - 32px)); padding: 18px 18px 14px; border-radius: 10px;
+    background: #f2f1ee; color: #222326; border: 1px solid #b4b3ae; box-shadow: 0 20px 50px rgba(0,0,0,0.35);
+    font: 500 13px/1.45 'Inter', system-ui, sans-serif; letter-spacing: 0.01em; }
+  .ui-dialog p { margin: 0 0 14px; white-space: pre-wrap; }
+  .ui-dialog input { width: 100%; box-sizing: border-box; margin: 0 0 14px; padding: 8px 10px; border: 1px solid #b4b3ae; border-radius: 5px; font: inherit; background: #fff; color: #222; }
+  .ui-dialog-btns { display: flex; justify-content: flex-end; gap: 8px; }
+  .ui-dialog-btns button { min-height: 34px; padding: 0 16px; border: 1px solid #b4b3ae; border-radius: 5px; background: linear-gradient(180deg,#f8f7f4,#e6e5e1); font: 600 12px 'Inter', system-ui, sans-serif; color: #2a2b2e; cursor: pointer; }
+  .ui-dialog-btns button.primary { background: #2a2b2e; border-color: #1a1b1d; color: #fff; }
+  html[data-skin="elektron"] .ui-dialog { background: #2a2b2f; color: #e6e7ea; border-color: #121315; }
+  html[data-skin="elektron"] .ui-dialog input { background: #1d1e21; color: #e6e7ea; border-color: #121315; }
+  html[data-skin="elektron"] .ui-dialog-btns button { background: linear-gradient(180deg,#3a3b3f,#2e2f33); color: #d6d7da; border-color: #121315; }
+  html[data-skin="elektron"] .ui-dialog-btns button.primary { background: #e6e7ea; color: #1a1b1d; }
+
+  .fx-rack-knob-unit.fx-knob-na { opacity: 0.4; }
+  .fx-rack-knob-unit.fx-knob-na .fx-knob-label::after { content: ' ·B'; font-size: 0.85em; }
+
+  .chassis-screen-recess.song-slot-playing { outline: 2px solid #f3b929; outline-offset: 2px; box-shadow: 0 0 14px rgba(243,185,41,0.55) !important; }
+
+  /* SONG: slot come piccoli display LCD, non riquadri neri */
+  .hardware-chassis .chassis-screen-recess.song-slot {
+    background:
+      repeating-linear-gradient(90deg, rgba(255,255,255,0.10) 0 1px, transparent 1px 3px),
+      linear-gradient(180deg, #e3f2fa 0%, #c9e3f2 100%) !important;
+    border: 2px solid #2a2f35 !important;
+    border-radius: 4px !important;
+    box-shadow: inset 0 2px 5px rgba(0,0,0,0.25) !important;
+  }
+  .hardware-chassis .song-slot > div:first-child { color: #22323d !important; border-bottom-color: rgba(34,50,61,0.35) !important; }
+  .hardware-chassis .song-slot select { min-height: 30px; font-family: ui-monospace, monospace !important; }
+  html[data-skin="elektron"] .hardware-chassis .chassis-screen-recess.song-slot {
+    background: repeating-linear-gradient(90deg, rgba(0,0,0,0.2) 0 1px, transparent 1px 3px), linear-gradient(180deg, #4a0710 0%, #2a0308 100%) !important;
+    border-color: #0b0b0c !important;
+  }
+  html[data-skin="elektron"] .hardware-chassis .song-slot > div:first-child { color: #ffb3ba !important; border-bottom-color: rgba(255,80,90,0.35) !important; }
 </style>
 </head>
 <body>
@@ -7607,6 +7644,43 @@
 </div>
 
 <script>
+
+// Finestre di dialogo interne: alert/confirm/prompt del browser non funzionano
+// nella WebView del plugin (confirm restituirebbe sempre false).
+(function () {
+  function dialog(message, { input = null, buttons = ['OK'] } = {}) {
+    return new Promise(resolve => {
+      const ov = document.createElement('div');
+      ov.className = 'ui-dialog-overlay';
+      ov.innerHTML = '<div class="ui-dialog" role="dialog" aria-modal="true"><p></p>' +
+        (input !== null ? '<input type="text">' : '') + '<div class="ui-dialog-btns"></div></div>';
+      ov.querySelector('p').textContent = message;
+      const field = ov.querySelector('input');
+      if (field) field.value = input;
+      const close = (v) => { ov.remove(); document.removeEventListener('keydown', onKey, true); resolve(v); };
+      const box = ov.querySelector('.ui-dialog-btns');
+      buttons.forEach((label, i) => {
+        const b = document.createElement('button');
+        b.type = 'button'; b.textContent = label;
+        if (i === buttons.length - 1) b.className = 'primary';
+        b.onclick = () => close(i === buttons.length - 1 ? (field ? field.value : true) : (field ? null : false));
+        box.appendChild(b);
+      });
+      const onKey = (e) => {
+        if (e.key === 'Escape') { e.preventDefault(); close(field ? null : (buttons.length > 1 ? false : true)); }
+        else if (e.key === 'Enter') { e.preventDefault(); box.lastChild.click(); }
+      };
+      document.addEventListener('keydown', onKey, true);
+      document.body.appendChild(ov);
+      (field || box.lastChild).focus();
+      if (field) field.select();
+    });
+  }
+  window.uiAlert = (msg) => dialog(String(msg));
+  window.uiConfirm = (msg) => dialog(String(msg), { buttons: ['Annulla', 'Conferma'] });
+  window.uiPrompt = (msg, def = '') => dialog(String(msg), { input: def ?? '', buttons: ['Annulla', 'OK'] });
+})();
+
 // Manopole fotorealistiche: oltre a ruotare l'indice CSS sceglie il fotogramma
 // dello sprite renderizzato in Blender (128 fotogrammi, griglia 16x8, -135..+135 gradi).
 function setKnobAngle(ind, angle) {
@@ -8473,6 +8547,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
     container.appendChild(btn);
     container.appendChild(popup);
 
+    btn._hasInfoListener = true;   // evita il secondo listener di initSectionInfoPopups (apriva e richiudeva)
     btn.addEventListener('click', (e) => {
       e.stopPropagation();
       const isActive = container.classList.contains('active');
@@ -8480,6 +8555,8 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
       if (!isActive) container.classList.add('active');
     });
 
+    header.querySelector('.section-info-close')._hasInfoListener = true;
+    popup._hasInfoListener = true;
     header.querySelector('.section-info-close').addEventListener('click', (e) => {
       e.stopPropagation();
       container.classList.remove('active');
@@ -9212,7 +9289,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
   document.getElementById('msAllow')?.addEventListener('click', async (e) => {
     if (midiStatus === 'denied' && embeddedBrowser) {
       try { await navigator.clipboard.writeText(location.href); e.target.textContent = 'Copiato ✓'; }
-      catch (err) { window.prompt('Copia questo indirizzo e aprilo in Chrome:', location.href); }
+      catch (err) { uiPrompt('Copia questo indirizzo e aprilo in Chrome:', location.href); }
       return;
     }
     initWebMidi();
@@ -9331,8 +9408,8 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
   function sendCC(channel, cc, value) {
     if (selectedOutput) {
       try {
-        // Normalizza: se 1..16 converti a 0..15, se 0..15 usa direttamente
-        const ch = (channel >= 1 && channel <= 16) ? (channel - 1) : (channel & 0x0F);
+        // canale 0-15 (P1 = 0). Prima "indovinava" 0- o 1-based e spostava P2..P4 di un canale.
+        const ch = channel & 0x0F;
         const chanByte = 0xB0 | (ch & 0x0F);
         const bytes = new Uint8Array([chanByte, cc & 0x7F, value & 0x7F]);
         selectedOutput.send(bytes);
@@ -9819,7 +9896,7 @@ function mutatePatch(amount = 0.2) {
 function exportCurrentPatchSyx() {
   const dump = window.lastReceivedDump;
   if (!dump || dump.length < 250) {
-    alert('Nessun dump completo ricevuto dal synth per questa patch. Clicca prima "leggi" o premi "STORE" sul synth per sincronizzarla.');
+    uiAlert('Nessun dump completo ricevuto dal synth per questa patch. Clicca prima "leggi" o premi "STORE" sul synth per sincronizzarla.');
     return;
   }
   const name = extractPatchName(dump) || 'patch';
@@ -9929,7 +10006,7 @@ function exportCurrentPatchSyx() {
     btnFetchSyx.title = 'Scarica la patch attiva corrente direttamente dal Virus TI Snow via SysEx';
     btnFetchSyx.addEventListener('click', () => {
       if (!selectedOutput) {
-        alert('Collega prima una porta MIDI Output in alto!');
+        uiAlert('Collega prima una porta MIDI Output in alto!');
         return;
       }
       requestDump(window.activeSinglePartIndex || 0);
@@ -10916,7 +10993,7 @@ function exportCurrentPatchSyx() {
       });
       saveLibrary(lib);
       renderLibrary();
-      alert(`Salvate ${patches.length} patch nella libreria!`);
+      uiAlert(`Salvate ${patches.length} patch nella libreria!`);
     });
     hdrBtns.appendChild(btnSaveAll);
     header.appendChild(hdrBtns);
@@ -11112,7 +11189,7 @@ function exportCurrentPatchSyx() {
 
   function syncAllMultiParts() {
     if (!selectedOutput) {
-      alert('MIDI Output non connesso!');
+      uiAlert('MIDI Output non connesso!');
       return;
     }
     document.getElementById('midi-debug').textContent = '🔥 LETTURA PARTI MULTI DAL SYNTH (P1-P4)...';
@@ -11268,8 +11345,8 @@ function exportCurrentPatchSyx() {
       const delBtn = document.createElement('button');
       delBtn.className = 'delete';
       delBtn.textContent = 'x';
-      delBtn.addEventListener('click', () => {
-        if (confirm('Delete multi preset?')){
+      delBtn.addEventListener('click', async () => {
+        if (await uiConfirm('Cancellare questo multi preset?')){
           delete lib[name];
           saveMultiLibrary(lib);
           renderMultiLibrary();
@@ -11286,7 +11363,7 @@ function exportCurrentPatchSyx() {
 
   function loadPatchToPart(rawBytesArray, partIndex) {
     if (!selectedOutput) {
-      alert('MIDI Output non connesso!');
+      uiAlert('MIDI Output non connesso!');
       return;
     }
     const dump = new Uint8Array(rawBytesArray);
@@ -11364,7 +11441,7 @@ function exportCurrentPatchSyx() {
     }
 
     if (patchesFound.length === 0) {
-      alert('Nessun dump valido per Access Virus TI trovato nel file (supportati file SysEx .syx e .mid).');
+      uiAlert('Nessun dump valido per Access Virus TI trovato nel file (supportati file SysEx .syx e .mid).');
       return;
     }
 
@@ -11380,10 +11457,10 @@ function exportCurrentPatchSyx() {
       window.lastReceivedDump = new Uint8Array(p.bytes);
       applyDumpToActivePatch(window.lastReceivedDump);
       document.getElementById('midi-debug').innerHTML = `<span style="color:#80c090;">📂 Patch importata: <b>${escapeHtml(p.name)}</b></span>`;
-      alert(`Patch "${p.name}" importata e caricata!`);
+      uiAlert(`Patch "${p.name}" importata e caricata!`);
     } else {
       document.getElementById('midi-debug').innerHTML = `<span style="color:#80c090;">📂 Banco importato: <b>${patchesFound.length} patch</b> da ${escapeHtml(filename)}</span>`;
-      alert(`Importate con successo ${patchesFound.length} patch dal file "${filename}" nella libreria!`);
+      uiAlert(`Importate con successo ${patchesFound.length} patch dal file "${filename}" nella libreria!`);
     }
   }
 
@@ -11443,12 +11520,12 @@ function exportCurrentPatchSyx() {
               renderMultiLibrary();
             }
             renderLibrary();
-            alert(`Ripristino completato! ${Object.keys(data.patches).length} patch importate dal backup.`);
+            uiAlert(`Ripristino completato! ${Object.keys(data.patches).length} patch importate dal backup.`);
           } else {
-            alert('File di backup JSON non valido o mancante del campo "patches".');
+            uiAlert('File di backup JSON non valido o mancante del campo "patches".');
           }
         } catch(err) {
-          alert('Errore nella lettura del file JSON: ' + err.message);
+          uiAlert('Errore nella lettura del file JSON: ' + err.message);
         }
       };
       reader.readAsText(file);
@@ -11474,7 +11551,7 @@ function exportCurrentPatchSyx() {
                 const merged = Object.assign({}, loadLibrary(), data.patches);
                 saveLibrary(merged);
                 renderLibrary();
-                alert(`Ripristino JSON completato: ${Object.keys(data.patches).length} patch importate!`);
+                uiAlert(`Ripristino JSON completato: ${Object.keys(data.patches).length} patch importate!`);
               }
             } catch(err) { console.error(err); }
           };
@@ -11586,8 +11663,8 @@ function exportCurrentPatchSyx() {
       delBtn.textContent = 'x';
       delBtn.className = 'delete';
       delBtn.title = 'Cancella patch';
-      delBtn.addEventListener('click', () => {
-        if (confirm(`Cancellare la patch "${name}" dalla libreria?`)){
+      delBtn.addEventListener('click', async () => {
+        if (await uiConfirm(`Cancellare la patch "${name}" dalla libreria?`)){
           delete lib[name];
           saveLibrary(lib);
           renderLibrary();
@@ -11618,7 +11695,7 @@ function exportCurrentPatchSyx() {
         multiParts[partIndex].values[pp.id] = value;
         if (send) {
           sendMultiPartParam(partIndex, pp.cc, value);
-          const ch = ((multiParts[partIndex].values.channel || 0) & 0x0F) + 1;
+          const ch = (multiParts[partIndex].values.channel || 0) & 0x0F;
           if (pp.id === 'volume') {
             sendCC(ch, 7, value);
           } else if (pp.id === 'pan') {
@@ -11652,7 +11729,7 @@ function exportCurrentPatchSyx() {
         multiParts[partIndex].values[param.id] = value;
         if (send) {
           sendPartSoundParam(partIndex, param.cc, value);
-          const ch = ((multiParts[partIndex].values.channel || 0) & 0x0F) + 1;
+          const ch = (multiParts[partIndex].values.channel || 0) & 0x0F;
           if (param.id === 'f1_cutoff') {
             sendCC(ch, 40, value);
             sendCC(ch, 74, value);
@@ -11708,10 +11785,10 @@ function exportCurrentPatchSyx() {
     display.style.cssText = 'background: rgba(0,0,0,0.5); border: 1px solid var(--border); border-radius: 3px; padding: 2px 5px; font-size: 11px; cursor: pointer; text-align: center; min-width: 32px; font-weight: bold; color: var(--fg);';
     display.textContent = noteName(multiParts[partIndex].values[pp.id]);
     display.title = 'Clicca per modificare (es. C-2, C3, G8 o numero 0-127)';
-    display.addEventListener('click', () => {
+    display.addEventListener('click', async () => {
       const current = multiParts[partIndex].values[pp.id];
       const currentStr = noteName(current);
-      const input = prompt(`Nota ${pp.name} (es. C-2, C3, G8 o numero 0-127):`, currentStr);
+      const input = await uiPrompt(`Nota ${pp.name} (es. C-2, C3, G8 o numero 0-127):`, currentStr);
       if (input === null) return;
       const value = parseNoteInput(input, current);
       multiParts[partIndex].values[pp.id] = value;
@@ -11902,9 +11979,9 @@ function exportCurrentPatchSyx() {
       if (selectedOutput) requestPartDump(index);
     });
 
-    wrap.addEventListener('dblclick', (e) => {
+    wrap.addEventListener('dblclick', async (e) => {
       e.stopPropagation();
-      const name = prompt('Nome parte:', multiParts[index].name || 'init');
+      const name = await uiPrompt('Nome parte:', multiParts[index].name || 'init');
       if (name !== null && name.trim() !== ''){
         multiParts[index].name = name.trim().slice(0, 16);
         startReveal();
@@ -12447,7 +12524,7 @@ function exportCurrentPatchSyx() {
 
   function startQuickBankScan(bankIndex, onComplete) {
     if (!selectedOutput) {
-      alert('Collega prima una porta MIDI Output nelle impostazioni in alto per scansionare il Virus!');
+      uiAlert('Collega prima una porta MIDI Output nelle impostazioni in alto per scansionare il Virus!');
       return;
     }
     const bName = BANK_NAMES[bankIndex] || `Banco ${bankIndex}`;
@@ -12553,7 +12630,7 @@ function exportCurrentPatchSyx() {
 
   function scanAllRamBanks() {
     if (!selectedOutput) {
-      alert('Collega prima una porta MIDI Output nelle impostazioni in alto!');
+      uiAlert('Collega prima una porta MIDI Output nelle impostazioni in alto!');
       return;
     }
     let cur = 0;
@@ -12621,12 +12698,12 @@ function exportCurrentPatchSyx() {
     }
   }
 
-  function resetBankNamesToFactory() {
+  async function resetBankNamesToFactory() {
     const textarea = document.getElementById('bankNamesTextarea');
     if (!textarea) return;
     const bankIndex = parseInt(textarea.dataset.bankIndex, 10) || 0;
     const bName = BANK_NAMES[bankIndex] || `Banco ${bankIndex}`;
-    if (confirm(`Ripristinare i nomi predefiniti per il banco ${bName}?`)) {
+    if (await uiConfirm(`Ripristinare i nomi predefiniti per il banco ${bName}?`)) {
       localStorage.removeItem(`virusTiSnow_bank_${bankIndex}`);
       const defaultNames = VIRUS_FACTORY_BANKS[bankIndex] || [];
       const lines = [];
@@ -13289,7 +13366,7 @@ function exportCurrentPatchSyx() {
     document.getElementById('frontBtnFetchCurrent')?.addEventListener('click', (e) => {
       e.stopPropagation();
       if (!selectedOutput) {
-        alert('Collega prima una porta MIDI Output in alto per comunicare col Virus TI!');
+        uiAlert('Collega prima una porta MIDI Output in alto per comunicare col Virus TI!');
         return;
       }
       const frontStatusEl = document.getElementById('frontScanStatus');
@@ -13304,7 +13381,7 @@ function exportCurrentPatchSyx() {
     document.getElementById('frontBtnScanBank')?.addEventListener('click', (e) => {
       e.stopPropagation();
       if (!selectedOutput) {
-        alert('Collega prima una porta MIDI Output in alto per scansionare il Virus!');
+        uiAlert('Collega prima una porta MIDI Output in alto per scansionare il Virus!');
         return;
       }
       const fBankSel = document.getElementById('frontBankSelect');
@@ -13370,6 +13447,15 @@ function exportCurrentPatchSyx() {
     const snowPos = (bank, prog) => ({ rom: bank >= 4, n: (bank % 4) * 2 + (prog >= 64 ? 1 : 0) + 1, p64: prog % 64, onSnow: bank < 8 });
     const midiPos = (rom, n, p64) => ({ bank: (rom ? 4 : 0) + Math.floor((n - 1) / 2), prog: ((n - 1) % 2) * 64 + p64 });
     const goSnow = (rom, n, p64) => { const m = midiPos(rom, n, p64); changePartSound(currentPartIndex || 0, m.bank, m.prog, true); };
+
+    // messaggio temporaneo sulla riga grande dell'LCD, poi torna alla schermata corrente
+    let flashTimer = 0;
+    const lcdFlash = (a, b, ms = 1300) => {
+      const big1 = document.getElementById('frontLcdBankProg'), big2 = document.getElementById('frontLcdPatchName');
+      if (big1) big1.textContent = a; if (big2) big2.textContent = b;
+      clearTimeout(flashTimer);
+      flashTimer = setTimeout(() => { if (panel.state === 'play') updateVirusSnowFrontPanel(currentPartIndex || 0); else render(); }, ms);
+    };
 
     const consumeShift = () => { const s = panel.shift; if (s) { panel.shift = false; } return s; };
     const toPlay = () => { panel.state = 'play'; panel.menu = null; panel.sel = 0; updateVirusSnowFrontPanel(currentPartIndex || 0); };
@@ -13471,6 +13557,7 @@ function exportCurrentPatchSyx() {
         }
         case 'frontBtnParamPrev': case 'frontBtnParamNext':
           if (panel.state === 'menu') { panel.sel = (panel.sel + (id === 'frontBtnParamNext' ? 1 : 2)) % 3; render(); }
+          else lcdFlash('EDIT?', 'EDIT/SHIFT + MENU');
           return;
         case 'frontBtnMulti': document.getElementById('btnTabMultipart')?.click(); return;
         case 'frontBtnConfig': document.getElementById('btnSettings')?.click(); return;
@@ -13541,15 +13628,15 @@ function exportCurrentPatchSyx() {
         activeNotes.clear();
         activeAudioVoices.forEach((v, k) => stopWebAudioNote(k));
         activeAudioVoices.clear();
-        setLastAction('PANIC: ALL SOUNDS OFF'); render(); return;
+        setLastAction('PANIC: ALL SOUNDS OFF'); lcdFlash('PANIC', 'ALL NOTES OFF'); return;
       }
       const now = Date.now();
       tapTimes = tapTimes.filter(t => now - t < 2500); tapTimes.push(now);
       if (tapTimes.length >= 2) {
         const avg = (tapTimes[tapTimes.length - 1] - tapTimes[0]) / (tapTimes.length - 1);
         const bpm = Math.round(60000 / avg);
-        if (bpm >= 40 && bpm <= 240) { window.snowTapBpm = bpm; setLastAction(`Tap tempo: ${bpm} BPM`); }
-      } else setLastAction('Tap tempo: continua a battere');
+        if (bpm >= 40 && bpm <= 240) { window.snowTapBpm = bpm; setLastAction(`Tap tempo: ${bpm} BPM`); lcdFlash('TEMPO', `${bpm} BPM`); }
+      } else { setLastAction('Tap tempo: continua a battere'); lcdFlash('TAP', 'BATTI IL TEMPO…'); }
     });
 
     // ---- AUDITION: suona C3 finche' premuto; tenuto a lungo resta in latch, ripremi per fermare
@@ -13704,7 +13791,7 @@ function exportCurrentPatchSyx() {
       setLastAction('connect midi output first');
       return;
     }
-    for (let ch = 1; ch <= 16; ch++) {
+    for (let ch = 0; ch < 16; ch++) {
       sendCC(ch, 120, 0); // All Sound Off
       sendCC(ch, 123, 0); // All Notes Off
     }
@@ -13724,11 +13811,11 @@ function exportCurrentPatchSyx() {
     const nameInput = document.getElementById('patchName');
     const name = nameInput.value.trim();
     if (!name){
-      alert('enter a patch name');
+      uiAlert('enter a patch name');
       return;
     }
     if (!window.lastReceivedDump) {
-      alert('Nessun Dump ricevuto! Invia prima un Single Dump dal synth premendo STORE.');
+      uiAlert('Nessun Dump ricevuto! Invia prima un Single Dump dal synth premendo STORE.');
       return;
     }
     const lib = loadLibrary();
@@ -13742,11 +13829,11 @@ function exportCurrentPatchSyx() {
     const nameInput = document.getElementById('multiName');
     const name = nameInput.value.trim();
     if (!name){
-      alert('enter a multi preset name');
+      uiAlert('enter a multi preset name');
       return;
     }
     if (!selectedOutput) {
-      alert('MIDI Output non connesso!');
+      uiAlert('MIDI Output non connesso!');
       return;
     }
     document.getElementById('midi-debug').textContent = '🔥 MULTI FETCH: Richiesta Part 1...';
@@ -13759,9 +13846,9 @@ function exportCurrentPatchSyx() {
     requestDump(0);
   });
 
-  function startBankOperation(mode) {
+  async function startBankOperation(mode) {
     if (!selectedOutput) {
-      alert('MIDI Output non connesso!');
+      uiAlert('MIDI Output non connesso!');
       return;
     }
     const type = document.getElementById('bankTypeSelect').value;
@@ -13777,7 +13864,7 @@ function exportCurrentPatchSyx() {
       ? `Vuoi estrarre e SALVARE nella libreria tutte le 128 patch dal banco ${bankName}?`
       : `Vuoi LEGGERE tutte le 128 patch dal banco ${bankName} senza salvarle?`;
 
-    if (confirm(msg)) {
+    if (await uiConfirm(msg)) {
       document.getElementById('midi-debug').textContent = `🔥 BANK ${mode.toUpperCase()}: Avvio richiesta ${bankName}...`;
       if (mode === 'read') {
         const list = document.getElementById('synthBankList');
@@ -15640,7 +15727,7 @@ function exportCurrentPatchSyx() {
         }
 
         if (canPlay && sData.active) {
-          const note = sData.note;
+          const note = Math.max(0, Math.min(127, sData.note + (this.transpose || 0)));
           const vel = sData.velocity || 100;
           const stepMs = this.getStepMs();
           const gateMs = Math.max(25, (stepMs * (trk.gatePercent / 100)) - 10);
@@ -15673,6 +15760,42 @@ function exportCurrentPatchSyx() {
       }
 
       this.currentStep = (this.currentStep + 1) % 64;
+      if (this.onStep) this.onStep(this.currentStep);
+    },
+
+    // ---- memoria pattern (P01..P64) usata dalla SONG
+    transpose: 0,
+    onStep: null,
+    PATTERN_KEY: 'virusTiSnow_seqPatterns',
+    loadPatternBank() { try { return JSON.parse(localStorage.getItem(this.PATTERN_KEY) || '{}'); } catch (e) { return {}; } },
+    cycleLength() { return Math.max(...this.tracks.map(t => t.length)); },
+    snapshot() {
+      return this.tracks.map(t => ({ length: t.length, gatePercent: t.gatePercent, muted: t.muted,
+        steps: t.steps.map(st => ({ active: st.active, note: st.note, velocity: st.velocity, tie: st.tie })) }));
+    },
+    applySnapshot(snap) {
+      this.tracks.forEach((t, i) => {
+        if (!snap[i]) return;
+        t.activeNotesPlaying.forEach(n => this.rawStopTrack(t.ch, n));
+        t.activeNotesPlaying.clear();
+        t.length = snap[i].length; t.gatePercent = snap[i].gatePercent; t.muted = !!snap[i].muted;
+        snap[i].steps.forEach((st, k) => Object.assign(t.steps[k], st));
+      });
+      this.renderPadsForCurrentPage();
+      this.updateUI();
+    },
+    savePattern(slot) {
+      const bank = this.loadPatternBank();
+      bank[slot] = this.snapshot();
+      localStorage.setItem(this.PATTERN_KEY, JSON.stringify(bank));
+      setLastAction(`Pattern salvato in P${String(slot).padStart(2, '0')}`);
+    },
+    recallPattern(slot) {
+      const snap = this.loadPatternBank()[slot];
+      if (!snap) { setLastAction(`P${String(slot).padStart(2, '0')} vuoto`); return false; }
+      this.applySnapshot(snap);
+      setLastAction(`Pattern P${String(slot).padStart(2, '0')} caricato`);
+      return true;
     },
 
     recordStep(noteNumber, velocity) {
@@ -16747,6 +16870,30 @@ function exportCurrentPatchSyx() {
     addPresetBtn('clear trk', () => seqEngine.presetClearTrack(), 'Svuota la traccia attiva');
     addPresetBtn('clear all 4', () => seqEngine.presetClearAll(), 'Svuota tutte e 4 le tracce');
 
+    // memoria pattern per la SONG
+    const patWrap = document.createElement('div');
+    patWrap.style.cssText = 'display: flex; gap: 6px; align-items: center; margin-left: auto;';
+    const patLbl = document.createElement('span');
+    patLbl.textContent = 'PATTERN:';
+    patLbl.style.cssText = 'font-family: monospace; font-size: 11px; font-weight: 800; letter-spacing: 0.08em;';
+    const patSel = document.createElement('select');
+    patSel.id = 'seqPatternSlot';
+    const refreshPatSel = () => {
+      const bank = seqEngine.loadPatternBank(); const cur = patSel.value || '1';
+      patSel.innerHTML = '';
+      for (let i = 1; i <= 64; i++) {
+        const o = document.createElement('option');
+        o.value = i; o.textContent = `P${String(i).padStart(2, '0')}${bank[i] ? ' ●' : ''}`;
+        patSel.appendChild(o);
+      }
+      patSel.value = cur;
+    };
+    refreshPatSel();
+    patWrap.append(patLbl, patSel);
+    presetsGroup.appendChild(patWrap);
+    addPresetBtn('salva in', () => { seqEngine.savePattern(+patSel.value); refreshPatSel(); }, 'Salva le 4 tracce attuali nello slot pattern scelto (usato dalla SONG)');
+    addPresetBtn('carica', () => seqEngine.recallPattern(+patSel.value), 'Carica nel sequencer il pattern dello slot scelto');
+
     presetsBar.appendChild(presetsGroup);
 
     innerLayout.appendChild(presetsBar);
@@ -16820,12 +16967,10 @@ function exportCurrentPatchSyx() {
       btn.textContent = lbl;
       btn.style.padding = '4px 12px';
       btn.style.width = 'auto';
-      if (idx === currentPage) {
-        btn.style.backgroundColor = '#ff9900';
-        btn.style.color = '#000';
-      }
+      if (idx === currentPage) btn.classList.add('active-view');
       btn.addEventListener('click', () => {
         currentPage = idx;
+        pageBtns.forEach((b, i) => b.classList.toggle('active-view', i === idx));
         pageBtns.forEach((b, i) => {
           if (i === currentPage) {
             b.style.backgroundColor = '#ff9900';
@@ -16860,7 +17005,7 @@ function exportCurrentPatchSyx() {
 
     for(let i=0; i<64; i++){
       const display = document.createElement('div');
-      display.className = 'chassis-screen-recess';
+      display.className = 'chassis-screen-recess song-slot';
       display.style.width = 'auto'; // .chassis-screen-recess forza 480px: qui deve seguire la colonna
       display.style.display = 'flex';
       display.style.flexDirection = 'column';
@@ -16930,6 +17075,7 @@ function exportCurrentPatchSyx() {
       row.appendChild(patternSel);
       row.appendChild(repsSel);
       row.appendChild(transpSel);
+      [patternSel, repsSel, transpSel].forEach(sel => sel.addEventListener('change', () => saveSongState()));   // salvataggio automatico
       display.appendChild(row);
 
       if (i >= 16) display.style.display = 'none';
@@ -16980,24 +17126,14 @@ function exportCurrentPatchSyx() {
     playBtn.textContent = 'PLAY SONG';
     playBtn.style.padding = '0 20px';
     playBtn.style.width = 'auto';
-    playBtn.addEventListener('click', () => { 
-      playBtn.style.backgroundColor = '#ff9900'; 
-      playBtn.style.color = '#000'; 
-      setTimeout(()=> { playBtn.style.backgroundColor = 'var(--section-bg)'; playBtn.style.color = 'var(--text-main)'; }, 200); 
-      if(window.sendCC) window.sendCC(1, 115, 127); 
-    });
+    playBtn.addEventListener('click', () => songPlayer.play());
 
     const stopBtn = document.createElement('button');
     stopBtn.className = 'chassis-page-btn';
     stopBtn.textContent = 'STOP';
     stopBtn.style.padding = '0 20px';
     stopBtn.style.width = 'auto';
-    stopBtn.addEventListener('click', () => { 
-      stopBtn.style.backgroundColor = '#ff9900'; 
-      stopBtn.style.color = '#000'; 
-      setTimeout(()=> { stopBtn.style.backgroundColor = 'var(--section-bg)'; stopBtn.style.color = 'var(--text-main)'; }, 200); 
-      if(window.sendCC) window.sendCC(1, 116, 127); 
-    });
+    stopBtn.addEventListener('click', () => songPlayer.stop());
 
     const loopBtn = document.createElement('button');
     loopBtn.className = 'chassis-page-btn';
@@ -17007,10 +17143,64 @@ function exportCurrentPatchSyx() {
     let isLoop = false;
     loopBtn.addEventListener('click', () => {
       isLoop = !isLoop;
-      loopBtn.style.backgroundColor = isLoop ? '#ff9900' : 'var(--section-bg)';
-      loopBtn.style.color = isLoop ? '#000' : 'var(--text-main)';
-      if(window.sendCC) window.sendCC(1, 117, isLoop ? 127 : 0);
+      loopBtn.classList.toggle('active', isLoop);
     });
+
+    // Riproduzione SONG: scorre gli slot (pattern P01..P64 salvati nel SEQ) x ripetizioni, con trasposizione
+    const songPlayer = {
+      playing: false, idx: -1, repLeft: 0, startedAt: 0,
+      chain() {
+        return slotWrappers.map((w, i) => ({ i, pat: w._patSel.value, rep: +w._repSel.value || 1, trn: +w._trnSel.value || 0 }))
+          .filter(sl => sl.pat !== 'OFF');
+      },
+      mark(i) {
+        slotWrappers.forEach((w, k) => w.classList.toggle('song-slot-playing', k === i));
+        if (i >= 0) {
+          const page = Math.floor(i / 16);
+          if (pageBtns[page] && slotWrappers[i].style.display === 'none') pageBtns[page].click();
+        }
+      },
+      play() {
+        const chain = this.chain();
+        const bank = seqEngine.loadPatternBank();
+        const missing = chain.filter(sl => !bank[sl.pat]).map(sl => 'P' + String(sl.pat).padStart(2, '0'));
+        if (!chain.length) { uiAlert('La song è vuota: scegli un pattern (P01…) in almeno uno slot.'); return; }
+        if (missing.length === chain.length) { uiAlert(`Nessuno dei pattern usati è salvato (${[...new Set(missing)].join(', ')}).\nNel SEQ prepara le tracce e premi «salva in» sullo slot pattern.`); return; }
+        this.list = chain.filter(sl => bank[sl.pat]);
+        this.playing = true; this.idx = -1;
+        this.next();
+        playBtn.classList.add('active');
+        seqEngine.onStep = (step) => {
+          if (!this.playing) return;
+          if (step % seqEngine.cycleLength() === 0 && --this.repLeft <= 0) this.next();
+        };
+        seqEngine.currentStep = 0;
+        if (!seqEngine.running) seqEngine.start();
+      },
+      next() {
+        this.idx++;
+        if (this.idx >= this.list.length) {
+          if (!isLoop) { this.stop(); setLastAction('Song finita'); return; }
+          this.idx = 0;
+        }
+        const sl = this.list[this.idx];
+        seqEngine.recallPattern(sl.pat);
+        seqEngine.transpose = sl.trn;
+        seqEngine.currentStep = 0;
+        this.repLeft = sl.rep;
+        this.mark(sl.i);
+        setLastAction(`Song: STP ${String(sl.i + 1).padStart(2, '0')} → P${String(sl.pat).padStart(2, '0')} x${sl.rep}${sl.trn ? ` (${sl.trn > 0 ? '+' : ''}${sl.trn})` : ''}`);
+      },
+      stop() {
+        this.playing = false;
+        seqEngine.onStep = null;
+        seqEngine.transpose = 0;
+        if (seqEngine.running) seqEngine.stop();
+        this.mark(-1);
+        playBtn.classList.remove('active');
+      },
+    };
+    window.songPlayer = songPlayer;
 
     const saveBtn = document.createElement('button');
     saveBtn.className = 'chassis-page-btn';
@@ -17028,8 +17218,8 @@ function exportCurrentPatchSyx() {
     clearBtn.textContent = 'CLEAR';
     clearBtn.style.padding = '0 16px';
     clearBtn.style.width = 'auto';
-    clearBtn.addEventListener('click', () => {
-      if (confirm('Clear all song steps?')) {
+    clearBtn.addEventListener('click', async () => {
+      if (await uiConfirm('Svuotare tutti gli step della song?')) {
         slotWrappers.forEach(w => {
           w._patSel.value = 'OFF';
           w._repSel.value = '1';
@@ -17191,15 +17381,16 @@ function exportCurrentPatchSyx() {
   let fxCanvasesInitialized = false;
 
   function sendFxCC(cc, val) {
+    if (Number.isNaN(cc)) { setLastAction('Parametro Page B: non controllabile via CC (usa il Virus o Virus Control)'); return; }
     if (!selectedOutput) return;
     if (window.fxTargetPart === -1) {
       for (let p = 0; p < NUM_PARTS; p++) {
-        const ch = multiParts[p] ? multiParts[p].channel : p;
+        const ch = multiParts[p]?.values?.channel ?? p;   // il canale sta in values.channel
         sendCC(ch, cc, val);
       }
     } else {
       const p = Math.max(0, Math.min(NUM_PARTS - 1, window.fxTargetPart || 0));
-      const ch = multiParts[p] ? multiParts[p].channel : p;
+      const ch = multiParts[p]?.values?.channel ?? p;
       sendCC(ch, cc, val);
     }
   }
@@ -17246,7 +17437,7 @@ function exportCurrentPatchSyx() {
             <canvas id="fxTapeCanvas" class="fx-scope-canvas" height="64"></canvas>
 
             <div class="fx-knobs-row">
-              <div class="fx-rack-knob-unit" data-cc="88" data-min="0" data-max="127" data-val="48" title="Delay Time (CC 88)">
+              <div class="fx-rack-knob-unit" data-cc="114" data-min="0" data-max="127" data-val="48" title="Delay Time (CC 114)">
                 <span class="fx-knob-label">TIME</span>
                 <div class="chassis-knob-outer fx-rack-knob" style="width: 46px; height: 46px; cursor: grab;">
                   <div class="chassis-knob-inner" style="width: 40px; height: 40px;">
@@ -17258,7 +17449,7 @@ function exportCurrentPatchSyx() {
                 <span class="fx-knob-val">375ms</span>
               </div>
 
-              <div class="fx-rack-knob-unit" data-cc="90" data-min="0" data-max="127" data-val="55" title="Delay Feedback (CC 90)">
+              <div class="fx-rack-knob-unit" data-cc="115" data-min="0" data-max="127" data-val="55" title="Delay Feedback (CC 115)">
                 <span class="fx-knob-label">FEEDBACK</span>
                 <div class="chassis-knob-outer fx-rack-knob" style="width: 46px; height: 46px; cursor: grab;">
                   <div class="chassis-knob-inner" style="width: 40px; height: 40px;">
@@ -17270,8 +17461,8 @@ function exportCurrentPatchSyx() {
                 <span class="fx-knob-val">55%</span>
               </div>
 
-              <div class="fx-rack-knob-unit" data-cc="91" data-min="0" data-max="127" data-val="40" title="Delay Mix (CC 91)">
-                <span class="fx-knob-label">DELAY MIX</span>
+              <div class="fx-rack-knob-unit" data-cc="113" data-min="0" data-max="127" data-val="40" title="Effect Send (CC 113)">
+                <span class="fx-knob-label">SEND</span>
                 <div class="chassis-knob-outer fx-rack-knob" style="width: 46px; height: 46px; cursor: grab;">
                   <div class="chassis-knob-inner" style="width: 40px; height: 40px;">
                     <div class="chassis-knob-top" style="width: 30px; height: 30px;">
@@ -17282,7 +17473,7 @@ function exportCurrentPatchSyx() {
                 <span class="fx-knob-val">31%</span>
               </div>
 
-              <div class="fx-rack-knob-unit" data-cc="92" data-min="0" data-max="127" data-val="65" title="Reverb Decay (CC 92)">
+              <div class="fx-rack-knob-unit" data-cc="116" data-min="0" data-max="127" data-val="65" title="Reverb Time (CC 116)">
                 <span class="fx-knob-label">REV DECAY</span>
                 <div class="chassis-knob-outer fx-rack-knob" style="width: 46px; height: 46px; cursor: grab;">
                   <div class="chassis-knob-inner" style="width: 40px; height: 40px;">
@@ -17294,8 +17485,8 @@ function exportCurrentPatchSyx() {
                 <span class="fx-knob-val">3.2s</span>
               </div>
 
-              <div class="fx-rack-knob-unit" data-cc="94" data-min="0" data-max="127" data-val="35" title="Reverb Mix (CC 94)">
-                <span class="fx-knob-label">REV MIX</span>
+              <div class="fx-rack-knob-unit" data-cc="117" data-min="0" data-max="127" data-val="35" title="Reverb Size (CC 117)">
+                <span class="fx-knob-label">SIZE</span>
                 <div class="chassis-knob-outer fx-rack-knob" style="width: 46px; height: 46px; cursor: grab;">
                   <div class="chassis-knob-inner" style="width: 40px; height: 40px;">
                     <div class="chassis-knob-top" style="width: 30px; height: 30px;">
@@ -17328,8 +17519,8 @@ function exportCurrentPatchSyx() {
             </div>
 
             <div class="fx-knobs-row">
-              <div class="fx-rack-knob-unit" data-cc="75" data-min="0" data-max="127" data-val="32" title="Distortion Drive (CC 75)">
-                <span class="fx-knob-label">DRIVE</span>
+              <div class="fx-rack-knob-unit" data-cc="36" data-min="0" data-max="127" data-val="32" title="Saturation / Osc Volume (CC 36)">
+                <span class="fx-knob-label">SATUR</span>
                 <div class="chassis-knob-outer fx-rack-knob" style="width: 46px; height: 46px; cursor: grab;">
                   <div class="chassis-knob-inner" style="width: 40px; height: 40px;">
                     <div class="chassis-knob-top" style="width: 30px; height: 30px;">
@@ -17340,7 +17531,7 @@ function exportCurrentPatchSyx() {
                 <span class="fx-knob-val" id="fxTubeDriveVal">32</span>
               </div>
 
-              <div class="fx-rack-knob-unit" data-cc="72" data-min="0" data-max="5" data-val="1" title="Curve Type (CC 72)">
+              <div class="fx-rack-knob-unit" data-cc="49" data-min="0" data-max="14" data-val="1" title="Saturation Curve (CC 49)">
                 <span class="fx-knob-label">CURVE</span>
                 <div class="chassis-knob-outer fx-rack-knob" style="width: 46px; height: 46px; cursor: grab;">
                   <div class="chassis-knob-inner" style="width: 40px; height: 40px;">
@@ -17352,7 +17543,7 @@ function exportCurrentPatchSyx() {
                 <span class="fx-knob-val" id="fxTubeCurveVal">TUBE</span>
               </div>
 
-              <div class="fx-rack-knob-unit" data-cc="76" data-min="0" data-max="127" data-val="70" title="Distortion Tone (CC 76)">
+              <div class="fx-rack-knob-unit fx-knob-na" data-cc="" data-min="0" data-max="127" data-val="70" title="Distortion Tone: parametro Page B, non controllabile via CC">
                 <span class="fx-knob-label">TONE</span>
                 <div class="chassis-knob-outer fx-rack-knob" style="width: 46px; height: 46px; cursor: grab;">
                   <div class="chassis-knob-inner" style="width: 40px; height: 40px;">
@@ -17364,7 +17555,7 @@ function exportCurrentPatchSyx() {
                 <span class="fx-knob-val">70</span>
               </div>
 
-              <div class="fx-rack-knob-unit" data-cc="77" data-min="0" data-max="127" data-val="50" title="Dry / Wet Mix">
+              <div class="fx-rack-knob-unit fx-knob-na" data-cc="" data-min="0" data-max="127" data-val="50" title="Distortion Mix: parametro Page B, non controllabile via CC">
                 <span class="fx-knob-label">DRY/WET</span>
                 <div class="chassis-knob-outer fx-rack-knob" style="width: 46px; height: 46px; cursor: grab;">
                   <div class="chassis-knob-inner" style="width: 40px; height: 40px;">
@@ -17392,7 +17583,7 @@ function exportCurrentPatchSyx() {
             <canvas id="fxStereoCanvas" class="fx-scope-canvas" height="64"></canvas>
 
             <div class="fx-knobs-row">
-              <div class="fx-rack-knob-unit" data-cc="85" data-min="0" data-max="127" data-val="60" title="Chorus Depth (CC 85)">
+              <div class="fx-rack-knob-unit" data-cc="107" data-min="0" data-max="127" data-val="60" title="Chorus Depth (CC 107)">
                 <span class="fx-knob-label">CHORUS DEPTH</span>
                 <div class="chassis-knob-outer fx-rack-knob" style="width: 46px; height: 46px; cursor: grab;">
                   <div class="chassis-knob-inner" style="width: 40px; height: 40px;">
@@ -17404,7 +17595,7 @@ function exportCurrentPatchSyx() {
                 <span class="fx-knob-val">60%</span>
               </div>
 
-              <div class="fx-rack-knob-unit" data-cc="86" data-min="0" data-max="127" data-val="35" title="Chorus Rate (CC 86)">
+              <div class="fx-rack-knob-unit" data-cc="106" data-min="0" data-max="127" data-val="35" title="Chorus Rate (CC 106)">
                 <span class="fx-knob-label">RATE</span>
                 <div class="chassis-knob-outer fx-rack-knob" style="width: 46px; height: 46px; cursor: grab;">
                   <div class="chassis-knob-inner" style="width: 40px; height: 40px;">
@@ -17416,7 +17607,7 @@ function exportCurrentPatchSyx() {
                 <span class="fx-knob-val">1.2Hz</span>
               </div>
 
-              <div class="fx-rack-knob-unit" data-cc="87" data-min="0" data-max="127" data-val="45" title="Chorus / Phaser Mix (CC 87)">
+              <div class="fx-rack-knob-unit" data-cc="104" data-min="0" data-max="127" data-val="45" title="Chorus Mix (CC 104)">
                 <span class="fx-knob-label">MOD MIX</span>
                 <div class="chassis-knob-outer fx-rack-knob" style="width: 46px; height: 46px; cursor: grab;">
                   <div class="chassis-knob-inner" style="width: 40px; height: 40px;">
@@ -17428,7 +17619,7 @@ function exportCurrentPatchSyx() {
                 <span class="fx-knob-val">35%</span>
               </div>
 
-              <div class="fx-rack-knob-unit" data-cc="96" data-min="0" data-max="127" data-val="90" title="Stereo Spread (CC 96)">
+              <div class="fx-rack-knob-unit" data-cc="99" data-min="0" data-max="127" data-val="90" title="Unison Spread (CC 99)">
                 <span class="fx-knob-label">SPREAD</span>
                 <div class="chassis-knob-outer fx-rack-knob" style="width: 46px; height: 46px; cursor: grab;">
                   <div class="chassis-knob-inner" style="width: 40px; height: 40px;">
@@ -17472,7 +17663,7 @@ function exportCurrentPatchSyx() {
                 <span class="fx-knob-val">64</span>
               </div>
 
-              <div class="fx-rack-knob-unit" data-cc="41" data-min="0" data-max="127" data-val="32" title="Macro 2: Filter Resonance (CC 41)">
+              <div class="fx-rack-knob-unit" data-cc="42" data-min="0" data-max="127" data-val="32" title="Macro 2: Filter Resonance (CC 42)">
                 <span class="fx-knob-label">2: RESO</span>
                 <div class="chassis-knob-outer fx-rack-knob" style="width: 46px; height: 46px; cursor: grab;">
                   <div class="chassis-knob-inner" style="width: 40px; height: 40px;">
@@ -17482,8 +17673,8 @@ function exportCurrentPatchSyx() {
                 <span class="fx-knob-val">32</span>
               </div>
 
-              <div class="fx-rack-knob-unit" data-cc="75" data-min="0" data-max="127" data-val="32" title="Macro 3: Tube Drive (CC 75)">
-                <span class="fx-knob-label">3: DRIVE</span>
+              <div class="fx-rack-knob-unit" data-cc="36" data-min="0" data-max="127" data-val="32" title="Macro 3: Saturation (CC 36)">
+                <span class="fx-knob-label">3: SATUR</span>
                 <div class="chassis-knob-outer fx-rack-knob" style="width: 46px; height: 46px; cursor: grab;">
                   <div class="chassis-knob-inner" style="width: 40px; height: 40px;">
                     <div class="chassis-knob-top" style="width: 30px; height: 30px;"><div class="chassis-knob-indicator-container" style="transform: rotate(-60deg);"><div class="chassis-knob-indicator" style="height: 10px; width: 2px; background: #f97316;"></div></div></div>
@@ -17492,8 +17683,8 @@ function exportCurrentPatchSyx() {
                 <span class="fx-knob-val">32</span>
               </div>
 
-              <div class="fx-rack-knob-unit" data-cc="94" data-min="0" data-max="127" data-val="35" title="Macro 4: Reverb Mix (CC 94)">
-                <span class="fx-knob-label">4: REVERB</span>
+              <div class="fx-rack-knob-unit" data-cc="113" data-min="0" data-max="127" data-val="35" title="Macro 4: Effect Send (CC 113)">
+                <span class="fx-knob-label">4: FX SEND</span>
                 <div class="chassis-knob-outer fx-rack-knob" style="width: 46px; height: 46px; cursor: grab;">
                   <div class="chassis-knob-inner" style="width: 40px; height: 40px;">
                     <div class="chassis-knob-top" style="width: 30px; height: 30px;"><div class="chassis-knob-indicator-container" style="transform: rotate(-55deg);"><div class="chassis-knob-indicator" style="height: 10px; width: 2px;"></div></div></div>
@@ -17527,16 +17718,16 @@ function exportCurrentPatchSyx() {
       const knob = unit.querySelector('.fx-rack-knob');
       const ind = unit.querySelector('.chassis-knob-indicator-container');
       const valEl = unit.querySelector('.fx-knob-val');
-      const cc = parseInt(unit.dataset.cc, 10);
+      const cc = unit.dataset.cc === '' ? NaN : parseInt(unit.dataset.cc, 10);   // NaN = Page B, solo visivo
       const minVal = parseInt(unit.dataset.min, 10) || 0;
       const maxVal = parseInt(unit.dataset.max, 10) || 127;
 
       const fxFormat = v => {
-        if (cc === 72) return ['OFF', 'TUBE', 'HARD', 'FOLD', 'CRUSH', 'RECT'][v] || String(v);
-        if (cc === 88) return `${Math.round(20 + v * 7.5)}ms`;
-        if (cc === 92) return `${(0.2 + v * 0.08).toFixed(1)}s`;
-        if (cc === 86) return `${(0.1 + v * 0.04).toFixed(1)}Hz`;
-        if (cc === 96) return v > 64 ? 'WIDE' : 'NARROW';
+        if (cc === 49) return ['OFF', 'LIGHT', 'SOFT', 'MIDDLE', 'HARD', 'DIGITAL', 'SHAPER', 'RECTIF', 'BITRED', 'RATERED', 'RATE+F', 'LOWPASS', 'LOW+F', 'HIGHPASS', 'HIGH+F'][v] || String(v);
+        if (cc === 114) return `${Math.round(20 + v * 7.5)}ms`;
+        if (cc === 116) return `${(0.2 + v * 0.08).toFixed(1)}s`;
+        if (cc === 106) return `${(0.1 + v * 0.04).toFixed(1)}Hz`;
+        if (cc === 36) return v < 64 ? `${v - 64}` : `SAT +${v - 64}`;
         return String(v);
       };
 
@@ -17549,7 +17740,7 @@ function exportCurrentPatchSyx() {
         // Send MIDI CC
         sendFxCC(cc, newVal);
         // Special visual reaction for Vacuum Tube Drive
-        if (cc === 75) {
+        if (cc === 36) {
           const glow = document.getElementById('tubeGlow');
           if (glow) {
             const intensity = 0.3 + (newVal / 127) * 0.7;
