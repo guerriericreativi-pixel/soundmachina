@@ -7097,6 +7097,21 @@
   .seq-trk-icon .kbd-part-icon svg { width: 16px !important; height: 16px !important; }
   .seq-trk-mute-btn, .seq-trk-solo-btn { min-width: 28px !important; }
   .seq-trk-name { overflow: hidden; text-overflow: ellipsis; text-transform: none !important; }
+  /* SONG */
+  .song-top { width: 100%; display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
+  .song-top > div:last-child { display: flex; flex-wrap: wrap; gap: 8px; }
+  .song-slot { flex-direction: column; gap: 6px; padding: 10px 12px; border-radius: 5px; border: 1px solid rgba(0,0,0,0.14); background: rgba(255,255,255,0.45); box-sizing: border-box; }
+  html[data-skin="elektron"] .song-slot { border-color: rgba(255,255,255,0.08); background: rgba(0,0,0,0.3); }
+  .song-slot.is-empty { opacity: 0.55; }
+  .song-slot.is-missing { border-color: #d97706; }
+  .song-slot.song-slot-playing { outline: 2px solid currentColor; opacity: 1; }
+  .song-slot-head { display: flex; justify-content: space-between; font: 800 11px/1 'Inter', sans-serif; letter-spacing: 0.08em; }
+  .song-slot-state { order: 2; font-weight: 600; letter-spacing: 0.02em; opacity: 0.75; }
+  .song-slot.is-missing .song-slot-state { color: #d97706; opacity: 1; }
+  .song-slot-row { display: flex; gap: 8px; }
+  .song-pages .chassis-page-btn.active-view { outline: 2px solid currentColor !important; outline-offset: -2px; font-weight: 900 !important; }
+  .song-field { display: flex; flex-direction: column; gap: 3px; flex: 1; min-width: 0; font: 700 9px/1 'Inter', sans-serif; letter-spacing: 0.08em; opacity: 0.85; }
+  .song-field select { width: 100%; }
 </style>
 </head>
 <body>
@@ -7990,7 +8005,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
     if (rail) rail.style.display = show ? 'grid' : 'none';
     if (strip) strip.style.display = show ? 'flex' : 'none';
     // in PANEL e SINGLE stato/azioni/guida MIDI stanno dietro il tasto MIDI della scocca
-    document.body.classList.toggle('panel-view', ['snow', 'single', 'multi', 'fx', 'patch', 'arp', 'seq'].includes(view));
+    document.body.classList.toggle('panel-view', ['snow', 'single', 'multi', 'fx', 'patch', 'arp', 'seq', 'song'].includes(view));
     if (!show && diag) diag.classList.add('hidden');
   }
 
@@ -17615,11 +17630,12 @@ function exportCurrentPatchSyx() {
 
     // Page Buttons for SONG
     const pageContainer = document.createElement('div');
+    pageContainer.className = 'song-pages';
     pageContainer.style.display = 'flex';
     pageContainer.style.gap = '10px';
     pageContainer.style.marginBottom = '10px';
 
-    const pages = ['1:16', '17:32', '33:48', '49:64'];
+    const pages = ['1–16', '17–32', '33–48', '49–64'];
     const pageBtns = [];
     let currentPage = 0;
 
@@ -17633,15 +17649,6 @@ function exportCurrentPatchSyx() {
       btn.addEventListener('click', () => {
         currentPage = idx;
         pageBtns.forEach((b, i) => b.classList.toggle('active-view', i === idx));
-        pageBtns.forEach((b, i) => {
-          if (i === currentPage) {
-            b.style.backgroundColor = '#ff9900';
-            b.style.color = '#000';
-          } else {
-            b.style.backgroundColor = 'var(--section-bg)';
-            b.style.color = 'var(--text-main)';
-          }
-        });
         slotWrappers.forEach((w, i) => {
           if (i >= currentPage * 16 && i < (currentPage + 1) * 16) {
             w.style.display = 'flex';
@@ -17667,45 +17674,22 @@ function exportCurrentPatchSyx() {
 
     for(let i=0; i<64; i++){
       const display = document.createElement('div');
-      display.className = 'chassis-screen-recess song-slot';
-      display.style.width = 'auto'; // .chassis-screen-recess forza 480px: qui deve seguire la colonna
+      display.className = 'song-slot';
       display.style.display = 'flex';
-      display.style.flexDirection = 'column';
-      display.style.alignItems = 'center';
-      display.style.justifyContent = 'center';
-      display.style.padding = '10px';
-      display.style.height = '90px';
-      display.style.boxSizing = 'border-box';
-      display.style.position = 'relative';
-      display.style.gap = '8px';
 
       const headerRow = document.createElement('div');
-      headerRow.style.display = 'flex';
-      headerRow.style.justifyContent = 'space-between';
-      headerRow.style.width = '100%';
-      headerRow.style.color = 'var(--accent)';
-      headerRow.style.fontFamily = 'monospace';
-      headerRow.style.fontSize = '12px';
-      headerRow.style.fontWeight = 'bold';
-      headerRow.style.borderBottom = '1px dashed var(--accent)';
-      headerRow.style.paddingBottom = '4px';
-      headerRow.style.position = 'relative';
-      headerRow.style.zIndex = '2';
+      headerRow.className = 'song-slot-head';
 
       const stepIdx = document.createElement('div');
-      stepIdx.textContent = 'STP ' + (i+1).toString().padStart(2, '0');
+      stepIdx.textContent = 'SLOT ' + (i+1).toString().padStart(2, '0');
+      const slotState = document.createElement('span'); slotState.className = 'song-slot-state';
+      headerRow.appendChild(slotState); display._state = slotState;
       headerRow.appendChild(stepIdx);
       display.appendChild(headerRow);
 
       const row = document.createElement('div');
-      row.style.display = 'flex';
-      row.style.gap = '10px';
-      row.style.alignItems = 'center';
-      row.style.position = 'relative';
-      row.style.zIndex = '2';
-      row.style.marginTop = '4px';
-
-      const selStyle = "background: transparent; color: var(--accent); border: 1px solid #333; font-family: monospace; font-size: 14px; outline: none; padding: 2px;";
+      row.className = 'song-slot-row';
+      const selStyle = '';
 
       const patternSel = document.createElement('select');
       patternSel.style.cssText = selStyle;
@@ -17734,10 +17718,13 @@ function exportCurrentPatchSyx() {
         transpSel.appendChild(opt);
       }
 
-      row.appendChild(patternSel);
-      row.appendChild(repsSel);
-      row.appendChild(transpSel);
-      [patternSel, repsSel, transpSel].forEach(sel => sel.addEventListener('change', () => saveSongState()));   // salvataggio automatico
+      // ogni menu con la sua etichetta: pattern salvato in SEQ, ripetizioni, trasposizione in semitoni
+      [[patternSel, 'PATTERN'], [repsSel, 'RIPETI'], [transpSel, 'TRASP']].forEach(([sel, lbl]) => {
+        const f = document.createElement('label'); f.className = 'song-field';
+        f.innerHTML = `<span>${lbl}</span>`; sel.setAttribute('aria-label', `Slot ${i + 1}: ${lbl.toLowerCase()}`);
+        f.appendChild(sel); row.appendChild(f);
+      });
+      [patternSel, repsSel, transpSel].forEach(sel => sel.addEventListener('change', () => { saveSongState(); paintSong(); }));   // salvataggio automatico
       display.appendChild(row);
 
       if (i >= 16) display.style.display = 'none';
@@ -17785,27 +17772,28 @@ function exportCurrentPatchSyx() {
 
     const playBtn = document.createElement('button');
     playBtn.className = 'chassis-page-btn';
-    playBtn.textContent = 'PLAY SONG';
+    playBtn.textContent = 'play song';
     playBtn.style.padding = '0 20px';
     playBtn.style.width = 'auto';
     playBtn.addEventListener('click', () => songPlayer.play());
 
     const stopBtn = document.createElement('button');
     stopBtn.className = 'chassis-page-btn';
-    stopBtn.textContent = 'STOP';
+    stopBtn.textContent = 'stop';
     stopBtn.style.padding = '0 20px';
     stopBtn.style.width = 'auto';
     stopBtn.addEventListener('click', () => songPlayer.stop());
 
     const loopBtn = document.createElement('button');
     loopBtn.className = 'chassis-page-btn';
-    loopBtn.textContent = 'LOOP';
+    loopBtn.textContent = 'loop';
     loopBtn.style.padding = '0 20px';
     loopBtn.style.width = 'auto';
     let isLoop = false;
     loopBtn.addEventListener('click', () => {
       isLoop = !isLoop;
       loopBtn.classList.toggle('active', isLoop);
+      paintSong();
     });
 
     // Riproduzione SONG: scorre gli slot (pattern P01..P64 salvati nel SEQ) x ripetizioni, con trasposizione
@@ -17817,6 +17805,7 @@ function exportCurrentPatchSyx() {
       },
       mark(i) {
         slotWrappers.forEach((w, k) => w.classList.toggle('song-slot-playing', k === i));
+        paintSong();
         if (i >= 0) {
           const page = Math.floor(i / 16);
           if (pageBtns[page] && slotWrappers[i].style.display === 'none') pageBtns[page].click();
@@ -17851,7 +17840,7 @@ function exportCurrentPatchSyx() {
         seqEngine.currentStep = 0;
         this.repLeft = sl.rep;
         this.mark(sl.i);
-        setLastAction(`Song: STP ${String(sl.i + 1).padStart(2, '0')} → P${String(sl.pat).padStart(2, '0')} x${sl.rep}${sl.trn ? ` (${sl.trn > 0 ? '+' : ''}${sl.trn})` : ''}`);
+        setLastAction(`Song: slot ${String(sl.i + 1).padStart(2, '0')} → P${String(sl.pat).padStart(2, '0')} x${sl.rep}${sl.trn ? ` (${sl.trn > 0 ? '+' : ''}${sl.trn})` : ''}`);
       },
       stop() {
         this.playing = false;
@@ -17866,18 +17855,18 @@ function exportCurrentPatchSyx() {
 
     const saveBtn = document.createElement('button');
     saveBtn.className = 'chassis-page-btn';
-    saveBtn.textContent = 'SAVE SONG';
+    saveBtn.textContent = 'save song';
     saveBtn.style.padding = '0 20px';
     saveBtn.style.width = 'auto';
     saveBtn.addEventListener('click', () => {
       saveSongState();
-      saveBtn.textContent = 'SAVED ✓';
-      setTimeout(() => { saveBtn.textContent = 'SAVE SONG'; }, 1000);
+      saveBtn.textContent = 'salvata';
+      setTimeout(() => { saveBtn.textContent = 'save song'; }, 1000);
     });
 
     const clearBtn = document.createElement('button');
     clearBtn.className = 'chassis-page-btn';
-    clearBtn.textContent = 'CLEAR';
+    clearBtn.textContent = 'clear';
     clearBtn.style.padding = '0 16px';
     clearBtn.style.width = 'auto';
     clearBtn.addEventListener('click', async () => {
@@ -17888,6 +17877,7 @@ function exportCurrentPatchSyx() {
           w._trnSel.value = '0';
         });
         saveSongState();
+        paintSong();
       }
     });
 
@@ -17896,7 +17886,48 @@ function exportCurrentPatchSyx() {
     controlsContainer.appendChild(loopBtn);
     controlsContainer.appendChild(saveBtn);
     controlsContainer.appendChild(clearBtn);
-    innerLayout.appendChild(controlsContainer);
+
+    // display LCD come nelle altre pagine + trasporto, in cima
+    const topBar = document.createElement('div');
+    topBar.className = 'song-top';
+    topBar.innerHTML = `
+      <div class="arp-lcd-wrap">
+        <div class="virus-snow-lcd-front arp-lcd">
+          <div class="lcd-header-bar"><span class="lcd-badge">SONG</span><span id="songLcdLoop">LOOP OFF</span><span id="songLcdState">STOPPED</span></div>
+          <div class="arp-lcd-main"><span id="songLcdSlot" class="lcd-bank-prog">SLOT --</span><span id="songLcdPat" class="lcd-patch-name">—</span></div>
+          <div class="lcd-footer-bar"><span id="songLcdUsed">0 slot usati</span><span id="songLcdSaved">0 pattern salvati</span></div>
+        </div>
+        <p class="arp-hint" id="songHint">Prima salva dei pattern nella pagina <b>SEQ</b> (menu PATTERN → <b>salva in</b>), poi sceglili negli slot.</p>
+      </div>`;
+    topBar.appendChild(controlsContainer);
+    innerLayout.prepend(topBar);
+    const songKeys = document.createElement('div');
+    songKeys.className = 'chassis-keys';
+    songKeys.innerHTML = `<button type="button" class="chassis-key fp-key" data-midi-key aria-expanded="${document.body.classList.contains('midi-open')}" title="Mostra / nascondi stato MIDI, azioni e guida di collegamento">MIDI</button>`;
+    songKeys.firstChild.addEventListener('click', () => window.toggleMidiPanel?.());
+    innerLayout.appendChild(songKeys);
+
+    // stato degli slot (vuoto / pattern non salvato) e display
+    function paintSong() {
+      let bank = {}; try { bank = seqEngine.loadPatternBank() || {}; } catch (e) {}
+      const saved = Object.keys(bank).filter(k => bank[k]).length;
+      let used = 0;
+      slotWrappers.forEach(w => {
+        if (!w._patSel) return;
+        const pat = w._patSel.value, empty = pat === 'OFF', missing = !empty && !bank[pat];
+        if (!empty) used++;
+        w.classList.toggle('is-empty', empty); w.classList.toggle('is-missing', missing);
+        if (w._state) w._state.textContent = empty ? '' : missing ? 'non salvato' : `P${String(pat).padStart(2, '0')}`;
+      });
+      const set = (id, t) => { const el = document.getElementById(id); if (el) el.textContent = t; };
+      set('songLcdUsed', `${used} slot usati`); set('songLcdSaved', `${saved} pattern salvati`);
+      set('songLcdLoop', isLoop ? 'LOOP ON' : 'LOOP OFF'); set('songLcdState', songPlayer.playing ? 'PLAYING' : 'STOPPED');
+      const sl = songPlayer.playing && songPlayer.list ? songPlayer.list[songPlayer.idx] : null;
+      set('songLcdSlot', sl ? `SLOT ${String(sl.i + 1).padStart(2, '0')}` : 'SLOT --');
+      set('songLcdPat', sl ? `P${String(sl.pat).padStart(2, '0')} x${sl.rep}${sl.trn ? ` ${sl.trn > 0 ? '+' : ''}${sl.trn}` : ''}` : '—');
+      const hint = document.getElementById('songHint'); if (hint) hint.hidden = saved > 0;
+    }
+    window.paintSong = paintSong;
 
     // Collega riferimenti e listener di autosave su ogni select
     slotWrappers.forEach(w => {
@@ -17912,6 +17943,7 @@ function exportCurrentPatchSyx() {
     });
 
     loadSongState();
+    setTimeout(paintSong, 0);
 
     elektronWrapper.appendChild(innerLayout);
 
@@ -18721,10 +18753,10 @@ function exportCurrentPatchSyx() {
       ['Pattern', 'Il menu <b>PATTERN P01–P64</b> con salva/carica memorizza i pattern da usare nella SONG.'],
     ]],
     btnTabSong: ['SONG — catena di pattern', [
-      ['Slot', 'Ogni slot suona un pattern salvato in SEQ (<b>P01–P64</b>), ripetuto <b>x1–x4</b>, con trasposizione. <b>1:16 … 49:64</b> sfoglia gli slot.'],
-      ['Riproduzione', '<b>play song</b> suona gli slot in ordine, <b>stop</b> ferma, <b>loop</b> ricomincia alla fine. Lo slot in riproduzione è evidenziato.'],
-      ['Salvataggio', '<b>save song</b> salva la catena, <b>clear</b> la svuota.'],
-    ], 'Prima crea e salva i pattern nella pagina SEQ.'],
+      ['Slot', 'Ogni slot suona un pattern salvato in SEQ: <b>PATTERN</b> (P01–P64), <b>RIPETI</b> (x1–x16), <b>TRASP</b> (semitoni). Gli slot vuoti sono attenuati; se il pattern scelto non è salvato lo slot diventa arancione. <b>1–16 … 49–64</b> sfoglia gli slot.'],
+      ['Riproduzione', '<b>play song</b> suona gli slot in ordine, <b>stop</b> ferma, <b>loop</b> ricomincia alla fine. Il display mostra slot, pattern, ripetizioni e trasposizione; lo slot che suona è evidenziato.'],
+      ['Salvataggio', 'Le modifiche si salvano da sole; <b>save song</b> salva subito, <b>clear</b> svuota la catena.'],
+    ], 'Prima crea e salva i pattern nella pagina SEQ (menu PATTERN → salva in).'],
   };
   const box = document.getElementById('sectionHelp');
   const activeTab = () => document.querySelector('.segmented-tab.active')?.id || 'btnTabSnow';
