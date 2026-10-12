@@ -9032,6 +9032,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
 
     // Processa ogni messaggio SysEx completo
     for (const msgBytes of sysexMessages) {
+      if (msgBytes[1] === 0x00 && msgBytes[2] === 0x20 && msgBytes[3] === 0x33 && msgBytes[5] < 0x10) window.virusDeviceId = msgBytes[5];
       // Play Mode annunciato dal Virus: F0 00 20 33 01 dd 73 pp 7A vv F7 (0 Single, 1 Sequencer, 2 Multi)
       if (msgBytes.length === 11 && msgBytes[6] === 0x73 && msgBytes[8] === 122) {
         window.currentSynthMode = msgBytes[9] === 0 ? 'single' : 'multi';
@@ -9295,7 +9296,9 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
     setLastAction('Sincronizzazione: chiedo al Virus modo e suono attivo…');
     // 1) Request Global: il Virus risponde coi parametri globali (73 00 pp vv), tra cui Play Mode (#122).
     //    L'edit buffer Single risponde anche in MULTI, quindi il modo va chiesto qui.
-    selectedOutput.send(new Uint8Array([...SYSEX_PREFIX, deviceId(), 0x35, 0xF7]));
+    // il Virus puo' ignorare la richiesta globale con ID OMNI (0x10): la manda anche col suo ID reale
+    // (letto dalle risposte, byte 5) o con 0x00
+    new Set([deviceId(), window.virusDeviceId ?? 0x00]).forEach(id => selectedOutput.send(new Uint8Array([...SYSEX_PREFIX, id, 0x35, 0xF7])));
     window.virusSync.timer = setTimeout(() => {          // nessun Play Mode: vecchio metodo (prima Single, poi Multi)
       if (!window.virusSync) return;
       window.virusSync.step = 'single'; ask(0x40);
