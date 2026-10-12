@@ -6858,6 +6858,27 @@
   #midiMonitor { margin: 6px 0 0; height: 220px; overflow: auto; padding: 8px 10px; border-radius: 6px;
     background: #15181c; color: #b9e6c9; font: 11.5px/1.45 ui-monospace, Menlo, monospace; white-space: pre; }
   .midi-diagnostics .diag-cell.wide.midi-monitor-cell { grid-column: 1 / -1; }
+  /* wave browser (scheda SINGLE) */
+  .wave-browser { margin: 0 24px 28px; padding: 14px 16px; border-radius: 6px; background: rgba(0,0,0,0.28); border: 1px solid rgba(255,255,255,0.08); color: #d6dbe3; font: 12px/1.3 'Roboto Mono', ui-monospace, monospace; position: relative; z-index: 1; }
+  .wave-browser .wb-head { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; }
+  .wave-browser .wb-title { font-weight: 800; letter-spacing: 0.12em; }
+  .wave-browser .wb-osc button { padding: 4px 10px; border: 1px solid rgba(255,255,255,0.2); background: transparent; color: inherit; font: inherit; cursor: pointer; }
+  .wave-browser .wb-osc button.active { background: #e8ebef; color: #111; }
+  .wave-browser select, .wave-browser input[type=search] { font: inherit; padding: 4px 6px; }
+  .wave-browser .wb-idx-wrap { display: flex; gap: 6px; align-items: center; }
+  .wave-browser .wb-idx-wrap[hidden] { display: none; }
+  .wave-browser button, .wave-browser select { text-transform: none !important; }
+  .wave-browser .wb-osc button.active, .wave-browser .wb-cell.active { outline: 2px solid currentColor; outline-offset: -2px; font-weight: 800; }
+  .wave-browser .wb-note { margin: 8px 0; opacity: 0.7; }
+  .wave-browser .wb-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 4px; max-height: 260px; overflow-y: auto; }
+  .wave-browser .wb-cell { text-align: left; padding: 6px 8px; border: 1px solid rgba(255,255,255,0.1); background: rgba(255,255,255,0.04); color: inherit; font: inherit; cursor: pointer; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .wave-browser .wb-cell span { opacity: 0.5; margin-right: 6px; }
+  .wave-browser .wb-cell:hover { background: rgba(255,255,255,0.12); }
+  .wave-browser .wb-cell.active { background: #e8ebef; color: #111; }
+  html[data-skin="te"] .wave-browser { background: rgba(255,255,255,0.55); color: #222; border-color: rgba(0,0,0,0.12); }
+  html[data-skin="te"] .wave-browser .wb-cell { border-color: rgba(0,0,0,0.12); background: rgba(0,0,0,0.03); }
+  html[data-skin="te"] .wave-browser .wb-osc button { border-color: rgba(0,0,0,0.25); }
+  html[data-skin="te"] .wave-browser .wb-osc button.active, html[data-skin="te"] .wave-browser .wb-cell.active { background: #2a2d33; color: #fff; }
 </style>
 </head>
 <body>
@@ -7836,7 +7857,6 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
       updateControlRoomStatus();
       if (typeof updateKeyboardPartDisplay === 'function') updateKeyboardPartDisplay();
       if (selectedOutput) {
-        sendVirusMode(0); // Commuta il Virus hardware in Single Mode
         unmuteAndSetVolume(getActiveMidiChannel());
         requestDump(0);
       }
@@ -7855,7 +7875,6 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
     }
     if (typeof updateKeyboardPartDisplay === 'function') updateKeyboardPartDisplay();
     if (selectedOutput) {
-      sendVirusMode(0); // Commuta il Virus hardware in Single Mode
       unmuteAndSetVolume(getActiveMidiChannel());
     }
     if (typeof updateSingleOledDisplay === 'function') updateSingleOledDisplay();
@@ -8788,6 +8807,8 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
     if (multiParts && multiParts[pIdx]) {
       multiParts[pIdx].name = name;
       multiParts[pIdx].dump = Array.from(msgBytes);
+      delete multiParts[pIdx].sound._osc1_model; delete multiParts[pIdx].sound._osc2_model;   // il modello ora viene dal dump
+      if (window.waveBrowserRender) setTimeout(window.waveBrowserRender, 0);
 
       // Estrai Cutoff (CC 40) e Resonance (CC 42) reali dal dump SysEx
       if (msgBytes.length > 51) {
@@ -10050,6 +10071,80 @@ function exportCurrentPatchSyx() {
   downloadBlob(dump, `${name.replace(/[^a-zA-Z0-9_-]/g, '_')}.syx`);
 }
 
+  // =====================================================================
+  // WAVE BROWSER: modelli oscillatore e wavetable di fabbrica del Virus TI.
+  // Le wave sono nel firmware: qui si scelgono, non si caricano.
+  // Modello = Page 6E #30/#35 (SysEx), Wave/Wavetable = CC 19/24, Index = CC 17/22.
+  // Nomi dal firmware TI (fonte: parameterDescriptions_TI di gearmulator).
+  // =====================================================================
+  const OSC_MODELS = ['Classic', 'HyperSaw', 'Wavetable', 'Wave PWM', 'Grain Simple', 'Grain Complex', 'Formant Simple', 'Formant Complex'];
+  const CLASSIC_WAVES = ['Sine', 'Triangle', ...Array.from({ length: 62 }, (_, i) => `Wave ${i + 3}`)];
+  const WAVETABLES = ['Sine', 'HarmncSweep', 'Glass Sweep', 'Draw Bars', 'Clusters', 'Insine Out', 'Landing', 'Liquid Metal', 'Opposition', 'Overtunes 1', 'Overtunes 2', 'Scale Trix', 'Sine Rider', 'Sqr Series', 'Upsine Down', 'Thumbs Up', 'Waterphone', 'E-Chime', 'Tinkabell', 'Bellfizz', 'Bellentine', 'Robot Wars', 'Alternator', 'Finger Bass', 'Fizzybar', 'Flutes', 'HP Love', 'Majestix', 'Hotch Potch', 'Resynater', 'Smooth Rough', 'Sawsalito', 'Bells 1', 'Bells 2', 'SportReport', 'Metal Guru', 'Bat Cave', 'Acetate', 'Buzzbizz', 'Buzzpartout', 'Vanish', 'Overbones', 'Pulsechecker', 'Stratosfear', 'Sooty Sweep', 'Throaty', 'Didgitalis', 'Evil', 'Chords', 'FM Grit', 'Bellsarnie', 'Octavius', 'Eat Pulse', 'Sinzin', 'Sine System', 'Clip Sweep', 'Roughage', 'Waving', 'Pling Saw', 'E-Peas', 'Bump Sweep', 'Filter Sqr', 'Fourmant', 'Formantera', 'Sundial 1', 'Sundial 2', 'Sundial 3', 'Clipdial 1', 'Clipdial 2', 'Voxonix', 'Solenoid', 'KlingKlang', 'Violator', 'Potassium', 'Pile Up', 'Tincanali', 'Sniper', 'Squeezy', 'Decomposer', 'Morfants', 'Pingvox', 'Adenoids', 'Nasal', 'Partialism', 'TableDance', 'Cascade', 'Prismism', 'Friction', 'Robotix', 'Whizzfizz', 'Spangly', 'Fluxbin', 'Fiboglide', 'Fibonice', 'Fibonasty', 'Penetrator', 'Blinder', 'Element 5', 'Bad Signs', 'Domina7rix'];
+
+  function buildWaveBrowser() {
+    const box = document.createElement('div');
+    box.className = 'wave-browser';
+    box.innerHTML = `
+      <div class="wb-head">
+        <span class="wb-title">WAVE BROWSER</span>
+        <div class="wb-osc" role="group" aria-label="Oscillatore">
+          <button type="button" data-osc="1" class="active">OSC 1</button><button type="button" data-osc="2">OSC 2</button>
+        </div>
+        <label>Model <select class="wb-model">${OSC_MODELS.map((m, i) => `<option value="${i}">${m}</option>`).join('')}</select></label>
+        <input class="wb-search" type="search" placeholder="Cerca wave…" aria-label="Cerca wave">
+        <label class="wb-idx-wrap">Index <input class="wb-idx" type="range" min="0" max="127"><span class="wb-idx-val"></span></label>
+      </div>
+      <div class="wb-note"></div>
+      <div class="wb-grid" role="listbox"></div>`;
+    let osc = 1;
+    const $ = sel => box.querySelector(sel);
+    const part = () => multiParts[currentPartIndex || 0];
+    const ids = () => ({ wave: `osc${osc}_wave`, shape: `osc${osc}_shape`, modelByte: 9 + 256 + (osc === 1 ? 30 : 35) });
+    const getModel = () => { const p = part(); const k = `_osc${osc}_model`; return p.sound[k] ?? p.dump?.[ids().modelByte] ?? 0; };
+    const sendModel = m => {
+      if (!selectedOutput) { setLastAction('connect midi output first'); return; }
+      const pt = window.currentSynthMode === 'single' ? 0x40 : (currentPartIndex || 0);
+      const bytes = new Uint8Array([...SYSEX_PREFIX, deviceId(), 0x6E, pt, osc === 1 ? 30 : 35, m & 0x7F, 0xF7]);
+      selectedOutput.send(bytes); recordMidiTx(`osc${osc} model ${OSC_MODELS[m]}`, bytes);
+    };
+    const setP = (id, v) => { patch[id] = v; sendParam(id, v); renderKnobsForParam(id); };
+
+    function render() {
+      const m = getModel();
+      $('.wb-model').value = String(m);
+      box.querySelectorAll('.wb-osc button').forEach(b => b.classList.toggle('active', +b.dataset.osc === osc));
+      const list = m === 0 ? CLASSIC_WAVES : m === 1 ? [] : WAVETABLES;
+      const cur = patch[ids().wave] ?? 0;
+      const q = $('.wb-search').value.trim().toLowerCase();
+      $('.wb-note').textContent = m === 0 ? 'Classic: la wave suona con Shape a 0 (scegliendola Shape va a 0). Shape 64 = saw, 127 = pulse.'
+        : m === 1 ? 'HyperSaw non usa wave: regola Density e Detune nella pagina OSC.'
+        : 'Index sposta la lettura dentro la wavetable (come Shape sul Virus).';
+      $('.wb-idx-wrap').hidden = m < 2;
+      $('.wb-idx').value = patch[ids().shape] ?? 0; $('.wb-idx-val').textContent = $('.wb-idx').value;
+      $('.wb-grid').innerHTML = list.map((n, i) => (!q || n.toLowerCase().includes(q))
+        ? `<button type="button" role="option" class="wb-cell${i === cur ? ' active' : ''}" aria-selected="${i === cur}" data-i="${i}"><span>${i + 1}</span>${n}</button>` : '').join('');
+    }
+
+    box.addEventListener('click', e => {
+      const ob = e.target.closest('.wb-osc button'); if (ob) { osc = +ob.dataset.osc; render(); return; }
+      const c = e.target.closest('.wb-cell'); if (!c) return;
+      const i = +c.dataset.i, m = getModel();
+      setP(ids().wave, i);
+      if (m === 0) setP(ids().shape, 0);
+      setLastAction(`OSC ${osc}: ${(m === 0 ? CLASSIC_WAVES : WAVETABLES)[i]}`);
+      render();
+    });
+    $('.wb-model').addEventListener('change', e => {
+      const m = +e.target.value; part().sound[`_osc${osc}_model`] = m; sendModel(m);
+      setLastAction(`OSC ${osc} model: ${OSC_MODELS[m]}`); render();
+    });
+    $('.wb-search').addEventListener('input', render);
+    $('.wb-idx').addEventListener('input', e => { setP(ids().shape, +e.target.value); $('.wb-idx-val').textContent = e.target.value; });
+    box._render = render; window.waveBrowserRender = render;
+    render();
+    return box;
+  }
+
   function buildSingleView(){
     const root = document.getElementById('singleView');
     root.innerHTML = '';
@@ -10250,6 +10345,7 @@ function exportCurrentPatchSyx() {
     elektronWrapper.appendChild(innerLayout);
     innerLayout.appendChild(leftCol);
     innerLayout.appendChild(rightCol);
+    elektronWrapper.appendChild(buildWaveBrowser());
 
     // --- Faceplate / LCD Visor Recess (Harmonized with Snow in Light Mode, Dark Star in Dark Mode) ---
     const screenRecess = document.createElement('div');
