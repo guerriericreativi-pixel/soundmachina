@@ -9012,7 +9012,10 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
         const patchName = extractPatchName(msgBytes);
 
         // Caso 0: risposta alla sincronizzazione d'avvio
-        if (window.virusSync && msgBytes[6] === 0x10 && msgBytes[7] === 0x00) {
+        // accetta solo la risposta alla richiesta in corso (0x40 = Single, 0x00 = parte 1):
+        // i dump di altre parti richiesti altrove non devono decidere il modo
+        if (window.virusSync && msgBytes[6] === 0x10 && msgBytes[7] === 0x00 &&
+            msgBytes[8] === (window.virusSync.step === 'single' ? 0x40 : 0x00)) {
           const isSingle = msgBytes[8] === 0x40;
           clearTimeout(window.virusSync.timer);
           window.virusSync = null;
