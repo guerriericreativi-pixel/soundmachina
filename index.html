@@ -7598,70 +7598,72 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
     { key: 'fx',     title: 'effects' },
   ];
 
+  // CC = numero del parametro Page A del Virus TI (mappa ufficiale, vale anche come offset nel dump).
+  // cc:null = parametro Page B: non controllabile via CC, va modificato sul Virus o in Virus Control.
   const PARAMS = [
     // Oscillator 1
-    { id:'osc1_wave',       name:'Osc1 Waveform',     short:'o1wv', section:'osc', cc:17, default:0 },
+    { id:'osc1_wave',       name:'Osc1 Waveform',     short:'o1wv', section:'osc', cc:19, default:0 },
     { id:'osc1_pw',         name:'Osc1 Pulsewidth',   short:'o1pw', section:'osc', cc:18, default:64 },
-    { id:'osc1_shape',      name:'Osc1 Shape',        short:'o1sh', section:'osc', cc:19, default:0 },
+    { id:'osc1_shape',      name:'Osc1 Shape',        short:'o1sh', section:'osc', cc:17, default:0 },
     { id:'osc1_semitone',   name:'Osc1 Semitone',     short:'o1st', section:'osc', cc:20, default:64, bipolar:true },
     { id:'osc1_keyflw',     name:'Osc1 Key Flw',      short:'o1ky', section:'osc', cc:21, default:64 },
-    { id:'osc1_vel',        name:'Vel>Osc1',          short:'v>o1', section:'osc', cc:22, default:64, bipolar:true },
-    { id:'osc1_subshape',   name:'Sub Osc Shape',     short:'sbsh', section:'osc', cc:23, default:0 },
+    { id:'osc1_vel',        name:'Vel>Osc1',          short:'v>o1', section:'osc', cc:null, default:64, bipolar:true },
+    { id:'osc1_subshape',   name:'Sub Osc Shape',     short:'sbsh', section:'osc', cc:35, default:0 },
 
     // Oscillator 2
     { id:'osc2_wave',       name:'Osc2 Waveform',     short:'o2wv', section:'osc', cc:24, default:0 },
-    { id:'osc2_pw',         name:'Osc2 Pulsewidth',   short:'o2pw', section:'osc', cc:25, default:64 },
-    { id:'osc2_shape',      name:'Osc2 Shape',        short:'o2sh', section:'osc', cc:26, default:0 },
-    { id:'osc2_semitone',   name:'Osc2 Semitone',     short:'o2st', section:'osc', cc:27, default:64, bipolar:true },
-    { id:'osc2_keyflw',     name:'Osc2 Key Flw',      short:'o2ky', section:'osc', cc:28, default:64 },
-    { id:'osc2_vel',        name:'Vel>Osc2',          short:'v>o2', section:'osc', cc:29, default:64, bipolar:true },
+    { id:'osc2_pw',         name:'Osc2 Pulsewidth',   short:'o2pw', section:'osc', cc:23, default:64 },
+    { id:'osc2_shape',      name:'Osc2 Shape',        short:'o2sh', section:'osc', cc:22, default:0 },
+    { id:'osc2_semitone',   name:'Osc2 Semitone',     short:'o2st', section:'osc', cc:25, default:64, bipolar:true },
+    { id:'osc2_keyflw',     name:'Osc2 Key Flw',      short:'o2ky', section:'osc', cc:31, default:64 },
+    { id:'osc2_vel',        name:'Vel>Osc2',          short:'v>o2', section:'osc', cc:null, default:64, bipolar:true },
 
     // Shared Detune & Balance
-    { id:'osc_detune',      name:'Osc Detune',        short:'det',  section:'osc', cc:30, default:0 },
-    { id:'osc_balance',     name:'Osc Balance',       short:'bal',  section:'osc', cc:31, default:64, bipolar:true },
+    { id:'osc_detune',      name:'Osc Detune',        short:'det',  section:'osc', cc:26, default:0 },
+    { id:'osc_balance',     name:'Osc Balance',       short:'bal',  section:'osc', cc:33, default:64, bipolar:true },
 
     // Oscillator 3
-    { id:'osc3_semi',       name:'Osc3 Semitone',     short:'o3st', section:'osc', cc:100, default:64, bipolar:true },
-    { id:'osc3_detune',     name:'Osc3 Detune',       short:'o3dt', section:'osc', cc:101, default:64, bipolar:true },
+    { id:'osc3_semi',       name:'Osc3 Semitone',     short:'o3st', section:'osc', cc:null, default:64, bipolar:true },
+    { id:'osc3_detune',     name:'Osc3 Detune',       short:'o3dt', section:'osc', cc:null, default:64, bipolar:true },
 
     // Unison
-    { id:'uni_detune',      name:'Unison Detune',     short:'udt',  section:'osc', cc:102, default:0 },
-    { id:'uni_pan',         name:'Unison Pan',        short:'upn',  section:'osc', cc:103, default:127 },
-    { id:'uni_lfophs',      name:'Unison LFO Phs',    short:'lfoP', section:'osc', cc:115, default:0 },
+    { id:'uni_detune',      name:'Unison Detune',     short:'udt',  section:'osc', cc:98, default:0 },
+    { id:'uni_pan',         name:'Unison Pan',        short:'upn',  section:'osc', cc:99, default:127 },
+    { id:'uni_lfophs',      name:'Unison LFO Phs',    short:'lfoP', section:'osc', cc:100, default:0 },
 
     // Common
-    { id:'com_sync',        name:'Osc Sync',          short:'snc',  section:'osc', cc:104, default:0 }, // Sync mode button
-    { id:'com_syncamt',     name:'Sync Amt',          short:'syam', section:'osc', cc:116, default:0 },
-    { id:'com_envosc',      name:'Env>Osc2',          short:'eno',  section:'osc', cc:105, default:64, bipolar:true },
-    { id:'com_phase',       name:'Phase Init',        short:'phi',  section:'osc', cc:106, default:0 },
+    { id:'com_sync',        name:'Osc Sync',          short:'snc',  section:'osc', cc:28, default:0 }, // Sync mode button
+    { id:'com_syncamt',     name:'Sync Amt',          short:'syam', section:'osc', cc:null, default:0 },
+    { id:'com_envosc',      name:'Env>Osc2',          short:'eno',  section:'osc', cc:29, default:64, bipolar:true },
+    { id:'com_phase',       name:'Phase Init',        short:'phi',  section:'osc', cc:null, default:0 },
     { id:'com_porta',       name:'Portamento',        short:'prt',  section:'osc', cc:5,   default:0 }, // Standard CC 5
-    { id:'com_velpw',       name:'Vel>PW',            short:'v>pw', section:'osc', cc:117, default:64, bipolar:true },
-    { id:'com_velsync',     name:'Vel>Sync',          short:'v>sy', section:'osc', cc:118, default:64, bipolar:true },
-    { id:'com_envsync',     name:'Env>Sync',          short:'e>sy', section:'osc', cc:119, default:64, bipolar:true },
-    { id:'com_fmmode',      name:'FM Mode',           short:'fmmd', section:'osc', cc:120, default:0 },
-    { id:'com_fmamt',       name:'FM Amount',         short:'fmam', section:'osc', cc:121, default:0 },
+    { id:'com_velpw',       name:'Vel>PW',            short:'v>pw', section:'osc', cc:null, default:64, bipolar:true },
+    { id:'com_velsync',     name:'Vel>Sync',          short:'v>sy', section:'osc', cc:null, default:64, bipolar:true },
+    { id:'com_envsync',     name:'Env>Sync',          short:'e>sy', section:'osc', cc:null, default:64, bipolar:true },
+    { id:'com_fmmode',      name:'FM Mode',           short:'fmmd', section:'osc', cc:null, default:0 },
+    { id:'com_fmamt',       name:'FM Amount',         short:'fmam', section:'osc', cc:27, default:0 },
 
     // Noise & Punch
-    { id:'noise_color',     name:'Noise Color',       short:'ncl',  section:'osc', cc:107, default:64, bipolar:true },
-    { id:'punch_int',       name:'Punch Intensity',   short:'pnc',  section:'osc', cc:108, default:0 },
+    { id:'noise_color',     name:'Noise Color',       short:'ncl',  section:'osc', cc:39, default:64, bipolar:true },
+    { id:'punch_int',       name:'Punch Intensity',   short:'pnc',  section:'osc', cc:null, default:0 },
 
     // Mixer
-    { id:'mix_osc12',       name:'Osc1/2 Bal',        short:'m12',  section:'osc', cc:109, default:64, bipolar:true },
-    { id:'mix_oscvol',      name:'Osc Vol (Sat)',     short:'mov',  section:'osc', cc:110, default:127 },
-    { id:'mix_osc3',        name:'Osc3 Vol',          short:'mo3',  section:'osc', cc:111, default:0 },
-    { id:'mix_noise',       name:'Noise Vol',         short:'mnv',  section:'osc', cc:112, default:0 },
-    { id:'mix_sub',         name:'Sub Osc Vol',       short:'msb',  section:'osc', cc:113, default:0 },
-    { id:'mix_ring',        name:'Ring Mod Vol',      short:'mrg',  section:'osc', cc:114, default:0 },
+    { id:'mix_osc12',       name:'Osc1/2 Bal',        short:'m12',  section:'osc', cc:33, default:64, bipolar:true },
+    { id:'mix_oscvol',      name:'Osc Vol (Sat)',     short:'mov',  section:'osc', cc:36, default:127 },
+    { id:'mix_osc3',        name:'Osc3 Vol',          short:'mo3',  section:'osc', cc:null, default:0 },
+    { id:'mix_noise',       name:'Noise Vol',         short:'mnv',  section:'osc', cc:37, default:0 },
+    { id:'mix_sub',         name:'Sub Osc Vol',       short:'msb',  section:'osc', cc:34, default:0 },
+    { id:'mix_ring',        name:'Ring Mod Vol',      short:'mrg',  section:'osc', cc:38, default:0 },
 
     // Filter 1 & 2
-    { id:'f1_mode',      name:'Filt1 Mode',        short:'f1md', section:'filter', cc:39, default:0 },
+    { id:'f1_mode',      name:'Filt1 Mode',        short:'f1md', section:'filter', cc:51, default:0 },
     { id:'f1_cutoff',    name:'Cutoff',            short:'CUTOFF', section:'main', cc:40, default:127 },
     { id:'f1_resonance', name:'Resonance',         short:'RESONANCE',  section:'main', cc:42, default:0 },
-    { id:'f1_envamt',    name:'Filt1 EnvAmt',      short:'f1ea', section:'filter', cc:43, default:64, bipolar:true },
+    { id:'f1_envamt',    name:'Filt1 EnvAmt',      short:'f1ea', section:'filter', cc:44, default:64, bipolar:true },
     { id:'f1_keytrack',  name:'Keyboard Track',    short:'key',  section:'filter', cc:46, default:0 },
     { id:'f2_cutoff',    name:'Cutoff 2',          short:'cut2', section:'filter', cc:41, default:64 },
-    { id:'f2_resonance', name:'Resonance 2',       short:'res2', section:'filter', cc:44, default:0 },
-    { id:'flt_balance',  name:'Filter Balance',    short:'fbal', section:'filter', cc:45, default:64, bipolar:true },
+    { id:'f2_resonance', name:'Resonance 2',       short:'res2', section:'filter', cc:43, default:0 },
+    { id:'flt_balance',  name:'Filter Balance',    short:'fbal', section:'filter', cc:48, default:64, bipolar:true },
 
     // Amplifier
     { id:'amp_attack',   name:'Attack',            short:'atk',  section:'amp', cc:59, default:0 },
@@ -7669,7 +7671,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
     { id:'amp_sustain',  name:'Sustain',           short:'sus',  section:'amp', cc:61, default:127 },
     { id:'amp_release',  name:'Release',           short:'rel',  section:'amp', cc:63, default:0 },
     { id:'amp_pan',      name:'Panorama',          short:'pan',  section:'amp', cc:10, default:64, bipolar:true },
-    { id:'amp_vel',      name:'Vel>Amp',           short:'v>am', section:'amp', cc:62, default:64, bipolar:true },
+    { id:'amp_vel',      name:'Vel>Amp',           short:'v>am', section:'amp', cc:null, default:64, bipolar:true },
     { id:'com_porta',    name:'Portamento',        short:'prt',  section:'amp', cc:5,  default:0 },
 
     // LFO 1
@@ -7684,10 +7686,10 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
     { id:'fx_chorus_rate',     name:'Chorus Rate',     short:'chrt', section:'fx', cc:106, default:64 },
     { id:'fx_delay_time',      name:'Delay Time',      short:'dlt',  section:'fx', cc:114, default:0 },
     { id:'fx_delay_feedback',  name:'Delay Feedback',  short:'dlfb', section:'fx', cc:115, default:0 },
-    { id:'fx_reverb_mix',      name:'Reverb Mix',      short:'rvmx', section:'fx', cc:88,  default:0 },
-    { id:'fx_reverb_decay',    name:'Reverb Decay',    short:'rvdc', section:'fx', cc:89,  default:64 },
-    { id:'fx_dist_type',       name:'Distortion Type', short:'dstt', section:'fx', cc:92,  default:0 },
-    { id:'fx_dist_intensity',  name:'Dist Intensity',  short:'dist', section:'fx', cc:93,  default:0 },
+    { id:'fx_reverb_mix',      name:'Reverb Mix',      short:'rvmx', section:'fx', cc:113,  default:0 },
+    { id:'fx_reverb_decay',    name:'Reverb Decay',    short:'rvdc', section:'fx', cc:116,  default:64 },
+    { id:'fx_dist_type',       name:'Distortion Type', short:'dstt', section:'fx', cc:null,  default:0 },
+    { id:'fx_dist_intensity',  name:'Dist Intensity',  short:'dist', section:'fx', cc:null,  default:0 },
   ];
 
   const SYSEX_PREFIX = [0xF0, 0x00, 0x20, 0x33, 0x01];
@@ -9045,15 +9047,8 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
     return true;
   }
 
-  function buildSysEx(cc, value){
-    return new Uint8Array([
-      ...SYSEX_PREFIX,
-      deviceId(),
-      SYSEX_CMD_PARAM,
-      cc & 0x7F,
-      value & 0x7F,
-      0xF7
-    ]);
+  function buildSysEx(cc, value, part = 0x40){
+    return new Uint8Array([...SYSEX_PREFIX, deviceId(), 0x70, part & 0x7F, cc & 0x7F, value & 0x7F, 0xF7]);
   }
 
   function sendParam(param, value){
@@ -9061,7 +9056,9 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
     if (!paramDef) return;
     if (selectedOutput){
       try{
-        if (paramDef.cc !== undefined && paramDef.cc < 120) {
+        if (paramDef.cc === null || paramDef.cc === undefined) {
+          setLastAction(`${paramDef.name}: parametro Page B, non controllabile via CC`);
+        } else if (paramDef.cc < 120) {
           // Send standard MIDI CC
           const channel = parseInt(document.getElementById('midiChannel').value, 10) - 1;
           const bytes = new Uint8Array([0xB0 | channel, paramDef.cc, value & 0x7F]);
@@ -9145,10 +9142,11 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
 
   // per-part full sound editor: addresses the part via the device-id byte
   function sendPartSoundParam(partIndex, cc, value){
+    if (cc === null || cc === undefined) { setLastAction('parametro Page B: non controllabile via CC'); return; }
     if (selectedOutput){
       try{
         const bytes = new Uint8Array([
-          ...SYSEX_PREFIX, partIndex & 0x7F, SYSEX_CMD_PARAM, cc & 0x7F, value & 0x7F, 0xF7
+          ...SYSEX_PREFIX, deviceId(), 0x70, partIndex & 0x7F, cc & 0x7F, value & 0x7F, 0xF7
         ]);
         selectedOutput.send(bytes);
         recordMidiTx('part p' + (partIndex + 1) + ' param ' + cc, bytes);
@@ -12942,6 +12940,8 @@ function exportCurrentPatchSyx() {
     }
     if (soft3El) soft3El.textContent = `Assign: ${part.values.fx_send ?? 20}`;
 
+    if (window.snowPanel) window.snowPanel.render();
+
     // Sincronizza i selettori veloci banco e patch
     const bankSel = document.getElementById('frontBankSelect');
     const patchSel = document.getElementById('frontPatchSelect');
@@ -13082,61 +13082,141 @@ function exportCurrentPatchSyx() {
       setLastAction(`Scansione banco ${bName}`);
     });
 
-    // 2. Hardware Button: AUDITION 🎵 (Suona la nota di prova sul canale della parte attiva)
-    const btnAudition = document.getElementById('frontBtnAudition');
-    let isAuditioning = false;
-
-    const startAuditionSound = () => {
-      if (isAuditioning) return;
-      isAuditioning = true;
-      if (btnAudition) btnAudition.classList.add('audition-active');
-      const ch = getActiveMidiChannel();
-      unmuteAndSetVolume(ch);
-      playNote(60, 100);
-      setLastAction(`♪ Audition (ch ${ch + 1})`);
+    // =====================================================================
+    // PANNELLO FRONTALE: comportamento del Virus TI Snow come da Quickstart
+    // manual ufficiale (Kemper Digital 2008, cap. "Modus Operandi" / "Edit Pages").
+    // Stati: play | menu (pagina di edit) | bank | part | mode.  EDIT/SHIFT = shift.
+    // =====================================================================
+    const NO_CC = null;   // parametro Page B: visibile ma non controllabile via CC
+    const EASY_MENUS = {
+      frontBtnOsc1:    ['OSC 1',   [{ n: 'Shape', cc: 17 },
+                                    { n: 'PulseWdt', cc: 18, alt: { n: 'WaveSel', cc: 19, when: v => v(17) < 64 } },
+                                    { n: 'OscBal', cc: 33, bip: true }]],
+      frontBtnOsc2:    ['OSC 2',   [{ n: 'Shape', cc: 22 },
+                                    { n: 'PulseWdt', cc: 23, alt: { n: 'WaveSel', cc: 24, when: v => v(22) < 64 } },
+                                    { n: 'FM Amt', cc: 27 }]],
+      frontBtnFilters: ['FILTERS', [{ n: 'Cutoff2', cc: 41 }, { n: 'SatCurve', cc: 49 }, { n: 'OscVol', cc: 36, bip: true }]],
+      frontBtnMod:     ['MOD',     [{ n: 'LFO1 Rate', cc: 67 }, { n: 'LFO2 Rate', cc: 79 }, { n: 'LFO3 Rate', cc: NO_CC }]],
+      frontBtnEnv:     ['ENV',     [{ n: 'AmpAtk', cc: 59 }, { n: 'FltAtk', cc: 54 }, { n: 'FltEnvAmt', cc: 44 }]],
+      frontBtnEffects: ['EFFECTS', [{ n: 'DelaySend', cc: 113 }, { n: 'RevSend', cc: NO_CC }, { n: 'PhaserMix', cc: NO_CC }]],
+      frontBtnArp:     ['ARP',     [{ n: 'ArpMode', cc: NO_CC }, { n: 'Pattern', cc: NO_CC }, { n: 'Length', cc: NO_CC }]],
+      frontBtnCommon:  ['COMMON',  [{ n: 'KeyMode', cc: 94 }, { n: 'Porta', cc: 5 }, { n: 'Transp', cc: 93, bip: true }]],
     };
+    // In play mode: SHIFT+VALUE 1/2/3 = Patch Volume, Transpose (ottave), Panorama (serigrafia sotto)
+    const PLATE = [{ n: 'PatchVol', cc: 91 }, { n: 'Transp', cc: 93, bip: true, oct: true }, { n: 'Pan', cc: 10, bip: true }];
+    const UPPER = ['frontBtnOsc1', 'frontBtnOsc2', 'frontBtnFilters', 'frontBtnMod', 'frontBtnEnv', 'frontBtnEffects', 'frontBtnArp', 'frontBtnCommon'];
+    const LOWER = ['frontBtnValMinus', 'frontBtnValPlus', 'frontBtnParamPrev', 'frontBtnParamNext', 'frontBtnAudition', 'frontBtnMulti', 'frontBtnConfig', 'frontBtnStore'];
+    const MODES = ['SINGLE', 'MULTI', 'SEQUENCER'];
 
-    const stopAuditionSound = () => {
-      if (!isAuditioning) return;
-      isAuditioning = false;
-      if (btnAudition) btnAudition.classList.remove('audition-active');
-      stopNote(60);
+    const panel = { state: 'play', menu: null, sel: 0, shift: false, modeIdx: 1, bankPrompt: false };
+    window.snowPanel = panel;
+    const curPart = () => multiParts[currentPartIndex || 0];
+    const partCh = () => { const p = curPart(); return p && p.values.channel !== undefined ? p.values.channel : (currentPartIndex || 0); };
+    const ccVals = () => { const p = curPart(); if (!p._cc) p._cc = {}; return p._cc; };
+    const getCC = cc => (ccVals()[cc] ?? 64);
+    const setCC = (cc, v) => { ccVals()[cc] = v; sendCC(partCh(), cc, v); };
+    const fmt = (prm, v) => {
+      if (prm.cc === NO_CC) return 'n/d';
+      if (prm.oct) return `${Math.round((v - 64) / 12) >= 0 ? '+' : ''}${Math.round((v - 64) / 12)}oct`;
+      return prm.bip ? `${v - 64 >= 0 ? '+' : ''}${v - 64}` : String(v);
     };
+    const resolve = prm => (prm.alt && prm.alt.when(getCC)) ? prm.alt : prm;
+    const softParams = () => panel.state === 'menu' ? EASY_MENUS[panel.menu][1].map(resolve) : PLATE;
 
-    if (btnAudition) {
-      btnAudition.addEventListener('mousedown', (e) => {
-        e.preventDefault();
-        startAuditionSound();
+    // Banchi Snow: 8 RAM + 8 ROM da 64 suoni; via MIDI ogni banco da 128 = due banchi Snow
+    const snowPos = (bank, prog) => ({ rom: bank >= 4, n: (bank % 4) * 2 + (prog >= 64 ? 1 : 0) + 1, p64: prog % 64, onSnow: bank < 8 });
+    const midiPos = (rom, n, p64) => ({ bank: (rom ? 4 : 0) + Math.floor((n - 1) / 2), prog: ((n - 1) % 2) * 64 + p64 });
+    const goSnow = (rom, n, p64) => { const m = midiPos(rom, n, p64); changePartSound(currentPartIndex || 0, m.bank, m.prog, true); };
+
+    const consumeShift = () => { const s = panel.shift; if (s) { panel.shift = false; } return s; };
+    const toPlay = () => { panel.state = 'play'; panel.menu = null; panel.sel = 0; render(); };
+
+    function render() {
+      const part = curPart(); if (!part) return;
+      const pos = snowPos(part.values.bank, part.values.program);
+      const led = (id, on) => { const el = document.getElementById(id); if (el) el.className = 'snow-indicator-led' + (on ? ' active-amber' : ''); };
+      for (let i = 0; i < 8; i++) {
+        let up = false, low = false;
+        if (panel.state === 'menu') up = UPPER[i] === panel.menu;
+        else if (panel.state === 'bank') { up = pos.rom && pos.n === i + 1; low = !pos.rom && pos.n === i + 1; }
+        else if (panel.state === 'part') low = i === (currentPartIndex || 0);
+        else { up = Math.floor(pos.p64 / 8) === i; low = pos.p64 % 8 === i; }   // play: gruppo e suono
+        led('frontRomLed' + i, up); led('frontRamLed' + i, low);
+      }
+      led('frontEditShiftLed', panel.shift || panel.state === 'menu');
+
+      const cat = document.getElementById('frontLcdCategory');
+      const badge = document.getElementById('frontLcdModeBadge');
+      const soft = [1, 2, 3].map(i => document.getElementById('frontLcdSoft' + i));
+      const bankTxt = pos.onSnow ? `${pos.rom ? 'ROM' : 'RAM'}${pos.n} ${Math.floor(pos.p64 / 8) + 1}-${pos.p64 % 8 + 1}` : (BANK_NAMES[part.values.bank] || '');
+      if (cat) cat.textContent = panel.state === 'menu' ? `EDIT • ${EASY_MENUS[panel.menu][0]}`
+        : panel.state === 'bank' ? 'BANK: ROM 1-8 sopra, RAM 1-8 sotto'
+        : panel.state === 'part' ? 'PART: premi 1-4 (fila sotto)'
+        : panel.state === 'mode' ? `MODE ▸ ${MODES[panel.modeIdx]}` : `P${(currentPartIndex || 0) + 1} • ${bankTxt}`;
+      if (badge && panel.state !== 'mode') badge.textContent = window.currentSynthMode === 'single' ? 'SINGLE' : 'MULTI';
+      const params = softParams();
+      soft.forEach((el, i) => {
+        if (!el) return;
+        const prm = params[i]; const v = prm.cc === NO_CC ? null : getCC(prm.cc);
+        const txt = `${prm.n}: ${fmt(prm, v)}`;
+        el.textContent = panel.state === 'menu' && i === panel.sel ? `▸${txt}` : txt;
       });
-      window.addEventListener('mouseup', () => {
-        if (isAuditioning) stopAuditionSound();
-      });
-      btnAudition.addEventListener('touchstart', (e) => {
-        e.preventDefault();
-        startAuditionSound();
-      }, { passive: false });
-      btnAudition.addEventListener('touchend', (e) => {
-        e.preventDefault();
-        stopAuditionSound();
+      // manopole VALUE 1-3 mostrano il parametro a cui sono assegnate
+      ['frontKnobValue1', 'frontKnobValue2', 'frontKnobValue3'].forEach((id, i) => {
+        const prm = params[i]; const k = document.getElementById(id);
+        if (!k) return;
+        k.title = `Value ${i + 1}: ${prm.n}${prm.cc === NO_CC ? ' (non controllabile via CC)' : ` (CC ${prm.cc})`}`;
+        if (prm.cc !== NO_CC) setFrontKnob(id, id + 'Ind', 'none', getCC(prm.cc));
       });
     }
+    panel.render = render;
 
-    // 3. Tasti di navigazione rapida patch: VALUE - e VALUE +
-    document.getElementById('frontBtnValMinus')?.addEventListener('click', () => {
-      const pIdx = currentPartIndex || 0;
-      const part = multiParts[pIdx];
-      if (!part) return;
-      applyFrontSoundChange((part.values.program - 1 + 128) % 128);
-    });
+    // ---- matrice: fila superiore
+    UPPER.forEach((id, i) => document.getElementById(id)?.addEventListener('click', () => {
+      if (panel.state === 'bank') { goSnow(true, i + 1, snowPos(curPart().values.bank, curPart().values.program).p64); toPlay(); setLastAction(`Bank ROM ${i + 1}`); return; }
+      if (consumeShift() || panel.state === 'menu') {             // EDIT/SHIFT + menu (o cambio menu)
+        panel.state = 'menu'; panel.menu = id; panel.sel = 0; render();
+        setLastAction(`Edit ${EASY_MENUS[id][0]}`); return;
+      }
+      const pos = snowPos(curPart().values.bank, curPart().values.program);   // play: gruppo i (prima cifra)
+      goSnow(pos.rom, pos.n, i * 8 + (pos.p64 % 8)); render();
+    }));
 
-    document.getElementById('frontBtnValPlus')?.addEventListener('click', () => {
-      const pIdx = currentPartIndex || 0;
-      const part = multiParts[pIdx];
-      if (!part) return;
-      applyFrontSoundChange((part.values.program + 1) % 128);
-    });
+    // ---- matrice: fila inferiore
+    LOWER.forEach((id, i) => document.getElementById(id)?.addEventListener('click', (e) => {
+      if (id === 'frontBtnAudition') return;                       // gestito sotto (tenuto = latch)
+      if (panel.state === 'bank') { goSnow(false, i + 1, snowPos(curPart().values.bank, curPart().values.program).p64); toPlay(); setLastAction(`Bank RAM ${i + 1}`); return; }
+      if (panel.state === 'part') { if (i < NUM_PARTS) selectPart(i); toPlay(); return; }
+      switch (id) {
+        case 'frontBtnValMinus': case 'frontBtnValPlus': {
+          const d = id === 'frontBtnValPlus' ? 1 : -1;
+          if (panel.state === 'mode') { panel.modeIdx = (panel.modeIdx + d + 3) % 3; render(); return; }
+          if (panel.state === 'menu') {
+            const prm = softParams()[panel.sel];
+            if (prm.cc === NO_CC) { setLastAction(`${prm.n}: parametro Page B, non controllabile via CC`); return; }
+            setCC(prm.cc, Math.max(0, Math.min(127, getCC(prm.cc) + d))); render(); return;
+          }
+          const pos = snowPos(curPart().values.bank, curPart().values.program);   // play: suono precedente/successivo
+          goSnow(pos.rom, pos.n, (pos.p64 + d + 64) % 64); render(); return;
+        }
+        case 'frontBtnParamPrev': case 'frontBtnParamNext':
+          if (panel.state === 'menu') { panel.sel = (panel.sel + (id === 'frontBtnParamNext' ? 1 : 2)) % 3; render(); }
+          return;
+        case 'frontBtnMulti': document.getElementById('btnTabMultipart')?.click(); return;
+        case 'frontBtnConfig': document.getElementById('btnSettings')?.click(); return;
+        case 'frontBtnStore':
+          consumeShift();
+          document.getElementById('btnTabPatchManager')?.click();
+          setTimeout(() => { const pInput = document.getElementById('patchName'); if (pInput) { pInput.focus(); pInput.select(); } }, 100);
+          return;
+      }
+      if (panel.state === 'play') {                                // play: suono 1-8 del gruppo (seconda cifra)
+        const pos = snowPos(curPart().values.bank, curPart().values.program);
+        goSnow(pos.rom, pos.n, Math.floor(pos.p64 / 8) * 8 + i); render();
+      }
+    }));
 
-    // 4. Tasto PART ⟳: Cicla tra le 4 parti del Multi + Click sui LED 1-4
+    // ---- PART: PART + tasto 1-4 della fila sotto
     const selectPart = (idx) => {
       currentPartIndex = Math.max(0, Math.min(NUM_PARTS - 1, idx));
       window.activeSinglePartIndex = currentPartIndex;
@@ -13145,167 +13225,127 @@ function exportCurrentPatchSyx() {
       updateKeyboardPartDisplay();
       setLastAction(`Part Select: P${currentPartIndex + 1}`);
     };
-
     document.getElementById('frontBtnPartCycle')?.addEventListener('click', () => {
-      selectPart((currentPartIndex + 1) % NUM_PARTS);
+      panel.state = panel.state === 'part' ? 'play' : 'part'; render();
     });
 
-    for (let p = 0; p < 4; p++) {
-      const led = document.getElementById('frontRamLed' + p);
-      if (led) {
-        led.style.cursor = 'pointer';
-        led.title = `Clicca per selezionare Parte ${p + 1}`;
-        led.addEventListener('click', () => selectPart(p));
+    // ---- BANK (SHIFT+BANK = SEARCH)
+    document.getElementById('frontBtnBankSearch')?.addEventListener('click', () => {
+      if (consumeShift()) {
+        document.getElementById('btnTabPatchManager')?.click();
+        setTimeout(() => { const sInput = document.getElementById('libSearchInput'); if (sInput) { sInput.focus(); sInput.select(); } }, 100);
+        return;
       }
-    }
+      panel.state = panel.state === 'bank' ? 'play' : 'bank'; render();
+    });
 
-    // 5. Tasto TAP TEMPO / PANIC (Sinistra)
+    // ---- EDIT/SHIFT: tocco = shift per il comando successivo (come tenerlo premuto)
+    document.getElementById('frontBtnEditShift')?.addEventListener('click', () => { panel.shift = !panel.shift; render(); });
+    window.addEventListener('keydown', e => { if (e.key === 'Shift' && !panel.shift) { panel.shift = true; panel._kbdShift = true; render(); } });
+    window.addEventListener('keyup', e => { if (e.key === 'Shift' && panel._kbdShift) { panel.shift = false; panel._kbdShift = false; render(); } });
+
+    // ---- EXIT / MODE: dalle pagine torna al play; dal play apre la scelta modo, ripremuto conferma
+    document.getElementById('frontBtnExitMode')?.addEventListener('click', () => {
+      consumeShift();
+      if (panel.state === 'mode') {
+        const m = panel.modeIdx;
+        sendVirusMode(m);
+        const badge = document.getElementById('frontLcdModeBadge'); if (badge) badge.textContent = m === 0 ? 'SINGLE' : 'MULTI';
+        if (m === 0) unmuteAndSetVolume(getActiveMidiChannel());
+        setLastAction(`Mode: ${MODES[m]}`);
+        if (typeof updateKeyboardPartDisplay === 'function') updateKeyboardPartDisplay();
+        toPlay(); return;
+      }
+      if (panel.state !== 'play') { toPlay(); return; }
+      panel.state = 'mode'; panel.modeIdx = window.currentSynthMode === 'single' ? 0 : 1; render();
+    });
+
+    // ---- TAP TEMPO (SHIFT+TAP = PANIC)
     let tapTimes = [];
     document.getElementById('frontBtnTapPanic')?.addEventListener('click', () => {
-      // Panic immediato
-      if (selectedOutput) {
-        for (let ch = 0; ch < 16; ch++) {
-          try {
-            selectedOutput.send(new Uint8Array([0xB0 | ch, 120, 0])); // All Sound Off
-            selectedOutput.send(new Uint8Array([0xB0 | ch, 123, 0])); // All Notes Off
-          } catch(e) {}
+      if (consumeShift()) {
+        if (selectedOutput) {
+          for (let ch = 0; ch < 16; ch++) {
+            try {
+              selectedOutput.send(new Uint8Array([0xB0 | ch, 120, 0]));
+              selectedOutput.send(new Uint8Array([0xB0 | ch, 123, 0]));
+            } catch (err) {}
+          }
         }
+        activeNotes.clear();
+        activeAudioVoices.forEach((v, k) => stopWebAudioNote(k));
+        activeAudioVoices.clear();
+        setLastAction('PANIC: ALL SOUNDS OFF'); render(); return;
       }
-      activeNotes.clear();
-      activeAudioVoices.forEach((v, k) => stopWebAudioNote(k));
-      activeAudioVoices.clear();
-
-      // Tap Tempo calculation
       const now = Date.now();
-      tapTimes.push(now);
-      if (tapTimes.length > 4) tapTimes.shift();
+      tapTimes = tapTimes.filter(t => now - t < 2500); tapTimes.push(now);
       if (tapTimes.length >= 2) {
-        const diffs = [];
-        for (let i = 1; i < tapTimes.length; i++) diffs.push(tapTimes[i] - tapTimes[i - 1]);
-        const avg = diffs.reduce((a, b) => a + b, 0) / diffs.length;
+        const avg = (tapTimes[tapTimes.length - 1] - tapTimes[0]) / (tapTimes.length - 1);
         const bpm = Math.round(60000 / avg);
-        if (bpm >= 40 && bpm <= 240) {
-          setLastAction(`Tap BPM: ${bpm}`);
-        }
-      } else {
-        setLastAction('PANIC: ALL SOUNDS OFF');
-      }
+        if (bpm >= 40 && bpm <= 240) { window.snowTapBpm = bpm; setLastAction(`Tap tempo: ${bpm} BPM`); }
+      } else setLastAction('Tap tempo: continua a battere');
     });
 
-    // 6. Tasto EXIT / MODE (Sinistra)
-    document.getElementById('frontBtnExitMode')?.addEventListener('click', () => {
-      const modeBadge = document.getElementById('frontLcdModeBadge');
-      const isMulti = modeBadge && modeBadge.textContent === 'MULTI';
-      if (isMulti) {
-        if (modeBadge) modeBadge.textContent = 'SINGLE';
-        setLastAction('Mode: SINGLE');
-        sendVirusMode(0); // Commuta il Virus hardware in Single Mode via SysEx
-        unmuteAndSetVolume(getActiveMidiChannel());
-      } else {
-        if (modeBadge) modeBadge.textContent = 'MULTI';
-        setLastAction('Mode: MULTI');
-        sendVirusMode(1); // Commuta il Virus hardware in Multi Mode via SysEx
-      }
-      if (typeof updateKeyboardPartDisplay === 'function') updateKeyboardPartDisplay();
-    });
-
-    // 7. Tasti Matrice Fila Superiore (OSC 1, OSC 2, FILTERS, MOD, ENV, EFFECTS, ARP, COMMON)
-    const openSynthSection = (selector) => {
-      document.getElementById('btnTabSynth')?.click();
-      setTimeout(() => {
-        const target = selector ? document.querySelector(selector) : null;
-        if (target) target.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      }, 100);
+    // ---- AUDITION: suona C3 finche' premuto; tenuto a lungo resta in latch, ripremi per fermare
+    const btnAudition = document.getElementById('frontBtnAudition');
+    let auditionOn = false, latched = false, holdTimer = 0;
+    const auditionStart = () => {
+      auditionOn = true; btnAudition?.classList.add('audition-active');
+      const ch = getActiveMidiChannel(); unmuteAndSetVolume(ch); playNote(60, 100);
+      setLastAction(`♪ Audition C3 (ch ${ch + 1})`);
     };
-
-    document.getElementById('frontBtnOsc1')?.addEventListener('click', () => openSynthSection('#osc1_shape, .section-osc1'));
-    document.getElementById('frontBtnOsc2')?.addEventListener('click', () => openSynthSection('#osc2_shape, .section-osc2'));
-    document.getElementById('frontBtnFilters')?.addEventListener('click', () => openSynthSection('#f1_mode, .section-filter'));
-    document.getElementById('frontBtnMod')?.addEventListener('click', () => openSynthSection('.section-lfo, .section-mod'));
-    document.getElementById('frontBtnEnv')?.addEventListener('click', () => openSynthSection('.section-env'));
-    document.getElementById('frontBtnEffects')?.addEventListener('click', () => openSynthSection('.section-fx'));
-    document.getElementById('frontBtnArp')?.addEventListener('click', () => document.getElementById('btnTabArp')?.click());
-    document.getElementById('frontBtnCommon')?.addEventListener('click', () => openSynthSection('.section-common'));
-
-    // 8. Tasti Matrice Seconda & Terza Fila (MULTI, CONFIG, STORE, EDIT/SHIFT, BANK/SEARCH)
-    document.getElementById('frontBtnMulti')?.addEventListener('click', () => document.getElementById('btnTabMultipart')?.click());
-    document.getElementById('frontBtnConfig')?.addEventListener('click', () => document.getElementById('btnSettings')?.click());
-    document.getElementById('frontBtnStore')?.addEventListener('click', () => {
-      document.getElementById('btnTabPatchManager')?.click();
-      setTimeout(() => {
-        const pInput = document.getElementById('patchName');
-        if (pInput) { pInput.focus(); pInput.select(); }
-      }, 100);
+    const auditionStop = () => { auditionOn = false; latched = false; btnAudition?.classList.remove('audition-active'); stopNote(60); };
+    btnAudition?.addEventListener('pointerdown', (e) => {
+      e.preventDefault();
+      if (latched) { auditionStop(); return; }
+      auditionStart();
+      holdTimer = setTimeout(() => { latched = true; setLastAction('♪ Audition in latch: ripremi per fermare'); }, 700);
     });
-    document.getElementById('frontBtnEditShift')?.addEventListener('click', () => document.getElementById('btnTabSynth')?.click());
-    document.getElementById('frontBtnBankSearch')?.addEventListener('click', () => {
-      document.getElementById('btnTabPatchManager')?.click();
-      setTimeout(() => {
-        const sInput = document.getElementById('libSearchInput');
-        if (sInput) { sInput.focus(); sInput.select(); }
-      }, 100);
-    });
+    const auditionRelease = () => { clearTimeout(holdTimer); if (auditionOn && !latched) auditionStop(); };
+    btnAudition?.addEventListener('pointerup', auditionRelease);
+    btnAudition?.addEventListener('pointerleave', auditionRelease);
 
     document.getElementById('frontBtnGoMulti')?.addEventListener('click', () => document.getElementById('btnTabMultipart')?.click());
     document.getElementById('frontBtnGoSingle')?.addEventListener('click', () => document.getElementById('btnTabSynth')?.click());
 
-    // 9. Configurazione delle 4 Manopole Orizzontali Reali
-    setupFrontKnob('frontKnobVolume', 'frontKnobVolumeInd', 'frontValVolume', 100, (v) => {
-      const part = multiParts[currentPartIndex || 0];
-      if (part) part.values.volume = v;
-      const ch = part ? (part.channel !== undefined ? part.channel : currentPartIndex) : 0;
-      sendCC(ch, 7, v);
-      setLastAction(`P${(currentPartIndex || 0) + 1} Vol: ${v}`);
+    // ---- manopole
+    // VOLUME: volume generale (sull'hardware e' analogico; qui CC7 sul canale della parte)
+    setupFrontKnob('frontKnobVolume', 'frontKnobVolumeInd', 'none', 100, (v) => {
+      const part = curPart(); if (part) part.values.volume = v;
+      sendCC(partCh(), 7, v);
+      setLastAction(`Volume: ${v}`);
     });
-
-    setupFrontKnob('frontKnobValue1', 'frontKnobValue1Ind', 'frontValValue1', 64, (v) => {
-      const part = multiParts[currentPartIndex || 0];
-      const trans = v - 64;
-      if (part) part.values.transpose = trans;
-      const soft1El = document.getElementById('frontLcdSoft1');
-      if (soft1El) soft1El.textContent = `Transp: ${trans}`;
-      setLastAction(`P${(currentPartIndex || 0) + 1} Transpose: ${trans}`);
-    });
-
-    setupFrontKnob('frontKnobValue2', 'frontKnobValue2Ind', 'frontValValue2', 64, (v) => {
-      const part = multiParts[currentPartIndex || 0];
-      if (part) part.values.pan = v;
-      const ch = part ? (part.channel !== undefined ? part.channel : currentPartIndex) : 0;
-      sendCC(ch, 10, v);
-      const panTxt = v === 64 ? 'C' : (v < 64 ? `L${64 - v}` : `R${v - 64}`);
-      const soft2El = document.getElementById('frontLcdSoft2');
-      if (soft2El) soft2El.textContent = `Pan: ${panTxt}`;
-      setLastAction(`P${(currentPartIndex || 0) + 1} Pan: ${panTxt}`);
-    });
-
-    setupFrontKnob('frontKnobValue3', 'frontKnobValue3Ind', 'frontValValue3', 20, (v) => {
-      const part = multiParts[currentPartIndex || 0];
-      if (part) part.values.fx_send = v;
-      const ch = part ? (part.channel !== undefined ? part.channel : currentPartIndex) : 0;
-      sendCC(ch, 91, v);
-      const soft3El = document.getElementById('frontLcdSoft3');
-      if (soft3El) soft3El.textContent = `Assign: ${v}`;
-      setLastAction(`P${(currentPartIndex || 0) + 1} Assign: ${v}`);
-    });
-
-    // 10. Configurazione delle 2 Manopole del Filtro (CUTOFF & RESONANCE)
-    setupFrontKnob('frontKnobCutoff', 'frontKnobCutoffInd', 'frontValCutoff', 64, (v) => {
-      const part = multiParts[currentPartIndex || 0];
-      if (part) part.values.f1_cutoff = v;
+    // VALUE 1-3: soft knob della pagina di edit; in play = serigrafia (Patch Volume / Transpose / Panorama)
+    [1, 2, 3].forEach(i => setupFrontKnob(`frontKnobValue${i}`, `frontKnobValue${i}Ind`, 'none', 64, (v) => {
+      if (panel.state === 'mode' && i === 1) { panel.modeIdx = Math.min(2, Math.floor(v / 43)); render(); return; }
+      consumeShift();
+      const prm = softParams()[i - 1];
+      if (prm.cc === NO_CC) { setLastAction(`${prm.n}: parametro Page B, non controllabile via CC`); return; }
+      let val = v;
+      if (prm.oct) val = 64 + Math.max(-4, Math.min(4, Math.round((v - 64) / 16))) * 12;   // Transpose a ottave
+      setCC(prm.cc, val);
+      const part = curPart();
+      if (part && prm.cc === 10) part.values.pan = val;
+      if (part && prm.cc === 93) part.values.transpose = val - 64;
+      if (panel.state === 'menu') panel.sel = i - 1;
+      render();
+      setLastAction(`${prm.n}: ${fmt(prm, val)} (CC ${prm.cc})`);
+    }));
+    // CUTOFF / RESONANCE; con SHIFT: Filter Envelope e Amp Envelope (Decay+Release insieme)
+    setupFrontKnob('frontKnobCutoff', 'frontKnobCutoffInd', 'none', 64, (v) => {
+      if (panel.shift) { setCC(55, v); setCC(58, v); setLastAction(`Filter Env Decay+Release: ${v}`); return; }
+      const part = curPart(); if (part) part.values.f1_cutoff = v;
       state.values.f1_cutoff = v;
-      const ch = part ? (part.channel !== undefined ? part.channel : currentPartIndex) : 0;
-      sendCC(ch, 40, v);
+      setCC(40, v);
       const macroKnobs = window.macroRefs;
       if (macroKnobs && macroKnobs[0] && macroKnobs[0]._updateKnob) macroKnobs[0]._updateKnob(v);
       setLastAction(`Cutoff: ${v}`);
     });
-
-    setupFrontKnob('frontKnobResonance', 'frontKnobResonanceInd', 'frontValResonance', 0, (v) => {
-      const part = multiParts[currentPartIndex || 0];
-      if (part) part.values.f1_resonance = v;
+    setupFrontKnob('frontKnobResonance', 'frontKnobResonanceInd', 'none', 0, (v) => {
+      if (panel.shift) { setCC(60, v); setCC(63, v); setLastAction(`Amp Env Decay+Release: ${v}`); return; }
+      const part = curPart(); if (part) part.values.f1_resonance = v;
       state.values.f1_resonance = v;
-      const ch = part ? (part.channel !== undefined ? part.channel : currentPartIndex) : 0;
-      sendCC(ch, 42, v);
+      setCC(42, v);
       const macroKnobs = window.macroRefs;
       if (macroKnobs && macroKnobs[1] && macroKnobs[1]._updateKnob) macroKnobs[1]._updateKnob(v);
       setLastAction(`Resonance: ${v}`);
