@@ -88,7 +88,7 @@ def mat(name, color, rough=0.5, metal=0.0, emission=0.0):
 
 
 PALETTE = {
-    'snow': dict(ink=vp.srgb('#46484d'), plate=vp.srgb('#7b726c'), plate_ink=vp.srgb('#f1eee8'),
+    'snow': dict(ink=vp.srgb('#3a3c41'), plate=vp.srgb('#7b726c'), plate_ink=vp.srgb('#f1eee8'),
                  recess=vp.srgb('#c9c8c3'), groove=vp.srgb('#9d9c97'), box=vp.srgb('#b3b4b7'),
                  box_ink=vp.srgb('#f4f4f2'), logo=vp.srgb('#2c3a5c'), slot=vp.srgb('#1c1d20'),
                  led=vp.srgb('#bdb57a'), collar=vp.srgb('#e8e8e5'), screen=vp.srgb('#15191d')),
@@ -143,13 +143,16 @@ def ring(name, px, py, r0, r1, material, z, height=0.06):
     return o
 
 
-Z_INK = T + 0.012     # sopra le piastre degli incavi (T+0.004) e le placche (T+0.006)
+Z_INK = T + 0.012
+LABEL_SCALE = 1.45    # serigrafia piu' grande del vero per la leggibilita' a schermo (loghi esclusi)     # sopra le piastre degli incavi (T+0.004) e le placche (T+0.006)
 
 
 def text(body, px, py, cap_px, font, material, align='CENTER', shear=0.0, z=None, spacing=1.0):
     cu = bpy.data.curves.new('txt', 'FONT')
     cu.body = body
     cu.font = font
+    if cap_px <= 14:
+        cap_px *= LABEL_SCALE
     cu.size = cap_px / 50.0 / 0.72
     cu.align_x = align
     cu.align_y = 'CENTER'
@@ -291,22 +294,22 @@ def build_faceplate(skin):
     text('BPM/LFO', 405, 322, 8, F['din'], ink, z=T + 0.09)
 
     # serigrafia del pannello
-    for s, x, y, c in (('TAP TEMPO', 238, 374, 11), ('PANIC', 238, 395, 9), ('EXIT', 246, 557, 11),
-                       ('MODE', 238, 578, 9), ('VOLUME', 238, 783, 11), ('VALUE 1', 437, 783, 11),
+    for s, x, y, c in (('TAP TEMPO', 238, 382, 11), ('PANIC', 238, 403, 9), ('EXIT', 246, 565, 11),
+                       ('MODE', 238, 586, 9), ('VOLUME', 238, 783, 11), ('VALUE 1', 437, 783, 11),
                        ('VALUE 2', 612, 783, 11), ('VALUE 3', 787, 783, 11), ('CUTOFF', 1388, 783, 11),
-                       ('RESONANCE', 1563, 783, 11), ('EDIT/SHIFT', 985, 735, 10), ('PART', 1072, 735, 10),
-                       ('BANK', 1160, 735, 10), ('POWER ON/OFF', 1030, 782, 9), ('SEARCH', 1160, 782, 9),
-                       ('VALUE -', 983, 552, 10), ('VALUE +', 1070, 552, 10), ('PARAMETERS', 1202, 552, 10),
-                       ('AUDITION', 1333, 552, 10), ('MULTI', 1421, 552, 10), ('CONFIG', 1508, 552, 10),
-                       ('STORE', 1596, 552, 10)):
+                       ('RESONANCE', 1563, 783, 11), ('EDIT/SHIFT', 985, 745, 10), ('PART', 1072, 745, 10),
+                       ('BANK', 1160, 745, 10), ('POWER ON/OFF', 1030, 782, 9), ('SEARCH', 1160, 782, 9),
+                       ('VALUE -', 983, 562, 10), ('VALUE +', 1070, 562, 10), ('PARAMETERS', 1202, 562, 10),
+                       ('AUDITION', 1333, 562, 10), ('MULTI', 1421, 562, 10), ('CONFIG', 1508, 562, 10),
+                       ('STORE', 1596, 562, 10)):
         text(s, x, y, c, F['din'], ink)
     for s, x in zip(['OSC 1', 'OSC 2', 'FILTERS', 'MOD', 'ENV', 'EFFECTS', 'ARP', 'COMMON'], ROW_X):
-        text(s, x, 368, 10, F['din'], ink)
+        text(s, x, 378, 10, F['din'], ink)
     for i, x in enumerate(ROW_X):
         text(str(i + 1), x - 14, 253, 10, F['din'], ink)
         text(str(i + 1), x - 14, 438, 10, F['din'], ink)
-    text('<', 1150, 552, 10, F['din'], ink)
-    text('>', 1254, 552, 10, F['din'], ink)
+    text('<', 1138, 562, 10, F['din'], ink)
+    text('>', 1266, 562, 10, F['din'], ink)
     for x0, x1 in ((945, 965), (1095, 1115)):            # parentesi di POWER ON/OFF
         flat_rrect('br', x0, 781, x1, 783, 0.005, ink, Z_INK)
     text('<', 1006 - 90, 738, 9, F['din'], ink) if False else None
