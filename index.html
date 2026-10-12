@@ -6940,6 +6940,23 @@
   .part-list.grid-mode .part-row > :nth-child(3) { justify-content: space-around !important; padding: 6px 4px 0 !important; box-sizing: border-box; }
   .part-row .part-ch { display: inline-flex !important; flex-direction: row !important; align-items: center; gap: 4px; }
   .part-row .part-ch label, .part-row .part-ch > span:first-child { font: 800 9px/1 'Inter', sans-serif; letter-spacing: 0.08em; margin: 0 !important; }
+  /* badge parte: icona strumento su fondo colorato, sceglibile */
+  .part-row .part-badge { display: inline-flex !important; align-items: center; gap: 4px; height: 26px; padding: 0 7px !important; border: 0 !important; border-radius: 4px !important; cursor: pointer;
+    background: var(--part-color, #888) !important; color: #111 !important; font: 900 11px/1 monospace !important; letter-spacing: 0.04em; box-shadow: 0 1px 0 rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.35) !important; }
+  .part-row .part-badge { width: auto !important; min-width: 52px !important; justify-content: center; text-transform: uppercase !important; }
+  .part-row .part-badge svg, .plp-icons svg { flex: 0 0 16px; width: 16px !important; height: 16px !important; }
+  .part-row .part-badge:focus-visible { outline: 2px solid #3b82f6; outline-offset: 2px; }
+  .part-look-picker { position: absolute; z-index: 100000; width: 300px; padding: 10px; border-radius: 6px; background: #f4f4f2; color: #222; border: 1px solid #c8c8c4; box-shadow: 0 10px 30px rgba(0,0,0,0.25); font: 12px/1.3 'Inter', sans-serif; }
+  html[data-skin="elektron"] .part-look-picker { background: #232427; color: #e2e3e6; border-color: #3a3b3f; }
+  .plp-title { font-weight: 800; font-size: 11px; letter-spacing: 0.04em; margin-bottom: 8px; }
+  .plp-icons { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; }
+  .plp-icons button { min-height: 0 !important; text-transform: none !important; display: flex; flex-direction: column; align-items: center; gap: 3px; padding: 6px 2px; border: 1px solid transparent; border-radius: 4px; background: rgba(0,0,0,0.04); color: inherit; font: 600 10px/1 'Inter', sans-serif; cursor: pointer; }
+  .plp-icons button:hover { background: rgba(0,0,0,0.1); }
+  .plp-icons button.on { border-color: currentColor; }
+  .plp-colors { display: flex; gap: 6px; margin: 10px 0 8px; }
+  .plp-colors button { min-width: 0 !important; min-height: 0 !important; flex: 0 0 22px; width: 22px !important; height: 22px !important; border-radius: 50%; border: 2px solid transparent; background: var(--c); cursor: pointer; padding: 0; }
+  .plp-colors button.on { border-color: currentColor; box-shadow: 0 0 0 2px rgba(255,255,255,0.6) inset; }
+  .plp-auto { border: 0; background: none; color: inherit; text-decoration: underline; font-size: 11px; cursor: pointer; padding: 0; opacity: 0.75; }
 </style>
 </head>
 <body>
@@ -8852,6 +8869,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
       multiParts[pIdx].dumpAt = Date.now();
       delete multiParts[pIdx].sound._osc1_model; delete multiParts[pIdx].sound._osc2_model;   // il modello ora viene dal dump
       if (window.waveBrowserRender) setTimeout(window.waveBrowserRender, 0);
+      if (window.refreshPartBadges) setTimeout(window.refreshPartBadges, 0);
 
       // Estrai Cutoff (CC 40) e Resonance (CC 42) reali dal dump SysEx
       if (msgBytes.length > 51) {
@@ -12366,6 +12384,87 @@ function exportCurrentPatchSyx() {
   // Multi-Mode Enhanced Controller (P1-P4 Rack Strips & Visualizer)
   // ---------------------------------------------------------------------
   const PART_COLORS = ['#56b6c2', '#e59500', '#c678dd', '#74c476'];
+
+  // ---- Icona strumento + colore di ogni parte (MULTI): per capire subito a cosa serve la parte.
+  // Scelta dall'utente (salvata in questo browser); se non scelta, proposta dalla categoria della patch.
+  const PART_ICONS = {
+    lead:    ['Lead',     '<path d="M3 17 9 7v10l6-10v10l6-10"/>'],
+    bass:    ['Bass',     '<path d="M5 6c4-1 8 1 8 5 0 5-5 8-9 9"/><circle cx="17" cy="8" r="1.2"/><circle cx="17" cy="14" r="1.2"/>'],
+    pad:     ['Pad',      '<path d="M7 18h10a4 4 0 0 0 0-8 6 6 0 0 0-11.5 1.5A3.3 3.3 0 0 0 7 18z"/>'],
+    keys:    ['Keys',     '<rect x="3" y="5" width="18" height="14" rx="1"/><path d="M8 5v14M13 5v14M18 5v14"/><path d="M6.5 5v8M11 5v8M16 5v8" stroke-width="3"/>'],
+    pluck:   ['Pluck',    '<path d="M12 21C7 17 5 12 5 8a7 4 0 0 1 14 0c0 4-2 9-7 13z"/>'],
+    bell:    ['Bell',     '<path d="M6 17V11a6 6 0 0 1 12 0v6l2 2H4z"/><path d="M10 21a2 2 0 0 0 4 0"/>'],
+    strings: ['Strings',  '<path d="M7 4v16M11 4v16M15 4v16M19 4v16"/><path d="M3 15 21 7"/>'],
+    brass:   ['Brass',    '<path d="M3 10h9l7-5v14l-7-5H3z"/><path d="M7 10v4"/>'],
+    arp:     ['Arp',      '<path d="M3 19h4v-4h4v-4h4V7h4V3"/>'],
+    drums:   ['Drums',    '<ellipse cx="12" cy="8" rx="8" ry="3"/><path d="M4 8v8c0 1.7 3.6 3 8 3s8-1.3 8-3V8"/><path d="M4 4l5 3M20 4l-5 3"/>'],
+    vocal:   ['Vocal',    '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3M9 21h6"/>'],
+    fx:      ['FX',       '<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/>'],
+  };
+  const PART_LOOK_COLORS = ['#56b6c2', '#e59500', '#c678dd', '#74c476', '#e06c75', '#e5c07b', '#61afef', '#9aa0a6'];
+  // categorie del firmware TI -> icona proposta
+  const CAT_TO_ICON = { 1: 'lead', 2: 'bass', 3: 'pad', 4: 'bell', 5: 'pluck', 6: 'bass', 7: 'keys', 8: 'arp', 9: 'fx', 10: 'drums', 11: 'drums', 12: 'vocal', 13: 'vocal', 17: 'keys', 18: 'keys', 19: 'strings', 20: 'bell', 21: 'lead', 22: 'fx' };
+  const PART_LOOK_KEY = 'virusH_partLook';
+  function loadPartLooks() { try { return JSON.parse(localStorage.getItem(PART_LOOK_KEY)) || []; } catch (e) { return []; } }
+  function autoPartIcon(part) {
+    const cat = part?.dump?.[9 + 251];
+    if (CAT_TO_ICON[cat]) return CAT_TO_ICON[cat];
+    const n = (part?.name || '').toLowerCase();
+    const guess = [[/bass|sub|303|reese/, 'bass'], [/pad|atmo|sweep|choir/, 'pad'], [/arp|seq/, 'arp'], [/bell|chime|glass|fm/, 'bell'],
+      [/key|piano|rhodes|ep\b|organ|clav|wurl/, 'keys'], [/pluck|pizz|harp|guitar/, 'pluck'], [/string|violin|orch/, 'strings'],
+      [/brass|horn|trump/, 'brass'], [/drum|kick|snare|perc|hat/, 'drums'], [/vox|voc|voice/, 'vocal'], [/fx|zap|noise|riser|drone/, 'fx']];
+    return (guess.find(([re]) => re.test(n)) || [0, 'lead'])[1];
+  }
+  function partLook(i) {
+    const saved = loadPartLooks()[i] || {};
+    return { icon: saved.icon || autoPartIcon(multiParts[i]), color: saved.color || PART_COLORS[i], chosen: !!saved.icon };
+  }
+  function setPartLook(i, change) {
+    const all = loadPartLooks(); all[i] = { ...(all[i] || {}), ...change };
+    try { localStorage.setItem(PART_LOOK_KEY, JSON.stringify(all)); } catch (e) {}
+  }
+  const partIconSvg = id => `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${PART_ICONS[id][1]}</svg>`;
+
+  function paintPartBadge(badge, i) {
+    const look = partLook(i);
+    badge.style.setProperty('--part-color', look.color);
+    badge.innerHTML = `${partIconSvg(look.icon)}<span>P${i + 1}</span>`;
+    badge.setAttribute('aria-label', `Parte ${i + 1}: ${PART_ICONS[look.icon][0]}. Cambia icona e colore`);
+    badge.title = `P${i + 1} · ${PART_ICONS[look.icon][0]}${look.chosen ? '' : ' (dalla categoria della patch)'} — clicca per cambiare`;
+    const row = badge.closest('.part-row'); if (row) row.style.borderLeftColor = look.color;
+  }
+
+  // popover unico per scegliere icona e colore
+  function openPartLookPicker(badge, i) {
+    document.getElementById('partLookPicker')?.remove();
+    const pop = document.createElement('div');
+    pop.id = 'partLookPicker'; pop.className = 'part-look-picker'; pop.setAttribute('role', 'dialog'); pop.setAttribute('aria-label', `Icona e colore della parte ${i + 1}`);
+    const look = partLook(i);
+    pop.innerHTML = `<div class="plp-title">P${i + 1} · a cosa serve questa parte?</div>
+      <div class="plp-icons">${Object.entries(PART_ICONS).map(([id, [label]]) => `<button type="button" data-icon="${id}" class="${id === look.icon ? 'on' : ''}" aria-pressed="${id === look.icon}">${partIconSvg(id)}<span>${label}</span></button>`).join('')}</div>
+      <div class="plp-colors">${PART_LOOK_COLORS.map(c => `<button type="button" data-color="${c}" style="--c:${c}" class="${c === look.color ? 'on' : ''}" aria-label="Colore ${c}" aria-pressed="${c === look.color}"></button>`).join('')}</div>
+      <button type="button" class="plp-auto">automatica dalla patch</button>`;
+    document.body.appendChild(pop);
+    const r = badge.getBoundingClientRect();
+    pop.style.left = Math.min(window.innerWidth - pop.offsetWidth - 8, Math.max(8, r.left + window.scrollX)) + 'px';
+    pop.style.top = (r.bottom + window.scrollY + 6) + 'px';
+    const close = () => { pop.remove(); document.removeEventListener('pointerdown', outside, true); document.removeEventListener('keydown', esc); badge.focus(); };
+    const outside = e => { if (!pop.contains(e.target) && e.target !== badge) close(); };
+    const esc = e => { if (e.key === 'Escape') close(); };
+    document.addEventListener('pointerdown', outside, true); document.addEventListener('keydown', esc);
+    pop.addEventListener('click', e => {
+      e.stopPropagation();
+      const ic = e.target.closest('[data-icon]'), co = e.target.closest('[data-color]');
+      if (ic) setPartLook(i, { icon: ic.dataset.icon });
+      else if (co) setPartLook(i, { color: co.dataset.color });
+      else if (e.target.closest('.plp-auto')) setPartLook(i, { icon: null });
+      else return;
+      paintPartBadge(badge, i); close();
+    });
+    pop.querySelector('.on')?.focus();
+  }
+  // quando arriva un dump la categoria puo' cambiare l'icona proposta
+  window.refreshPartBadges = () => document.querySelectorAll('.part-row .part-badge').forEach(b => paintPartBadge(b, +b.dataset.part));
   const partMuteState = [false, false, false, false];
   let activeSoloPart = -1;
 
@@ -13155,11 +13254,13 @@ function exportCurrentPatchSyx() {
     const leftGroup = document.createElement('div');
     leftGroup.style.cssText = 'display: flex; align-items: center; gap: 3px; flex-shrink: 0;';
 
-    const badge = document.createElement('div');
-    badge.style.cssText = `background: ${partColor}; color: #000; font-weight: 900; font-size: 11px; padding: 3px 6px; border-radius: 3px; font-family: monospace; letter-spacing: 0.05em; min-width: 20px; text-align: center; box-shadow: 0 0 6px ${partColor}55;`;
-    badge.textContent = 'P' + (index + 1);
-    badge.title = `Access Virus TI Snow Part ${index + 1}`;
+    const badge = document.createElement('button');
+    badge.type = 'button';
+    badge.className = 'part-badge fp-key';   // .fp-key: fuori dallo stile generico dei pulsanti della scocca
+    badge.dataset.part = index;
+    badge.addEventListener('click', e => { e.stopPropagation(); openPartLookPicker(badge, index); });
     leftGroup.appendChild(badge);
+    queueMicrotask(() => paintPartBadge(badge, index));
 
     const enableBtn = document.createElement('button');
     enableBtn.className = 'chassis-page-btn';
