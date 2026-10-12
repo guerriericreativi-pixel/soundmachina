@@ -9232,6 +9232,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
       // (Il Snow non risponde a Request Global, ma dopo un cambio di modo o di programma manda 73 pp ...)
       if (msgBytes.length === 11 && msgBytes[6] >= 0x70 && msgBytes[6] <= 0x73 && msgBytes[2] === 0x20 && msgBytes[3] === 0x33) {
         const m = msgBytes[7] === 0x40 ? 'single' : (msgBytes[7] < 16 ? 'multi' : null);
+        if (m) window.__virusModeSeen = m;
         if (m && m !== window.currentSynthMode) {
           window.setSynthMode(m);
           setLastAction(`Il Virus è in ${m === 'single' ? 'SINGLE' : 'MULTI'}`);
@@ -9241,7 +9242,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
       // Play Mode annunciato dal Virus: F0 00 20 33 01 dd 73 pp 7A vv F7 (0 Single, 1 Sequencer, 2 Multi)
       if (msgBytes.length === 11 && msgBytes[6] === 0x73 && msgBytes[8] === 122) {
         window.__virusPlayMode = msgBytes[9];
-        window.setSynthMode(msgBytes[9] === 0 ? 'single' : 'multi');
+        window.setSynthMode(msgBytes[9] === 0 ? 'single' : 'multi', !window.virusSync);
         if (window.virusSync && window.virusSync.step === 'global') window.virusSync.askDump(window.currentSynthMode);
         if (window.snowPanel && window.snowPanel.state === 'play') window.snowPanel.render();
         continue;
@@ -9812,7 +9813,23 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
 
   // ultimo modo noto del Virus (confermato dal synth o scelto dal pannello), ricordato tra una sessione e l'altra
   window.lastSynthMode = () => { try { return localStorage.getItem('virusH_synthMode') || 'single'; } catch (e) { return 'single'; } };
-  window.setSynthMode = m => { window.currentSynthMode = m; try { localStorage.setItem('virusH_synthMode', m); } catch (e) {} };
+  window.setSynthMode = (m, reload = true) => {
+    const changed = m !== window.currentSynthMode;
+    window.currentSynthMode = m; try { localStorage.setItem('virusH_synthMode', m); } catch (e) {}
+    // il Virus ha cambiato modo: si rilegge cio' che ora suona (le 4 parti del Multi, oppure il suono Single)
+    if (changed && reload && selectedOutput) {
+      clearTimeout(window.__modeReload);
+      window.__modeReload = setTimeout(() => {
+        if (m === 'multi') {
+          syncAllMultiParts();
+          setTimeout(() => { if (typeof updateVirusSnowFrontPanel === 'function') updateVirusSnowFrontPanel(currentPartIndex || 0); }, 900);
+        } else {
+          currentPartIndex = 0; window.activeSinglePartIndex = 0;
+          requestPartDump(0);
+        }
+      }, 250);
+    }
+  };
   if (!window.currentSynthMode) window.currentSynthMode = window.lastSynthMode();
 
   function sendVirusMode(mode = 0) { // 0 = Single Mode, 1 = Multi Mode, 2 = Sequencer
@@ -9828,14 +9845,15 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
         recordMidiTx(`set synth mode: ${label}`, bytes);
       });
       // verifica: rilegge dal Virus modo e suono attivo; il display segue cio' che il Virus conferma
-      window.__virusPlayMode = undefined;
-      setTimeout(() => window.syncWithVirus && window.syncWithVirus(false), 400);
+      // conferma: dopo il cambio il Virus manda un parametro col byte parte 0x40 (Single) o 0..15 (Multi)
+      window.__virusModeSeen = undefined;
+      const wantMode = mode === 0 ? 'single' : 'multi';
       setTimeout(() => {
-        const got = window.__virusPlayMode;
-        if (got === want) setLastAction(`Modo ${label}: confermato dal Virus`);
-        else if (got === undefined) setLastAction(`Modo ${label} inviato al Virus`);   // il Virus spesso non risponde alla richiesta di stato
-        else setLastAction(`Il Virus è rimasto in ${['SINGLE', 'SEQUENCER', 'MULTI'][got] || got}: il cambio a ${label} non è stato accettato`);
-      }, 2200);
+        const seen = window.__virusModeSeen;
+        setLastAction(seen === wantMode ? `Modo ${label}: confermato dal Virus`
+          : seen ? `Il Virus è rimasto in ${seen === 'single' ? 'SINGLE' : 'MULTI'}: il cambio a ${label} non è stato accettato`
+          : `Modo ${label} inviato al Virus`);
+      }, 1500);
     } catch(e) { console.error('sendVirusMode error', e); }
   }
 
