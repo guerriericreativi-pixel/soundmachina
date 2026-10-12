@@ -6943,8 +6943,15 @@
   /* badge parte: icona strumento su fondo colorato, sceglibile */
   .part-row .part-badge { display: inline-flex !important; align-items: center; gap: 4px; height: 26px; padding: 0 7px !important; border: 0 !important; border-radius: 4px !important; cursor: pointer;
     background: var(--part-color, #888) !important; color: #111 !important; font: 900 11px/1 monospace !important; letter-spacing: 0.04em; box-shadow: 0 1px 0 rgba(0,0,0,0.25), inset 0 1px 0 rgba(255,255,255,0.35) !important; }
-  .part-row .part-badge { width: auto !important; min-width: 52px !important; justify-content: center; text-transform: uppercase !important; }
-  .part-row .part-badge svg, .plp-icons svg { flex: 0 0 16px; width: 16px !important; height: 16px !important; }
+  .part-row .part-badge { width: auto !important; min-width: 64px !important; height: 34px !important; gap: 6px !important; font-size: 13px !important; justify-content: center; text-transform: uppercase !important; }
+  .part-row .part-badge svg, #singlePartSelector .part-pick svg { flex: 0 0 22px; width: 22px !important; height: 22px !important; }
+  .plp-icons svg { flex: 0 0 26px; width: 26px !important; height: 26px !important; }
+  /* pulsanti P1-P4 della pagina SINGLE con icona e colore della parte */
+  #singlePartSelector .part-pick { display: inline-flex !important; align-items: center; gap: 6px; height: 36px !important; min-width: 70px; padding: 0 10px !important; border-radius: 4px !important;
+    background: var(--part-color, #888) !important; color: #111 !important; font: 900 13px/1 monospace !important; text-transform: uppercase !important; opacity: 0.55; border: 2px solid transparent !important; }
+  #singlePartSelector .part-pick.active-view { opacity: 1; border-color: #111 !important; box-shadow: 0 0 0 2px rgba(255,255,255,0.7) !important; }
+  html[data-skin="elektron"] #singlePartSelector .part-pick.active-view { border-color: #fff !important; box-shadow: 0 0 0 2px rgba(0,0,0,0.6) !important; }
+  .kbd-part-icon { display: inline-flex; vertical-align: middle; margin-right: 6px; padding: 2px; border-radius: 3px; background: var(--part-color); color: #111; }
   .part-row .part-badge:focus-visible { outline: 2px solid #3b82f6; outline-offset: 2px; }
   .part-look-picker { position: absolute; z-index: 100000; width: 300px; padding: 10px; border-radius: 6px; background: #f4f4f2; color: #222; border: 1px solid #c8c8c4; box-shadow: 0 10px 30px rgba(0,0,0,0.25); font: 12px/1.3 'Inter', sans-serif; }
   html[data-skin="elektron"] .part-look-picker { background: #232427; color: #e2e3e6; border-color: #3a3b3f; }
@@ -10319,9 +10326,10 @@ function exportCurrentPatchSyx() {
 
     for (let i = 0; i < NUM_PARTS; i++) {
       const pBtn = document.createElement('button');
-      pBtn.className = 'seq-page-btn' + (i === (window.activeSinglePartIndex || 0) ? ' active-view' : '');
-      pBtn.style.cssText = 'padding: 4px 10px; font-size: 11px;';
+      pBtn.className = 'seq-page-btn part-pick' + (i === (window.activeSinglePartIndex || 0) ? ' active-view' : '');
+      pBtn.dataset.part = i;
       pBtn.textContent = `P${i + 1}`;
+      queueMicrotask(() => window.paintPartPick?.(pBtn, i));
       pBtn.title = `Edita i suoni e filtri di P${i + 1} (ch ${multiParts[i].values.channel + 1})`;
       pBtn.addEventListener('click', () => {
         setSingleEditingPart(i);
@@ -12423,7 +12431,7 @@ function exportCurrentPatchSyx() {
     const all = loadPartLooks(); all[i] = { ...(all[i] || {}), ...change };
     try { localStorage.setItem(PART_LOOK_KEY, JSON.stringify(all)); } catch (e) {}
   }
-  const partIconSvg = id => `<svg viewBox="0 0 24 24" width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${PART_ICONS[id][1]}</svg>`;
+  const partIconSvg = (id, size = 22) => `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${PART_ICONS[id][1]}</svg>`;
 
   function paintPartBadge(badge, i) {
     const look = partLook(i);
@@ -12441,7 +12449,7 @@ function exportCurrentPatchSyx() {
     pop.id = 'partLookPicker'; pop.className = 'part-look-picker'; pop.setAttribute('role', 'dialog'); pop.setAttribute('aria-label', `Icona e colore della parte ${i + 1}`);
     const look = partLook(i);
     pop.innerHTML = `<div class="plp-title">P${i + 1} · a cosa serve questa parte?</div>
-      <div class="plp-icons">${Object.entries(PART_ICONS).map(([id, [label]]) => `<button type="button" data-icon="${id}" class="${id === look.icon ? 'on' : ''}" aria-pressed="${id === look.icon}">${partIconSvg(id)}<span>${label}</span></button>`).join('')}</div>
+      <div class="plp-icons">${Object.entries(PART_ICONS).map(([id, [label]]) => `<button type="button" data-icon="${id}" class="${id === look.icon ? 'on' : ''}" aria-pressed="${id === look.icon}">${partIconSvg(id, 26)}<span>${label}</span></button>`).join('')}</div>
       <div class="plp-colors">${PART_LOOK_COLORS.map(c => `<button type="button" data-color="${c}" style="--c:${c}" class="${c === look.color ? 'on' : ''}" aria-label="Colore ${c}" aria-pressed="${c === look.color}"></button>`).join('')}</div>
       <button type="button" class="plp-auto">automatica dalla patch</button>`;
     document.body.appendChild(pop);
@@ -12459,12 +12467,25 @@ function exportCurrentPatchSyx() {
       else if (co) setPartLook(i, { color: co.dataset.color });
       else if (e.target.closest('.plp-auto')) setPartLook(i, { icon: null });
       else return;
-      paintPartBadge(badge, i); close();
+      window.refreshPartBadges(); close();
     });
     pop.querySelector('.on')?.focus();
   }
   // quando arriva un dump la categoria puo' cambiare l'icona proposta
-  window.refreshPartBadges = () => document.querySelectorAll('.part-row .part-badge').forEach(b => paintPartBadge(b, +b.dataset.part));
+  // stessa icona sui pulsanti P1-P4 della pagina SINGLE e sull'indicatore della tastiera
+  function paintPartPick(btn, i) {
+    const look = partLook(i);
+    btn.style.setProperty('--part-color', look.color);
+    btn.innerHTML = `${partIconSvg(look.icon)}<span>P${i + 1}</span>`;
+    btn.title = `P${i + 1} · ${PART_ICONS[look.icon][0]} (ch ${multiParts[i].values.channel + 1}) — edita questa parte`;
+  }
+  window.partIconHtml = i => { const look = partLook(i); return `<span class="kbd-part-icon" style="--part-color:${look.color}">${partIconSvg(look.icon, 18)}</span>`; };
+  window.refreshPartBadges = () => {
+    document.querySelectorAll('.part-row .part-badge').forEach(b => paintPartBadge(b, +b.dataset.part));
+    document.querySelectorAll('#singlePartSelector .part-pick').forEach(b => paintPartPick(b, +b.dataset.part));
+    if (typeof updateKeyboardPartDisplay === 'function') updateKeyboardPartDisplay();
+  };
+  window.paintPartPick = paintPartPick;
   const partMuteState = [false, false, false, false];
   let activeSoloPart = -1;
 
@@ -14777,13 +14798,10 @@ function exportCurrentPatchSyx() {
       : (part ? getBankPatchName(part.values.bank, part.values.program) : 'Init');
 
     const ch = getActiveMidiChannel() + 1;
-    if (isSingleView) {
-      el.textContent = `SINGLE P${pIdx + 1}: ${pName} (MIDI Ch ${ch})`;
-    } else if (isSingleMode) {
-      el.textContent = `SINGLE: ${pName} (MIDI Ch ${ch})`;
-    } else {
-      el.textContent = `MULTI P${pIdx + 1}: ${pName} (ch ${ch})`;
-    }
+    const txt = isSingleView ? `SINGLE P${pIdx + 1}: ${pName} (MIDI Ch ${ch})`
+      : isSingleMode ? `SINGLE: ${pName} (MIDI Ch ${ch})` : `MULTI P${pIdx + 1}: ${pName} (ch ${ch})`;
+    el.textContent = txt;
+    if (window.partIconHtml) el.insertAdjacentHTML('afterbegin', window.partIconHtml(pIdx));
   }
 
   function playNote(noteNumber, velocity = currentVelocity) {
