@@ -6240,7 +6240,7 @@
     background: none !important;
     box-shadow: none !important;
     border: 1px solid transparent !important;
-    border-image: var(--hw-btn-up) 38 38 43 38 fill / 19px 19px 21.5px 19px / 13px 13px 16.5px 13px stretch !important;
+    border-image: var(--hw-btn-up) 38 38 43 38 fill / 9px 9px 10px 9px / 6px 6px 8px 6px stretch !important;
     color: var(--hw-btn-text) !important;
     text-shadow: none !important;
     transform: none !important;
@@ -6268,8 +6268,8 @@
   .hardware-chassis .seq-trk-solo-btn.active,
   .hardware-chassis .arp-hw-btn-hold.active,
   #snowHardwareChassis .snow-front-dock button:not([style*="background"]).active {
-    border-image: var(--hw-btn-down) 38 38 40 38 fill / 19px 19px 20px 19px / 13px 13px 15px 13px stretch !important;
-    transform: translateY(1.5px) !important;
+    border-image: var(--hw-btn-down) 38 38 40 38 fill / 9px 9px 9.5px 9px / 6px 6px 7px 6px stretch !important;
+    transform: translateY(1px) !important;
     box-shadow: none !important;
     color: var(--hw-btn-on) !important;
   }
@@ -6577,6 +6577,98 @@
 
   .faceplate .fp-lcd .lcd-footer-bar { gap: 0.8cqw; }
   .faceplate .fp-lcd .lcd-footer-bar span { white-space: nowrap !important; font-size: 0.95cqw !important; }
+
+  /* ==========================================================================
+     PULSANTI DI INTERFACCIA SOBRI (viste MULTI/SINGLE/ARP/SEQ/FX/PATCH):
+     chiari, bordo sottile, ombra minima. I tasti hardware renderizzati restano.
+     ========================================================================== */
+  .hardware-chassis button:not(.fp-key):not(.arp-hw-step-pad):not(.snow-sq-btn):not(.snow-sq-nav-btn):not(.snow-matrix-btn):not(.section-info-btn):not(.section-info-close),
+  html[data-skin] .hardware-chassis button:not(.fp-key):not(.arp-hw-step-pad):not(.snow-sq-btn):not(.snow-sq-nav-btn):not(.snow-matrix-btn):not(.section-info-btn):not(.section-info-close) {
+    border-image: none !important;
+    border: 1px solid #b4b3ae !important;
+    border-radius: 5px !important;
+    background: linear-gradient(180deg, #f1f0ed 0%, #e3e2de 100%) !important;
+    box-shadow: 0 1px 0 rgba(0,0,0,0.10), 0 1px 2px rgba(0,0,0,0.06) !important;
+    color: #2f3033 !important;
+    text-shadow: none !important;
+    transform: none !important;
+    font-weight: 600 !important;
+    transition: background 80ms ease, box-shadow 80ms ease !important;
+  }
+  .hardware-chassis button:not(.fp-key):not(.arp-hw-step-pad):not(.snow-sq-btn):not(.snow-sq-nav-btn):not(.snow-matrix-btn):not(.section-info-btn):not(.section-info-close):hover {
+    background: linear-gradient(180deg, #f7f6f3 0%, #e9e8e4 100%) !important;
+  }
+  .hardware-chassis button:not(.fp-key):not(.arp-hw-step-pad):not(.snow-sq-btn):not(.snow-sq-nav-btn):not(.snow-matrix-btn):not(.section-info-btn):not(.section-info-close):active,
+  .hardware-chassis button.active:not(.fp-key):not(.arp-hw-step-pad):not(.snow-sq-btn):not(.snow-sq-nav-btn):not(.snow-matrix-btn) {
+    background: linear-gradient(180deg, #dcdbd6 0%, #e6e5e1 100%) !important;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.14) !important;
+    border-color: #9e9d98 !important;
+    color: #1f2023 !important;
+  }
+  /* stato attivo: piccolo LED bianco/ambra invece di riempimenti colorati */
+  .hardware-chassis button.active:not(.fp-key):not(.arp-hw-step-pad):not(.snow-sq-btn):not(.snow-sq-nav-btn):not(.snow-matrix-btn) {
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.14), inset 0 -2px 0 #c9a227 !important;
+  }
+  /* pulsanti con colore di funzione: stesso corpo sobrio, colore solo nel testo */
+  .hardware-chassis button[style*="background"]:not(.fp-key) {
+    background: linear-gradient(180deg, #f1f0ed 0%, #e3e2de 100%) !important;
+  }
+
+  html[data-skin="elektron"] .hardware-chassis button:not(.fp-key):not(.arp-hw-step-pad):not(.snow-sq-btn):not(.snow-sq-nav-btn):not(.snow-matrix-btn):not(.section-info-btn):not(.section-info-close),
+  html[data-skin="elektron"] .hardware-chassis button[style*="background"]:not(.fp-key) {
+    border-color: #18191b !important;
+    background: linear-gradient(180deg, #3a3b3f 0%, #2e2f33 100%) !important;
+    box-shadow: 0 1px 0 rgba(255,255,255,0.05) inset, 0 1px 2px rgba(0,0,0,0.4) !important;
+    color: #d6d7da !important;
+  }
+  html[data-skin="elektron"] .hardware-chassis button:not(.fp-key):not(.arp-hw-step-pad):not(.snow-sq-btn):not(.snow-sq-nav-btn):not(.snow-matrix-btn):not(.section-info-btn):not(.section-info-close):hover {
+    background: linear-gradient(180deg, #424347 0%, #35363a 100%) !important;
+  }
+  html[data-skin="elektron"] .hardware-chassis button:not(.fp-key):not(.arp-hw-step-pad):not(.snow-sq-btn):not(.snow-sq-nav-btn):not(.snow-matrix-btn):active,
+  html[data-skin="elektron"] .hardware-chassis button.active:not(.fp-key):not(.arp-hw-step-pad):not(.snow-sq-btn):not(.snow-sq-nav-btn):not(.snow-matrix-btn) {
+    background: #2a2b2e !important;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.5), inset 0 -2px 0 #e6e8ea !important;
+    color: #ffffff !important;
+  }
+
+  /* link-pulsante "apri editor" (↗) con lo stesso stile sobrio */
+  .hardware-chassis a.chassis-page-btn,
+  html[data-skin] .hardware-chassis a.chassis-page-btn {
+    border-image: none !important;
+    border: 1px solid #b4b3ae !important;
+    border-radius: 5px !important;
+    background: linear-gradient(180deg, #f1f0ed 0%, #e3e2de 100%) !important;
+    box-shadow: 0 1px 0 rgba(0,0,0,0.10), 0 1px 2px rgba(0,0,0,0.06) !important;
+    transform: none !important;
+  }
+  html[data-skin="elektron"] .hardware-chassis a.chassis-page-btn {
+    border-color: #18191b !important;
+    background: linear-gradient(180deg, #3a3b3f 0%, #2e2f33 100%) !important;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.4) !important;
+  }
+
+  /* step pad ARP/SEQ: stesso tasto renderizzato del frontale (piu' piatto), numeri neutri */
+  .hardware-chassis .arp-hw-step-pad { --key-sprite: url("assets/faceplate/fp-key-snow.webp") !important; }
+  html[data-skin="elektron"] .hardware-chassis .arp-hw-step-pad { --key-sprite: url("assets/faceplate/fp-key-dark.webp") !important; }
+  .hardware-chassis .arp-hw-step-pad::before { inset: -40% !important; }
+  .hardware-chassis .arp-hw-step-pad { color: #f4f4f2 !important; text-shadow: 0 1px 1px rgba(0,0,0,0.35) !important; }
+  .hardware-chassis .arp-hw-step-pad.active { color: #ffffff !important; text-shadow: 0 0 6px rgba(255,255,255,0.9) !important; }
+
+  .hardware-chassis .arp-hw-pad-well { background: transparent !important; box-shadow: none !important; border: none !important; }
+
+  /* SEQ: gruppi traccia e griglia step su pannello ribassato, non riquadri neri */
+  .hardware-chassis div[style*="background: rgb(19, 20, 26)"],
+  .hardware-chassis div[style*="background: rgb(12, 13, 17)"] {
+    background: rgba(0,0,0,0.05) !important;
+    border: 1px solid rgba(0,0,0,0.10) !important;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.10) !important;
+  }
+  html[data-skin="elektron"] .hardware-chassis div[style*="background: rgb(19, 20, 26)"],
+  html[data-skin="elektron"] .hardware-chassis div[style*="background: rgb(12, 13, 17)"] {
+    background: rgba(0,0,0,0.25) !important;
+    border-color: rgba(0,0,0,0.5) !important;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.5) !important;
+  }
 </style>
 </head>
 <body>
