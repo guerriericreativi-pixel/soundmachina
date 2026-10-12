@@ -6979,6 +6979,15 @@
   .section-help b { font-weight: 700; }
   .sh-tip { margin: 16px 0 0; padding: 10px 12px; border-radius: 4px; background: rgba(0,0,0,0.06); font-size: 12.5px; }
   html[data-skin="elektron"] .sh-tip { background: rgba(255,255,255,0.06); }
+  /* FX RACK */
+  .fx-rack-title-box { display: flex; align-items: baseline; gap: 12px; }
+  .fx-rack-sub { font: 600 11px/1 'Inter', sans-serif; letter-spacing: 0.04em; opacity: 0.6; }
+  .fx-target-label { font: 800 10px/1 'Inter', sans-serif; letter-spacing: 0.08em; opacity: 0.7; margin-right: 6px; }
+  .fx-rack-grid { align-items: start !important; width: 100%; box-sizing: border-box; }
+  .fx-part-btn .kbd-part-icon { margin-right: 5px; padding: 1px; }
+  .fx-part-btn .kbd-part-icon svg { width: 16px !important; height: 16px !important; }
+  .fx-part-btn { display: inline-flex !important; align-items: center; }
+  .fx-keys { position: absolute !important; right: 46px; bottom: 26px; margin: 0 !important; z-index: 3; }
 </style>
 </head>
 <body>
@@ -7890,7 +7899,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
     if (rail) rail.style.display = show ? 'grid' : 'none';
     if (strip) strip.style.display = show ? 'flex' : 'none';
     // in PANEL e SINGLE stato/azioni/guida MIDI stanno dietro il tasto MIDI della scocca
-    document.body.classList.toggle('panel-view', view === 'snow' || view === 'single' || view === 'multi');
+    document.body.classList.toggle('panel-view', ['snow', 'single', 'multi', 'fx'].includes(view));
     if (!show && diag) diag.classList.add('hidden');
   }
 
@@ -10253,6 +10262,7 @@ function exportCurrentPatchSyx() {
   }
   const waveBrowsers = [];
   // tasto MIDI (PANEL e SINGLE): mostra stato, azioni e guida di collegamento
+  window.toggleMidiPanel = () => toggleMidiPanel();
   function toggleMidiPanel() {
     const open = document.body.classList.toggle('midi-open');
     document.querySelectorAll('[data-midi-key]').forEach(k => k.setAttribute('aria-expanded', String(open)));
@@ -12498,6 +12508,7 @@ function exportCurrentPatchSyx() {
   window.refreshPartBadges = () => {
     document.querySelectorAll('.part-row .part-badge').forEach(b => paintPartBadge(b, +b.dataset.part));
     document.querySelectorAll('#singlePartSelector .part-pick').forEach(b => paintPartPick(b, +b.dataset.part));
+    document.querySelectorAll('.fx-part-btn[data-part]').forEach(b => { const i = +b.dataset.part; if (i >= 0) b.innerHTML = `${window.partIconHtml(i)}P${i + 1}`; });
     if (typeof updateKeyboardPartDisplay === 'function') updateKeyboardPartDisplay();
   };
   window.paintPartPick = paintPartPick;
@@ -17924,6 +17935,7 @@ function exportCurrentPatchSyx() {
 
     container.innerHTML = `
       <div class="hardware-chassis fx-rack-chassis">
+        <div class="chassis-keys fx-keys"><button type="button" class="chassis-key fp-key" data-midi-key aria-expanded="${document.body.classList.contains('midi-open')}" title="Mostra / nascondi stato MIDI, azioni e guida di collegamento">MIDI</button></div>
         <div class="chassis-screw screw-tl"></div>
         <div class="chassis-screw screw-tr"></div>
         <div class="chassis-screw screw-bl"></div>
@@ -17932,11 +17944,11 @@ function exportCurrentPatchSyx() {
         <!-- Top Header & Target Part Selector -->
         <div class="fx-rack-topbar">
           <div class="fx-rack-title-box">
-            <span class="fx-rack-badge">STUDIO RACK</span>
-            <span class="fx-rack-title">VIRUS-TI MULTI-EFFECTS &amp; MACRO PROCESSOR</span>
+            <span class="fx-rack-title">FX RACK</span>
+            <span class="fx-rack-sub">effetti e macro della parte</span>
           </div>
           <div class="fx-target-selector">
-            <span style="font-size: 9px; font-weight: 800; color: #94a3b8; margin-right: 4px;">TARGET PART:</span>
+            <span class="fx-target-label">PARTE</span>
             <button class="fx-part-btn active" data-part="0">P1</button>
             <button class="fx-part-btn" data-part="1">P2</button>
             <button class="fx-part-btn" data-part="2">P3</button>
@@ -17951,9 +17963,8 @@ function exportCurrentPatchSyx() {
             <div class="fx-unit-header">
               <div class="fx-unit-name">
                 <span class="fx-unit-led"></span>
-                <span>TAPE DELAY &amp; REVERBERATION SPACE</span>
+                <span>DELAY · REVERB</span>
               </div>
-              <div style="font-size: 8.5px; font-weight: 700; color: #64748b; font-family: monospace;">UNIT 01 // DSP</div>
             </div>
 
             <!-- Tape Reels Visualizer Canvas -->
@@ -18027,17 +18038,12 @@ function exportCurrentPatchSyx() {
             <div class="fx-unit-header">
               <div class="fx-unit-name">
                 <span class="fx-unit-led" style="background: #f97316; box-shadow: 0 0 8px #f97316;"></span>
-                <span>VACUUM TUBE DRIVE &amp; SATURATION</span>
+                <span>SATURATION</span>
               </div>
-              <div style="font-size: 8.5px; font-weight: 700; color: #64748b; font-family: monospace;">UNIT 02 // ANALOG TUBE</div>
             </div>
 
-            <!-- Interactive 12AX7 Vacuum Tube Visualizer -->
+            <!-- curva di saturazione -->
             <div class="tube-container">
-              <div class="vacuum-tube" id="tubeVisualizer">
-                <div class="tube-glow" id="tubeGlow" style="opacity: 0.55; transform: scale(1);"></div>
-                <div class="tube-plate"></div>
-              </div>
               <canvas id="fxTubeCurveCanvas" class="fx-scope-canvas" style="width: 170px; height: 74px;"></canvas>
             </div>
 
@@ -18097,9 +18103,8 @@ function exportCurrentPatchSyx() {
             <div class="fx-unit-header">
               <div class="fx-unit-name">
                 <span class="fx-unit-led" style="background: #38bdf8; box-shadow: 0 0 8px #38bdf8;"></span>
-                <span>STEREO CHORUS &amp; 6-STAGE PHASER</span>
+                <span>CHORUS</span>
               </div>
-              <div style="font-size: 8.5px; font-weight: 700; color: #64748b; font-family: monospace;">UNIT 03 // MODULATION</div>
             </div>
 
             <!-- Stereo Lissajous Canvas -->
@@ -18161,9 +18166,8 @@ function exportCurrentPatchSyx() {
             <div class="fx-unit-header">
               <div class="fx-unit-name">
                 <span class="fx-unit-led" style="background: #a855f7; box-shadow: 0 0 8px #a855f7;"></span>
-                <span>TOUCH X/Y KAOSS SURFACE &amp; MACRO PERFORMANCE</span>
+                <span>X/Y PAD · MACRO</span>
               </div>
-              <div style="font-size: 8.5px; font-weight: 700; color: #64748b; font-family: monospace;">UNIT 04 // LIVE EXPRESSION</div>
             </div>
 
             <!-- X/Y Touch Surface with Crosshairs and Puck -->
@@ -18226,6 +18230,8 @@ function exportCurrentPatchSyx() {
   }
 
   function initFxRackInteractions() {
+    document.querySelector('.fx-keys [data-midi-key]')?.addEventListener('click', () => window.toggleMidiPanel?.());
+    window.refreshPartBadges?.();
     // Target Part Selector
     document.querySelectorAll('.fx-part-btn').forEach(btn => {
       btn.addEventListener('click', () => {
@@ -18560,7 +18566,7 @@ function exportCurrentPatchSyx() {
     ], 'I parametri marcati “n/d” sono Page B: il Virus non li accetta via CC, vanno cambiati sul synth.'],
     btnTabFxRack: ['FX RACK — effetti della parte', [
       ['Parte', 'In alto scegli la parte (<b>p1–p4</b>) o <b>all</b> per tutte.'],
-      ['Effetti', 'Delay (<b>TIME, FEEDBACK, SEND</b>), riverbero (<b>REV DECAY, SIZE</b>), saturazione (<b>SATUR, CURVE</b>), chorus (<b>DEPTH, RATE, MIX</b>). Le manopole grigie con “·B” sono Page B: non inviano nulla.'],
+      ['Effetti', 'Delay (<b>TIME, FEEDBACK, SEND</b>), riverbero (<b>REV DECAY, SIZE</b>), saturazione (<b>SATUR, CURVE</b>), chorus (<b>DEPTH, RATE, MOD MIX, SPREAD</b>). Il pad X/Y muove Cutoff (orizzontale) e Resonance (verticale). Le manopole grigie con “·B” sono Page B: non inviano nulla.'],
       ['Macro', '<b>1: CUTOFF, 2: RESO, 3: SATUR, 4: FX SEND</b>: comandi rapidi sui parametri principali della parte.'],
     ]],
     btnTabPatchManager: ['PATCH — libreria e file', [
