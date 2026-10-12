@@ -6848,6 +6848,14 @@
     border-color: #0b0b0c !important;
   }
   html[data-skin="elektron"] .hardware-chassis .song-slot > div:first-child { color: #ffb3ba !important; border-bottom-color: rgba(255,80,90,0.35) !important; }
+
+  .midi-monitor-cell .diag-label { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .midi-monitor-cell .mm-hint { font-weight: 500; opacity: 0.6; text-transform: none; letter-spacing: 0; }
+  .midi-monitor-cell button { min-height: 26px; padding: 0 10px; font-size: 11px; }
+  .midi-monitor-cell button:first-of-type { margin-left: auto; }
+  #midiMonitor { margin: 6px 0 0; height: 220px; overflow: auto; padding: 8px 10px; border-radius: 6px;
+    background: #15181c; color: #b9e6c9; font: 11.5px/1.45 ui-monospace, Menlo, monospace; white-space: pre; }
+  .midi-diagnostics .diag-cell.wide.midi-monitor-cell { grid-column: 1 / -1; }
 </style>
 </head>
 <body>
@@ -7062,6 +7070,14 @@
   <div class="diag-cell wide">
     <div class="diag-label">Last MIDI</div>
     <div class="diag-value" id="diagLastMidi">none</div>
+  </div>
+  <div class="diag-cell wide midi-monitor-cell">
+    <div class="diag-label">Monitor MIDI <span class="mm-hint">(IN = dal Virus · OUT = verso il Virus)</span>
+      <button type="button" id="btnCopyMidiLog">copia log</button>
+      <button type="button" id="btnClearMidiLog">svuota</button>
+      <button type="button" id="btnSyncVirus">sincronizza col Virus</button>
+    </div>
+    <pre id="midiMonitor" aria-live="off"></pre>
   </div>
 </div>
 
@@ -8822,9 +8838,53 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
     if (typeof initElektronLcd === 'function') initElektronLcd();
   }
 
+  // ---------------------------------------------------------------------
+  // Monitor MIDI: ultimi messaggi IN/OUT decodificati (pannello diagnostics)
+  // ---------------------------------------------------------------------
+  const CC_NAMES = {0:'Bank MSB',1:'Mod Wheel',5:'Portamento',7:'Volume',10:'Pan',17:'Osc1 Shape',18:'Osc1 PW',19:'Osc1 Wave',20:'Osc1 Semi',22:'Osc2 Shape',23:'Osc2 PW',24:'Osc2 Wave',25:'Osc2 Semi',26:'Osc2 Detune',27:'Osc2 FM',28:'Osc2 Sync',32:'Bank LSB',33:'Osc Balance',34:'Sub Vol',36:'Osc Vol/Sat',37:'Noise Vol',38:'Ring Vol',40:'Cutoff',41:'Cutoff 2',42:'Resonance',43:'Resonance 2',44:'Flt Env Amt',46:'Flt1 Keyflw',48:'Flt Balance',49:'Sat Curve',51:'Flt1 Mode',54:'FEnv Attack',55:'FEnv Decay',56:'FEnv Sustain',58:'FEnv Release',59:'AEnv Attack',60:'AEnv Decay',61:'AEnv Sustain',63:'AEnv Release',64:'Hold',67:'LFO1 Rate',68:'LFO1 Shape',79:'LFO2 Rate',91:'Patch Volume',93:'Transpose',94:'Key Mode',97:'Unison Mode',98:'Unison Detune',99:'Unison Spread',104:'Chorus Mix',106:'Chorus Rate',107:'Chorus Depth',113:'Effect Send',114:'Delay Time',115:'Delay Feedback',116:'Reverb Time',117:'Reverb Size',120:'All Sound Off',123:'All Notes Off'};
+  const VIRUS_CMD = {0x10:'Single Dump',0x11:'Multi Dump',0x12:'Global Dump',0x30:'Req Single',0x31:'Req Multi',0x32:'Req Single Bank',0x33:'Req Multi Bank',0x35:'Req Global',0x36:'Req Total',0x70:'Param Page A',0x71:'Param Page B',0x72:'Param Page C',0x73:'Global Param'};
+  function describeMidi(d) {
+    const st = d[0], hi = st & 0xF0, ch = (st & 0x0F) + 1;
+    if (st === 0xF0) {
+      const isVirus = d[1] === 0x00 && d[2] === 0x20 && d[3] === 0x33;
+      if (!isVirus) return `SysEx ${d.length} byte`;
+      const cmd = d[6], name = VIRUS_CMD[cmd] || ('cmd 0x' + (cmd ?? 0).toString(16));
+      if (cmd === 0x10) return `SysEx ${name} bank ${d[7]} prog ${d[8] === 0x40 ? '0x40 (edit buffer Single)' : d[8]} · "${extractPatchName(d)}" (${d.length} byte)`;
+      if (cmd === 0x30) return `SysEx ${name} bank ${d[7]} prog ${d[8] === 0x40 ? '0x40 (edit buffer Single)' : d[8]}`;
+      if (cmd >= 0x70 && cmd <= 0x72) return `SysEx ${name} parte ${d[7] === 0x40 ? 'Single' : d[7] + 1} param ${d[8]} = ${d[9]}`;
+      return `SysEx ${name} (${d.length} byte)`;
+    }
+    if (hi === 0x90 && d[2] > 0) return `ch${ch} Note On ${d[1]} vel ${d[2]}`;
+    if (hi === 0x80 || hi === 0x90) return `ch${ch} Note Off ${d[1]}`;
+    if (hi === 0xB0) return `ch${ch} CC ${d[1]} ${CC_NAMES[d[1]] ? '(' + CC_NAMES[d[1]] + ') ' : ''}= ${d[2]}`;
+    if (hi === 0xC0) return `ch${ch} Program Change ${d[1]}`;
+    if (hi === 0xE0) return `ch${ch} Pitch Bend ${(d[2] << 7 | d[1]) - 8192}`;
+    if (hi === 0xD0) return `ch${ch} Aftertouch ${d[1]}`;
+    return Array.from(d).map(b => b.toString(16).padStart(2, '0')).join(' ');
+  }
+  const midiLog = [];
+  function midiMonitorLog(dir, data) {
+    const d = Array.from(data);
+    if (d[0] === 0xF8 || d[0] === 0xFE) return;   // clock e active sensing
+    const t = new Date();
+    const line = `${t.toTimeString().slice(0, 8)}.${String(t.getMilliseconds()).padStart(3, '0')}  ${dir === 'in' ? 'IN ' : 'OUT'}  ${describeMidi(d)}`;
+    midiLog.push(line);
+    if (midiLog.length > 300) midiLog.shift();
+    const el = document.getElementById('midiMonitor');
+    if (el) { el.textContent = midiLog.slice(-120).join('\n'); el.scrollTop = el.scrollHeight; }
+  }
+  window.midiMonitorLog = midiMonitorLog;
+  document.getElementById('btnCopyMidiLog')?.addEventListener('click', async () => {
+    try { await navigator.clipboard.writeText(midiLog.join('\n')); setLastAction(`Log MIDI copiato (${midiLog.length} righe)`); }
+    catch (e) { uiPrompt('Copia il log MIDI:', midiLog.join(' | ')); }
+  });
+  document.getElementById('btnClearMidiLog')?.addEventListener('click', () => { midiLog.length = 0; const el = document.getElementById('midiMonitor'); if (el) el.textContent = ''; });
+  document.getElementById('btnSyncVirus')?.addEventListener('click', () => syncWithVirus(true));
+
   function handleIncomingMidi(event) {
     const bytes = event.data;
     midiStats.rx++;
+    midiMonitorLog('in', bytes);
 
     // Ignora il Clock (F8) e Active Sensing (FE) per non intasare il debug
     if (bytes[0] !== 0xF8 && bytes[0] !== 0xFE) {
@@ -8950,6 +9010,21 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
       // Un Single Patch Dump del Virus TI ha almeno 265 bytes (tipicamente 267 bytes)
       if (msgBytes.length >= 250) {
         const patchName = extractPatchName(msgBytes);
+
+        // Caso 0: risposta alla sincronizzazione d'avvio
+        if (window.virusSync && msgBytes[6] === 0x10 && msgBytes[7] === 0x00) {
+          const isSingle = msgBytes[8] === 0x40;
+          clearTimeout(window.virusSync.timer);
+          window.virusSync = null;
+          window.currentSynthMode = isSingle ? 'single' : 'multi';
+          if (isSingle) { currentPartIndex = 0; window.activeSinglePartIndex = 0; }
+          if (typeof applyDumpToActivePatch === 'function') applyDumpToActivePatch(msgBytes);
+          const part = multiParts[currentPartIndex || 0];
+          if (part) part.name = patchName;
+          updateVirusSnowFrontPanel(currentPartIndex || 0);
+          setLastAction(`Sincronizzato col Virus: ${isSingle ? 'SINGLE' : 'MULTI'} · ${patchName}`);
+          continue;
+        }
 
         // Caso 1: Fetch di una Parte Multi (Part 1..4)
         if (window.multiFetchState && window.multiFetchState.active) {
@@ -9142,6 +9217,42 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
     }
   }
 
+  // ---------------------------------------------------------------------
+  // Sincronizzazione col Virus: all'apertura (e quando cambia la porta) chiede
+  // al synth lo stato reale invece di mostrare quello salvato nel browser.
+  // 1) edit buffer Single (prog 0x40): se risponde, il Virus e' in SINGLE
+  // 2) altrimenti edit buffer della parte 1 del Multi
+  // ---------------------------------------------------------------------
+  let lastSyncedOutputId = null;
+  window.virusSync = null;
+  function syncLcd(a, b) {
+    const big1 = document.getElementById('frontLcdBankProg'), big2 = document.getElementById('frontLcdPatchName');
+    const cat = document.getElementById('frontLcdCategory');
+    if (big1) big1.textContent = a; if (big2) big2.textContent = b; if (cat) cat.textContent = 'SYNC';
+  }
+  function syncWithVirus(manual) {
+    if (!selectedOutput) { if (manual) uiAlert('Collega prima la porta MIDI del Virus.'); return; }
+    clearTimeout(window.virusSync?.timer);
+    const ask = (prog) => selectedOutput.send(new Uint8Array([...SYSEX_PREFIX, deviceId(), 0x30, 0x00, prog, 0xF7]));
+    window.virusSync = { step: 'single', timer: 0 };
+    syncLcd('SYNC', 'LETTURA DAL VIRUS…');
+    setLastAction('Sincronizzazione: richiedo il suono attivo al Virus…');
+    ask(0x40);
+    window.virusSync.timer = setTimeout(() => {
+      if (!window.virusSync) return;
+      window.virusSync.step = 'multi';
+      ask(0x00);
+      window.virusSync.timer = setTimeout(() => {
+        if (!window.virusSync) return;
+        window.virusSync = null;
+        syncLcd('NO SYNC', 'IL VIRUS NON RISPONDE');
+        setLastAction('Il Virus non risponde alle richieste SysEx: controlla porta MIDI IN, Device ID e che il synth sia acceso (vedi Monitor MIDI)');
+        setTimeout(() => updateVirusSnowFrontPanel(currentPartIndex || 0), 2500);
+      }, 1200);
+    }, 900);
+  }
+  window.syncWithVirus = syncWithVirus;
+
   function refreshPorts(){
     const prevOut = outSelect.value;
     outSelect.innerHTML = '<option value="">none</option>';
@@ -9204,6 +9315,15 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
   function onOutputChange(){
     const id = outSelect.value;
     selectedOutput = (midiAccess && id) ? midiAccess.outputs.get(id) : null;
+    if (selectedOutput && !selectedOutput.__monitored) {
+      const orig = selectedOutput.send.bind(selectedOutput);
+      selectedOutput.send = (data, ts) => { midiMonitorLog('out', data); return orig(data, ts); };
+      selectedOutput.__monitored = true;
+    }
+    if (selectedOutput && selectedOutput.id !== lastSyncedOutputId) {
+      lastSyncedOutputId = selectedOutput.id;
+      setTimeout(() => syncWithVirus(false), 300);
+    }
     if (selectedOutput) {
       localStorage.setItem(MIDI_OUT_KEY, selectedOutput.name);
     } else {
@@ -13458,7 +13578,7 @@ function exportCurrentPatchSyx() {
     };
 
     const consumeShift = () => { const s = panel.shift; if (s) { panel.shift = false; } return s; };
-    const toPlay = () => { panel.state = 'play'; panel.menu = null; panel.sel = 0; updateVirusSnowFrontPanel(currentPartIndex || 0); };
+    const toPlay = () => { panel.state = 'play'; panel.menu = null; panel.sel = 0; panel.shift = false; updateVirusSnowFrontPanel(currentPartIndex || 0); };
 
     function render() {
       const part = curPart(); if (!part) return;
@@ -13469,8 +13589,7 @@ function exportCurrentPatchSyx() {
         if (panel.state === 'menu') { up = UPPER[i] === panel.menu; low = i === (currentPartIndex || 0); }
         else if (panel.state === 'bank') { up = pos.rom && pos.n === i + 1; low = !pos.rom && pos.n === i + 1; }
         else if (panel.state === 'part') low = i === (currentPartIndex || 0);
-        else if (panel.state === 'num') { up = (panel.group ?? Math.floor(pos.p64 / 8)) === i; low = panel.group == null && pos.p64 % 8 === i; }
-        else low = i === (currentPartIndex || 0);                  // play: PART 1-4 attiva
+        else if (!panel.shift) { up = Math.floor(pos.p64 / 8) === i; low = pos.p64 % 8 === i; }   // selezione suoni: gruppo e suono
         led('frontRomLed' + i, up); led('frontRamLed' + i, low);
       }
       led('frontEditShiftLed', panel.shift || panel.state === 'menu');
@@ -13496,7 +13615,7 @@ function exportCurrentPatchSyx() {
       } else if (panel.state === 'bank') setBig('BANK', 'ROM 1-8 / RAM 1-8');
       else if (panel.state === 'part') setBig('PART', `SCEGLI 1-4  (ORA P${(currentPartIndex || 0) + 1})`);
       else if (panel.state === 'mode') setBig('MODE', MODES[panel.modeIdx]);
-      if (panel.shift && panel.state === 'play') setBig('SHIFT', 'PREMI UN TASTO');
+      if (panel.shift && panel.state === 'play') setBig('EDIT', 'MENU O FUNZIONE');
 
       const params = softParams();
       soft.forEach((el, i) => {
@@ -13521,48 +13640,55 @@ function exportCurrentPatchSyx() {
       try { navigator.vibrate && navigator.vibrate(8); } catch (e) {}
     }));
 
-    // ---- matrice: fila superiore
+    // ---- matrice 16 tasti (come sul Virus TI Snow):
+    //  EDIT/SHIFT spento  -> selezione suoni: fila sopra = gruppo 1-8, fila sotto = suono 1-8 del banco corrente
+    //  EDIT/SHIFT acceso  -> funzioni serigrafate: fila sopra = menu di edit, fila sotto = VALUE/PARAMETERS/AUDITION/MULTI/CONFIG/STORE
+    //  dopo BANK          -> fila sopra = ROM 1-8, fila sotto = RAM 1-8
+    const editOn = () => panel.shift || panel.state === 'menu';
+
     UPPER.forEach((id, i) => document.getElementById(id)?.addEventListener('click', () => {
-      if (panel.state === 'bank') { goSnow(true, i + 1, snowPos(curPart().values.bank, curPart().values.program).p64); panel.state = 'num'; panel.group = null; render(); setLastAction(`Bank ROM ${i + 1}: scegli gruppo (sopra) e patch (sotto)`); return; }
-      if (panel.state === 'num') {                                 // dopo BANK: prima cifra = gruppo
-        panel.group = i; render();
-        setLastAction(`Gruppo ${i + 1}: scegli la patch 1-8 sulla fila sotto`); return;
+      const pos = snowPos(curPart().values.bank, curPart().values.program);
+      if (panel.state === 'bank') { goSnow(true, i + 1, pos.p64); toPlay(); setLastAction(`Bank ROM ${i + 1}`); return; }
+      if (editOn()) {                                              // menu di edit
+        panel.shift = false;
+        panel.state = 'menu'; panel.menu = id; panel.sel = 0; render();
+        setLastAction(`Edit ${EASY_MENUS[id][0]}`); return;
       }
-      consumeShift();                                              // tasti menu ad accesso diretto
-      panel.state = 'menu'; panel.menu = id; panel.sel = 0; render();
-      setLastAction(`Edit ${EASY_MENUS[id][0]}`);
+      if (panel.state === 'part' || panel.state === 'mode') return;
+      goSnow(pos.rom, pos.n, i * 8 + (pos.p64 % 8));               // gruppo i, stesso suono
+      render();
     }));
 
-    // ---- matrice: fila inferiore
-    LOWER.forEach((id, i) => document.getElementById(id)?.addEventListener('click', (e) => {
-      if (id === 'frontBtnAudition' && panel.state !== 'num' && panel.state !== 'bank' && panel.state !== 'part') return;   // gestito sotto
-      if (panel.state === 'bank') { goSnow(false, i + 1, snowPos(curPart().values.bank, curPart().values.program).p64); panel.state = 'num'; panel.group = null; render(); setLastAction(`Bank RAM ${i + 1}: scegli gruppo (sopra) e patch (sotto)`); return; }
-      if (panel.state === 'num') {                                 // seconda cifra: suono i del gruppo
-        const pos = snowPos(curPart().values.bank, curPart().values.program);
-        const g = panel.group ?? Math.floor(pos.p64 / 8);
-        goSnow(pos.rom, pos.n, g * 8 + i); panel.group = null; toPlay(); return;
-      }
+    LOWER.forEach((id, i) => document.getElementById(id)?.addEventListener('click', () => {
+      const pos = snowPos(curPart().values.bank, curPart().values.program);
+      if (panel.state === 'bank') { goSnow(false, i + 1, pos.p64); toPlay(); setLastAction(`Bank RAM ${i + 1}`); return; }
       if (panel.state === 'part') { if (i < NUM_PARTS) selectPart(i); toPlay(); return; }
+      if (panel.state === 'mode' && (id === 'frontBtnValMinus' || id === 'frontBtnValPlus')) {
+        panel.modeIdx = (panel.modeIdx + (id === 'frontBtnValPlus' ? 1 : 2)) % 3; render(); return;
+      }
+      if (!editOn()) {                                             // suono i del gruppo corrente
+        goSnow(pos.rom, pos.n, Math.floor(pos.p64 / 8) * 8 + i); render(); return;
+      }
       switch (id) {
+        case 'frontBtnAudition': return;                           // gestito da pointerdown (tenuto = latch)
         case 'frontBtnValMinus': case 'frontBtnValPlus': {
           const d = id === 'frontBtnValPlus' ? 1 : -1;
-          if (panel.state === 'mode') { panel.modeIdx = (panel.modeIdx + d + 3) % 3; render(); return; }
           if (panel.state === 'menu') {
             const prm = softParams()[panel.sel];
             if (prm.cc === NO_CC) { setLastAction(`${prm.n}: parametro Page B, non controllabile via CC`); return; }
             setCC(prm.cc, Math.max(0, Math.min(127, getCC(prm.cc) + d))); render(); return;
           }
-          const pos = snowPos(curPart().values.bank, curPart().values.program);   // play: suono precedente/successivo
+          panel.shift = false;
           goSnow(pos.rom, pos.n, (pos.p64 + d + 64) % 64); render(); return;
         }
         case 'frontBtnParamPrev': case 'frontBtnParamNext':
           if (panel.state === 'menu') { panel.sel = (panel.sel + (id === 'frontBtnParamNext' ? 1 : 2)) % 3; render(); }
-          else lcdFlash('EDIT?', 'EDIT/SHIFT + MENU');
+          else lcdFlash('EDIT', 'SCEGLI UN MENU');
           return;
-        case 'frontBtnMulti': document.getElementById('btnTabMultipart')?.click(); return;
-        case 'frontBtnConfig': document.getElementById('btnSettings')?.click(); return;
+        case 'frontBtnMulti': toPlay(); document.getElementById('btnTabMultipart')?.click(); return;
+        case 'frontBtnConfig': toPlay(); document.getElementById('btnSettings')?.click(); return;
         case 'frontBtnStore':
-          consumeShift();
+          toPlay();
           document.getElementById('btnTabPatchManager')?.click();
           setTimeout(() => { const pInput = document.getElementById('patchName'); if (pInput) { pInput.focus(); pInput.select(); } }, 100);
           return;
@@ -13593,7 +13719,10 @@ function exportCurrentPatchSyx() {
     });
 
     // ---- EDIT/SHIFT: tocco = shift per il comando successivo (come tenerlo premuto)
-    document.getElementById('frontBtnEditShift')?.addEventListener('click', () => { panel.shift = !panel.shift; render(); });
+    document.getElementById('frontBtnEditShift')?.addEventListener('click', () => {
+      if (panel.state === 'menu') { toPlay(); return; }            // spegne EDIT: torna alla selezione suoni
+      panel.shift = !panel.shift; render();
+    });
     window.addEventListener('keydown', e => { if (e.key === 'Shift' && !panel.shift) { panel.shift = true; panel._kbdShift = true; render(); } });
     window.addEventListener('keyup', e => { if (e.key === 'Shift' && panel._kbdShift) { panel.shift = false; panel._kbdShift = false; render(); } });
 
@@ -13649,7 +13778,7 @@ function exportCurrentPatchSyx() {
     };
     const auditionStop = () => { auditionOn = false; latched = false; btnAudition?.classList.remove('audition-active'); stopNote(60); };
     btnAudition?.addEventListener('pointerdown', (e) => {
-      if (['num', 'bank', 'part'].includes(panel.state)) return;    // qui vale come tasto 5
+      if (!(panel.shift || panel.state === 'menu') || ['bank', 'part'].includes(panel.state)) return;   // altrimenti e' il suono 5
       e.preventDefault();
       if (latched) { auditionStop(); return; }
       auditionStart();
