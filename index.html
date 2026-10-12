@@ -5,10 +5,10 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Virus TI Snow">
+<meta name="apple-mobile-web-app-title" content="Virus H">
 <meta name="theme-color" content="#111317">
 <meta name="format-detection" content="telephone=no">
-<title>virus ti snow // editor</title>
+<title>Virus H — editor per Virus TI</title>
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>❄️</text></svg>">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Press+Start+2P&family=VT323&family=JetBrains+Mono:wght@400;700&display=swap');
@@ -6459,7 +6459,7 @@
      ========================================================================== */
   .faceplate-wrap { width: 100%; max-width: 1240px; margin: 8px auto 24px; }
   .faceplate {
-    --fp: url("assets/faceplate/faceplate-snow.webp");
+    --fp: url("assets/faceplate/faceplate-snow-vh.webp");
     position: relative;
     width: 100%;
     aspect-ratio: var(--aspect);
@@ -6467,7 +6467,7 @@
     container-type: inline-size;
     user-select: none;
   }
-  html[data-skin="elektron"] .faceplate { --fp: url("assets/faceplate/faceplate-dark.webp"); }
+  html[data-skin="elektron"] .faceplate { --fp: url("assets/faceplate/faceplate-dark-vh.webp"); }
   .faceplate > * { position: absolute !important; left: calc(var(--x) * 1%); top: calc(var(--y) * 1%); transform: translate(-50%, -50%); }
 
   .faceplate .fp-knob {
@@ -6930,7 +6930,7 @@
               <div class="virus-info-step-content">
                 <div class="virus-info-step-title">Esplora le 6 Viste Dedicate</div>
                 <div class="virus-info-step-desc">
-                  • <strong>TI-SNOW</strong>: Replica fisica del frontale con manopole Cutoff/Resonance e display LCD.<br>
+                  • <strong>PANEL</strong>: Replica fisica del frontale con manopole Cutoff/Resonance e display LCD.<br>
                   • <strong>SINGLE</strong>: Sintetizzatore completo con display vettoriale, filtri, inviluppi e oscilloscopio.<br>
                   • <strong>MULTI</strong>: Mixer multitimbrico a 4 parti (P1..P4) con banchi, volumi e pan indipendenti.<br>
                   • <strong>ARP</strong>: Arpeggiatore avanzato a 16 step con rate, swing, ottave e canale di destinazione.<br>
@@ -6969,7 +6969,7 @@
       </div>
     </div>
     <div class="segmented-control" id="partTabs">
-      <button class="segmented-tab active" id="btnTabSnow">TI-SNOW</button>
+      <button class="segmented-tab active" id="btnTabSnow">PANEL</button>
       <button class="segmented-tab" id="btnTabMultipart">MULTI</button>
       <button class="segmented-tab" id="btnTabSynth">SINGLE</button>
       <button class="segmented-tab" id="btnTabFxRack">🎛 FX RACK</button>
@@ -7393,7 +7393,7 @@
     </div>
     <div id="snowWaveBrowserSlot"></div>
     <div class="faceplate-toolbar">
-      <button id="frontThemeToggleBtn" class="snow-theme-quick-switch" type="button" title="Commuta tra Virus TI Snow e Virus TI2 Dark Star"><span class="theme-switch-indicator"></span><span id="frontThemeSwitchText">TI SNOW</span></button>
+      <button id="frontThemeToggleBtn" class="snow-theme-quick-switch" type="button" title="Commuta finitura bianca / scura"><span class="theme-switch-indicator"></span><span id="frontThemeSwitchText">WHITE</span></button>
       <div class="snow-front-dock">
       <div style="display: flex; align-items: center; gap: 8px; flex-wrap: wrap;">
         <span style="font-size: 10px; font-weight: 900; letter-spacing: 0.08em; color: #444;">BANCO / SUONO:</span>
@@ -8257,7 +8257,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
     const frontSwitchText = document.getElementById('frontThemeSwitchText');
     const frontSwitchBtn = document.getElementById('frontThemeToggleBtn');
     if (frontSwitchText) {
-      frontSwitchText.textContent = isDark ? 'TI2 DARK STAR' : 'TI SNOW';
+      frontSwitchText.textContent = isDark ? 'DARK' : 'WHITE';
     }
     if (frontSwitchBtn) {
       frontSwitchBtn.title = isDark ? 'Finitura attiva: Access Virus TI2 Dark Star (clicca per TI Snow)' : 'Finitura attiva: Access Virus TI Snow (clicca per TI2 Dark Star)';
@@ -8679,7 +8679,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
     const themeName = isDark ? 'Access Virus TI2 Dark Star' : 'Access Virus TI Snow';
     const midiOut = selectedOutput ? selectedOutput.name : 'Nessuna porta connessa';
     const midiIn = selectedInput ? selectedInput.name : 'Nessuna porta connessa';
-    const activeTab = document.querySelector('.segmented-tab.active')?.textContent.trim() || 'TI-SNOW';
+    const activeTab = document.querySelector('.segmented-tab.active')?.textContent.trim() || 'PANEL';
     const ch = (typeof getActiveMidiChannel === 'function' ? getActiveMidiChannel() + 1 : 1);
     const pIdx = (typeof currentPartIndex !== 'undefined' ? currentPartIndex + 1 : 1);
     const osInfo = (navigator.userAgent.match(/\(([^)]+)\)/) || [])[1] || 'Web Browser';
@@ -18313,6 +18313,50 @@ function exportCurrentPatchSyx() {
   updateTopPanelsVisibility('snow');
 })();
 
+</script>
+<script>
+// Marchi: "Access", "Virus TI Snow", "Virus TI2 Dark Star" e i loghi sono dei rispettivi proprietari
+// (Access Music / Kemper Digital). L'editor non li mostra nelle intestazioni e sul frontale; i testi
+// d'aiuto che citano "Access Virus TI" restano, perche' indicano solo la compatibilita'.
+(function () {
+  const BRAND = /VIRUS\s*(TI2?\s*)?(\||\/\/|\/)\s*(TI\s*SNOW|DARK\s*STAR)/gi;
+  const HEADER = 'VIRUS H';
+
+  function brandText(root) {
+    const walker = document.createTreeWalker(root, NodeFilter.SHOW_TEXT);
+    const nodes = [];
+    while (walker.nextNode()) nodes.push(walker.currentNode);
+    nodes.forEach(n => {
+      const p = n.parentElement;
+      if (!p || p.closest('script, style, .section-info-popup, .virus-info-popup')) return;
+      if (BRAND.test(n.nodeValue)) n.nodeValue = n.nodeValue.replace(BRAND, HEADER);
+      BRAND.lastIndex = 0;
+      if (/virus ti snow\s*\/\//i.test(n.nodeValue)) n.nodeValue = n.nodeValue.replace(/virus ti snow\s*\/\//i, 'virus h //');
+      if (/^\s*access\s*$/i.test(n.nodeValue) && p.closest('.hardware-chassis')) {
+        const logo = p.closest('[style*="position: absolute"], .chassis-access-logo') || p;
+        logo.style.display = 'none';
+      }
+    });
+    // badge "VIRUS | TI SNOW" spezzato in piu' span
+    document.querySelectorAll('.hardware-chassis *').forEach(el => {
+      if (el.children.length && el.children.length <= 2 && /^VIRUS\s*\|\s*(TI SNOW|DARK STAR)$/i.test(el.textContent.trim().replace(/\s+/g, ' '))) {
+        el.textContent = HEADER;
+      }
+    });
+    document.querySelectorAll('.hardware-chassis span').forEach(el => {
+      if (el.textContent.trim() === '❖') el.style.display = 'none';
+    });
+  }
+
+  let pending = 0;
+  const schedule = () => { if (!pending) pending = requestAnimationFrame(() => { pending = 0; brandText(document.body); }); };
+
+  document.addEventListener('DOMContentLoaded', () => {
+    brandText(document.body);
+    new MutationObserver(schedule).observe(document.body, { childList: true, subtree: true, characterData: true });
+
+  });
+})();
 </script>
 </body>
 </html>

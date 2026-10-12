@@ -1,6 +1,6 @@
 #!/bin/bash
 # Copia l'editor web (index.html + grafiche) nelle risorse del plugin Virus H,
-# aggiunge il ponte MIDI nativo e il branding, e usa il frontale senza marchi Access.
+# aggiunge il ponte MIDI nativo e gli extra del plugin.
 # Uso: plugin/VirusH/scripts/sync-web.sh   (da rilanciare dopo ogni modifica a index.html)
 set -euo pipefail
 
@@ -13,11 +13,8 @@ mkdir -p "$WEB/assets/sprites" "$WEB/assets/faceplate"
 
 cp "$HERE/web-src/web-midi-shim.js" "$HERE/web-src/plugin-brand.js" "$WEB/"
 cp "$ROOT"/assets/sprites/*.webp "$WEB/assets/sprites/"
-cp "$ROOT"/assets/faceplate/fp-*.webp "$ROOT/assets/faceplate/layout.json" "$WEB/assets/faceplate/"
-# frontale senza logo "access" e "VIRUS | TI SNOW"
-for skin in snow dark; do
-  cp "$ROOT/assets/faceplate/faceplate-$skin-vh.webp" "$WEB/assets/faceplate/faceplate-$skin.webp"
-done
+# frontale senza marchi Access (faceplate-*-vh), lo stesso dell'editor web
+cp "$ROOT"/assets/faceplate/fp-*.webp "$ROOT"/assets/faceplate/faceplate-*-vh.webp "$ROOT/assets/faceplate/layout.json" "$WEB/assets/faceplate/"
 
 # gli script del plugin devono girare prima di quelli dell'editor
 python3 - "$ROOT/index.html" "$WEB/index.html" <<'PY'

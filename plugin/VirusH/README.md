@@ -14,12 +14,12 @@ dell'editor web (`../../index.html`), caricata in una WebView.
 | Plugin (iPlug2): messaggi UI, stato nel progetto, MIDI thru dal DAW | `VirusH.cpp`, `VirusH.h` |
 | MIDI nativo CoreMIDI (porte USB del Virus, SysEx) | `VirusMidi.h`, `VirusMidi_mac.mm` |
 | Ponte Web MIDI: ricrea `navigator.requestMIDIAccess` nella WebView | `web-src/web-midi-shim.js` |
-| Branding plugin (niente marchi Access nelle intestazioni, boot "H-STRAIN") | `web-src/plugin-brand.js` |
+| Extra plugin (titolo, boot "H-STRAIN"); i marchi Access sono già tolti nell'editor | `web-src/plugin-brand.js` |
 | Copia dell'editor web nelle risorse del plugin | `scripts/sync-web.sh` |
 
 - Le note e il SysEx della traccia del DAW vengono inoltrati al Virus sulla porta in uso (MIDI thru).
 - Lo stato dell'editor (localStorage) viene salvato nel progetto del DAW e ripristinato all'apertura.
-- Il frontale usa la variante renderizzata senza logo Access (`virus_faceplate.py --brand=vh`).
+- Editor e plugin usano il frontale renderizzato senza marchi Access (`virus_faceplate.py --brand=vh`).
 
 ## Compilare (macOS)
 
