@@ -8111,7 +8111,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
     }
     updateControlRoomStatus();
     // aprire la pagina non deve cambiare il Virus: se e' in MULTI si legge il suo Multi (il routing si imposta solo da ROUTING)
-    if (selectedOutput && window.currentSynthMode === 'multi') syncAllMultiParts();
+    if (selectedOutput) syncAllMultiParts();   // solo lettura: Multi e parti P1-P4
   });
 
   document.getElementById('btnTabPatchManager').addEventListener('click', () => {
@@ -9225,7 +9225,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
       // Multi dump (0x11): nome del Multi e banco/programma/canale reali delle parti
       // layout: header 9 + 4 byte + nome (13..22) ... Part Bank Select 41.., Program 57.., MIDI channel 73..
       if (msgBytes[6] === 0x11 && msgBytes.length > 90 && msgBytes[2] === 0x20 && msgBytes[3] === 0x33) {
-        window.multiName = String.fromCharCode(...msgBytes.slice(13, 23)).replace(/[^\x20-\x7e]/g, ' ').trim() || 'Multi';
+        window.virusMultiName = String.fromCharCode(...msgBytes.slice(13, 23)).replace(/[^\x20-\x7e]/g, ' ').trim() || 'Multi';
         for (let i = 0; i < NUM_PARTS; i++) {
           const v = multiParts[i] && multiParts[i].values; if (!v) continue;
           if (msgBytes[41 + i] < BANK_NAMES.length) v.bank = msgBytes[41 + i];
@@ -9235,7 +9235,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
         if (typeof buildMultiView === 'function') buildMultiView();
         if (typeof updateVirusSnowMasterDisplay === 'function') updateVirusSnowMasterDisplay(currentPartIndex || 0);
         if (typeof renderMultiPartsOverview === 'function') renderMultiPartsOverview();
-        setLastAction(`Multi letto dal Virus: ${window.multiName}`);
+        setLastAction(`Multi letto dal Virus: ${window.virusMultiName}`);
         continue;
       }
       // Il byte "parte" dei parametri che il Virus manda rivela il modo: 0x40 = Single, 0..15 = parte del Multi.
@@ -11739,7 +11739,7 @@ function exportCurrentPatchSyx() {
     } catch (e) { console.error('Dump request error', e); }
   }
 
-  function requestPartDump(partIndex) {
+  function requestPartDump(partIndex, multiPart = false) {
     if (!selectedOutput) {
       setLastAction('connect midi output first');
       return;
@@ -11748,7 +11748,7 @@ function exportCurrentPatchSyx() {
       // 0x30 = Single Dump Request: F0 00 20 33 01 <deviceId> 30 00 <buffer> F7
       // buffer 0x40 = edit buffer Single (Virus in SINGLE), 0..15 = parte del Multi.
       // In SINGLE la parte 1 del Multi resta ferma: chiederla restituiva sempre lo stesso suono.
-      const buffer = window.currentSynthMode === 'single' ? 0x40 : (partIndex & 0x0F);
+      const buffer = (window.currentSynthMode === 'single' && !multiPart) ? 0x40 : (partIndex & 0x0F);
       const bytes = new Uint8Array([
         ...SYSEX_PREFIX, deviceId(), 0x30, 0x00, buffer, 0xF7
       ]);
@@ -11768,7 +11768,7 @@ function exportCurrentPatchSyx() {
     try { selectedOutput.send(new Uint8Array([...SYSEX_PREFIX, deviceId(), 0x31, 0x00, 0x00, 0xF7])); } catch (e) {}
     for (let i = 0; i < NUM_PARTS; i++) {
       setTimeout(() => {
-        requestPartDump(i);
+        requestPartDump(i, true);   // sempre la parte i del Multi, anche se l'app crede il Virus in Single
       }, i * 150);
     }
   }
@@ -13413,7 +13413,7 @@ function exportCurrentPatchSyx() {
 
     if (catEl) {
       // come il display reale: parte + categoria della patch (Single dump Page B #123)
-      catEl.textContent = `${window.multiName ? window.multiName + ' · ' : ''}Part ${pIdx + 1}  CAT:${(window.VIRUS_CATEGORIES || [])[part.dump?.[9 + 251]] || '--'}`;
+      catEl.textContent = `${window.virusMultiName ? window.virusMultiName + ' · ' : ''}Part ${pIdx + 1}  CAT:${(window.VIRUS_CATEGORIES || [])[part.dump?.[9 + 251]] || '--'}`;
     }
     if (prgEl) {
       const multiNum = multiInput ? parseInt(multiInput.value, 10) || (pIdx + 1) : (pIdx + 1);
@@ -13798,12 +13798,19 @@ function exportCurrentPatchSyx() {
   });
 
   const multiProgramInput = document.getElementById('multiProgramInput');
+  // cambio Multi: Page C (0x72), parte 0, parametro 105 = Multi Program Change; poi si rilegge il Multi e le 4 parti
+  function sendMultiProgram(v) {
+    if (!selectedOutput) return;
+    new Set([deviceId(), window.virusDeviceId ?? 0x00]).forEach(id => {
+      try { selectedOutput.send(new Uint8Array([...SYSEX_PREFIX, id, 0x72, 0x00, 105, v & 0x7F, 0xF7])); } catch (e) {}
+    });
+    clearTimeout(window.__multiReload);
+    window.__multiReload = setTimeout(() => syncAllMultiParts(), 400);
+  }
   function handleMultiProgramChange(rawVal) {
     const v = clamp7(rawVal);
     if (multiProgramInput) multiProgramInput.value = String(v);
-    if (selectedOutput) {
-      try { selectedOutput.send(buildSysEx(105, v)); } catch(e) {}
-    }
+    sendMultiProgram(v);
     setLastAction(`multi prg: ${v}`);
     if (typeof updateVirusSnowMasterDisplay === 'function') {
       updateVirusSnowMasterDisplay(currentPartIndex || 0);
@@ -13826,9 +13833,7 @@ function exportCurrentPatchSyx() {
     if (!multiProgramInput) return;
     const v = clamp7(parseInt(multiProgramInput.value, 10) || 0);
     multiProgramInput.value = String(v);
-    if (selectedOutput){
-      try{ selectedOutput.send(buildSysEx(105, v)); } catch(e){ console.error('MIDI send error', e); }
-    }
+    sendMultiProgram(v);
     setLastAction('loaded multi prg ' + v);
     const statusEl = document.getElementById('quickScanStatus');
     if (statusEl) statusEl.textContent = `Caricato Multi Program ${v} dal Virus TI`;
@@ -14170,7 +14175,7 @@ function exportCurrentPatchSyx() {
       // categoria come sul Virus: "CAT:Lead" (Category 1 = Single dump Page B #123)
       const catTxt = 'CAT:' + (CATEGORIES[part.dump?.[9 + 251]] || '--');
       if (cat) cat.textContent = panel.state === 'menu' ? EASY_MENUS[panel.menu][0]
-        : panel.state === 'mode' ? 'MODE' : single ? catTxt : `${window.multiName ? window.multiName + ' · ' : ''}Part ${(currentPartIndex || 0) + 1}`;
+        : panel.state === 'mode' ? 'MODE' : single ? catTxt : `${window.virusMultiName ? window.virusMultiName + ' · ' : ''}Part ${(currentPartIndex || 0) + 1}`;
       const prg = document.getElementById('frontLcdMultiPrg'); if (prg) prg.hidden = single;
       if (badge && panel.state !== 'mode') badge.textContent = single ? 'SINGLE' : 'MULTI';
       const big1 = document.getElementById('frontLcdBankProg');
