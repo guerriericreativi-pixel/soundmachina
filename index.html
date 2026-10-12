@@ -6860,6 +6860,7 @@
   .midi-diagnostics .diag-cell.wide.midi-monitor-cell { grid-column: 1 / -1; }
   /* wave browser (scheda SINGLE) */
   .wave-browser { margin: 0 24px 28px; padding: 14px 16px; border-radius: 6px; background: rgba(0,0,0,0.28); border: 1px solid rgba(255,255,255,0.08); color: #d6dbe3; font: 12px/1.3 'Roboto Mono', ui-monospace, monospace; position: relative; z-index: 1; }
+  #snowWaveBrowserSlot .wave-browser { margin: 16px 0 0; }
   .wave-browser .wb-head { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; }
   .wave-browser .wb-title { font-weight: 800; letter-spacing: 0.12em; }
   .wave-browser .wb-osc button { padding: 4px 10px; border: 1px solid rgba(255,255,255,0.2); background: transparent; color: inherit; font: inherit; cursor: pointer; }
@@ -7390,6 +7391,7 @@
             </div>
       </div>
     </div>
+    <div id="snowWaveBrowserSlot"></div>
     <div class="faceplate-toolbar">
       <button id="frontThemeToggleBtn" class="snow-theme-quick-switch" type="button" title="Commuta tra Virus TI Snow e Virus TI2 Dark Star"><span class="theme-switch-indicator"></span><span id="frontThemeSwitchText">TI SNOW</span></button>
       <div class="snow-front-dock">
@@ -10140,10 +10142,19 @@ function exportCurrentPatchSyx() {
     });
     $('.wb-search').addEventListener('input', render);
     $('.wb-idx').addEventListener('input', e => { setP(ids().shape, +e.target.value); $('.wb-idx-val').textContent = e.target.value; });
-    box._render = render; window.waveBrowserRender = render;
+    box._render = render;
+    box._setOsc = n => { osc = n; render(); };
+    waveBrowsers.push(box);
     render();
     return box;
   }
+  const waveBrowsers = [];
+  window.waveBrowserRender = () => waveBrowsers.forEach(b => b.isConnected && b._render());
+  // anche sotto il frontale TI-SNOW (segue i tasti OSC 1 / OSC 2)
+  setTimeout(() => {
+    const slot = document.getElementById('snowWaveBrowserSlot');
+    if (slot && !slot.firstChild) { window.snowWaveBrowser = buildWaveBrowser(); slot.appendChild(window.snowWaveBrowser); }
+  }, 0);
 
   function buildSingleView(){
     const root = document.getElementById('singleView');
@@ -13789,6 +13800,7 @@ function exportCurrentPatchSyx() {
       if (editOn()) {                                              // menu di edit
         panel.shift = false;
         panel.state = 'menu'; panel.menu = id; panel.sel = 0; render();
+        if (id === 'frontBtnOsc1' || id === 'frontBtnOsc2') window.snowWaveBrowser?._setOsc(id === 'frontBtnOsc1' ? 1 : 2);
         setLastAction(`Edit ${EASY_MENUS[id][0]}`); return;
       }
       if (panel.state === 'part' || panel.state === 'mode') return;
