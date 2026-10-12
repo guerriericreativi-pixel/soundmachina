@@ -10102,7 +10102,8 @@ function exportCurrentPatchSyx() {
     let osc = 1;
     const $ = sel => box.querySelector(sel);
     const part = () => multiParts[currentPartIndex || 0];
-    const ids = () => ({ wave: `osc${osc}_wave`, shape: `osc${osc}_shape`, modelByte: 9 + 256 + (osc === 1 ? 30 : 35) });
+    // dump Single: header 9 + Page A/B (256) + checksum (1) + Page 6E: il modello sta a 9+257+#30/#35
+    const ids = () => ({ wave: `osc${osc}_wave`, shape: `osc${osc}_shape`, modelByte: 9 + 257 + (osc === 1 ? 30 : 35) });
     const getModel = () => { const p = part(); const k = `_osc${osc}_model`; return p.sound[k] ?? p.dump?.[ids().modelByte] ?? 0; };
     const sendModel = m => {
       if (!selectedOutput) { setLastAction('connect midi output first'); return; }
