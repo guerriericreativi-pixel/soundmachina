@@ -6669,6 +6669,148 @@
     border-color: rgba(0,0,0,0.5) !important;
     box-shadow: inset 0 1px 3px rgba(0,0,0,0.5) !important;
   }
+
+  /* ==========================================================================
+     LED NEI TASTI: gruppo esclusivo. Il tasto scelto (pagina SEQ, traccia,
+     sezione SINGLE) accende il suo LED che resta acceso finche' non si sceglie
+     un altro tasto dello stesso gruppo. Il tasto resta anche "premuto".
+     ========================================================================== */
+  .hardware-chassis button.active-view .arp-hw-led,
+  .hardware-chassis button.active-trk .arp-hw-led,
+  .hardware-chassis button.active .arp-hw-led {
+    background: radial-gradient(circle at 40% 35%, #ffffff 0%, #f6f8fa 45%, #dfe4e9 100%) !important;
+    box-shadow: 0 0 5px rgba(255,255,255,0.95), 0 0 11px rgba(235,240,245,0.65) !important;
+    border-color: rgba(200,205,210,0.6) !important;
+  }
+  .hardware-chassis button.active-view:not(.fp-key),
+  .hardware-chassis button.active-trk:not(.fp-key) {
+    background: linear-gradient(180deg, #dcdbd6 0%, #e6e5e1 100%) !important;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.14) !important;
+    border-color: #9e9d98 !important;
+    color: #1f2023 !important;
+  }
+  html[data-skin="elektron"] .hardware-chassis button.active-view:not(.fp-key),
+  html[data-skin="elektron"] .hardware-chassis button.active-trk:not(.fp-key) {
+    background: #2a2b2e !important;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.5) !important;
+    color: #ffffff !important;
+  }
+
+  /* ==========================================================================
+     MENU A TENDINA coerenti col pannello (al posto dei controlli bianchi del browser)
+     ========================================================================== */
+  .hardware-chassis select,
+  .faceplate-toolbar select,
+  #midiSetup select {
+    -webkit-appearance: none;
+    appearance: none;
+    border: 1px solid #b4b3ae !important;
+    border-radius: 5px !important;
+    background:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%2346484d' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") right 10px center / 10px 6px no-repeat,
+      linear-gradient(180deg, #f6f5f2 0%, #eae9e5 100%) !important;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.08) !important;
+    color: #2a2b2e !important;
+    padding-right: 28px !important;
+    padding-left: 10px !important;
+    font-weight: 600;
+    cursor: pointer;
+    transition: border-color 80ms ease;
+  }
+  .hardware-chassis select:hover, .faceplate-toolbar select:hover, #midiSetup select:hover { border-color: #8f8e89 !important; }
+  .hardware-chassis select:focus-visible, .faceplate-toolbar select:focus-visible, #midiSetup select:focus-visible {
+    outline: 2px solid #2f6fe4; outline-offset: 1px;
+  }
+  html[data-skin="elektron"] .hardware-chassis select,
+  html[data-skin="elektron"] .faceplate-toolbar select,
+  html[data-skin="elektron"] #midiSetup select {
+    border-color: #18191b !important;
+    background:
+      url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M1 1l4 4 4-4' fill='none' stroke='%23c9cace' stroke-width='1.6' stroke-linecap='round' stroke-linejoin='round'/%3E%3C/svg%3E") right 10px center / 10px 6px no-repeat,
+      linear-gradient(180deg, #2f3034 0%, #26272a 100%) !important;
+    box-shadow: inset 0 1px 2px rgba(0,0,0,0.5) !important;
+    color: #e2e3e6 !important;
+  }
+  html[data-skin="elektron"] .hardware-chassis select option,
+  html[data-skin="elektron"] .faceplate-toolbar select option { background: #26272a; color: #e2e3e6; }
+
+  /* LED acceso leggibile anche su pannello chiaro: anello scuro sottile + alone */
+  html[data-skin] .hardware-chassis button.active-view .arp-hw-led,
+  html[data-skin] .hardware-chassis button.active-trk .arp-hw-led,
+  html[data-skin] .hardware-chassis button.active .arp-hw-led {
+    width: 8px !important; height: 8px !important;
+    background: radial-gradient(circle at 40% 35%, #ffffff 0%, #ffffff 40%, #e9eef2 100%) !important;
+    border: 1px solid rgba(70,74,80,0.55) !important;
+    box-shadow: 0 0 0 2px rgba(255,255,255,0.55), 0 0 7px 2px rgba(255,255,255,0.95), 0 0 14px 4px rgba(190,215,235,0.55) !important;
+  }
+  html[data-skin] .hardware-chassis button.active-view:not(.fp-key),
+  html[data-skin] .hardware-chassis button.active-trk:not(.fp-key) {
+    background: linear-gradient(180deg, #d6d5d0 0%, #e2e1dd 100%) !important;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.18) !important;
+    border-color: #8f8e89 !important;
+    color: #141518 !important;
+  }
+  html[data-skin="elektron"] .hardware-chassis button.active-view:not(.fp-key),
+  html[data-skin="elektron"] .hardware-chassis button.active-trk:not(.fp-key) {
+    background: #232427 !important;
+    box-shadow: inset 0 1px 3px rgba(0,0,0,0.6) !important;
+    border-color: #0d0e10 !important;
+    color: #ffffff !important;
+  }
+
+  /* LED nei tasti: spento = grigio scuro opaco, acceso = bianco con alone (contrasto su entrambi i temi) */
+  html[data-skin] .hardware-chassis button .arp-hw-led {
+    width: 8px !important; height: 8px !important;
+    background: radial-gradient(circle at 40% 35%, #8a8c90 0%, #5d5f63 60%, #46484c 100%) !important;
+    border: 1px solid rgba(0,0,0,0.35) !important;
+    box-shadow: inset 0 -1px 1px rgba(0,0,0,0.35), 0 1px 0 rgba(255,255,255,0.5) !important;
+  }
+  html[data-skin="elektron"] .hardware-chassis button .arp-hw-led {
+    background: radial-gradient(circle at 40% 35%, #4a4c50 0%, #2c2d30 70%) !important;
+    box-shadow: inset 0 -1px 1px rgba(0,0,0,0.5), 0 1px 0 rgba(255,255,255,0.08) !important;
+  }
+  html[data-skin] .hardware-chassis button.active-view .arp-hw-led,
+  html[data-skin] .hardware-chassis button.active-trk .arp-hw-led,
+  html[data-skin] .hardware-chassis button.active .arp-hw-led {
+    background: radial-gradient(circle at 40% 35%, #ffffff 0%, #ffffff 45%, #e6edf3 100%) !important;
+    border-color: rgba(120,140,160,0.6) !important;
+    box-shadow: 0 0 4px 1px rgba(255,255,255,1), 0 0 10px 3px rgba(150,190,230,0.75) !important;
+  }
+
+  /* barra sotto il pannello frontale: stessi pulsanti sobri */
+  .faceplate-toolbar button,
+  .faceplate-toolbar button[style] {
+    border-image: none !important;
+    border: 1px solid #b4b3ae !important;
+    border-radius: 5px !important;
+    background: linear-gradient(180deg, #f1f0ed 0%, #e3e2de 100%) !important;
+    box-shadow: 0 1px 0 rgba(0,0,0,0.10), 0 1px 2px rgba(0,0,0,0.06) !important;
+    color: #2f3033 !important;
+    transform: none !important;
+    font-weight: 600 !important;
+  }
+  .faceplate-toolbar button:active { background: #dcdbd6 !important; box-shadow: inset 0 1px 2px rgba(0,0,0,0.14) !important; }
+  html[data-skin="elektron"] .faceplate-toolbar button,
+  html[data-skin="elektron"] .faceplate-toolbar button[style] {
+    border-color: #18191b !important;
+    background: linear-gradient(180deg, #3a3b3f 0%, #2e2f33 100%) !important;
+    box-shadow: 0 1px 2px rgba(0,0,0,0.4) !important;
+    color: #d6d7da !important;
+  }
+
+  .faceplate .fp-key.pressed::before { background-position: 100% 0 !important; }
+  .faceplate .fp-key { transition: transform 60ms ease; }
+  .faceplate .fp-key.pressed { transform: translate(-50%, calc(-50% + 1px)); }
+  /* SINGLE: pulsante editor dedicato sobrio come gli altri */
+  .hardware-chassis a:not(.fp-key)[class],
+  html[data-skin] .hardware-chassis a:not(.fp-key)[class] {
+    border-image: none !important; border: 1px solid #b4b3ae !important; border-radius: 5px !important;
+    background: linear-gradient(180deg, #f1f0ed 0%, #e3e2de 100%) !important;
+    box-shadow: 0 1px 0 rgba(0,0,0,0.10), 0 1px 2px rgba(0,0,0,0.06) !important; color: #2f3033 !important; transform: none !important;
+  }
+  html[data-skin="elektron"] .hardware-chassis a:not(.fp-key)[class] {
+    border-color: #18191b !important; background: linear-gradient(180deg, #3a3b3f 0%, #2e2f33 100%) !important; color: #d6d7da !important;
+  }
 </style>
 </head>
 <body>
@@ -13230,7 +13372,7 @@ function exportCurrentPatchSyx() {
     const goSnow = (rom, n, p64) => { const m = midiPos(rom, n, p64); changePartSound(currentPartIndex || 0, m.bank, m.prog, true); };
 
     const consumeShift = () => { const s = panel.shift; if (s) { panel.shift = false; } return s; };
-    const toPlay = () => { panel.state = 'play'; panel.menu = null; panel.sel = 0; render(); };
+    const toPlay = () => { panel.state = 'play'; panel.menu = null; panel.sel = 0; updateVirusSnowFrontPanel(currentPartIndex || 0); };
 
     function render() {
       const part = curPart(); if (!part) return;
@@ -13257,6 +13399,19 @@ function exportCurrentPatchSyx() {
         : panel.state === 'num' ? `${bankTxt.split(' ')[0]} ${((panel.group ?? Math.floor(pos.p64 / 8)) + 1)}-_ : suono 1-8 sotto`
         : panel.state === 'mode' ? `MODE ▸ ${MODES[panel.modeIdx]}` : `P${(currentPartIndex || 0) + 1} • ${bankTxt}`;
       if (badge && panel.state !== 'mode') badge.textContent = window.currentSynthMode === 'single' ? 'SINGLE' : 'MULTI';
+      const big1 = document.getElementById('frontLcdBankProg');
+      const big2 = document.getElementById('frontLcdPatchName');
+      const setBig = (a, b) => { if (big1) big1.textContent = a; if (big2) big2.textContent = b; };
+      if (panel.state === 'menu') {
+        const prm = softParams()[panel.sel];
+        setBig(EASY_MENUS[panel.menu][0].replace(' ', ''), `${prm.n} ${fmt(prm, prm.cc === NO_CC ? null : getCC(prm.cc))}`.toUpperCase());
+      } else if (panel.state === 'num') {
+        setBig(`${pos.rom ? 'ROM' : 'RAM'}${pos.n}`, `${(panel.group ?? Math.floor(pos.p64 / 8)) + 1}-?  SUONO 1-8`);
+      } else if (panel.state === 'bank') setBig('BANK', 'ROM 1-8 / RAM 1-8');
+      else if (panel.state === 'part') setBig('PART', `SCEGLI 1-4  (ORA P${(currentPartIndex || 0) + 1})`);
+      else if (panel.state === 'mode') setBig('MODE', MODES[panel.modeIdx]);
+      if (panel.shift && panel.state === 'play') setBig('SHIFT', 'PREMI UN TASTO');
+
       const params = softParams();
       soft.forEach((el, i) => {
         if (!el) return;
@@ -13273,6 +13428,12 @@ function exportCurrentPatchSyx() {
       });
     }
     panel.render = render;
+
+    document.querySelectorAll('.faceplate .fp-key').forEach(k => k.addEventListener('pointerdown', () => {
+      k.classList.add('pressed');
+      clearTimeout(k._pt); k._pt = setTimeout(() => k.classList.remove('pressed'), 160);
+      try { navigator.vibrate && navigator.vibrate(8); } catch (e) {}
+    }));
 
     // ---- matrice: fila superiore
     UPPER.forEach((id, i) => document.getElementById(id)?.addEventListener('click', () => {
