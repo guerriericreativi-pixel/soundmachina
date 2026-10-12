@@ -7091,6 +7091,12 @@
   .arp-dest { display: inline-flex; align-items: center; gap: 4px; margin-left: 8px; }
   .arp-knob-val { display: block; margin-top: 4px; font: 700 11px/1 'JetBrains Mono', ui-monospace, monospace; text-align: center; }
   .arp-step-hint { font-weight: 500; opacity: 0.6; text-transform: none; letter-spacing: 0; }
+  /* SEQ */
+  .seq-trk-btn { display: inline-flex !important; align-items: center; gap: 6px; }
+  .seq-trk-icon .kbd-part-icon { margin-right: 0; padding: 1px; }
+  .seq-trk-icon .kbd-part-icon svg { width: 16px !important; height: 16px !important; }
+  .seq-trk-mute-btn, .seq-trk-solo-btn { min-width: 28px !important; }
+  .seq-trk-name { overflow: hidden; text-overflow: ellipsis; text-transform: none !important; }
 </style>
 </head>
 <body>
@@ -7984,7 +7990,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
     if (rail) rail.style.display = show ? 'grid' : 'none';
     if (strip) strip.style.display = show ? 'flex' : 'none';
     // in PANEL e SINGLE stato/azioni/guida MIDI stanno dietro il tasto MIDI della scocca
-    document.body.classList.toggle('panel-view', ['snow', 'single', 'multi', 'fx', 'patch', 'arp'].includes(view));
+    document.body.classList.toggle('panel-view', ['snow', 'single', 'multi', 'fx', 'patch', 'arp', 'seq'].includes(view));
     if (!show && diag) diag.classList.add('hidden');
   }
 
@@ -12565,10 +12571,14 @@ function exportCurrentPatchSyx() {
     btn.innerHTML = `${partIconSvg(look.icon)}<span>P${i + 1}</span>`;
     btn.title = `P${i + 1} · ${PART_ICONS[look.icon][0]} (ch ${multiParts[i].values.channel + 1}) — edita questa parte`;
   }
+  window.partLabel = i => PART_ICONS[partLook(i).icon][0];
   window.partIconHtml = i => { const look = partLook(i); return `<span class="kbd-part-icon" style="--part-color:${look.color}">${partIconSvg(look.icon, 18)}</span>`; };
   window.refreshPartBadges = () => {
     document.querySelectorAll('.part-row .part-badge').forEach(b => paintPartBadge(b, +b.dataset.part));
     document.querySelectorAll('#singlePartSelector .part-pick').forEach(b => paintPartPick(b, +b.dataset.part));
+    if (window.seqEngine) window.seqEngine.tracks.forEach((t, i) => { t.name = `P${i + 1}: ${window.partLabel(i).toUpperCase()}`; });
+    document.querySelectorAll('.seq-trk-icon[data-part]').forEach(el => { const i = +el.dataset.part; el.innerHTML = window.partIconHtml(i); el.nextElementSibling.textContent = `P${i + 1} · ${window.partLabel(i)}`; });
+    window.seqEngine?.updateOledDisplay?.();
     document.querySelectorAll('.fx-part-btn[data-part]').forEach(b => { const i = +b.dataset.part; if (i >= 0) b.innerHTML = `${window.partIconHtml(i)}P${i + 1}`; });
     if (typeof updateKeyboardPartDisplay === 'function') updateKeyboardPartDisplay();
   };
@@ -16563,19 +16573,19 @@ function exportCurrentPatchSyx() {
         if (btnMute) {
           if (trk.muted) {
             btnMute.classList.add('muted');
-            btnMute.textContent = 'MUTE 🔇';
+            btnMute.textContent = 'M';
           } else {
             btnMute.classList.remove('muted');
-            btnMute.textContent = 'MUTE';
+            btnMute.textContent = 'M';
           }
         }
         if (btnSolo) {
           if (trk.solo) {
             btnSolo.classList.add('soloed');
-            btnSolo.textContent = 'SOLO ⭐';
+            btnSolo.textContent = 'S';
           } else {
             btnSolo.classList.remove('soloed');
-            btnSolo.textContent = 'SOLO';
+            btnSolo.textContent = 'S';
           }
         }
       }
@@ -16583,10 +16593,7 @@ function exportCurrentPatchSyx() {
 
     updateOledDisplay() {
       const st = document.getElementById('seqDisplayStatus');
-      if (st) {
-        st.textContent = this.running ? 'RUNNING' : 'STOPPED';
-        st.style.color = this.running ? '#ffffff' : '#888';
-      }
+      if (st) st.textContent = this.running ? 'RUNNING' : 'STOPPED';
       const bpmEl = document.getElementById('seqDisplayBpm');
       if (bpmEl) bpmEl.textContent = `${this.bpm} BPM`;
 
@@ -16623,10 +16630,10 @@ function exportCurrentPatchSyx() {
           midiOutEl.textContent = selectedOutput.name;
           midiOutEl.style.color = '#e0e4ec';
         } else {
-          midiOutEl.textContent = 'NON CONNESSO ⚠️';
-          midiOutEl.style.color = '#ffaa44';
+          midiOutEl.textContent = 'NON CONNESSO';
         }
       }
+      if (typeof this.paintKnobVals === 'function') this.paintKnobVals();
     },
 
     updateStepEditToolbar() {
@@ -16666,7 +16673,7 @@ function exportCurrentPatchSyx() {
       const followBtn = document.getElementById('seqBtnFollow');
       if (followBtn) {
         if (this.followPage) {
-          followBtn.textContent = 'follow: on 👁';
+          followBtn.textContent = 'follow: on';
           followBtn.classList.add('latched');
         } else {
           followBtn.textContent = 'follow: off';
@@ -16905,7 +16912,7 @@ function exportCurrentPatchSyx() {
     const blScrew = document.createElement('div'); blScrew.className = 'chassis-screw screw-bl';
     const brScrew = document.createElement('div'); brScrew.className = 'chassis-screw screw-br';
     const logo = document.createElement('div'); logo.className = 'chassis-logo';
-    logo.textContent = 'VIRUS-H 4-PART MULTI SEQUENCER';
+    logo.textContent = 'VIRUS-H SEQ';
 
     elektronWrapper.appendChild(tlScrew);
     elektronWrapper.appendChild(trScrew);
@@ -16927,7 +16934,7 @@ function exportCurrentPatchSyx() {
     elektronWrapper.appendChild(seqInfo);
 
     const innerLayout = document.createElement('div');
-    innerLayout.style.cssText = 'display: flex; flex-direction: column; gap: 14px; align-items: center; margin-top: 24px; width: 100%; box-sizing: border-box; z-index: 1; padding-bottom: 70px;';
+    innerLayout.style.cssText = 'display: flex; flex-direction: column; gap: 14px; align-items: center; margin-top: 24px; width: 100%; box-sizing: border-box; z-index: 1; padding-bottom: 24px;';
 
     // =========================================================================
     // 1. TOP TRANSPORT & DIGITAL OLED DISPLAY
@@ -16954,7 +16961,7 @@ function exportCurrentPatchSyx() {
     const btnFollow = document.createElement('button');
     btnFollow.id = 'seqBtnFollow';
     btnFollow.className = 'arp-hw-btn-hold latched';
-    btnFollow.textContent = 'follow: on 👁';
+    btnFollow.textContent = 'follow: on';
     btnFollow.title = 'Page Follow: quando attivo, la vista salta automaticamente alla pagina che sta suonando';
     btnFollow.addEventListener('click', () => {
       seqEngine.followPage = !seqEngine.followPage;
@@ -16965,7 +16972,7 @@ function exportCurrentPatchSyx() {
     const btnTestHw = document.createElement('button');
     btnTestHw.className = 'arp-hw-preset-btn';
     btnTestHw.style.cssText = 'padding: 8px 12px; font-weight: 800; font-size: 11px;';
-    btnTestHw.innerHTML = '🔊 test 4 parti';
+    btnTestHw.textContent = 'test 4 parti';
     btnTestHw.title = 'Invia un accordo di prova hardware simultaneo a tutte e 4 le parti (Ch 1, 2, 3, 4)';
     btnTestHw.addEventListener('click', () => {
       [0, 1, 2, 3].forEach(ch => unmuteAndSetVolume(ch));
@@ -16993,22 +17000,26 @@ function exportCurrentPatchSyx() {
 
     topBar.appendChild(transportBox);
 
-    // Harmonized OLED / ice-blue LCD Readout Display
+    // display LCD come quello del PANEL (stessi id aggiornati da seqEngine.updateOledDisplay)
     const lcdDisp = document.createElement('div');
-    lcdDisp.className = 'chassis-top-display-visor seq-oled-visor';
+    lcdDisp.className = 'arp-lcd-wrap';
     lcdDisp.innerHTML = `
-      <div style="color: #666;">STATO: <span id="seqDisplayStatus" style="font-weight: bold; color: #888;">STOPPED</span></div>
-      <div style="color: #666;">TEMPO: <span id="seqDisplayBpm" style="font-weight: bold; color: #fff;">125 BPM</span></div>
-      <div style="color: #666;">STEP: <span id="seqDisplayStep" style="font-weight: bold; color: #ffffff;">01/16</span></div>
-      <div style="color: #666;">TRACCIA: <span id="seqDisplayCurTrk" style="font-weight: bold; color: #ffffff;">TRK 1: P1 BASS [CH 1]</span></div>
-      <div style="color: #666;">LUNGHEZZA: <span id="seqDisplayLen" style="font-weight: bold; color: #fff;">16 STEPS</span></div>
-      <div style="color: #666;">RISOLUZIONE: <span id="seqDisplayRate" style="font-weight: bold; color: #e0e4ec;">1/16</span></div>
-      <div style="color: #666;"><span id="seqDisplayPage" style="font-weight: bold; color: #c0c4cc;">PAGE 1/4</span></div>
-      <div style="color: #666;">MIXER: <span id="seqDisplayMixerStatus" style="font-weight: bold; color: #a0a6b4;">P1:ON P2:ON P3:ON P4:ON</span></div>
-      <div style="display: flex; align-items: center; gap: 6px; border-left: 1px solid #222; padding-left: 10px; cursor: pointer;" id="seqMidiOutStatusBox" title="Stato interfaccia MIDI OUT (clicca per configurare)">
-        <span style="color: #666;">MIDI OUT:</span>
-        <span id="seqDisplayMidiOut" style="color: #e0e4ec; font-weight: bold;">...</span>
+      <div class="virus-snow-lcd-front arp-lcd">
+        <div class="lcd-header-bar">
+          <span class="lcd-badge">SEQ</span>
+          <span id="seqDisplayCurTrk">P1</span>
+          <span id="seqDisplayStatus">STOPPED</span>
+        </div>
+        <div class="arp-lcd-main">
+          <span id="seqDisplayStep" class="lcd-bank-prog">01/16</span>
+          <span id="seqDisplayBpm" class="lcd-patch-name">125 BPM</span>
+          <span id="seqDisplayRate" class="lcd-patch-name">1/16</span>
+        </div>
+        <div class="lcd-footer-bar">
+          <span id="seqDisplayLen">16 STEPS</span><span id="seqDisplayPage">PAGE 1/4</span><span id="seqDisplayMixerStatus">P1:ON P2:ON P3:ON P4:ON</span>
+        </div>
       </div>
+      <span id="seqDisplayMidiOut" hidden></span>
     `;
     topBar.appendChild(lcdDisp);
 
@@ -17042,7 +17053,7 @@ function exportCurrentPatchSyx() {
         <div class="arp-hw-led-well" style="width: 9px; height: 9px; flex-shrink: 0;">
           <div class="arp-hw-led" id="seqTrkLed${idx}" style="width: 5px; height: 5px;"></div>
         </div>
-        <span>${trk.name}</span>
+        <span class="seq-trk-icon" data-part="${idx}"></span><span class="seq-trk-name">${trk.name}</span>
       `;
       btnTrk.title = `Seleziona ${trk.name} per visualizzare e modificare i suoi 64 step`;
       btnTrk.addEventListener('click', () => {
@@ -17055,7 +17066,7 @@ function exportCurrentPatchSyx() {
       btnMute.id = `seqTrkMuteBtn${idx}`;
       btnMute.className = 'seq-trk-mute-btn' + (trk.muted ? ' muted' : '');
       btnMute.style.cssText = 'padding: 4px 6px; font-size: 8.5px; flex-shrink: 0;';
-      btnMute.textContent = trk.muted ? 'MUTE 🔇' : 'MUTE';
+      btnMute.textContent = 'M';
       btnMute.title = `Muta / Smuta ${trk.name}`;
       btnMute.addEventListener('click', () => {
         seqEngine.toggleMute(idx);
@@ -17067,7 +17078,7 @@ function exportCurrentPatchSyx() {
       btnSolo.id = `seqTrkSoloBtn${idx}`;
       btnSolo.className = 'seq-trk-solo-btn' + (trk.solo ? ' soloed' : '');
       btnSolo.style.cssText = 'padding: 4px 6px; font-size: 8.5px; flex-shrink: 0;';
-      btnSolo.textContent = trk.solo ? 'SOLO ⭐' : 'SOLO';
+      btnSolo.textContent = 'S';
       btnSolo.title = `Metti in solo ${trk.name}`;
       btnSolo.addEventListener('click', () => {
         seqEngine.toggleSolo(idx);
@@ -17081,7 +17092,7 @@ function exportCurrentPatchSyx() {
     const unmuteAllBtn = document.createElement('button');
     unmuteAllBtn.className = 'seq-subtoolbar-btn';
     unmuteAllBtn.style.cssText = 'padding: 6px 10px; font-size: 9.5px; white-space: nowrap; flex-shrink: 0;';
-    unmuteAllBtn.innerHTML = '🔊 unmute all';
+    unmuteAllBtn.textContent = 'unmute all';
     unmuteAllBtn.title = 'Attiva tutte e 4 le tracce contemporaneamente';
     unmuteAllBtn.addEventListener('click', () => {
       seqEngine.unmuteAll();
@@ -17201,6 +17212,17 @@ function exportCurrentPatchSyx() {
     });
     knobsGrid.appendChild(pitchKnob);
 
+    const seqKnobVals = [
+      [bpmKnob, () => `${seqEngine.bpm}`], [rateKnob, () => seqEngine.rates[seqEngine.rateIdx].name], [lenKnob, () => `${seqEngine.getActiveTrack().length}`],
+      [gateKnob, () => `${seqEngine.getActiveTrack().gatePercent}%`], [swingKnob, () => `${seqEngine.swingPercent}%`],
+      [pitchKnob, () => { const t = seqEngine.getActiveTrack(), st = t.steps[t.selectedStep]; return st && st.active ? midiNoteName(st.note) : '—'; }],
+    ];
+    seqEngine.paintKnobVals = () => seqKnobVals.forEach(([k, f]) => {
+      let v = k.querySelector('.arp-knob-val'); if (!v) { v = document.createElement('span'); v.className = 'arp-knob-val'; k.appendChild(v); }
+      v.textContent = f();
+    });
+    ['pointermove', 'pointerup', 'keyup', 'dblclick'].forEach(ev => knobsGrid.addEventListener(ev, seqEngine.paintKnobVals));
+    knobsGrid.addEventListener('wheel', seqEngine.paintKnobVals, { passive: true });
     innerLayout.appendChild(knobsGrid);
 
     // =========================================================================
@@ -17381,7 +17403,7 @@ function exportCurrentPatchSyx() {
     const btnTie = document.createElement('button');
     btnTie.id = 'seqBtnToggleTie';
     btnTie.className = 'seq-subtoolbar-btn';
-    btnTie.innerHTML = '∿ tie legato';
+    btnTie.textContent = 'tie legato';
     btnTie.title = 'Lega questa nota allo step successivo senza staccare il gate';
     btnTie.addEventListener('click', () => {
       const trk = seqEngine.getActiveTrack();
@@ -17396,7 +17418,7 @@ function exportCurrentPatchSyx() {
     const btnAccent = document.createElement('button');
     btnAccent.id = 'seqBtnToggleAccent';
     btnAccent.className = 'seq-subtoolbar-btn';
-    btnAccent.innerHTML = '⚡ accent';
+    btnAccent.textContent = 'accent';
     btnAccent.title = 'Attiva Velocity Accent (127 vs 96)';
     btnAccent.addEventListener('click', () => {
       const trk = seqEngine.getActiveTrack();
@@ -17410,7 +17432,7 @@ function exportCurrentPatchSyx() {
 
     const btnAudition = document.createElement('button');
     btnAudition.className = 'seq-subtoolbar-btn';
-    btnAudition.innerHTML = '🔊 audition';
+    btnAudition.textContent = 'audition';
     btnAudition.title = 'Ascolta la nota dello step selezionato sul canale di questa traccia';
     btnAudition.addEventListener('click', () => {
       const trk = seqEngine.getActiveTrack();
@@ -17492,12 +17514,12 @@ function exportCurrentPatchSyx() {
       presetsGroup.appendChild(b);
     }
 
-    addPresetBtn('★ full multi groove', () => seqEngine.presetFullMultiGroove(), 'Carica un groove completo su tutte e 4 le parti del Virus (Bass + Lead + Pad + Pluck)', true);
+    addPresetBtn('full multi groove', () => seqEngine.presetFullMultiGroove(), 'Carica un groove completo su tutte e 4 le parti del Virus (Bass + Lead + Pad + Pluck)', true);
     addPresetBtn('rolling bass', () => seqEngine.presetRollingBass(), 'Carica linea di basso in sedicesimi sulla traccia attiva');
     addPresetBtn('acid 303', () => seqEngine.presetAcid303(), 'Carica pattern acid 303 sulla traccia attiva');
     addPresetBtn('melodic techno', () => seqEngine.presetMelodicTechno(), 'Carica pattern melodic techno a 32 step sulla traccia attiva');
     addPresetBtn('offbeats', () => seqEngine.presetOffbeats(), 'Carica pattern in levare sulla traccia attiva');
-    addPresetBtn('🎲 random in key', () => seqEngine.presetRandomizeKey(), 'Genera note casuali quantizzate sulla traccia attiva');
+    addPresetBtn('random in key', () => seqEngine.presetRandomizeKey(), 'Genera note casuali quantizzate sulla traccia attiva');
     addPresetBtn('◀ shift', () => seqEngine.presetShift(-1), 'Sposta gli step a sinistra sulla traccia attiva');
     addPresetBtn('shift ▶', () => seqEngine.presetShift(1), 'Sposta gli step a destra sulla traccia attiva');
     addPresetBtn('invert', () => seqEngine.presetInvert(), 'Inverte gli step sulla traccia attiva');
@@ -17532,6 +17554,12 @@ function exportCurrentPatchSyx() {
 
     innerLayout.appendChild(presetsBar);
 
+    const seqKeys = document.createElement('div');
+    seqKeys.className = 'chassis-keys';
+    seqKeys.innerHTML = `<button type="button" class="chassis-key fp-key" data-midi-key aria-expanded="${document.body.classList.contains('midi-open')}" title="Mostra / nascondi stato MIDI, azioni e guida di collegamento">MIDI</button>`;
+    seqKeys.firstChild.addEventListener('click', () => window.toggleMidiPanel?.());
+    innerLayout.appendChild(seqKeys);
+    setTimeout(() => window.refreshPartBadges?.(), 0);
     elektronWrapper.appendChild(innerLayout);
 
     const woodStrip = document.createElement('div');
@@ -18687,9 +18715,9 @@ function exportCurrentPatchSyx() {
       ['Step', 'I 16 pad accendono/spengono gli step. I pulsanti sotto caricano pattern pronti (tutti on, 4/4, ottavi, offbeat, trance, acid).'],
     ]],
     btnTabSequencer: ['SEQ — sequencer a 4 tracce', [
-      ['Tracce', '<b>p1–p4</b> sceglie la traccia (una per parte), con <b>mute</b> e <b>solo</b>. <b>start seq</b> avvia, <b>follow</b> segue la pagina in riproduzione.'],
+      ['Tracce', 'Una traccia per parte, con l’icona e il nome scelti in MULTI (es. <b>P2 · Bass</b>). Cliccala per modificarla; <b>M</b> = mute, <b>S</b> = solo. <b>start seq</b> avvia, <b>follow</b> segue la pagina in riproduzione.'],
       ['Step', '<b>page 1–4</b> mostra gli step 1–16 … 49–64. Clicca uno step per selezionarlo: <b>−oct −1 +1 +oct</b> cambiano la nota, <b>tie</b> la lega alla successiva, <b>accent</b> la accentua, <b>audition</b> la fa sentire.'],
-      ['Traccia', '<b>TEMPO, RESOLUTION, TRK LENGTH, TRK GATE, SWING</b>. Tonalità e scala per <b>random in key</b>; pattern pronti; <b>shift</b>, <b>invert</b>, <b>clear trk</b>.'],
+      ['Traccia', '<b>TEMPO, RESOLUTION, TRK LENGTH, TRK GATE, SWING, STEP PITCH</b> (valore sotto ogni manopola). Tonalità e scala per <b>random in key</b>; pattern pronti; <b>shift</b>, <b>invert</b>, <b>clear trk</b>.'],
       ['Pattern', 'Il menu <b>PATTERN P01–P64</b> con salva/carica memorizza i pattern da usare nella SONG.'],
     ]],
     btnTabSong: ['SONG — catena di pattern', [
