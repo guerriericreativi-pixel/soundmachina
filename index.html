@@ -8925,7 +8925,11 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
     const outCount = midiAccess ? midiAccess.outputs.size : 0;
     const accessText = document.getElementById('msAccessText');
     const allow = document.getElementById('msAllow');
-    if (midiStatus === 'unsupported') {
+    if (midiStatus === 'pending' && !midiAccess) {
+      step('access', 'current');
+      accessText.textContent = 'Rispondi «Consenti» alla richiesta MIDI del browser (in alto, vicino all’indirizzo).';
+      allow.hidden = true;
+    } else if (midiStatus === 'unsupported') {
       step('access', 'error');
       accessText.textContent = 'Questo browser non supporta Web MIDI. Usa Chrome o Edge su computer (Safari, iPhone e iPad non sono supportati).';
       allow.hidden = true;
@@ -8967,6 +8971,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
   });
 
   function initWebMidi(){
+    renderMidiSetup();   // visibile subito, anche mentre il browser chiede il permesso
     if (!navigator.requestMIDIAccess){
       midiStatus = 'unsupported';
       connLabel.textContent = 'web midi non supportato';
