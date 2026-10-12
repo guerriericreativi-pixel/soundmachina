@@ -4157,7 +4157,6 @@
     font-size: 18px;
     font-weight: 900;
     letter-spacing: 0.06em;
-    text-transform: uppercase;
     color: #0f2233;
     text-shadow: 0 1px 0 rgba(255,255,255,0.6);
     overflow: hidden;
@@ -6547,6 +6546,9 @@
   .faceplate .fp-lcd .virus-snow-lcd-front > div { margin: 0 !important; gap: 1cqw !important; }
   .faceplate .fp-lcd .lcd-footer-bar { font-size: 1cqw !important; padding-top: 0.2cqw !important; margin: 0 !important; }
   .faceplate .fp-lcd .lcd-footer-bar span, .faceplate .fp-lcd .lcd-header-bar span { font-size: inherit !important; }
+  /* indicatore complessita' patch, come sull'header del display reale */
+  .lcd-cpx { display: inline-block; width: 2.2em; height: 0.8em; border: 1px solid currentColor; background: linear-gradient(90deg, currentColor 35%, transparent 35%) content-box; padding: 1px; }
+  #frontLcdMultiPrg[hidden] { display: none; }
 
   .faceplate-toolbar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 10px; }
   .faceplate-toolbar .snow-front-dock { flex: 1 1 auto; margin: 0 !important; }
@@ -7349,16 +7351,15 @@
         <div id="frontLcdScreen" class="virus-snow-lcd-front">
               <div class="lcd-header-bar">
                 <span id="frontLcdModeBadge" class="lcd-badge">MULTI</span>
-                <span id="frontLcdCategory" style="letter-spacing: 0.05em; color: #eaf3fa; font-weight: 800;">P1 • RAM-A</span>
+                <span id="frontLcdCategory" style="letter-spacing: 0.05em; color: #eaf3fa; font-weight: 800;">CAT:Off</span>
                 <span style="display: flex; align-items: center; gap: 4px; color: #d7e9f5;">
-                  <span style="font-size: 9px;">▤</span>
-                  <span>🔒</span>
                   <span id="frontLcdMultiPrg" style="font-weight: 900;">01</span>
+                  <span class="lcd-cpx" title="Patch complexity"></span>
                 </span>
               </div>
               <div style="display: flex; align-items: baseline; gap: 12px; margin: 4px 0;">
-                <span id="frontLcdBankProg" class="lcd-bank-prog">A-01</span>
-                <span id="frontLcdPatchName" class="lcd-patch-name">SNOWFALL BC</span>
+                <span id="frontLcdBankProg" class="lcd-bank-prog">RAM-A 1</span>
+                <span id="frontLcdPatchName" class="lcd-patch-name">Init</span>
               </div>
               <div class="lcd-footer-bar">
                 <span id="frontLcdSoft1" style="flex: 1; text-align: left;">Transp: 0</span>
@@ -9245,7 +9246,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
     clearTimeout(window.virusSync?.timer);
     const ask = (prog) => selectedOutput.send(new Uint8Array([...SYSEX_PREFIX, deviceId(), 0x30, 0x00, prog, 0xF7]));
     window.virusSync = { step: 'single', timer: 0 };
-    syncLcd('SYNC', 'LETTURA DAL VIRUS…');
+    syncLcd('Sync', 'Reading Virus…');
     setLastAction('Sincronizzazione: richiedo il suono attivo al Virus…');
     ask(0x40);
     window.virusSync.timer = setTimeout(() => {
@@ -9255,7 +9256,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
       window.virusSync.timer = setTimeout(() => {
         if (!window.virusSync) return;
         window.virusSync = null;
-        syncLcd('NO SYNC', 'IL VIRUS NON RISPONDE');
+        syncLcd('No Sync', 'Virus not responding');
         setLastAction('Il Virus non risponde alle richieste SysEx: controlla porta MIDI IN, Device ID e che il synth sia acceso (vedi Monitor MIDI)');
         setTimeout(() => updateVirusSnowFrontPanel(currentPartIndex || 0), 2500);
       }, 1200);
@@ -12881,14 +12882,13 @@ function exportCurrentPatchSyx() {
       prgEl.textContent = String(multiNum).padStart(2, '0');
     }
     if (bankProgEl) {
-      const bLetter = (BANK_NAMES[part.values.bank] || 'A').replace('RAM-', '').replace('ROM-', '');
-      bankProgEl.textContent = `${bLetter}-${String(part.values.program + 1).padStart(2, '0')}`;
+      bankProgEl.textContent = `${BANK_NAMES[part.values.bank] || 'RAM-A'} ${part.values.program + 1}`;
     }
     if (patchNameEl) {
       const name = (part.name && part.name !== 'init' && !isDummyPatchName(part.name))
         ? part.name
-        : (getBankPatchName(part.values.bank, part.values.program) || 'INIT');
-      patchNameEl.textContent = name.toUpperCase();
+        : (getBankPatchName(part.values.bank, part.values.program) || 'Init');
+      patchNameEl.textContent = name;
     }
     const soft1El = document.getElementById('snowLcdSoft1');
     const soft3El = document.getElementById('snowLcdSoft3');
@@ -13378,20 +13378,18 @@ function exportCurrentPatchSyx() {
     const multiInput = document.getElementById('multiProgramInput');
 
     const bankName = BANK_NAMES[part.values.bank] || 'RAM-A';
-    if (catEl) catEl.textContent = `P${pIdx + 1} • ${bankName}`;
     if (prgEl) {
       const multiNum = multiInput ? parseInt(multiInput.value, 10) || (pIdx + 1) : (pIdx + 1);
       prgEl.textContent = String(multiNum).padStart(2, '0');
     }
     if (bankProgEl) {
-      const bLetter = (BANK_NAMES[part.values.bank] || 'A').replace('RAM-', '').replace('ROM-', '');
-      bankProgEl.textContent = `${bLetter}-${String(part.values.program + 1).padStart(2, '0')}`;
+      bankProgEl.textContent = `${BANK_NAMES[part.values.bank] || 'RAM-A'} ${part.values.program + 1}`;
     }
     if (patchNameEl) {
       const name = (part.name && part.name !== 'init' && !isDummyPatchName(part.name))
         ? part.name
-        : (getBankPatchName(part.values.bank, part.values.program) || 'INIT');
-      patchNameEl.textContent = name.toUpperCase();
+        : (getBankPatchName(part.values.bank, part.values.program) || 'Init');
+      patchNameEl.textContent = name;
     }
 
     // Aggiorna parametri soft nel footer dell'LCD
@@ -13572,7 +13570,8 @@ function exportCurrentPatchSyx() {
     const PLATE = [{ n: 'PatchVol', cc: 91 }, { n: 'Transp', cc: 93, bip: true, oct: true }, { n: 'Pan', cc: 10, bip: true }];
     const UPPER = ['frontBtnOsc1', 'frontBtnOsc2', 'frontBtnFilters', 'frontBtnMod', 'frontBtnEnv', 'frontBtnEffects', 'frontBtnArp', 'frontBtnCommon'];
     const LOWER = ['frontBtnValMinus', 'frontBtnValPlus', 'frontBtnParamPrev', 'frontBtnParamNext', 'frontBtnAudition', 'frontBtnMulti', 'frontBtnConfig', 'frontBtnStore'];
-    const MODES = ['SINGLE', 'MULTI', 'SEQUENCER'];
+    const MODES = ['Single', 'Multi', 'Sequencer'];
+    const CATEGORIES = ['Off', 'Lead', 'Bass', 'Pad', 'Decay', 'Pluck', 'Acid', 'Classic', 'Arpeggiator', 'Effects', 'Drums', 'Percussion', 'Input', 'Vocoder', 'Favourite1', 'Favourite2', 'Favourite3'];
 
     const panel = { state: 'play', menu: null, sel: 0, shift: false, modeIdx: 1, bankPrompt: false };
     window.snowPanel = panel;
@@ -13623,31 +13622,28 @@ function exportCurrentPatchSyx() {
       const cat = document.getElementById('frontLcdCategory');
       const badge = document.getElementById('frontLcdModeBadge');
       const soft = [1, 2, 3].map(i => document.getElementById('frontLcdSoft' + i));
-      const bankTxt = pos.onSnow ? `${pos.rom ? 'ROM' : 'RAM'}${pos.n} ${Math.floor(pos.p64 / 8) + 1}-${pos.p64 % 8 + 1}` : (BANK_NAMES[part.values.bank] || '');
-      if (cat) cat.textContent = panel.state === 'menu' ? `EDIT • ${EASY_MENUS[panel.menu][0]}`
-        : panel.state === 'bank' ? 'BANK • ROM sopra / RAM sotto'
-        : panel.state === 'part' ? 'PART • 1-4 fila sotto'
-        : panel.state === 'num' ? `PATCH • ${bankTxt.split(' ')[0]}`
-        : panel.state === 'mode' ? `MODE ▸ ${MODES[panel.modeIdx]}` : `P${(currentPartIndex || 0) + 1} • ${bankTxt}`;
-      if (badge && panel.state !== 'mode') badge.textContent = window.currentSynthMode === 'single' ? 'SINGLE' : 'MULTI';
+      const single = window.currentSynthMode === 'single';
+      // categoria come sul Virus: "CAT:Lead" (Category 1 = Single dump Page B #123)
+      const catTxt = 'CAT:' + (CATEGORIES[part.dump?.[9 + 251]] || 'Off');
+      if (cat) cat.textContent = panel.state === 'menu' ? EASY_MENUS[panel.menu][0]
+        : panel.state === 'mode' ? 'MODE' : single ? catTxt : `Part ${(currentPartIndex || 0) + 1}  ${catTxt}`;
+      const prg = document.getElementById('frontLcdMultiPrg'); if (prg) prg.hidden = single;
+      if (badge && panel.state !== 'mode') badge.textContent = single ? 'SINGLE' : 'MULTI';
       const big1 = document.getElementById('frontLcdBankProg');
       const big2 = document.getElementById('frontLcdPatchName');
       const setBig = (a, b) => { if (big1) big1.textContent = a; if (big2) big2.textContent = b; };
       if (panel.state === 'menu') {
         const prm = softParams()[panel.sel];
-        setBig(EASY_MENUS[panel.menu][0].replace(' ', ''), `${prm.n} ${fmt(prm, prm.cc === NO_CC ? null : getCC(prm.cc))}`.toUpperCase());
-      } else if (panel.state === 'num') {
-        setBig(`${pos.rom ? 'ROM' : 'RAM'}${pos.n}`, panel.group == null ? 'GRUPPO 1-8 ↑' : `${panel.group + 1}-?  PATCH 1-8 ↓`);
-      } else if (panel.state === 'bank') setBig('BANK', 'ROM 1-8 / RAM 1-8');
-      else if (panel.state === 'part') setBig('PART', `SCEGLI 1-4  (ORA P${(currentPartIndex || 0) + 1})`);
-      else if (panel.state === 'mode') setBig('MODE', MODES[panel.modeIdx]);
-      if (panel.shift && panel.state === 'play') setBig('EDIT', 'MENU O FUNZIONE');
+        setBig(prm.n, fmt(prm, prm.cc === NO_CC ? null : getCC(prm.cc)));
+      } else if (panel.state === 'bank') setBig('Bank', 'Select ROM/RAM 1-8');
+      else if (panel.state === 'part') setBig(`Part ${(currentPartIndex || 0) + 1}`, 'Select Part 1-4');
+      else if (panel.state === 'mode') setBig('Mode', MODES[panel.modeIdx]);
 
       const params = softParams();
       soft.forEach((el, i) => {
         if (!el) return;
         const prm = params[i]; const v = prm.cc === NO_CC ? null : getCC(prm.cc);
-        const txt = `${prm.n}: ${fmt(prm, v)}`;
+        const txt = panel.state === 'menu' ? `${prm.n}: ${fmt(prm, v)}` : prm.n;   // in play solo i nomi, come il display reale
         el.textContent = panel.state === 'menu' && i === panel.sel ? `▸${txt}` : txt;
       });
       // manopole VALUE 1-3 mostrano il parametro a cui sono assegnate
@@ -13709,7 +13705,7 @@ function exportCurrentPatchSyx() {
         }
         case 'frontBtnParamPrev': case 'frontBtnParamNext':
           if (panel.state === 'menu') { panel.sel = (panel.sel + (id === 'frontBtnParamNext' ? 1 : 2)) % 3; render(); }
-          else lcdFlash('EDIT', 'SCEGLI UN MENU');
+          else lcdFlash('Edit', 'Select Menu');
           return;
         case 'frontBtnMulti': toPlay(); document.getElementById('btnTabMultipart')?.click(); return;
         case 'frontBtnConfig': toPlay(); document.getElementById('btnSettings')?.click(); return;
@@ -13783,15 +13779,15 @@ function exportCurrentPatchSyx() {
         activeNotes.clear();
         activeAudioVoices.forEach((v, k) => stopWebAudioNote(k));
         activeAudioVoices.clear();
-        setLastAction('PANIC: ALL SOUNDS OFF'); lcdFlash('PANIC', 'ALL NOTES OFF'); return;
+        setLastAction('PANIC: ALL SOUNDS OFF'); lcdFlash('Panic', 'All Notes Off'); return;
       }
       const now = Date.now();
       tapTimes = tapTimes.filter(t => now - t < 2500); tapTimes.push(now);
       if (tapTimes.length >= 2) {
         const avg = (tapTimes[tapTimes.length - 1] - tapTimes[0]) / (tapTimes.length - 1);
         const bpm = Math.round(60000 / avg);
-        if (bpm >= 40 && bpm <= 240) { window.snowTapBpm = bpm; setLastAction(`Tap tempo: ${bpm} BPM`); lcdFlash('TEMPO', `${bpm} BPM`); }
-      } else { setLastAction('Tap tempo: continua a battere'); lcdFlash('TAP', 'BATTI IL TEMPO…'); }
+        if (bpm >= 40 && bpm <= 240) { window.snowTapBpm = bpm; setLastAction(`Tap tempo: ${bpm} BPM`); lcdFlash('Tempo', `${bpm} BPM`); }
+      } else { setLastAction('Tap tempo: continua a battere'); lcdFlash('Tap', 'Tempo…'); }
     });
 
     // ---- AUDITION: suona C3 finche' premuto; tenuto a lungo resta in latch, ripremi per fermare
@@ -13837,6 +13833,7 @@ function exportCurrentPatchSyx() {
       if (part && prm.cc === 10) part.values.pan = val;
       if (part && prm.cc === 93) part.values.transpose = val - 64;
       if (panel.state === 'menu') panel.sel = i - 1;
+      else lcdFlash(prm.n, fmt(prm, val));
       render();
       setLastAction(`${prm.n}: ${fmt(prm, val)} (CC ${prm.cc})`);
     }));
