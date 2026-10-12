@@ -9228,6 +9228,16 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
     // Processa ogni messaggio SysEx completo
     for (const msgBytes of sysexMessages) {
       if (msgBytes[1] === 0x00 && msgBytes[2] === 0x20 && msgBytes[3] === 0x33 && msgBytes[5] < 0x10) window.virusDeviceId = msgBytes[5];
+      // Il byte "parte" dei parametri che il Virus manda rivela il modo: 0x40 = Single, 0..15 = parte del Multi.
+      // (Il Snow non risponde a Request Global, ma dopo un cambio di modo o di programma manda 73 pp ...)
+      if (msgBytes.length === 11 && msgBytes[6] >= 0x70 && msgBytes[6] <= 0x73 && msgBytes[2] === 0x20 && msgBytes[3] === 0x33) {
+        const m = msgBytes[7] === 0x40 ? 'single' : (msgBytes[7] < 16 ? 'multi' : null);
+        if (m && m !== window.currentSynthMode) {
+          window.setSynthMode(m);
+          setLastAction(`Il Virus è in ${m === 'single' ? 'SINGLE' : 'MULTI'}`);
+          if (window.snowPanel && window.snowPanel.state === 'play') window.snowPanel.render();
+        }
+      }
       // Play Mode annunciato dal Virus: F0 00 20 33 01 dd 73 pp 7A vv F7 (0 Single, 1 Sequencer, 2 Multi)
       if (msgBytes.length === 11 && msgBytes[6] === 0x73 && msgBytes[8] === 122) {
         window.__virusPlayMode = msgBytes[9];
