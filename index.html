@@ -7002,41 +7002,57 @@
   html[data-skin="elektron"] #fxRackContent .xy-coords-badge { background: #3f040a !important; color: #ffccd0 !important; }
   #fxRackContent .xy-crosshair-x, #fxRackContent .xy-crosshair-y { background: rgba(28,42,56,0.45) !important; }
   html[data-skin="elektron"] #fxRackContent .xy-crosshair-x, html[data-skin="elektron"] #fxRackContent .xy-crosshair-y { background: rgba(255,90,100,0.55) !important; }
-  /* riflesso del vetro su tutti i display LCD (PANEL, MULTI, FX RACK, pad X/Y); segue un poco il mouse */
+  /* Vetro dei display (PANEL, MULTI, FX RACK, pad X/Y): cornice di plastica trasparente intorno,
+     riflesso con taglio netto in alto, fondo piu' scuro per dare volume, bagliore che segue un poco il mouse */
   :root { --glass-x: 0px; }
   .lcd-glass { position: relative; border-radius: 4px; }
   .virus-snow-lcd-front, .xy-pad-surface { position: relative; }
+  .lcd-glass > canvas { position: relative; z-index: 1; }
+  #fxRackContent .xy-pad-surface > * { z-index: 5; }
+  /* cornice in acrilico: bordo scuro del display, labbro chiaro, corpo traslucido, luce dall'alto, ombra sotto */
+  .faceplate .fp-lcd .virus-snow-lcd-front, .multi-lcd, .lcd-glass, #fxRackContent .xy-pad-surface {
+    box-shadow:
+      inset 0 3px 8px rgba(10,25,45,0.45), inset 0 -1px 2px rgba(0,0,0,0.25),
+      0 0 0 1px rgba(0,0,0,0.6),
+      0 0 0 2px rgba(255,255,255,0.85),
+      0 -3px 0 4px rgba(255,255,255,0.55),
+      0 0 0 7px rgba(196,212,224,0.42),
+      0 0 0 8px rgba(0,0,0,0.28),
+      0 7px 10px 6px rgba(0,0,0,0.22) !important;
+  }
+  .lcd-glass { box-shadow: 0 0 0 1px rgba(0,0,0,0.6), 0 0 0 2px rgba(255,255,255,0.85), 0 -3px 0 4px rgba(255,255,255,0.55), 0 0 0 7px rgba(196,212,224,0.42), 0 0 0 8px rgba(0,0,0,0.28), 0 7px 10px 6px rgba(0,0,0,0.22) !important; }
+  html[data-skin="elektron"] .faceplate .fp-lcd .virus-snow-lcd-front, html[data-skin="elektron"] .multi-lcd, html[data-skin="elektron"] #fxRackContent .xy-pad-surface {
+    box-shadow:
+      inset 0 3px 10px rgba(0,0,0,0.85), inset 0 0 24px rgba(255,30,45,0.18),
+      0 0 0 1px rgba(0,0,0,0.85),
+      0 0 0 2px rgba(255,255,255,0.22),
+      0 -3px 0 4px rgba(255,255,255,0.10),
+      0 0 0 7px rgba(70,72,78,0.45),
+      0 0 0 8px rgba(0,0,0,0.6),
+      0 0 18px 8px rgba(224,36,36,0.16),
+      0 7px 10px 6px rgba(0,0,0,0.45) !important;
+  }
+  html[data-skin="elektron"] .lcd-glass { box-shadow: 0 0 0 1px rgba(0,0,0,0.85), 0 0 0 2px rgba(255,255,255,0.22), 0 -3px 0 4px rgba(255,255,255,0.10), 0 0 0 7px rgba(70,72,78,0.45), 0 0 0 8px rgba(0,0,0,0.6), 0 0 18px 8px rgba(224,36,36,0.16), 0 7px 10px 6px rgba(0,0,0,0.45) !important; }
+  /* riflesso: filo di luce sul bordo alto, taglio netto della lastra, ombra in basso, bagliore mobile */
   .virus-snow-lcd-front::after, .lcd-glass::after, #fxRackContent .xy-pad-surface::after {
     content: ''; position: absolute; inset: 0; border-radius: inherit; pointer-events: none; z-index: 4;
     background:
-      linear-gradient(112deg, rgba(255,255,255,0) 0 28%, rgba(255,255,255,0.26) 36%, rgba(255,255,255,0.07) 44%, rgba(255,255,255,0) 50%, rgba(255,255,255,0) 72%, rgba(255,255,255,0.10) 76%, rgba(255,255,255,0) 80%),
-      linear-gradient(180deg, rgba(255,255,255,0.20) 0, rgba(255,255,255,0.04) 22%, rgba(255,255,255,0) 45%),
-      radial-gradient(130% 120% at 50% 45%, rgba(0,0,0,0) 62%, rgba(0,0,0,0.14) 100%) !important;
-    background-size: 160% 100%, 100% 100%, 100% 100% !important;
-    background-position: calc(30% + var(--glass-x)) 0, 0 0, 0 0 !important;
-    mix-blend-mode: screen;
-  }
-  .virus-snow-lcd-front::after, #fxRackContent .xy-pad-surface::after { mix-blend-mode: normal; }
-  /* Snow: fondo chiaro, il riflesso deve essere piu' deciso per vedersi */
-  html:not([data-skin="elektron"]) .virus-snow-lcd-front::after, html:not([data-skin="elektron"]) .lcd-glass::after, html:not([data-skin="elektron"]) #fxRackContent .xy-pad-surface::after {
-    mix-blend-mode: normal;
-    background:
-      linear-gradient(112deg, rgba(255,255,255,0) 0 27%, rgba(255,255,255,0.62) 35%, rgba(255,255,255,0.18) 43%, rgba(255,255,255,0) 50%, rgba(255,255,255,0) 71%, rgba(255,255,255,0.30) 75%, rgba(255,255,255,0) 79%),
-      linear-gradient(180deg, rgba(255,255,255,0.45) 0, rgba(255,255,255,0.08) 20%, rgba(255,255,255,0) 42%),
-      radial-gradient(130% 120% at 50% 45%, rgba(0,0,0,0) 60%, rgba(10,30,50,0.16) 100%) !important;
-    background-size: 160% 100%, 100% 100%, 100% 100% !important;
-    background-position: calc(30% + var(--glass-x)) 0, 0 0, 0 0 !important;
+      linear-gradient(180deg, rgba(255,255,255,0.95) 0 1px, rgba(255,255,255,0) 1px),
+      linear-gradient(172deg, rgba(255,255,255,0.42) 0, rgba(255,255,255,0.20) 38%, rgba(255,255,255,0) 38.4%),
+      linear-gradient(180deg, rgba(0,0,0,0) 52%, rgba(0,15,30,0.26) 100%),
+      linear-gradient(112deg, rgba(255,255,255,0) 0 40%, rgba(255,255,255,0.22) 46%, rgba(255,255,255,0) 52%) !important;
+    background-size: 100% 100%, 100% 100%, 100% 100%, 170% 100% !important;
+    background-position: 0 0, 0 0, 0 0, calc(30% + var(--glass-x)) 0 !important;
   }
   html[data-skin="elektron"] .virus-snow-lcd-front::after, html[data-skin="elektron"] .lcd-glass::after, html[data-skin="elektron"] #fxRackContent .xy-pad-surface::after {
     background:
-      linear-gradient(112deg, rgba(255,255,255,0) 0 28%, rgba(255,255,255,0.11) 36%, rgba(255,255,255,0.03) 44%, rgba(255,255,255,0) 50%, rgba(255,255,255,0) 72%, rgba(255,255,255,0.05) 76%, rgba(255,255,255,0) 80%),
-      linear-gradient(180deg, rgba(255,255,255,0.08) 0, rgba(255,255,255,0) 35%),
-      radial-gradient(130% 120% at 50% 45%, rgba(0,0,0,0) 60%, rgba(0,0,0,0.35) 100%) !important;
-    background-size: 160% 100%, 100% 100%, 100% 100% !important;
-    background-position: calc(30% + var(--glass-x)) 0, 0 0, 0 0 !important;
+      linear-gradient(180deg, rgba(255,255,255,0.35) 0 1px, rgba(255,255,255,0) 1px),
+      linear-gradient(172deg, rgba(255,255,255,0.14) 0, rgba(255,255,255,0.06) 38%, rgba(255,255,255,0) 38.4%),
+      linear-gradient(180deg, rgba(0,0,0,0) 48%, rgba(0,0,0,0.5) 100%),
+      linear-gradient(112deg, rgba(255,255,255,0) 0 40%, rgba(255,255,255,0.08) 46%, rgba(255,255,255,0) 52%) !important;
+    background-size: 100% 100%, 100% 100%, 100% 100%, 170% 100% !important;
+    background-position: 0 0, 0 0, 0 0, calc(30% + var(--glass-x)) 0 !important;
   }
-  .lcd-glass > canvas { position: relative; z-index: 1; }
-  #fxRackContent .xy-pad-surface > * { z-index: 5; }
 </style>
 </head>
 <body>
