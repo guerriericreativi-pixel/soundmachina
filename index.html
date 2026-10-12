@@ -8912,6 +8912,8 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
   // Guida al primo collegamento: visibile finche' non c'e' una porta di uscita attiva
   // ---------------------------------------------------------------------
   let midiStatus = 'pending';   // pending | unsupported | denied | granted
+  // browser integrati (pannello di Claude, app Electron) negano sempre Web MIDI senza chiedere
+  const embeddedBrowser = /\bClaude\/|Electron\//.test(navigator.userAgent);
   let midiSetupDismissed = false;
   try { midiSetupDismissed = sessionStorage.getItem('virusMidiSetupHidden') === '1'; } catch (e) {}
 
@@ -8933,6 +8935,10 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
       step('access', 'error');
       accessText.textContent = 'Questo browser non supporta Web MIDI. Usa Chrome o Edge su computer (Safari, iPhone e iPad non sono supportati).';
       allow.hidden = true;
+    } else if (midiStatus === 'denied' && embeddedBrowser) {
+      step('access', 'error');
+      accessText.textContent = 'Questo è il browser integrato di un’app, che non permette il MIDI. Apri la pagina in Chrome o Edge: copia l’indirizzo e incollalo lì.';
+      allow.hidden = false; allow.textContent = 'Copia indirizzo';
     } else if (midiStatus === 'denied') {
       step('access', 'error');
       accessText.textContent = 'Permesso negato. Clicca sul lucchetto accanto all’indirizzo → Impostazioni sito → MIDI → Consenti, poi premi Riprova.';
@@ -8958,7 +8964,14 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
     step('test', selectedOutput ? 'current' : 'todo');
   }
 
-  document.getElementById('msAllow')?.addEventListener('click', () => initWebMidi());
+  document.getElementById('msAllow')?.addEventListener('click', async (e) => {
+    if (midiStatus === 'denied' && embeddedBrowser) {
+      try { await navigator.clipboard.writeText(location.href); e.target.textContent = 'Copiato ✓'; }
+      catch (err) { window.prompt('Copia questo indirizzo e aprilo in Chrome:', location.href); }
+      return;
+    }
+    initWebMidi();
+  });
   document.getElementById('msPort')?.addEventListener('change', e => {
     outSelect.value = e.target.value;
     outSelect.dispatchEvent(new Event('change'));
