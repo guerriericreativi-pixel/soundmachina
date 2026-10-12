@@ -7028,7 +7028,7 @@
         <span class="step-bar bar-1"></span><span class="step-bar bar-2"></span><span class="step-bar bar-3"></span>
       </button>
     </div>
-    <button class="theme-toggle" id="themeToggle" style="margin: 0;">○</button>
+    <button class="settings-trigger theme-toggle" id="themeToggle" type="button" style="margin: 0; white-space: nowrap;">○ SNOW</button>
     <button class="settings-trigger" id="btnToggleKeyboard" type="button" title="Tastiera virtuale per provare i suoni" style="margin: 0;">🎹 KEYS</button>
     <button class="settings-trigger" id="btnSettings" type="button" aria-haspopup="dialog" aria-controls="settingsModal" aria-expanded="false" title="MIDI settings">MIDI</button>
     <button class="settings-trigger" id="btnFeedback" type="button" aria-haspopup="dialog" aria-controls="feedbackModal" aria-expanded="false" title="Note sicurezza & suggerimenti per la community Synth Cafe" style="margin: 0; font-weight: 700; color: #ffca3a; border-color: rgba(255, 202, 58, 0.4);">💬 FEEDBACK</button>
@@ -7400,7 +7400,6 @@
       <button class="fp-wave" id="frontBtnMidi" data-midi-key type="button" aria-expanded="false" title="Mostra / nascondi stato MIDI, azioni (receive, send, test, diagnostics, panic) e guida di collegamento" style="--x:12.316;--y:84.6">MIDI</button>
       <button class="fp-wave" id="frontBtnSounds" type="button" aria-expanded="false" aria-controls="snowSoundsDock" title="Mostra / nascondi banco e lista suoni" style="--x:54.52;--y:84.6">SOUNDS</button>
       <button class="fp-wave" id="frontBtnWaves" type="button" aria-expanded="false" aria-controls="snowWaveBrowserSlot" title="Mostra / nascondi il Wave Browser" style="--x:59.435;--y:84.6">WAVES</button>
-      <button class="fp-wave" id="frontBtnFinish" type="button" title="Finitura bianca / scura" style="--x:64.407;--y:84.6">FINISH</button>
       <div class="fp-lcd" style="--x:19.492;--y:34.011;--w:27.401;--h:12.07">
         <div id="frontLcdScreen" class="virus-snow-lcd-front">
               <div class="lcd-header-bar">
@@ -8252,8 +8251,8 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
     const isDark = (theme === 'elektron');
     if (isDark){
       document.documentElement.setAttribute('data-skin', 'elektron');
-      themeToggle.textContent = '●';
-      themeToggle.title = 'Tema attivo: Access Virus TI2 Dark Star (clicca per Virus TI Snow)';
+      themeToggle.textContent = '● DARK';
+      themeToggle.title = 'Finitura scura (clicca per Snow)';
       const pDisplay = document.getElementById('patchNameDisplay');
       if (pDisplay && pDisplay.textContent.includes('virus ti snow')) {
         pDisplay.textContent = pDisplay.textContent.replace('virus ti snow', 'virus ti2 dark star');
@@ -8268,8 +8267,8 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
       if (badgeModel) badgeModel.innerHTML = 'VIRUS TI2 <span style="font-weight: 300; opacity: 0.5;">|</span> DARK STAR';
     } else {
       document.documentElement.setAttribute('data-skin', 'te');
-      themeToggle.textContent = '○';
-      themeToggle.title = 'Tema attivo: Access Virus TI Snow (clicca per Virus TI2 Dark Star)';
+      themeToggle.textContent = '○ SNOW';
+      themeToggle.title = 'Finitura Snow (clicca per Dark)';
       const pDisplay = document.getElementById('patchNameDisplay');
       if (pDisplay && pDisplay.textContent.includes('virus ti2 dark star')) {
         pDisplay.textContent = pDisplay.textContent.replace('virus ti2 dark star', 'virus ti snow');
@@ -10230,7 +10229,6 @@ function exportCurrentPatchSyx() {
     // tasti sulla scocca (SOUNDS, WAVES): aprono/chiudono i pannelli sotto il frontale; lo stato resta in questo browser
     document.querySelectorAll('.faceplate .fp-wave[aria-controls]').forEach(btn => bindPanelKey(btn, document.getElementById(btn.getAttribute('aria-controls'))));
     document.getElementById('frontBtnMidi')?.addEventListener('click', toggleMidiPanel);
-    document.getElementById('frontBtnFinish')?.addEventListener('click', () => document.getElementById('frontThemeToggleBtn')?.click());
   }, 0);
 
   function buildSingleView(){
