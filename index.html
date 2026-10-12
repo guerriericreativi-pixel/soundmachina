@@ -9011,6 +9011,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
       // Play Mode annunciato dal Virus: F0 00 20 33 01 dd 73 pp 7A vv F7 (0 Single, 1 Sequencer, 2 Multi)
       if (msgBytes.length === 11 && msgBytes[6] === 0x73 && msgBytes[8] === 122) {
         window.currentSynthMode = msgBytes[9] === 0 ? 'single' : 'multi';
+        if (window.virusSync && window.virusSync.step === 'global') window.virusSync.askDump(window.currentSynthMode);
         if (window.snowPanel && window.snowPanel.state === 'play') window.snowPanel.render();
         continue;
       }
@@ -9251,22 +9252,31 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
     if (!selectedOutput) { if (manual) uiAlert('Collega prima la porta MIDI del Virus.'); return; }
     clearTimeout(window.virusSync?.timer);
     const ask = (prog) => selectedOutput.send(new Uint8Array([...SYSEX_PREFIX, deviceId(), 0x30, 0x00, prog, 0xF7]));
-    window.virusSync = { step: 'single', timer: 0 };
-    syncLcd('Sync', 'Reading Virus…');
-    setLastAction('Sincronizzazione: richiedo il suono attivo al Virus…');
-    ask(0x40);
-    window.virusSync.timer = setTimeout(() => {
+    const fail = () => {
       if (!window.virusSync) return;
-      window.virusSync.step = 'multi';
-      ask(0x00);
-      window.virusSync.timer = setTimeout(() => {
-        if (!window.virusSync) return;
-        window.virusSync = null;
-        syncLcd('No Sync', 'Virus not responding');
-        setLastAction('Il Virus non risponde alle richieste SysEx: controlla porta MIDI IN, Device ID e che il synth sia acceso (vedi Monitor MIDI)');
-        setTimeout(() => updateVirusSnowFrontPanel(currentPartIndex || 0), 2500);
-      }, 1200);
-    }, 900);
+      window.virusSync = null;
+      syncLcd('No Sync', 'Virus not responding');
+      setLastAction('Il Virus non risponde alle richieste SysEx: controlla porta MIDI IN, Device ID e che il synth sia acceso (vedi Monitor MIDI)');
+      setTimeout(() => updateVirusSnowFrontPanel(currentPartIndex || 0), 2500);
+    };
+    // 2) chiede l'edit buffer giusto per il modo: Single (0x40) o parte 1 del Multi (0x00)
+    const askDump = (mode) => {
+      clearTimeout(window.virusSync.timer);
+      window.virusSync.step = mode;
+      ask(mode === 'single' ? 0x40 : 0x00);
+      window.virusSync.timer = setTimeout(fail, 1500);
+    };
+    window.virusSync = { step: 'global', timer: 0, askDump };
+    syncLcd('Sync', 'Reading Virus…');
+    setLastAction('Sincronizzazione: chiedo al Virus modo e suono attivo…');
+    // 1) Request Global: il Virus risponde coi parametri globali (73 00 pp vv), tra cui Play Mode (#122).
+    //    L'edit buffer Single risponde anche in MULTI, quindi il modo va chiesto qui.
+    selectedOutput.send(new Uint8Array([...SYSEX_PREFIX, deviceId(), 0x35, 0xF7]));
+    window.virusSync.timer = setTimeout(() => {          // nessun Play Mode: vecchio metodo (prima Single, poi Multi)
+      if (!window.virusSync) return;
+      window.virusSync.step = 'single'; ask(0x40);
+      window.virusSync.timer = setTimeout(() => window.virusSync && askDump('multi'), 900);
+    }, 700);
   }
   window.syncWithVirus = syncWithVirus;
 
