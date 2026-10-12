@@ -8809,6 +8809,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
     if (multiParts && multiParts[pIdx]) {
       multiParts[pIdx].name = name;
       multiParts[pIdx].dump = Array.from(msgBytes);
+      multiParts[pIdx].dumpAt = Date.now();
       delete multiParts[pIdx].sound._osc1_model; delete multiParts[pIdx].sound._osc2_model;   // il modello ora viene dal dump
       if (window.waveBrowserRender) setTimeout(window.waveBrowserRender, 0);
 
@@ -10108,7 +10109,12 @@ function exportCurrentPatchSyx() {
       const pt = window.currentSynthMode === 'single' ? 0x40 : (currentPartIndex || 0);
       const bytes = new Uint8Array([...SYSEX_PREFIX, deviceId(), 0x6E, pt, osc === 1 ? 30 : 35, m & 0x7F, 0xF7]);
       selectedOutput.send(bytes); recordMidiTx(`osc${osc} model ${OSC_MODELS[m]}`, bytes);
+      // verifica: rilegge l'edit buffer e controlla che il Virus abbia davvero cambiato modello
+      check = { osc, m, t: Date.now() };
+      setTimeout(() => { try { selectedOutput.send(new Uint8Array([...SYSEX_PREFIX, deviceId(), 0x30, 0x00, pt, 0xF7])); } catch (e) {} }, 300);
+      setTimeout(() => { if (check && check.t && Date.now() - check.t > 2400) { check = { ...check, timeout: true }; render(); } }, 2500);
     };
+    let check = null;
     const setP = (id, v) => { patch[id] = v; sendParam(id, v); renderKnobsForParam(id); };
 
     function render() {
@@ -10121,6 +10127,18 @@ function exportCurrentPatchSyx() {
       $('.wb-note').textContent = m === 0 ? 'Classic: la wave suona con Shape a 0 (scegliendola Shape va a 0). Shape 64 = saw, 127 = pulse.'
         : m === 1 ? 'HyperSaw non usa wave: regola Density e Detune nella pagina OSC.'
         : 'Index sposta la lettura dentro la wavetable (come Shape sul Virus).';
+      const p = part();
+      if (check && check.osc === osc) {
+        if (p.dumpAt > check.t) {
+          const got = p.dump[ids().modelByte];
+          $('.wb-note').textContent = got === check.m ? `✓ Il Virus conferma: OSC ${osc} = ${OSC_MODELS[got]}`
+            : `⚠ Il Virus non ha accettato ${OSC_MODELS[check.m]} (OSC ${osc} resta ${OSC_MODELS[got] ?? got}). Copia il log del Monitor MIDI e mandamelo.`;
+          check = null;
+        } else if (check.timeout) {
+          $('.wb-note').textContent = '⚠ Il Virus non ha risposto alla verifica: controlla la porta MIDI IN.';
+          check = null;
+        }
+      }
       $('.wb-idx-wrap').hidden = m < 2;
       $('.wb-idx').value = patch[ids().shape] ?? 0; $('.wb-idx-val').textContent = $('.wb-idx').value;
       $('.wb-grid').innerHTML = list.map((n, i) => (!q || n.toLowerCase().includes(q))
