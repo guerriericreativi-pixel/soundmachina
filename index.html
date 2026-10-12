@@ -9231,7 +9231,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
       // Play Mode annunciato dal Virus: F0 00 20 33 01 dd 73 pp 7A vv F7 (0 Single, 1 Sequencer, 2 Multi)
       if (msgBytes.length === 11 && msgBytes[6] === 0x73 && msgBytes[8] === 122) {
         window.__virusPlayMode = msgBytes[9];
-        window.currentSynthMode = msgBytes[9] === 0 ? 'single' : 'multi';
+        window.setSynthMode(msgBytes[9] === 0 ? 'single' : 'multi');
         if (window.virusSync && window.virusSync.step === 'global') window.virusSync.askDump(window.currentSynthMode);
         if (window.snowPanel && window.snowPanel.state === 'play') window.snowPanel.render();
         continue;
@@ -9417,7 +9417,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
         window.lastReceivedDump = new Uint8Array(msgBytes);
         applyDumpToActivePatch(msgBytes);
         if (msgBytes[7] === 0x00 && msgBytes[8] === 0x40) {          // edit buffer Single
-          if (window.currentSynthMode !== 'single') window.currentSynthMode = 'single';
+          // un dump dell'edit buffer Single non dice in che modo e' il Virus (risponde anche in Multi): il modo non si tocca
           const part = multiParts[currentPartIndex || 0];
           if (part) part.name = patchName;
           updateVirusSnowFrontPanel(currentPartIndex || 0);
@@ -9495,11 +9495,9 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
     // il Virus puo' ignorare la richiesta globale con ID OMNI (0x10): la manda anche col suo ID reale
     // (letto dalle risposte, byte 5) o con 0x00
     new Set([deviceId(), window.virusDeviceId ?? 0x00]).forEach(id => selectedOutput.send(new Uint8Array([...SYSEX_PREFIX, id, 0x35, 0xF7])));
-    window.virusSync.timer = setTimeout(() => {          // nessun Play Mode: vecchio metodo (prima Single, poi Multi)
-      if (!window.virusSync) return;
-      window.virusSync.step = 'single'; ask(0x40);
-      window.virusSync.timer = setTimeout(() => window.virusSync && askDump('multi'), 900);
-    }, 700);
+    // il Virus non risponde col Play Mode: si resta sull'ultimo modo noto (confermato o scelto dal pannello),
+    // perche' l'edit buffer Single risponde anche in Multi e non permette di capirlo
+    window.virusSync.timer = setTimeout(() => window.virusSync && askDump(window.lastSynthMode()), 700);
   }
   window.syncWithVirus = syncWithVirus;
 
@@ -9802,8 +9800,13 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
     } catch(e) {}
   }
 
+  // ultimo modo noto del Virus (confermato dal synth o scelto dal pannello), ricordato tra una sessione e l'altra
+  window.lastSynthMode = () => { try { return localStorage.getItem('virusH_synthMode') || 'single'; } catch (e) { return 'single'; } };
+  window.setSynthMode = m => { window.currentSynthMode = m; try { localStorage.setItem('virusH_synthMode', m); } catch (e) {} };
+  if (!window.currentSynthMode) window.currentSynthMode = window.lastSynthMode();
+
   function sendVirusMode(mode = 0) { // 0 = Single Mode, 1 = Multi Mode, 2 = Sequencer
-    window.currentSynthMode = mode === 0 ? 'single' : 'multi';
+    window.setSynthMode(mode === 0 ? 'single' : 'multi');
     if (!selectedOutput) return;
     try {
       // Global Page D (0x73), param 122 = Play Mode; valori del Virus: 0 Single, 1 Sequencer (Multi Single), 2 Multi.
@@ -9820,7 +9823,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
       setTimeout(() => {
         const got = window.__virusPlayMode;
         if (got === want) setLastAction(`Modo ${label}: confermato dal Virus`);
-        else if (got === undefined) setLastAction(`Modo ${label} inviato, ma il Virus non ha confermato (vedi Monitor MIDI)`);
+        else if (got === undefined) setLastAction(`Modo ${label} inviato al Virus`);   // il Virus spesso non risponde alla richiesta di stato
         else setLastAction(`Il Virus è rimasto in ${['SINGLE', 'SEQUENCER', 'MULTI'][got] || got}: il cambio a ${label} non è stato accettato`);
       }, 2200);
     } catch(e) { console.error('sendVirusMode error', e); }
