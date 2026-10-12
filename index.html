@@ -6861,6 +6861,15 @@
   /* wave browser (scheda SINGLE) */
   .wave-browser { margin: 0 24px 28px; padding: 14px 16px; border-radius: 6px; background: rgba(0,0,0,0.28); border: 1px solid rgba(255,255,255,0.08); color: #d6dbe3; font: 12px/1.3 'Roboto Mono', ui-monospace, monospace; position: relative; z-index: 1; }
   #snowWaveBrowserSlot .wave-browser { margin: 16px 0 0; }
+  #snowWaveBrowserSlot[hidden] { display: none; }
+  /* tasto rettangolare sulla scocca, sotto la fascia PART VOLUME / TRANSPOSE / PANORAMA */
+  .faceplate .fp-wave { width: 6.2%; height: 2.7%; padding: 0; border: 0; border-radius: 0.25cqw; cursor: pointer;
+    background: linear-gradient(#a3a3a1, #8f8f8d); color: #f2f2f0; font: 700 0.8cqw/1 "Inter", sans-serif; letter-spacing: 0.1em; text-transform: uppercase !important;
+    box-shadow: 0 0.25cqw 0 #5f5f5d, 0 0.45cqw 0.6cqw rgba(0,0,0,0.35); }
+  .faceplate .fp-wave:active, .faceplate .fp-wave[aria-expanded="true"] { transform: translate(-50%, calc(-50% + 0.18cqw)); box-shadow: 0 0.07cqw 0 #5f5f5d, 0 0.2cqw 0.3cqw rgba(0,0,0,0.35); }
+  .faceplate .fp-wave[aria-expanded="true"] { color: #fff; text-shadow: 0 0 0.4cqw rgba(255,255,255,0.9); }
+  .faceplate .fp-wave:focus-visible { outline: 2px solid #3b82f6; outline-offset: 2px; }
+  html[data-skin="elektron"] .faceplate .fp-wave { background: linear-gradient(#3a3b3e, #2b2c2f); color: #c9cbd0; box-shadow: 0 0.25cqw 0 #151617, 0 0.45cqw 0.6cqw rgba(0,0,0,0.5); }
   .wave-browser .wb-head { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; }
   .wave-browser .wb-title { font-weight: 800; letter-spacing: 0.12em; }
   .wave-browser .wb-osc button { padding: 4px 10px; border: 1px solid rgba(255,255,255,0.2); background: transparent; color: inherit; font: inherit; cursor: pointer; }
@@ -7369,6 +7378,7 @@
       <span class="snow-indicator-led" id="frontRamLed7" style="--x:89.379;--y:41.708"></span>
       <span class="snow-indicator-led active-amber" id="frontEditShiftLed" style="--x:54.52;--y:59.058"></span>
       <span class="fp-bpm pulse-bpm" style="--x:21.751;--y:27.614"></span>
+      <button class="fp-wave" id="frontBtnWaves" type="button" aria-expanded="false" aria-controls="snowWaveBrowserSlot" title="Mostra / nascondi il Wave Browser" style="--x:33.446;--y:84.6">WAVES</button>
       <div class="fp-lcd" style="--x:19.492;--y:34.011;--w:27.401;--h:12.07">
         <div id="frontLcdScreen" class="virus-snow-lcd-front">
               <div class="lcd-header-bar">
@@ -7391,7 +7401,7 @@
             </div>
       </div>
     </div>
-    <div id="snowWaveBrowserSlot"></div>
+    <div id="snowWaveBrowserSlot" hidden></div>
     <div class="faceplate-toolbar">
       <button id="frontThemeToggleBtn" class="snow-theme-quick-switch" type="button" title="Commuta finitura bianca / scura"><span class="theme-switch-indicator"></span><span id="frontThemeSwitchText">WHITE</span></button>
       <div class="snow-front-dock">
@@ -10176,6 +10186,18 @@ function exportCurrentPatchSyx() {
   setTimeout(() => {
     const slot = document.getElementById('snowWaveBrowserSlot');
     if (slot && !slot.firstChild) { window.snowWaveBrowser = buildWaveBrowser(); slot.appendChild(window.snowWaveBrowser); }
+    // si apre solo dal tasto WAVES sulla scocca
+    const btn = document.getElementById('frontBtnWaves');
+    const show = open => {
+      slot.hidden = !open; btn.setAttribute('aria-expanded', String(open));
+      try { localStorage.setItem('virusH_wavesOpen', open ? '1' : ''); } catch (e) {}
+    };
+    let saved = false; try { saved = !!localStorage.getItem('virusH_wavesOpen'); } catch (e) {}
+    show(saved);
+    btn?.addEventListener('click', () => {
+      show(slot.hidden);
+      if (!slot.hidden) { window.waveBrowserRender(); slot.scrollIntoView({ behavior: 'smooth', block: 'nearest' }); }
+    });
   }, 0);
 
   function buildSingleView(){
