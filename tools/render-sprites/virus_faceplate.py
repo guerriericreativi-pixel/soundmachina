@@ -28,6 +28,9 @@ import virus_sprites as vs     # noqa: E402  (manopola, tasto, luci degli sprite
 argv = sys.argv[sys.argv.index('--') + 1:] if '--' in sys.argv else []
 PREVIEW = '--preview' in argv
 SKINS = [a for a in argv if a in ('snow', 'dark')] or ['snow']
+# --brand=vh: variante per il plugin distribuito, senza marchi Access (logo e "VIRUS | TI SNOW")
+BRAND = next((a.split('=')[1] for a in argv if a.startswith('--brand=')), 'access')
+SUFFIX = '' if BRAND == 'access' else '-' + BRAND
 OUT = os.path.join(vp.ROOT, 'assets', 'faceplate')
 PPU = 64                         # px per unita' nell'immagine del pannello (circa 2x CSS)
 TILT = vp.TILT
@@ -250,8 +253,12 @@ def build_faceplate(skin):
 
     # logo access
     logo = mat('logo', P['logo'], 0.45)
-    text('access', 1452, 128, 46, F['round'], logo, align='LEFT', spacing=1.02)
-    star(1412, 126, 0.42, logo, z=Z_INK)
+    if BRAND == 'vh':
+        text('VIRUS H', 1680, 122, 40, F['black'], logo, align='RIGHT', spacing=1.06)
+        text('H-STRAIN EDITOR', 1680, 160, 14.5, F['din'], ink, align='RIGHT', spacing=1.4)
+    else:
+        text('access', 1452, 128, 46, F['round'], logo, align='LEFT', spacing=1.02)
+        star(1412, 126, 0.42, logo, z=Z_INK)
 
     # contorno inciso dell'area di sinistra con il gradino obliquo
     groove = mat('groove', P['groove'], 0.7)
@@ -288,9 +295,14 @@ def build_faceplate(skin):
         vp.screw(skin, (x, y, T + 0.09), 0.17)
     flat_rrect('lcd-frame', 350, 345, 865, 500, 0.05, mat('lcdframe', (0.012, 0.013, 0.015), 0.4), T + 0.09)
     flat_rrect('lcd-glass', *LCD_SCREEN, 0.02, mat('screen', P['screen'], 0.15), T + 0.095)
-    text('VIRUS', 678, 319, 22, F['black'], ink, align='RIGHT', shear=0.18, z=T + 0.09)
-    flat_rrect('bar', 688, 306, 691, 332, 0.005, ink, T + 0.09)
-    text('TI SNOW', 700, 319, 22, F['regular'], ink, align='LEFT', z=T + 0.09)
+    if BRAND == 'vh':
+        text('H-STRAIN', 678, 319, 22, F['black'], ink, align='RIGHT', shear=0.18, z=T + 0.09)
+        flat_rrect('bar', 688, 306, 691, 332, 0.005, ink, T + 0.09)
+        text('SAMPLE 0001', 700, 319, 22, F['regular'], ink, align='LEFT', z=T + 0.09)
+    else:
+        text('VIRUS', 678, 319, 22, F['black'], ink, align='RIGHT', shear=0.18, z=T + 0.09)
+        flat_rrect('bar', 688, 306, 691, 332, 0.005, ink, T + 0.09)
+        text('TI SNOW', 700, 319, 22, F['regular'], ink, align='LEFT', z=T + 0.09)
     text('BPM/LFO', 405, 322, 8, F['din'], ink, z=T + 0.09)
 
     # serigrafia del pannello
@@ -345,7 +357,7 @@ def render_faceplate(skin):
     project, w, h = frame()
     build_faceplate(skin)
     vp.OUT = OUT
-    vp.render_save(f'faceplate-{skin}', alpha_floor=0.01)
+    vp.render_save(f'faceplate-{skin}{SUFFIX}', alpha_floor=0.01)
 
     # posizioni dei controlli per il CSS (percentuali dell'immagine)
     lay = {'aspect': w / h, 'knobs': {}, 'keys': {}, 'leds': {}}
@@ -410,4 +422,5 @@ if __name__ == '__main__':
     os.makedirs(OUT, exist_ok=True)
     for sk in SKINS:
         w = render_faceplate(sk)
-        render_controls(sk, w)
+        if BRAND == 'access':      # manopole e tasti sono uguali per tutte le varianti
+            render_controls(sk, w)

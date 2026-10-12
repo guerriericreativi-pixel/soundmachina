@@ -32,3 +32,10 @@ index_head.html
 assets/sprites/*-preview.webp
 assets/faceplate/*-preview.webp
 __pycache__/
+
+# plugin Virus H: prodotti di build e risorse web generate da scripts/sync-web.sh
+plugin/VirusH/build-mac/
+plugin/VirusH/dist/
+plugin/VirusH/resources/web/
+!plugin/VirusH/resources/icon-1024.png
+!plugin/VirusH/resources/Images.xcassets/**/*.png
