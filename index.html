@@ -8077,7 +8077,8 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
       updateControlRoomStatus();
       if (typeof updateKeyboardPartDisplay === 'function') updateKeyboardPartDisplay();
       if (selectedOutput) {
-        requestDump(0);
+        if (window.currentSynthMode === 'multi') requestPartDump(currentPartIndex || 0, true);
+        else requestDump(0);
       }
     });
   }
@@ -9416,8 +9417,9 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
           if (partDisplays[pIdx] && partDisplays[pIdx]._startReveal) {
             partDisplays[pIdx]._startReveal();
           }
+          // i display mostrano la parte selezionata: leggere P1-P4 non deve spostare la selezione sull'ultima letta
           if (typeof updateVirusSnowMasterDisplay === 'function') {
-            updateVirusSnowMasterDisplay(pIdx);
+            updateVirusSnowMasterDisplay(currentPartIndex || 0);
           }
           if (typeof renderMultiPartsOverview === 'function') {
             renderMultiPartsOverview();
@@ -13885,8 +13887,9 @@ function exportCurrentPatchSyx() {
 
   function updateVirusSnowFrontPanel(activePartIdx = 0) {
     const pIdx = Math.max(0, Math.min(NUM_PARTS - 1, activePartIdx));
-    currentPartIndex = pIdx;
-    window.activeSinglePartIndex = pIdx;
+    // il frontale mostra solo la parte selezionata e non la cambia: aggiornare un'altra parte
+    // (lettura P1-P4, Program Change in arrivo, avvio) spostava la selezione e i comandi finivano su quella
+    if (pIdx !== (currentPartIndex || 0)) return;
     const part = multiParts[pIdx];
     if (!part) return;
 
