@@ -9237,6 +9237,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
           const v = multiParts[i] && multiParts[i].values; if (!v) continue;
           if (msgBytes[41 + i] < BANK_NAMES.length) v.bank = msgBytes[41 + i];
           if (msgBytes[57 + i] < 128) v.program = msgBytes[57 + i];
+          v.posUnknown = false;
           if (msgBytes[73 + i] < 16) v.channel = msgBytes[73 + i];
         }
         if (typeof buildMultiView === 'function') buildMultiView();
@@ -9425,6 +9426,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
           const pIdx = msgBytes[8];
           multiParts[pIdx].name = patchName;
           multiParts[pIdx].dump = Array.from(msgBytes);
+          window.placePartByName(pIdx, patchName);
           if (msgBytes.length > 50) {
             multiParts[pIdx].sound['f1_cutoff'] = msgBytes[49];
             multiParts[pIdx].sound['f1_resonance'] = msgBytes[50];
@@ -9459,7 +9461,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
         if (msgBytes[7] === 0x00 && msgBytes[8] === 0x40) {          // edit buffer Single
           // un dump dell'edit buffer Single non dice in che modo e' il Virus (risponde anche in Multi): il modo non si tocca
           const part = multiParts[currentPartIndex || 0];
-          if (part) part.name = patchName;
+          if (part) { part.name = patchName; window.placePartByName(currentPartIndex || 0, patchName); }
           updateVirusSnowFrontPanel(currentPartIndex || 0);
         }
 
@@ -9888,14 +9890,21 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
 
   // Multi mode SysEx send
   // ---------------------------------------------------------------------
+  // parametro SysEx (pagina, parte, numero, valore) mandato con l'ID OMNI e con l'ID reale del Virus:
+  // il Snow ignora parte dei messaggi indirizzati a OMNI (0x10), come visto per i parametri globali
+  function sendVirusParam(page, part, param, value, label) {
+    new Set([deviceId(), window.virusDeviceId ?? 0x00]).forEach(id => {
+      const bytes = new Uint8Array([...SYSEX_PREFIX, id, page, part & 0x7F, param & 0x7F, value & 0x7F, 0xF7]);
+      selectedOutput.send(bytes);
+      if (id === deviceId()) recordMidiTx(label, bytes);
+    });
+  }
+  window.sendVirusParam = sendVirusParam;
+
   function sendMultiPartParam(partIndex, cc, value){
     if (selectedOutput){
       try{
-        const bytes = new Uint8Array([
-          ...SYSEX_PREFIX, deviceId(), SYSEX_CMD_MULTI, partIndex & 0x7F, cc & 0x7F, value & 0x7F, 0xF7
-        ]);
-        selectedOutput.send(bytes);
-        recordMidiTx('multi p' + (partIndex + 1) + ' param ' + cc, bytes);
+        sendVirusParam(SYSEX_CMD_MULTI, partIndex, cc, value, 'multi p' + (partIndex + 1) + ' param ' + cc);
       } catch(e){ console.error('MIDI send error', e); }
     } else {
       setLastAction('connect midi output first');
@@ -9907,11 +9916,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
     if (cc === null || cc === undefined) { setLastAction('parametro Page B: non controllabile via CC'); return; }
     if (selectedOutput){
       try{
-        const bytes = new Uint8Array([
-          ...SYSEX_PREFIX, deviceId(), 0x70, partIndex & 0x7F, cc & 0x7F, value & 0x7F, 0xF7
-        ]);
-        selectedOutput.send(bytes);
-        recordMidiTx('part p' + (partIndex + 1) + ' param ' + cc, bytes);
+        sendVirusParam(0x70, partIndex, cc, value, 'part p' + (partIndex + 1) + ' param ' + cc);
       } catch(e){ console.error('MIDI send error', e); }
     } else {
       setLastAction('connect midi output first');
@@ -13008,6 +13013,29 @@ function exportCurrentPatchSyx() {
     return null;
   }
 
+  // Il dump di un suono non dice da quale banco/numero viene: lo si cerca per nome nei banchi scansionati dal Virus.
+  // Ritorna {bank, prog}, oppure null se non trovato; 'unknown' se il banco attuale e' scansionato ma il nome non c'e'.
+  function locateSoundByName(name, curBank, curProg) {
+    const n = (name || '').trim(); if (!n) return null;
+    const cur = getBankSoundCache(curBank);
+    if (cur && (cur[curProg] || '').trim() === n) return { bank: curBank, prog: curProg };
+    const order = [curBank, ...BANK_NAMES.map((_, i) => i).filter(i => i !== curBank)];
+    for (const b of order) {
+      const c = getBankSoundCache(b); if (!c) continue;
+      const i = c.findIndex(x => (x || '').trim() === n);
+      if (i >= 0) return { bank: b, prog: i };
+    }
+    return cur ? 'unknown' : null;
+  }
+  window.locateSoundByName = locateSoundByName;
+  // aggiorna banco/numero (e quindi i LED del pannello) di una parte dal nome del suono appena letto
+  window.placePartByName = (pIdx, name) => {
+    const part = multiParts[pIdx]; if (!part) return;
+    const found = locateSoundByName(name, part.values.bank, part.values.program);
+    if (found && found !== 'unknown') { part.values.bank = found.bank; part.values.program = found.prog; part.values.posUnknown = false; }
+    else if (found === 'unknown') part.values.posUnknown = true;
+  };
+
   function saveBankSoundCache(bankIndex, namesArray) {
     try {
       localStorage.setItem(`virusTiSnow_bank_${bankIndex}`, JSON.stringify(namesArray));
@@ -13177,6 +13205,7 @@ function exportCurrentPatchSyx() {
     if (emitMidi) window.__lastOwnChange = Date.now();
     const part = multiParts[pIdx];
     if (!part) return;
+    part.values.posUnknown = false;
 
     const bank = clamp7(bankIndex);
     const prog = clamp7(programIndex);
@@ -14183,7 +14212,7 @@ function exportCurrentPatchSyx() {
         if (panel.state === 'menu') { up = UPPER[i] === panel.menu; low = i === (currentPartIndex || 0); }
         else if (panel.state === 'bank') { up = pos.rom && pos.n === i + 1; low = !pos.rom && pos.n === i + 1; }
         else if (panel.state === 'part') low = i === (currentPartIndex || 0);
-        else if (!panel.shift) { up = Math.floor(pos.p64 / 8) === i; low = pos.p64 % 8 === i; }   // selezione suoni: gruppo e suono
+        else if (!panel.shift && !part.values.posUnknown) { up = Math.floor(pos.p64 / 8) === i; low = pos.p64 % 8 === i; }   // selezione suoni: gruppo e suono (spenti se la posizione non e' nota)
         led('frontRomLed' + i, up); led('frontRamLed' + i, low);
       }
       led('frontEditShiftLed', panel.shift || panel.state === 'menu');
