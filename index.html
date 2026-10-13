@@ -13931,14 +13931,16 @@ function exportCurrentPatchSyx() {
       const multiNum = multiInput ? parseInt(multiInput.value, 10) || (pIdx + 1) : (pIdx + 1);
       prgEl.textContent = String(multiNum).padStart(2, '0');
     }
-    if (bankProgEl) {
-      bankProgEl.textContent = `${BANK_NAMES[part.values.bank] || 'RAM-A'} ${part.values.program + 1}`;
-    }
-    if (patchNameEl) {
-      const name = (part.name && part.name !== 'init' && !isDummyPatchName(part.name))
-        ? part.name
-        : (getBankPatchName(part.values.bank, part.values.program) || 'Init');
-      patchNameEl.textContent = name;
+    const partName = (part.name && part.name !== 'init' && !isDummyPatchName(part.name))
+      ? part.name : (getBankPatchName(part.values.bank, part.values.program) || 'Init');
+    if (window.currentSynthMode === 'multi') {
+      // come il Virus in MULTI: riga grande = "<multi>-<parte> <nome del Multi>"
+      const multiNum = parseInt(document.getElementById('multiProgramInput')?.value, 10) || 1;
+      if (bankProgEl) bankProgEl.textContent = `${multiNum}-${pIdx + 1}`;
+      if (patchNameEl) patchNameEl.textContent = window.virusMultiName || partName;
+    } else {
+      if (bankProgEl) bankProgEl.textContent = `${BANK_NAMES[part.values.bank] || 'RAM-A'} ${part.values.program + 1}`;
+      if (patchNameEl) patchNameEl.textContent = partName;
     }
 
     // Aggiorna parametri soft nel footer dell'LCD
@@ -14178,7 +14180,8 @@ function exportCurrentPatchSyx() {
       // categoria come sul Virus: "CAT:Lead" (Category 1 = Single dump Page B #123)
       const catTxt = 'CAT:' + (CATEGORIES[part.dump?.[9 + 251]] || '--');
       if (cat) cat.textContent = panel.state === 'menu' ? EASY_MENUS[panel.menu][0]
-        : panel.state === 'mode' ? 'MODE' : single ? catTxt : `${window.virusMultiName ? window.virusMultiName + ' · ' : ''}Part ${(currentPartIndex || 0) + 1}`;
+        : panel.state === 'mode' ? 'MODE' : single ? catTxt
+        : `P${(currentPartIndex || 0) + 1} · ${part.name && !isDummyPatchName(part.name) ? part.name : (BANK_NAMES[part.values.bank] + ' ' + (part.values.program + 1))}`;
       const prg = document.getElementById('frontLcdMultiPrg'); if (prg) prg.hidden = single;
       if (badge && panel.state !== 'mode') badge.textContent = single ? 'SINGLE' : 'MULTI';
       const big1 = document.getElementById('frontLcdBankProg');
