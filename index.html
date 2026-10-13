@@ -8060,6 +8060,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
       updateControlRoomStatus();
       if (typeof renderFxRackView === 'function') renderFxRackView();
       if (typeof updateKeyboardPartDisplay === 'function') updateKeyboardPartDisplay();
+      window.fxLoadFromPart && window.fxLoadFromPart();
     });
   }
 
@@ -17073,6 +17074,11 @@ function exportCurrentPatchSyx() {
       setLastAction('Tutte e 4 le tracce svuotate');
     }
   };
+  // tracce = parti del Multi: nome del suono e canale MIDI reali della parte (P2 sullo stesso canale di P1 suona insieme a P1)
+  seqEngine.tracks.forEach((trk, i) => Object.defineProperties(trk, {
+    name: { get: () => `P${i + 1}: ${multiParts[i]?.name || '—'}` },
+    ch: { get: () => multiParts[i]?.values?.channel ?? i },
+  }));
 
   window.seqEngine = seqEngine;
 
@@ -18562,8 +18568,19 @@ function exportCurrentPatchSyx() {
         document.querySelectorAll('.fx-part-btn').forEach(b => b.classList.remove('active'));
         btn.classList.add('active');
         window.fxTargetPart = parseInt(btn.dataset.part, 10);
+        window.fxLoadFromPart();
       });
     });
+
+    // manopole FX = valori del suono della parte (Page A: CC n = byte 9+n del dump); con ALL si mostra P1
+    window.fxLoadFromPart = () => {
+      const d = multiParts[Math.max(0, window.fxTargetPart)]?.dump;
+      if (!d || d.length < 9 + 128) return;
+      document.querySelectorAll('#fxRackContent .fx-rack-knob-unit').forEach(u => {
+        const cc = parseInt(u.dataset.cc, 10);
+        if (u._apply && cc >= 0 && cc < 128 && d[9 + cc] < 128) u._apply(d[9 + cc], true);
+      });
+    };
 
     // Knob drag logic for FX Rack
     document.querySelectorAll('.fx-rack-knob-unit').forEach(unit => {
@@ -18584,14 +18601,14 @@ function exportCurrentPatchSyx() {
         return String(v);
       };
 
-      const applyFx = (newVal) => {
+      const applyFx = (newVal, silent) => {
         unit.dataset.val = String(newVal);
         // Update rotation (-135deg to +135deg)
         const angle = -135 + ((newVal - minVal) / (maxVal - minVal)) * 270;
         if (ind) setKnobAngle(ind, angle);
         if (valEl) valEl.textContent = fxFormat(newVal);
-        // Send MIDI CC
-        sendFxCC(cc, newVal);
+        // Send MIDI CC (silent = valore letto dal suono, non si rimanda al Virus)
+        if (!silent) sendFxCC(cc, newVal);
         // Special visual reaction for Vacuum Tube Drive
         if (cc === 36) {
           const glow = document.getElementById('tubeGlow');
@@ -18769,7 +18786,7 @@ function exportCurrentPatchSyx() {
             x += gap; amp *= fb * 0.98; n++;
           }
           ctx.fillStyle = c.ink; ctx.fillRect(x0, base, w - x0 - 4, 1);
-          label(s, `DLY ${unitOf(114)?.querySelector('.fx-knob-val')?.textContent || ''}  FB ${Math.round(fb * 100)}%`, 8, 4);
+          label(s, `DLY ${unitOf(114)?.querySelector('.fx-knob-val')?.textContent || ''}  FB ${unitOf(115)?.querySelector('.fx-knob-val')?.textContent || ''}`, 8, 4);
           label(s, `REV ${unitOf(116)?.querySelector('.fx-knob-val')?.textContent || ''}`, w - 8, 4, 'right');
         }
       }
@@ -18800,7 +18817,7 @@ function exportCurrentPatchSyx() {
           const v = Math.sin(t * 2.4), px = ax + (v + 1) / 2 * aw, py = midY - shape(v) * (h * 0.32);
           ctx.fillStyle = c.hi; ctx.beginPath(); ctx.arc(px, py, 3.2, 0, Math.PI * 2); ctx.fill();
           label(s, CURVES[curveIdx] || '', 8, 4);
-          label(s, val(36, 32) > 64 ? `SAT +${val(36, 32) - 64}` : 'SAT 0', w - 8, 4, 'right');
+          label(s, `SAT ${unitOf(36)?.querySelector('.fx-knob-val')?.textContent || ''}`.replace('SAT SAT', 'SAT'), w - 8, 4, 'right');
         }
       }
 
@@ -18821,7 +18838,7 @@ function exportCurrentPatchSyx() {
             }
             ctx.stroke(); ctx.globalAlpha = 1;
           });
-          label(s, `DEPTH ${Math.round(depth * 100)}%`, 8, 4);
+          label(s, `DEPTH ${unitOf(107)?.querySelector('.fx-knob-val')?.textContent || ''}`, 8, 4);
           label(s, `RATE ${unitOf(106)?.querySelector('.fx-knob-val')?.textContent || ''}`, w - 8, 4, 'right');
         }
       }
