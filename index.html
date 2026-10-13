@@ -16839,6 +16839,8 @@ function exportCurrentPatchSyx() {
     },
 
     updateUI() {
+      // nome del suono sulle tracce (la parte P1..P4 la dice gia' l'icona)
+      document.querySelectorAll('#sequencerContent .seq-trk-name').forEach((el, i) => { el.textContent = multiParts[i]?.name || '—'; el.parentElement.title = this.tracks[i]?.name || ''; });
       const playBtn = document.getElementById('seqBtnPlayStop');
       if (playBtn) {
         if (this.running) {
@@ -17237,7 +17239,7 @@ function exportCurrentPatchSyx() {
         <div class="arp-hw-led-well" style="width: 9px; height: 9px; flex-shrink: 0;">
           <div class="arp-hw-led" id="seqTrkLed${idx}" style="width: 5px; height: 5px;"></div>
         </div>
-        <span class="seq-trk-icon" data-part="${idx}"></span><span class="seq-trk-name">${trk.name}</span>
+        <span class="seq-trk-icon" data-part="${idx}"></span><span class="seq-trk-name">${multiParts[idx]?.name || '—'}</span>
       `;
       btnTrk.title = `Seleziona ${trk.name} per visualizzare e modificare i suoi 64 step`;
       btnTrk.addEventListener('click', () => {
