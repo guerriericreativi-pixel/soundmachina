@@ -9233,6 +9233,12 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
       // layout: header 9 + 4 byte + nome (13..22) ... Part Bank Select 41.., Program 57.., MIDI channel 73..
       if (msgBytes[6] === 0x11 && msgBytes.length > 90 && msgBytes[2] === 0x20 && msgBytes[3] === 0x33) {
         window.virusMultiName = String.fromCharCode(...msgBytes.slice(13, 23)).replace(/[^\x20-\x7e]/g, ' ').trim() || 'Multi';
+        // seconda lettura (fine sequenza): solo il nome, le posizioni delle parti sono gia' state sistemate dai loro nomi
+        if (window.multiReadNameOnly && window.multiReadNameOnly()) {
+          if (typeof updateVirusSnowMasterDisplay === 'function') updateVirusSnowMasterDisplay(currentPartIndex || 0);
+          window.multiReadGot('multi');
+          continue;
+        }
         for (let i = 0; i < NUM_PARTS; i++) {
           const v = multiParts[i] && multiParts[i].values; if (!v) continue;
           if (msgBytes[41 + i] < BANK_NAMES.length) v.bank = msgBytes[41 + i];
@@ -11813,13 +11819,15 @@ function exportCurrentPatchSyx() {
     if (!multiRead) return;
     clearTimeout(multiRead.timer);
     multiRead.step++;
-    if (multiRead.step > NUM_PARTS) {                       // finito
+    if (multiRead.step > NUM_PARTS + 1) {                   // finito
       const again = multiRead.again; multiRead = null;
       if (typeof updateVirusSnowFrontPanel === 'function') updateVirusSnowFrontPanel(currentPartIndex || 0);
       if (again) setTimeout(syncAllMultiParts, 150);
       return;
     }
-    if (multiRead.step === 0) {
+    if (multiRead.step === 0 || multiRead.step === NUM_PARTS + 1) {
+      // Multi all'inizio (banchi/canali delle parti) e di nuovo alla fine, solo per il nome definitivo:
+      // all'inizio il Virus puo' essere ancora a meta' del cambio di Multi
       try { selectedOutput.send(new Uint8Array([...SYSEX_PREFIX, deviceId(), 0x31, 0x00, 0x00, 0xF7])); } catch (e) {}
     } else {
       requestPartDump(multiRead.step - 1, true);           // sempre la parte del Multi, anche se l'app crede il Virus in Single
@@ -11829,8 +11837,9 @@ function exportCurrentPatchSyx() {
   // chiamata quando arriva la risposta attesa (Multi dump o dump della parte i)
   window.multiReadGot = (kind, i) => {
     if (!multiRead) return;
-    if ((kind === 'multi' && multiRead.step === 0) || (kind === 'part' && multiRead.step === i + 1)) setTimeout(nextMultiRead, 30);
+    if ((kind === 'multi' && (multiRead.step === 0 || multiRead.step === NUM_PARTS + 1)) || (kind === 'part' && multiRead.step === i + 1)) setTimeout(nextMultiRead, 30);
   };
+  window.multiReadNameOnly = () => !!multiRead && multiRead.step === NUM_PARTS + 1;
 
   function renderMultiPartsOverview() {
     const container = document.getElementById('multiPartsOverview');
