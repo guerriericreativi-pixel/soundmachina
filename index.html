@@ -9249,11 +9249,16 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
       }
       // In MULTI, un parametro mandato dal Virus vuol dire che sul synth e' cambiato qualcosa (Multi, suono di una parte):
       // si rilegge Multi e parti, cosi' nome e suoni seguono il Virus anche quando si usa il synth
-      // (non se e' l'eco di un comando appena mandato dall'app: rileggere riporterebbe indietro i tasti suono)
-      if (msgBytes.length === 11 && msgBytes[6] >= 0x70 && msgBytes[6] <= 0x73 && msgBytes[7] < 16 && window.currentSynthMode === 'multi' && selectedOutput
-          && Date.now() - (window.__lastOwnChange || 0) > 2000) {
-        clearTimeout(window.__multiFollow);
-        window.__multiFollow = setTimeout(() => syncAllMultiParts(), 1000);
+      // Se e' la risposta a un cambio appena fatto dall'app si rilegge solo quella parte (il segnale arriva a suono caricato),
+      // altrimenti il Multi intero (rileggerlo riporterebbe indietro banco/numero appena scelti).
+      if (msgBytes.length === 11 && msgBytes[6] >= 0x70 && msgBytes[6] <= 0x73 && msgBytes[7] < 16 && window.currentSynthMode === 'multi' && selectedOutput) {
+        if (Date.now() - (window.__lastOwnChange || 0) < 2000) {
+          clearTimeout(window.__ownPartRead);
+          window.__ownPartRead = setTimeout(() => requestPartDump(window.__lastOwnPart || 0, true), 120);
+        } else {
+          clearTimeout(window.__multiFollow);
+          window.__multiFollow = setTimeout(() => syncAllMultiParts(), 1000);
+        }
       }
       // Il byte "parte" dei parametri che il Virus manda rivela il modo: 0x40 = Single, 0..15 = parte del Multi.
       // (Il Snow non risponde a Request Global, ma dopo un cambio di modo o di programma manda 73 pp ...)
@@ -9424,9 +9429,14 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
         // Caso 3: Ricezione Dump per una specifica Parte Multi (Part 0..3)
         if (msgBytes[7] === 0x00 && msgBytes[8] >= 0 && msgBytes[8] <= 3) {
           const pIdx = msgBytes[8];
+          const prevName = multiParts[pIdx].name;
           multiParts[pIdx].name = patchName;
           multiParts[pIdx].dump = Array.from(msgBytes);
-          window.placePartByName(pIdx, patchName);
+          if (pIdx === window.__lastOwnPart && Date.now() - (window.__lastOwnChange || 0) < 3000) {
+            // suono scelto dall'app: banco/numero sono certi, si impara il nome per quella posizione
+            const v = multiParts[pIdx].values; v.posUnknown = false;
+            if (!isDummyPatchName(patchName)) saveBankSoundName(v.bank, v.program, patchName);
+          } else window.placePartByName(pIdx, patchName);
           if (msgBytes.length > 50) {
             multiParts[pIdx].sound['f1_cutoff'] = msgBytes[49];
             multiParts[pIdx].sound['f1_resonance'] = msgBytes[50];
@@ -9451,6 +9461,10 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
           }
           document.getElementById('midi-debug').innerHTML = `<span style="color:#80c090;">🔊 P${pIdx + 1}: Letto dal synth <b>${escapeHtml(patchName)}</b></span>`;
           window.multiReadGot && window.multiReadGot('part', pIdx);
+          if (pIdx === (currentPartIndex || 0) && (prevName !== patchName || pIdx === window.__lastOwnPart && Date.now() - (window.__lastOwnChange || 0) < 3000) && window.currentSynthMode === 'multi' && window.snowPanel?.flash) {
+            const v = multiParts[pIdx].values;
+            window.snowPanel.flash(v.posUnknown ? `P${pIdx + 1}` : `${BANK_NAMES[v.bank]} ${v.program + 1}`, patchName, 2000);
+          }
           setLastAction('read P' + (pIdx + 1) + ': ' + patchName);
           continue;
         }
@@ -13202,7 +13216,7 @@ function exportCurrentPatchSyx() {
 
   function changePartSound(partIndex, bankIndex, programIndex, emitMidi = true) {
     const pIdx = Math.max(0, Math.min(NUM_PARTS - 1, partIndex || 0));
-    if (emitMidi) window.__lastOwnChange = Date.now();
+    if (emitMidi) { window.__lastOwnChange = Date.now(); window.__lastOwnPart = partIndex || 0; }
     const part = multiParts[pIdx];
     if (!part) return;
     part.values.posUnknown = false;
@@ -13249,6 +13263,9 @@ function exportCurrentPatchSyx() {
 
       clearTimeout(part._dumpTimer);
       part._dumpTimer = setTimeout(() => requestPartDump(pIdx), 150);
+      // il Virus puo' metterci di piu' a caricare il suono: seconda lettura di sicurezza
+      clearTimeout(part._dumpTimer2);
+      part._dumpTimer2 = setTimeout(() => requestPartDump(pIdx, window.currentSynthMode === 'multi'), 900);
     }
 
     // 4. Aggiorna interfaccia visiva (Frontale Snow, LCD, Multi Mixer e Dropdown)
@@ -14255,6 +14272,7 @@ function exportCurrentPatchSyx() {
       });
     }
     panel.render = render;
+    panel.flash = (a, b, ms) => { if (panel.state === 'play') lcdFlash(a, b, ms); };
 
     document.querySelectorAll('.faceplate .fp-key').forEach(k => k.addEventListener('pointerdown', () => {
       k.classList.add('pressed');
