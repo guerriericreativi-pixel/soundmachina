@@ -7597,7 +7597,7 @@
       <span class="snow-indicator-led" id="frontRomLed5" style="--x:79.492;--y:24.263"></span>
       <span class="snow-indicator-led" id="frontRomLed6" style="--x:84.407;--y:24.263"></span>
       <span class="snow-indicator-led" id="frontRomLed7" style="--x:89.379;--y:24.263"></span>
-      <span class="snow-indicator-led active-amber" id="frontRamLed0" style="--x:54.746;--y:41.708"></span>
+      <span class="snow-indicator-led" id="frontRamLed0" style="--x:54.746;--y:41.708"></span>
       <span class="snow-indicator-led" id="frontRamLed1" style="--x:59.661;--y:41.708"></span>
       <span class="snow-indicator-led" id="frontRamLed2" style="--x:64.633;--y:41.708"></span>
       <span class="snow-indicator-led" id="frontRamLed3" style="--x:69.605;--y:41.708"></span>
@@ -7605,7 +7605,7 @@
       <span class="snow-indicator-led" id="frontRamLed5" style="--x:79.492;--y:41.708"></span>
       <span class="snow-indicator-led" id="frontRamLed6" style="--x:84.407;--y:41.708"></span>
       <span class="snow-indicator-led" id="frontRamLed7" style="--x:89.379;--y:41.708"></span>
-      <span class="snow-indicator-led active-amber" id="frontEditShiftLed" style="--x:54.52;--y:59.058"></span>
+      <span class="snow-indicator-led" id="frontEditShiftLed" style="--x:54.52;--y:59.058"></span>
       <span class="fp-bpm pulse-bpm" style="--x:21.751;--y:27.614"></span>
       <button class="fp-wave" id="frontBtnMidi" data-midi-key type="button" aria-expanded="false" title="Mostra / nascondi stato MIDI, azioni (receive, send, test, diagnostics, panic) e guida di collegamento" style="--x:12.316;--y:84.6">MIDI</button>
       <button class="fp-wave" id="frontBtnSounds" type="button" aria-expanded="false" aria-controls="snowSoundsDock" title="Mostra / nascondi banco e lista suoni" style="--x:54.52;--y:84.6">SOUNDS</button>
@@ -14273,6 +14273,7 @@ function exportCurrentPatchSyx() {
     }
     panel.render = render;
     panel.flash = (a, b, ms) => { if (panel.state === 'play') lcdFlash(a, b, ms); };
+    setTimeout(render, 0);   // LED coerenti fin dall'avvio
 
     document.querySelectorAll('.faceplate .fp-key').forEach(k => k.addEventListener('pointerdown', () => {
       k.classList.add('pressed');
