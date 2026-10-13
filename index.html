@@ -9066,6 +9066,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
       const cmd = d[6], name = VIRUS_CMD[cmd] || ('cmd 0x' + (cmd ?? 0).toString(16));
       if (cmd === 0x10) return `SysEx ${name} bank ${d[7]} prog ${d[8] === 0x40 ? '0x40 (edit buffer Single)' : d[8]} · "${extractPatchName(d)}" (${d.length} byte)`;
       if (cmd === 0x30) return `SysEx ${name} bank ${d[7]} prog ${d[8] === 0x40 ? '0x40 (edit buffer Single)' : d[8]}`;
+      if (cmd === 0x11 && d.length > 30) return `SysEx ${name} bank ${d[7]} prog ${d[8]} · "${String.fromCharCode(...d.slice(13, 23)).trim()}" · parti ${[0, 1, 2, 3].map(i => `${d[41 + i]}/${d[57 + i]}`).join(' ')} (${d.length} byte)`;
       if (cmd >= 0x70 && cmd <= 0x72) return `SysEx ${name} parte ${d[7] === 0x40 ? 'Single' : d[7] + 1} param ${d[8]} = ${d[9]}`;
       return `SysEx ${name} (${d.length} byte)` + (d.length <= 32 ? `  [${d.map(b => b.toString(16).padStart(2, '0')).join(' ')}]` : '');
     }
@@ -9186,7 +9187,12 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
       // Richiedi il dump dal Virus reale per sincronizzare i veri parametri e il vero nome
       clearTimeout(window._incomingDumpDebounce);
       window._incomingDumpDebounce = setTimeout(() => {
-        requestDump(targetPartIdx);
+        // in MULTI: la parte che ha cambiato suono e poi il Multi intero; in SINGLE l'edit buffer Single
+        if (window.currentSynthMode === 'multi') {
+          requestPartDump(targetPartIdx, true);
+          clearTimeout(window.__multiFollow);
+          window.__multiFollow = setTimeout(() => syncAllMultiParts(), 700);
+        } else requestDump(targetPartIdx);
       }, 70);
 
       document.getElementById('midi-debug').innerHTML = `<span style="color:#00ffcc;">📥 SYNTH HARDWARE -> PROG CHANGE: P${targetPartIdx + 1} Prog ${progNum + 1} (Bank ${incomingBank})</span>`;
@@ -9238,6 +9244,12 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
         if (typeof renderMultiPartsOverview === 'function') renderMultiPartsOverview();
         setLastAction(`Multi letto dal Virus: ${window.virusMultiName}`);
         continue;
+      }
+      // In MULTI, un parametro mandato dal Virus vuol dire che sul synth e' cambiato qualcosa (Multi, suono di una parte):
+      // si rilegge Multi e parti, cosi' nome e suoni seguono il Virus anche quando si usa il synth
+      if (msgBytes.length === 11 && msgBytes[6] >= 0x70 && msgBytes[6] <= 0x73 && msgBytes[7] < 16 && window.currentSynthMode === 'multi' && selectedOutput) {
+        clearTimeout(window.__multiFollow);
+        window.__multiFollow = setTimeout(() => syncAllMultiParts(), 700);
       }
       // Il byte "parte" dei parametri che il Virus manda rivela il modo: 0x40 = Single, 0..15 = parte del Multi.
       // (Il Snow non risponde a Request Global, ma dopo un cambio di modo o di programma manda 73 pp ...)
