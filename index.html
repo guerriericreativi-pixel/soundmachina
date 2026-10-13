@@ -9247,7 +9247,9 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
       }
       // In MULTI, un parametro mandato dal Virus vuol dire che sul synth e' cambiato qualcosa (Multi, suono di una parte):
       // si rilegge Multi e parti, cosi' nome e suoni seguono il Virus anche quando si usa il synth
-      if (msgBytes.length === 11 && msgBytes[6] >= 0x70 && msgBytes[6] <= 0x73 && msgBytes[7] < 16 && window.currentSynthMode === 'multi' && selectedOutput) {
+      // (non se e' l'eco di un comando appena mandato dall'app: rileggere riporterebbe indietro i tasti suono)
+      if (msgBytes.length === 11 && msgBytes[6] >= 0x70 && msgBytes[6] <= 0x73 && msgBytes[7] < 16 && window.currentSynthMode === 'multi' && selectedOutput
+          && Date.now() - (window.__lastOwnChange || 0) > 2000) {
         clearTimeout(window.__multiFollow);
         window.__multiFollow = setTimeout(() => syncAllMultiParts(), 700);
       }
@@ -13148,6 +13150,7 @@ function exportCurrentPatchSyx() {
 
   function changePartSound(partIndex, bankIndex, programIndex, emitMidi = true) {
     const pIdx = Math.max(0, Math.min(NUM_PARTS - 1, partIndex || 0));
+    if (emitMidi) window.__lastOwnChange = Date.now();
     const part = multiParts[pIdx];
     if (!part) return;
 
@@ -13905,31 +13908,7 @@ function exportCurrentPatchSyx() {
     const part = multiParts[pIdx];
     if (!part) return;
 
-    // Aggiorna i LED RAM/PART della seconda fila (I LED 1-4 indicano quale parte è attiva)
-    for (let i = 0; i < 8; i++) {
-      const ramLed = document.getElementById('frontRamLed' + i);
-      if (ramLed) {
-        if (i < 4) {
-          if (i === pIdx) {
-            ramLed.className = 'snow-indicator-led active-amber';
-          } else {
-            ramLed.className = 'snow-indicator-led';
-          }
-        } else {
-          ramLed.className = 'snow-indicator-led';
-        }
-      }
-    }
-
-    // Aggiorna i LED ROM della prima fila
-    for (let i = 0; i < 8; i++) {
-      const romLed = document.getElementById('frontRomLed' + i);
-      if (romLed) {
-        const isRom = part.values.bank >= 4;
-        const romNum = part.values.bank - 4;
-        romLed.className = (isRom && romNum === i) ? 'snow-indicator-led active-amber' : 'snow-indicator-led';
-      }
-    }
+    // i LED dei tasti li gestisce solo snowPanel.render() (chiamato in fondo)
 
     // Aggiorna lo schermo LCD del frontale
     const catEl = document.getElementById('frontLcdCategory');
