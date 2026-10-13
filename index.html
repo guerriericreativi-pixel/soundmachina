@@ -9233,6 +9233,11 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
       // layout: header 9 + 4 byte + nome (13..22) ... Part Bank Select 41.., Program 57.., MIDI channel 73..
       if (msgBytes[6] === 0x11 && msgBytes.length > 90 && msgBytes[2] === 0x20 && msgBytes[3] === 0x33) {
         window.virusMultiName = String.fromCharCode(...msgBytes.slice(13, 23)).replace(/[^\x20-\x7e]/g, ' ').trim() || 'Multi';
+        // byte 12 = numero del Multi (0..63, sul Virus "gruppo-numero": 63 = 8-8); nel dump dell'edit buffer (prog 127) dice quale Multi e' caricato
+        if (msgBytes[8] === 127 && msgBytes[12] < 128) {
+          window.virusMultiNum = msgBytes[12];
+          const mpi = document.getElementById('multiProgramInput'); if (mpi) mpi.value = String(msgBytes[12]);
+        }
         // seconda lettura (fine sequenza): solo il nome, le posizioni delle parti sono gia' state sistemate dai loro nomi
         if (window.multiReadNameOnly && window.multiReadNameOnly()) {
           if (typeof updateVirusSnowMasterDisplay === 'function') updateVirusSnowMasterDisplay(currentPartIndex || 0);
@@ -13897,6 +13902,7 @@ function exportCurrentPatchSyx() {
   // cambio Multi: Page C (0x72), parte 0, parametro 105 = Multi Program Change; poi si rilegge il Multi e le 4 parti
   function sendMultiProgram(v) {
     if (!selectedOutput) return;
+    window.virusMultiNum = v & 0x7F;
     new Set([deviceId(), window.virusDeviceId ?? 0x00]).forEach(id => {
       try { selectedOutput.send(new Uint8Array([...SYSEX_PREFIX, id, 0x72, 0x00, 105, v & 0x7F, 0xF7])); } catch (e) {}
     });
@@ -14005,8 +14011,8 @@ function exportCurrentPatchSyx() {
       ? part.name : (getBankPatchName(part.values.bank, part.values.program) || 'Init');
     if (window.currentSynthMode === 'multi') {
       // come il Virus in MULTI: riga grande = "<multi>-<parte> <nome del Multi>"
-      const multiNum = parseInt(document.getElementById('multiProgramInput')?.value, 10) || 1;
-      if (bankProgEl) bankProgEl.textContent = `${multiNum}-${pIdx + 1}`;
+      const mn = window.virusMultiNum ?? (parseInt(document.getElementById('multiProgramInput')?.value, 10) || 0);
+      if (bankProgEl) bankProgEl.textContent = `${((mn >> 3) & 7) + 1}-${(mn & 7) + 1}`;
       if (patchNameEl) patchNameEl.textContent = window.virusMultiName || partName;
     } else {
       if (bankProgEl) bankProgEl.textContent = `${BANK_NAMES[part.values.bank] || 'RAM-A'} ${part.values.program + 1}`;
@@ -14238,6 +14244,7 @@ function exportCurrentPatchSyx() {
         if (panel.state === 'menu') { up = UPPER[i] === panel.menu; low = i === (currentPartIndex || 0); }
         else if (panel.state === 'bank') { up = pos.rom && pos.n === i + 1; low = !pos.rom && pos.n === i + 1; }
         else if (panel.state === 'part') low = i === (currentPartIndex || 0);
+        else if (!panel.shift && window.currentSynthMode === 'multi') { const mn = window.virusMultiNum; up = mn != null && ((mn >> 3) & 7) === i; low = mn != null && (mn & 7) === i; }   // in MULTI i tasti scelgono il Multi: gruppo e numero
         else if (!panel.shift && !part.values.posUnknown) { up = Math.floor(pos.p64 / 8) === i; low = pos.p64 % 8 === i; }   // selezione suoni: gruppo e suono (spenti se la posizione non e' nota)
         led('frontRomLed' + i, up); led('frontRamLed' + i, low);
       }
