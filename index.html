@@ -9243,6 +9243,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
         if (typeof updateVirusSnowMasterDisplay === 'function') updateVirusSnowMasterDisplay(currentPartIndex || 0);
         if (typeof renderMultiPartsOverview === 'function') renderMultiPartsOverview();
         setLastAction(`Multi letto dal Virus: ${window.virusMultiName}`);
+        window.multiReadGot && window.multiReadGot('multi');
         continue;
       }
       // In MULTI, un parametro mandato dal Virus vuol dire che sul synth e' cambiato qualcosa (Multi, suono di una parte):
@@ -9251,7 +9252,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
       if (msgBytes.length === 11 && msgBytes[6] >= 0x70 && msgBytes[6] <= 0x73 && msgBytes[7] < 16 && window.currentSynthMode === 'multi' && selectedOutput
           && Date.now() - (window.__lastOwnChange || 0) > 2000) {
         clearTimeout(window.__multiFollow);
-        window.__multiFollow = setTimeout(() => syncAllMultiParts(), 700);
+        window.__multiFollow = setTimeout(() => syncAllMultiParts(), 1000);
       }
       // Il byte "parte" dei parametri che il Virus manda rivela il modo: 0x40 = Single, 0..15 = parte del Multi.
       // (Il Snow non risponde a Request Global, ma dopo un cambio di modo o di programma manda 73 pp ...)
@@ -9447,6 +9448,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
             applyDumpToActivePatch(msgBytes);
           }
           document.getElementById('midi-debug').innerHTML = `<span style="color:#80c090;">🔊 P${pIdx + 1}: Letto dal synth <b>${escapeHtml(patchName)}</b></span>`;
+          window.multiReadGot && window.multiReadGot('part', pIdx);
           setLastAction('read P' + (pIdx + 1) + ': ' + patchName);
           continue;
         }
@@ -11774,20 +11776,42 @@ function exportCurrentPatchSyx() {
     } catch (e) { console.error('requestPartDump error', e); }
   }
 
+  // Lettura del Multi in sequenza: Multi (0x31), poi P1..P4 (0x30 00 i), una richiesta alla volta.
+  // Il Virus, cambiando Multi, manda piu' segnali di fila: letture sovrapposte perdevano risposte o
+  // leggevano parti a meta' caricamento. Se arriva una nuova richiesta durante la lettura, si rifa' alla fine.
+  let multiRead = null;
   function syncAllMultiParts() {
     if (!selectedOutput) {
       uiAlert('MIDI Output non connesso!');
       return;
     }
+    if (multiRead) { multiRead.again = true; return; }
+    multiRead = { step: -1, again: false, timer: 0 };
     document.getElementById('midi-debug').textContent = 'Lettura del Multi e delle parti P1-P4 dal synth…';
-    // Request Multi (0x31) dell'edit buffer: nome del Multi, banchi/programmi/canali delle parti
-    try { selectedOutput.send(new Uint8Array([...SYSEX_PREFIX, deviceId(), 0x31, 0x00, 0x00, 0xF7])); } catch (e) {}
-    for (let i = 0; i < NUM_PARTS; i++) {
-      setTimeout(() => {
-        requestPartDump(i, true);   // sempre la parte i del Multi, anche se l'app crede il Virus in Single
-      }, i * 150);
-    }
+    nextMultiRead();
   }
+  function nextMultiRead() {
+    if (!multiRead) return;
+    clearTimeout(multiRead.timer);
+    multiRead.step++;
+    if (multiRead.step > NUM_PARTS) {                       // finito
+      const again = multiRead.again; multiRead = null;
+      if (typeof updateVirusSnowFrontPanel === 'function') updateVirusSnowFrontPanel(currentPartIndex || 0);
+      if (again) setTimeout(syncAllMultiParts, 150);
+      return;
+    }
+    if (multiRead.step === 0) {
+      try { selectedOutput.send(new Uint8Array([...SYSEX_PREFIX, deviceId(), 0x31, 0x00, 0x00, 0xF7])); } catch (e) {}
+    } else {
+      requestPartDump(multiRead.step - 1, true);           // sempre la parte del Multi, anche se l'app crede il Virus in Single
+    }
+    multiRead.timer = setTimeout(nextMultiRead, 600);       // senza risposta si passa oltre
+  }
+  // chiamata quando arriva la risposta attesa (Multi dump o dump della parte i)
+  window.multiReadGot = (kind, i) => {
+    if (!multiRead) return;
+    if ((kind === 'multi' && multiRead.step === 0) || (kind === 'part' && multiRead.step === i + 1)) setTimeout(nextMultiRead, 30);
+  };
 
   function renderMultiPartsOverview() {
     const container = document.getElementById('multiPartsOverview');
