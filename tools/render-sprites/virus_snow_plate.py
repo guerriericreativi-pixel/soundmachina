@@ -4,7 +4,7 @@ Run with Blender -b -P tools/render-sprites/virus_snow_plate.py.
 """
 import os,sys,json
 import bpy
-from mathutils import Vector
+from mathutils import Vector, Matrix
 from bpy_extras.object_utils import world_to_camera_view
 ROOT=os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 sys.path.insert(0,ROOT+'/tools/render-sprites')
@@ -28,18 +28,20 @@ for o in s.objects:
 mat=bpy.data.materials['screen'].node_tree.nodes['Principled BSDF']
 mat.inputs['Base Color'].default_value=(.008,.022,.026,1)
 mat.inputs['Emission Strength'].default_value=0
-s.render.resolution_x=1920;s.render.resolution_y=1080;s.render.resolution_percentage=100
+s.render.resolution_x=1920;s.render.resolution_y=1200;s.render.resolution_percentage=100
 s.cycles.samples=96;s.cycles.use_denoising=True
 s.render.image_settings.file_format='PNG'
 s.render.filepath=ROOT+'/output/blender/snow-plate.png'
 bpy.data.objects['Scrivania studio'].is_shadow_catcher=True
 s.render.film_transparent=True
 s.view_layers[0].update()
+surface_values=s.get('hardware_surface_matrix', list(Matrix.Identity(4)[0]) + list(Matrix.Identity(4)[1]) + list(Matrix.Identity(4)[2]) + list(Matrix.Identity(4)[3]))
+surface=Matrix([surface_values[i:i+4] for i in range(0,16,4)])
 def proj(x,y,z=fp.T):
-    mx,my=fp.M(x,y);c=world_to_camera_view(s,s.camera,Vector((mx,my,z)))
+    mx,my=fp.M(x,y);c=world_to_camera_view(s,s.camera,surface @ Vector((mx,my,z)))
     return c.x*100,(1-c.y)*100
 width=s.camera.data.ortho_scale
-lay={'aspect':1920/1080,'width':1920,'height':1080,'knobs':{},'keys':{},'leds':{},'camera':{'type':s.camera.data.type,'orthoScale':width,'position':list(s.camera.location),'rotation':list(s.camera.rotation_euler)}}
+lay={'aspect':1920/1200,'width':1920,'height':1200,'knobs':{},'keys':{},'leds':{},'camera':{'type':s.camera.data.type,'orthoScale':width,'position':list(s.camera.location),'rotation':list(s.camera.rotation_euler)}}
 for k,(x,y,_) in fp.KNOBS.items():
     px,py=proj(x,y);lay['knobs'][k]={'x':round(px,4),'y':round(py,4),'d':round(fp.KNOB_R*2/width*100,4)}
 for k,(x,y) in fp.KEYS.items():

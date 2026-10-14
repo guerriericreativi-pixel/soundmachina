@@ -124,3 +124,34 @@ della lamiera, senza parete frontale aggiunta o angoli da guscio stampato.
 
 Ultimo raccordo: raggio delle pieghe laterali 0,55 per una curvatura più
 morbida; manopole in ABS uniforme #a6a9a5, leggermente più scuro.
+
+## Approvazione del rendering
+
+Su richiesta dell’utente, mostrare e far approvare il rendering locale
+prima di qualsiasi nuovo commit o push delle modifiche grafiche.
+L’approvazione di un singolo dettaglio non approva automaticamente il pannello
+completo né autorizza la pubblicazione di altre correzioni ancora in revisione.
+
+Anteprima attuale: conservata la piega laterale con raggio 0,55; bordo
+libero della lamiera raccordato 0,022 e rimbalzo inferiore limitato a piano
+e scocca per eliminare l’ombra nera piena sotto il frontale. I controlli
+mobili mantengono la loro illuminazione approvata.
+
+Il vano frontale è chiuso da un pannello di ciliegio satinato, incassato
+all’interno della fascia metallica. Venatura orizzontale, spigoli raccordati,
+materiale caldo distinto dal legno grigio del piano di studio. La luce
+inferiore è ridotta a 2400 e limitata a lamiera, piano e inserto in ciliegio.
+Questa variante è locale e richiede l’ok del rendering prima di commit/push.
+
+Ultima anteprima richiesta: scocca inclinata con altezza 4 cm davanti e
+4,5 cm dietro (quote indicate dall’utente), esclusi i controlli. Piano e camera
+trasformati insieme per conservare gli ancoraggi interattivi. Frontale in
+ciliegio largo 31,3 unità, alto 3,89, incassato 0,05; colori meno saturi
+#6c574a/#9d826f e angoli superiori adattati alle pieghe della lamiera.
+Linea di contorno con bevel_depth 0,028, rispetto al precedente 0,02.
+Richiede ancora approvazione del rendering prima di commit e push.
+
+Approvata la variante Snow con richiesta esplicita di commit/push. Ultimo
+render 1920×1200: ombra fisica interamente nel canvas, PMMA trasparente
+smussato, ciliegio opaco con venatura irregolare. I metadati Snow incorporati
+usano aspect 1,6; rigenerarli dal JSON dopo l’export.

@@ -125,3 +125,34 @@ Confronto a camera e scala identiche: `output/qa/snow-soft-bends-comparison.png`
 (prima a sinistra, dopo a destra). Verifica nel browser in
 `output/qa/snow-soft-bends-grey-local.png`: nessun errore in console.
 Verificate superfici opache e margini trasparenti di tutti i 64 sprite.
+
+## Anteprima del bordo inferiore — in attesa dell’ok dell’utente
+
+Conservata la piega laterale superiore approvata. Raccordato il bordo libero
+della lamiera (0,022); rimbalzo di luce inferiore limitato a piano e scocca
+per ridurre la fascia di ombra nera sotto il pannello. Sprite dei controlli
+conservati. Verifica locale: `output/qa/snow-under-edge-preview-local.png`
+e dettaglio `snow-under-edge-preview-detail.png`; console senza errori.
+Nessun commit o push della presente anteprima: pubblicazione sospesa fino
+all’approvazione esplicita del rendering completo.
+
+## Pannello frontale in ciliegio — anteprima da approvare
+
+Aggiunto inserto tridimensionale in ciliegio satinato nel vano della scocca:
+30,8×0,6×1,82 unità, frontale incassato 0,07, spigoli raccordati 0,16.
+Venatura orizzontale, colori #683921/#aa6340, distinta dal piano grigio.
+La luce inferiore include l’inserto e resta esclusa dai controlli mobili.
+Verifica locale: `output/qa/snow-cherry-front-local.png` e dettaglio
+`snow-cherry-front-detail.png`; console senza errori. Ancora nessun
+commit o push: attesa approvazione esplicita dell’anteprima completa.
+
+## Variante Snow approvata — venature, ombra e plexiglass
+
+Approvazione esplicita dell’utente con richiesta «commit e push». Frontale
+in ciliegio opaco con venature anisotrope irregolari; cornice trasparente
+in PMMA con smussi e riflessi controllati. Scocca 4/4,5 cm secondo le quote
+indicate. Area render 1920×1200 per conservare l’ombra fisica sul piano.
+Verificato il mantenimento in pixel dei 45 ancoraggi di controlli/LED,
+aggiornate percentuali e metadati incorporati; console senza errori.
+Test Node: 31 pass, 0 fail. Riscontro: `output/qa/snow-approved-wood-plexi-local.png`.
+La modifica successiva del Desktop sarà mostrata in una nuova anteprima.

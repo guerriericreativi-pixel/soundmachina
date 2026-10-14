@@ -4,7 +4,7 @@ Run with Blender -b -P tools/render-sprites/virus_snow_knob_atlas.py.
 """
 import os,sys,json,math
 import bpy
-from mathutils import Vector
+from mathutils import Vector, Matrix
 ROOT=os.path.abspath(os.path.join(os.path.dirname(__file__), '..', '..'))
 sys.path.insert(0,ROOT+'/tools/render-sprites')
 import virus_panels as vp
@@ -13,6 +13,13 @@ import virus_sprites as vs
 vp.reset(10,10)
 bpy.ops.wm.open_mainfile(filepath=ROOT+'/output/blender/virus-ti-snow-studio-refined.blend')
 s=bpy.context.scene
+# Work in the canonical faceplate coordinate system after physical chassis tilt.
+if 'hardware_surface_matrix' in s:
+    values=s['hardware_surface_matrix']
+    inverse=Matrix([values[i:i+4] for i in range(0,16,4)]).inverted()
+    for obj in s.objects:
+        if not obj.parent:
+            obj.matrix_world=inverse @ obj.matrix_world
 rotor=bpy.data.objects['frontKnobValue1']
 keep={rotor,*rotor.children_recursive}
 source=Vector((*fp.M(612,683),fp.T+.015))
