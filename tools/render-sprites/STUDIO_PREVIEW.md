@@ -102,3 +102,8 @@ Il display usa un substrato LCD raster e una copertura trasparente renderizzata
 separatamente; il testo vivo resta leggibile sopra il substrato. PNG e scene
 Blender rimangono in `output/blender/`, WebP di produzione in `assets/panel/`.
 La geometria è ricostruita dalle fotografie, senza quote CAD certificate.
+
+Le manopole Snow aggiornate hanno altezza 1,09, profondità delle 14 righe
+0,055 e indice bianco 0,125×0,84×0,07. Per il WebP di produzione eseguire
+`pack_snow_knobs.py` con Python/Pillow dopo l’export Blender: il confezionamento
+rimuove il velo residuo del catcher e verifica tutti i bordi alfa.

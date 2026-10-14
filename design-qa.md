@@ -71,3 +71,13 @@ Verifica visiva nel browser a 1142×900: `output/qa/snow-refined-panel.png`;
 confronto con dettaglio fotografico in `output/qa/snow-reference-controls.png`.
 Verificati apertura ARP con Edit/Shift e ritorno con Exit/Mode; nessun errore
 in console. Fondi più scuri dei controlli e tappo privo di scanalatura visibili.
+
+## Correzione sprite delle manopole — 14 ottobre, dettaglio zoom
+
+Eliminato il velo rettangolare del catcher: fondo alfa stimato per fotogramma,
+con margine trasparente raccordato; ombre di contatto conservate. Verificati
+i bordi trasparenti e le superfici opache per tutti i 64 fotogrammi.
+Manopole più spesse (altezza normalizzata 1,09), zigrinatura profonda 0,055,
+indice bianco largo 0,125 e alto 0,07. Verifica a zoom 250% nel browser:
+`output/qa/snow-shadow-fix-zoom.png`, nessun riquadro visibile. Nessun errore
+in console, zoom riportato al 100%, nessuna modifica ai comandi MIDI.

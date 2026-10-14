@@ -18,17 +18,17 @@
 }
 #virusFaceplate.studio-snow {
   aspect-ratio: 16/9;
-  background: url("assets/panel/snow-studio.webp?v=snow-rigid-v3") center/100%
+  background: url("assets/panel/snow-studio.webp?v=snow-rigid-v4") center/100%
     100% no-repeat;
   border: 0;
   box-shadow: none;
   border-radius: 0;
 }
 #virusFaceplate.studio-snow .fp-knob::after {
-  background-image: url("assets/panel/snow-knob.webp?v=snow-rigid-v3") !important;
+  background-image: url("assets/panel/snow-knob.webp?v=snow-rigid-v4") !important;
 }
 #virusFaceplate.studio-snow .fp-key::before {
-  background-image: url("assets/panel/snow-key.webp?v=snow-rigid-v3") !important;
+  background-image: url("assets/panel/snow-key.webp?v=snow-rigid-v4") !important;
 }
 #virusFaceplate.studio-snow .fp-key.pressed {
   transform: translate(-50%, -50%) !important;
@@ -225,7 +225,7 @@ html[data-skin="elektron"] #btnTabSnow.active {
 
 /* Snow LCD: physical raster substrate and acrylic reflections, with live text. */
 #virusFaceplate.studio-snow #frontLcdScreen {
-  background: #c0e1e7 url("assets/panel/snow-lcd-surface.webp?v=snow-rigid-v3")
+  background: #c0e1e7 url("assets/panel/snow-lcd-surface.webp?v=snow-rigid-v4")
     center/100% 100% no-repeat !important;
   box-shadow: none !important;
   border: 0 !important;
@@ -238,7 +238,7 @@ html[data-skin="elektron"] #btnTabSnow.active {
   content: none !important;
 }
 #virusFaceplate.studio-snow #frontLcdScreen::after {
-  background: url("assets/panel/snow-lcd-glass.webp?v=snow-rigid-v3")
+  background: url("assets/panel/snow-lcd-glass.webp?v=snow-rigid-v4")
     center/100% 100% no-repeat !important;
   box-shadow: none !important;
   animation: none !important;

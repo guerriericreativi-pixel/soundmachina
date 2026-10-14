@@ -72,22 +72,22 @@ def rigid_knobs(scene):
     """ABS uniforme, corpo alto a cono tronco e indice chiaro in rilievo."""
     plastic = vs.plastic('ABS uniforme manopola Snow', vs.srgb('#b2b5b1'),
                          0.45, coat=0.04, bump=0.02)
-    pointer_mat = vs.plastic('Indice chiaro in rilievo Snow', vs.srgb('#e4e5df'),
+    pointer_mat = vs.plastic('Indice chiaro in rilievo Snow', vs.srgb('#f4f4ed'),
                              0.40, coat=0.02)
     for name in fp.KNOBS:
         rotor = bpy.data.objects[name]
         for child in list(rotor.children_recursive):
             bpy.data.objects.remove(child, do_unlink=True)
         grip = vs.fluted_skirt(plastic, r_bottom=1.0, r_top=0.91,
-                               height=0.85, flutes=14, depth=0.021)
+                               height=0.98, flutes=14, depth=0.055)
         cap = vs.revolve('Tappo piano senza scanalatura Snow',
-                         [(0, 0.96), (0.810, 0.96), (0.843, 0.955),
-                          (0.856, 0.944), (0.86, 0.910), (0.85, 0.84)], plastic)
+                         [(0, 1.09), (0.810, 1.09), (0.843, 1.085),
+                          (0.856, 1.074), (0.86, 1.040), (0.85, 0.97)], plastic)
         for polygon in cap.data.polygons:
             if polygon.index % 5 == 0:
                 polygon.use_smooth = False
-        pointer = vs.beveled_box('Indice sopraelevato Snow', (0.075, 0.84, 0.035),
-                                  0.008, pointer_mat, (0, 0.38, 0.9775), segments=3)
+        pointer = vs.beveled_box('Indice sopraelevato Snow', (0.125, 0.84, 0.07),
+                                  0.008, pointer_mat, (0, 0.38, 1.125), segments=3)
         for obj in (grip, cap, pointer):
             obj.parent = rotor
 

@@ -254,17 +254,30 @@ def render_to_array(path):
     return arr.reshape(h, w, 4)            # righe dal basso verso l'alto (convenzione Blender)
 
 
-def save_sheet(frames, cols, cell, name, quality=82):
+def save_sheet(frames, cols, cell, name, quality=82, clean_shadow_edges=False):
     rows = math.ceil(len(frames) / cols)
     W, H = cols * cell, rows * cell
     sheet = np.zeros((H, W, 4), dtype=np.float32)
     for i, f in enumerate(frames):
         c, r = i % cols, i // cols
         y0 = H - (r + 1) * cell
+        if clean_shadow_edges:
+            f = f.copy()
+            alpha = f[..., 3]
+            # Catcher indirect light leaves a faint nonuniform matte. Its
+            # boundary opacity estimates the unwanted floor for this frame.
+            border = np.concatenate((alpha[0], alpha[-1], alpha[:, 0], alpha[:, -1]))
+            floor = float(border.max()) + 1 / 255
+            alpha[:] = np.clip((alpha - floor) / (1 - floor), 0, 1)
+            distance = np.minimum(np.arange(cell), np.arange(cell)[::-1])
+            fade = np.clip(distance / 6, 0, 1)
+            fade = fade * fade * (3 - 2 * fade)
+            alpha *= fade[:, None] * fade[None, :]
         sheet[y0:y0 + cell, c * cell:(c + 1) * cell] = f
     # il catcher lascia un velo d'ombra quasi invisibile su tutta la cella: lo azzera
     a = sheet[..., 3]
-    sheet[..., 3] = np.clip((a - 0.025) / 0.975, 0, 1)
+    if not clean_shadow_edges:
+        sheet[..., 3] = np.clip((a - 0.025) / 0.975, 0, 1)
     img = bpy.data.images.new(name, W, H, alpha=True)
     img.pixels.foreach_set(sheet.ravel())
     img.filepath_raw = os.path.join(OUT, name + '.webp')

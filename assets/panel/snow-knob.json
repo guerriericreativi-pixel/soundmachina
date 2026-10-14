@@ -28,6 +28,10 @@
   "samples": 32,
   "webpQuality": 95,
   "geometry": "uniform ABS tall truncated cone, flat cap and raised pointer",
-  "normalizedHeight": 0.96,
-  "flutes": 14
+  "normalizedHeight": 1.09,
+  "fluteDepth": 0.055,
+  "pointerWidth": 0.125,
+  "pointerHeight": 0.07,
+  "flutes": 14,
+  "shadowMatte": "adaptive border floor with smooth transparent margin"
 }

@@ -37,5 +37,5 @@ for i in range(64):
     frames.append(vs.render_to_array('/tmp/snow-knob-frames/%03d.png'%i))
     print('FRAME',i,flush=True)
 vs.OUT=ROOT+'/assets/panel'
-vs.save_sheet(frames,8,192,'snow-knob',quality=95)
-with open(vs.OUT+'/snow-knob.json','w')as f:json.dump({'frames':64,'columns':8,'rows':8,'cell':192,'physicalCellWidth':3.072,'radius':.96,'angles':[-135,135],'rotationSign':-1,'sourcePoint':list(source),'origin':[0,0,0],'cameraTiltDegrees':18,'originInCell':[.5,.5],'samples':32,'webpQuality':95,'geometry':'uniform ABS tall truncated cone, flat cap and raised pointer','normalizedHeight':.96,'flutes':14},f,indent=2)
+vs.save_sheet(frames,8,192,'snow-knob',quality=95,clean_shadow_edges=True)
+with open(vs.OUT+'/snow-knob.json','w')as f:json.dump({'frames':64,'columns':8,'rows':8,'cell':192,'physicalCellWidth':3.072,'radius':.96,'angles':[-135,135],'rotationSign':-1,'sourcePoint':list(source),'origin':[0,0,0],'cameraTiltDegrees':18,'originInCell':[.5,.5],'samples':32,'webpQuality':95,'shadowMatte':'adaptive border floor with smooth transparent margin','geometry':'uniform ABS tall truncated cone, flat cap and raised pointer','normalizedHeight':1.09,'fluteDepth':.055,'pointerWidth':.125,'pointerHeight':.07,'flutes':14},f,indent=2)
