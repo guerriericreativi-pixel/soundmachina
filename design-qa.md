@@ -156,3 +156,94 @@ Verificato il mantenimento in pixel dei 45 ancoraggi di controlli/LED,
 aggiornate percentuali e metadati incorporati; console senza errori.
 Test Node: 31 pass, 0 fail. Riscontro: `output/qa/snow-approved-wood-plexi-local.png`.
 La modifica successiva del Desktop sarà mostrata in una nuova anteprima.
+
+## Strumenti accessori e Desktop — anteprima locale da approvare
+
+Final result: passed (verifica locale; approvazione visiva dell’utente pendente).
+
+MULTI, SINGLE, FX RACK, PATCH, ARP, SEQ e SONG usano materiali nativi Blender:
+lamiera verniciata a polvere, due pieghe laterali raccordate, frontale incassato
+in ciliegio desaturato per Snow e metallo antracite per Desktop. Pulsanti ABS
+con lieve bombatura, manopole dagli atlas PANEL e cornici PMMA trasparenti.
+Rimosse sovrapposizioni CSS che simulavano metallo/cromature e riflessi diagonali.
+Gli ingombri e i tagli 9-slice sono invariati; corretto il clipping della scocca
+per mostrare bordo e ombra. Il margine del catcher sfuma sul piano senza rettangolo.
+
+Confronto delle sette viste a 1020 px, stesso zoom e stesso stato delle parti:
+`output/qa/accessory-before-*.png` rispetto ad `accessory-after-*.png`.
+Verificati inoltre tutti i sette temi scuri: `accessory-dark-*.png`.
+Nessun errore console; 31 test Node pass, 0 fail; Python compilato e diff pulito.
+La scocca Desktop PANEL non ha più il frontale in legno; il piano antracite
+nativo copre l’intera pagina. Camera, layout e 32 manopole/43 pulsanti invariati.
+Riscontro: `output/qa/ti2-metal-fullscreen-local.png`.
+Raccolta delle 15 anteprime: `output/qa/accessory-review.html`.
+Risorse web del plugin sincronizzate, binari AU/VST3 non ricompilati.
+
+Lo Snow già approvato è pubblicato: sorgente 83a87333, Tools a24f0b78.
+Verifica SHA256 remota: index, hardware CSS, layout JS e Snow WebP identici
+al commit approvato; screenshot `snow-approved-public-83a87333.png`.
+Le nuove modifiche restano non committate e non pubblicate, come richiesto
+con «prima di committare e pushare ti devo dare l’ok del rendering».
+
+## Revisione materiali e LCD — seconda anteprima locale
+
+Final result: passed (verifica tecnica e visiva locale; approvazione utente pendente).
+
+La prima anteprima accessori è stata giudicata troppo piatta. Le superfici
+continue 1920×1200 ora usano gli shader e le area light dei file PANEL originali:
+`Acciaio Snow verniciato a polvere` e `Vernice antracite TI2`. Cornici laterali
+con lo stesso rig; ciliegio originale per Snow. I quattro pulsanti rettangolari
+riusano `ABS rigido tasto Snow` / `Tasti TI2 opachi`, senza vernice a polvere
+sull’ABS. Le manopole rimangono quelle degli atlas del PANEL.
+
+Serigrafie opache, gruppi stampati sulla superficie e luce continua, senza
+texture luminose ripetute. Finestre LCD con cornice ABS nera smussata nativa,
+PMMA separato e fondo ricavato dal PANEL. Palette Desktop grigio-verde neutra;
+rimosse componenti rosse, bagliori OLED e tremolio decorativo dei nomi Multi.
+Nomi immediatamente completi e stabili; bitmap aggiornata per =, +, /, _;
+passo dei caratteri adattato ai nomi lunghi senza modificare i dati MIDI.
+
+Confronto alla stessa scala delle precedenti anteprime: 1020×916, zoom 100%.
+Sette sezioni per entrambi i materiali: `output/qa/accessory-v2-snow-*.png`
+e `accessory-v2-dark-*.png`, tutte osservate nel browser. Nessun errore console.
+Test Node: 31 pass, 0 fail; generatori Python compilati, diff senza errori.
+Gallery aggiornata: `output/qa/accessory-review.html?v=2`.
+Tutte le nuove modifiche restano locali, senza commit o push.
+
+Ultimo controllo: tutte le forme stampate ARP/SEQ uniformate alla stessa
+finitura dei gruppi FX/MULTI. Rimossi i bordi rossi degli LCD e la tinta rossa
+dei cappelli degli step, preservando i LED fisici separati. Verificati nomi
+completi sui quattro LCD Multi, adattati allo spazio disponibile. Aggiornate
+le 14 immagini; ripristinato il viewport del browser dopo il confronto.
+Gallery cache aggiornata con v=2.1; nessun errore console e nessun push.
+
+## Snow LCD v3 e ricerca icone — 15 ottobre 2026
+
+Final result: passed (anteprima locale, non pubblicata).
+
+Solo gli accessori Snow ricevono una copertura PMMA nativa più spessa,
+riflesso di studio controllato e ombra interna posta sopra i canvas, senza
+sfocare testi o grafici. PATCH usa ora un ampio fondo LCD azzurro con cornice
+nera e copertura trasparente; campi e comandi restano interattivi. SINGLE
+ha una finestra relativa dedicata al solo LCD; Desktop e PANEL conservano
+le superfici precedenti. Renderer accessorio separato, CPU per evitare un
+abort Metal; due PNG e due WebP completati regolarmente.
+
+Sette screenshot Snow v3 a 1020×916 in output/qa; console senza errori;
+31 test passati, generatori Python compilati e diff pulito. Viewport ripristinato.
+Raccolta: output/qa/accessory-review.html?v=3.
+
+Ricerca librerie su fonti ufficiali: Lucide (ISC), FontAudio (SVG CC BY 4.0,
+font OFL, codice MIT), Game-icons (CC BY 3.0). Confronto locale di 18 esempi
+con le 12 icone attuali, anche a 18 e 24 px. SVG verificati e salvati solo
+in output/qa/icon-libraries con fonti; nessuna sostituzione nell’app.
+Raccolta: output/qa/icon-library-review.html. Nessun commit/push.
+
+## Icon libraries integration — 2026-10-15
+Status: passed (local preview); rendering approval and publication pending.
+- Replaced all twelve part category icons with vendored FontAudio, Lucide and three Game-icons instrument silhouettes. Existing category IDs, firmware classification, saved colors/choices and MIDI behavior remain intact.
+- Shared `virus-icons.js` preserves each library's coordinate system and fill/stroke mode. The same renderer serves MULTI, category picker, selected part and keyboard badges. Header FX RACK, KEYS and FEEDBACK use Lucide.
+- Added source SVGs, licensing/attribution and an accessible credits link in the quick guide. Updated plugin and Tools copy manifests; no Tools build/publication performed.
+- Verification: all 31 existing Node tests passed; inline JavaScript syntax, twelve renderers and git diff whitespace checks passed. No browser console errors. Visually checked actual MULTI picker and catalog at 18/26 px on light/dark backgrounds.
+- Evidence: `output/qa/icons-integrated-multi.png`, `output/qa/icons-integrated-catalog.png`, `output/qa/icon-integration-tests.txt`. Preview: `/output/qa/icon-implementation-review.html`.
+- No commit or push: awaiting the user's rendering approval as requested.

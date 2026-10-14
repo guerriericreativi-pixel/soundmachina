@@ -42,7 +42,7 @@
 .desktop-faceplate {
   position: relative;
   aspect-ratio: 2;
-  background: url("assets/panel/ti2-desktop.webp") center/100% 100% no-repeat;
+  background: url("assets/panel/ti2-desktop.webp?v=desktop-metal-v1-preview") center/100% 100% no-repeat;
 }
 .desktop-knob,
 .desktop-key,

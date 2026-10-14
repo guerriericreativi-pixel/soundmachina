@@ -155,3 +155,20 @@ Approvata la variante Snow con richiesta esplicita di commit/push. Ultimo
 render 1920×1200: ombra fisica interamente nel canvas, PMMA trasparente
 smussato, ciliegio opaco con venatura irregolare. I metadati Snow incorporati
 usano aspect 1,6; rigenerarli dal JSON dopo l’export.
+
+Anteprima strumenti accessori (locale, attesa approvazione):
+`virus_accessory_rasters.py` produce vernice a polvere, pieghe laterali,
+frontale Snow in ciliegio / Desktop metallico, PMMA e pulsanti ABS.
+`pack_accessory_rasters.py` conserva dimensioni/slice e sfuma il catcher.
+Gli atlas mobili sono quelli del PANEL; l’app sceglie 64 fotogrammi per
+le nuove manopole, mantenendo separata la compatibilità con i vecchi atlas.
+`virus_ti2_desktop_plate.py` rimuove il legno del Desktop ed esporta il
+piano antracite; `pack_ti2_plate.py` prepara plate trasparente e fondo pagina.
+Raccolta per approvazione: `output/qa/accessory-review.html`.
+
+Seconda anteprima accessori, dopo richiesta di maggiore fotorealismo:
+`virus_accessory_illumination.py` esporta mappe continue 1920×1200 dai materiali
+PANEL originali e può rigenerare i fianchi con `--chassis-only` o i pulsanti
+con `--buttons-only`. `virus_accessory_lcd_surround.py` esporta la cornice
+LCD ABS nera 756×300, slice 60, centro trasparente. Il packer supporta gli
+stessi filtri. Nessuna pubblicazione fino all’ok del rendering.

@@ -10,7 +10,7 @@
 <meta name="format-detection" content="telephone=no">
 <title>Virus H — editor per Virus TI</title>
 <link rel="stylesheet" href="multi-setup.css">
-<link rel="stylesheet" href="virus-hardware-panel.css?v=snow-natural-v14-preview">
+<link rel="stylesheet" href="virus-hardware-panel.css?v=accessory-studio-v1-preview">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>❄️</text></svg>">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Press+Start+2P&family=VT323&family=JetBrains+Mono:wght@400;700&display=swap');
@@ -6095,18 +6095,18 @@
      cosi' ogni pannello resta ridimensionabile. Valori slice/margini dallo script.
      ========================================================================== */
   :root {
-    --hw-surface: url("assets/sprites/surface-snow.webp");
-    --hw-chassis-frame: url("assets/sprites/chassis-snow.webp");
-    --hw-recess-frame: url("assets/sprites/recess-snow.webp");
-    --hw-bezel: url("assets/sprites/bezel-snow.webp");
-    --hw-screw: url("assets/sprites/screw-snow.webp");
+    --hw-surface: url("assets/sprites/surface-snow.webp?v=accessory-studio-v1-preview");
+    --hw-chassis-frame: url("assets/sprites/chassis-snow.webp?v=accessory-depth-v4-preview");
+    --hw-recess-frame: url("assets/sprites/recess-snow.webp?v=accessory-studio-v1-preview");
+    --hw-bezel: url("assets/sprites/bezel-snow.webp?v=accessory-studio-v1-preview");
+    --hw-screw: url("assets/sprites/screw-snow.webp?v=accessory-studio-v1-preview");
   }
   html[data-skin="elektron"] {
-    --hw-surface: url("assets/sprites/surface-dark.webp");
-    --hw-chassis-frame: url("assets/sprites/chassis-dark.webp");
-    --hw-recess-frame: url("assets/sprites/recess-dark.webp");
-    --hw-bezel: url("assets/sprites/bezel-dark.webp");
-    --hw-screw: url("assets/sprites/screw-dark.webp");
+    --hw-surface: url("assets/sprites/surface-dark.webp?v=accessory-studio-v1-preview");
+    --hw-chassis-frame: url("assets/sprites/chassis-dark.webp?v=accessory-depth-v4-preview");
+    --hw-recess-frame: url("assets/sprites/recess-dark.webp?v=accessory-studio-v1-preview");
+    --hw-bezel: url("assets/sprites/bezel-dark.webp?v=accessory-studio-v1-preview");
+    --hw-screw: url("assets/sprites/screw-dark.webp?v=accessory-studio-v1-preview");
   }
 
   /* scocca: texture renderizzata + luce morbida dall'alto; bordo e ombra dalla cornice */
@@ -6206,14 +6206,14 @@
      slice e margini da virus_panels.py job_button (render inclinato: faccia frontale sotto).
      ========================================================================== */
   :root {
-    --hw-btn-up: url("assets/sprites/btn-snow-up.webp");
-    --hw-btn-down: url("assets/sprites/btn-snow-down.webp");
+    --hw-btn-up: url("assets/sprites/btn-snow-up.webp?v=accessory-depth-v4-preview");
+    --hw-btn-down: url("assets/sprites/btn-snow-down.webp?v=accessory-depth-v4-preview");
     --hw-btn-text: #2f2f31;
     --hw-btn-on: #8a5200;
   }
   html[data-skin="elektron"] {
-    --hw-btn-up: url("assets/sprites/btn-dark-up.webp");
-    --hw-btn-down: url("assets/sprites/btn-dark-down.webp");
+    --hw-btn-up: url("assets/sprites/btn-dark-up.webp?v=accessory-depth-v4-preview");
+    --hw-btn-down: url("assets/sprites/btn-dark-down.webp?v=accessory-depth-v4-preview");
     --hw-btn-text: #d3d4d7;
     --hw-btn-on: #ff4d5a;
   }
@@ -7178,6 +7178,11 @@
     #lightLimiter { margin-left: 0 !important; }
   }
 </style>
+<link rel="stylesheet" href="virus-accessory-panel.css?v=snow-lcd-v3-preview">
+<style>
+.virus-icon { display: inline-block; flex: none; vertical-align: middle; }
+[data-virus-icon] { display: inline-flex; align-items: center; vertical-align: middle; margin-right: 4px; }
+</style>
 </head>
 <body>
 
@@ -7218,7 +7223,7 @@
               <div class="virus-info-step-content">
                 <div class="virus-info-step-title">Verifica del Suono (Test Immediato)</div>
                 <div class="virus-info-step-desc">
-                  Premi <strong>🔊 test virus</strong> o <strong>🔊 test synth</strong> per inviare una nota di prova hardware al canale attivo. Apri la tastiera virtuale con <strong>🎹 KEYS</strong> in alto per suonare a schermo, oppure usa direttamente la tastiera del Mac.
+                  Premi <strong>🔊 test virus</strong> o <strong>🔊 test synth</strong> per inviare una nota di prova hardware al canale attivo. Apri la tastiera virtuale con <strong><span data-virus-icon="keys" aria-hidden="true"></span> KEYS</strong> in alto per suonare a schermo, oppure usa direttamente la tastiera del Mac.
                 </div>
               </div>
             </div>
@@ -7260,6 +7265,7 @@
           </div>
 
           <div class="virus-info-footer">
+            <a href="assets/icons/index.html" target="_blank" rel="noopener" style="color:inherit">Crediti e licenze delle icone</a>
             <span class="virus-info-badge-shortcut">Scorciatoie Tastiera Mac</span>
             <span>Suona le note con <code>A S D F G H J K L</code> • Cambia ottava con <code>Z / X</code> • Regola la velocity con <code>C / V</code>.</span>
           </div>
@@ -7270,7 +7276,7 @@
       <button class="segmented-tab active" id="btnTabSnow">PANEL</button>
       <button class="segmented-tab" id="btnTabMultipart">MULTI</button>
       <button class="segmented-tab" id="btnTabSynth">SINGLE</button>
-      <button class="segmented-tab" id="btnTabFxRack">🎛 FX RACK</button>
+      <button class="segmented-tab" id="btnTabFxRack"><span data-virus-icon="rack" aria-hidden="true"></span> FX RACK</button>
       <button class="segmented-tab" id="btnTabPatchManager">PATCH</button>
       <button class="segmented-tab" id="btnTabArp">ARP</button>
       <button class="segmented-tab" id="btnTabSequencer">SEQ</button>
@@ -7299,9 +7305,9 @@
       </button>
     </div>
     <button class="settings-trigger theme-toggle" id="themeToggle" type="button" style="margin: 0; white-space: nowrap;">○ SNOW</button>
-    <button class="settings-trigger" id="btnToggleKeyboard" type="button" title="Tastiera virtuale per provare i suoni" style="margin: 0;">🎹 KEYS</button>
+    <button class="settings-trigger" id="btnToggleKeyboard" type="button" title="Tastiera virtuale per provare i suoni" style="margin: 0;"><span data-virus-icon="keys" aria-hidden="true"></span> KEYS</button>
     <button class="settings-trigger" id="btnSettings" type="button" aria-haspopup="dialog" aria-controls="settingsModal" aria-expanded="false" title="MIDI settings">MIDI</button>
-    <button class="settings-trigger" id="btnFeedback" type="button" aria-haspopup="dialog" aria-controls="feedbackModal" aria-expanded="false" title="Note sicurezza & suggerimenti per la community Synth Cafe" style="margin: 0; font-weight: 700; color: #ffca3a; border-color: rgba(255, 202, 58, 0.4);">💬 FEEDBACK</button>
+    <button class="settings-trigger" id="btnFeedback" type="button" aria-haspopup="dialog" aria-controls="feedbackModal" aria-expanded="false" title="Note sicurezza & suggerimenti per la community Synth Cafe" style="margin: 0; font-weight: 700; color: #ffca3a; border-color: rgba(255, 202, 58, 0.4);"><span data-virus-icon="feedback" aria-hidden="true"></span> FEEDBACK</button>
   </div>
 </div>
 
@@ -7956,6 +7962,7 @@
   </div>
 </div>
 
+<script src="virus-icons.js?v=1"></script>
 <script src="multi-setup.js"></script>
 <script src="virus-panel-layouts.js?v=snow-natural-v14-preview"></script>
 <script src="virus-hardware-panel.js"></script>
@@ -7997,6 +8004,34 @@
   window.uiPrompt = (msg, def = '') => dialog(String(msg), { input: def ?? '', buttons: ['Annulla', 'OK'] });
 })();
 
+// LCD substrates come from the native PANEL renders; live content stays sharp.
+const accessoryLcdImages = new Map();
+function drawAccessoryLcdBackground(ctx, width, height, desktop) {
+  const source = desktop
+    ? 'assets/panel/ti2-lcd-surface.webp?v=accessory-depth-v2'
+    : 'assets/panel/accessory-snow-lcd-surface.webp?v=snow-lcd-v3';
+  let image = accessoryLcdImages.get(source);
+  if (!image) {
+    image = new Image();
+    image.onload = () => {
+      if (typeof initElektronLcd === 'function') initElektronLcd();
+      if (typeof partDisplays !== 'undefined') {
+        partDisplays.forEach(display => display && display._render());
+      }
+    };
+    accessoryLcdImages.set(source, image);
+    image.src = source;
+  }
+  ctx.fillStyle = desktop ? '#c6ccb7' : '#bbdbe1';
+  ctx.fillRect(0, 0, width, height);
+  if (image.complete && image.naturalWidth) {
+    ctx.save();
+    ctx.imageSmoothingEnabled = true;
+    ctx.drawImage(image, 0, 0, width, height);
+    ctx.restore();
+  }
+}
+
 // Manopole fotorealistiche: oltre a ruotare l'indice CSS sceglie il fotogramma
 // dello sprite renderizzato in Blender (128 fotogrammi, griglia 16x8, -135..+135 gradi).
 function setKnobAngle(ind, angle) {
@@ -8007,6 +8042,10 @@ function setKnobAngle(ind, angle) {
   const f = Math.max(0, Math.min(frames - 1, Math.round((angle + 135) / 270 * (frames - 1))));
   knob.style.setProperty('--kx', f % cols);
   knob.style.setProperty('--ky', Math.floor(f / cols));
+  // Accessory instruments reuse the approved 64-frame PANEL atlases.
+  const accessoryFrame = Math.max(0, Math.min(63, Math.round((angle + 135) / 270 * 63)));
+  knob.style.setProperty('--akx', accessoryFrame % 8);
+  knob.style.setProperty('--aky', Math.floor(accessoryFrame / 8));
 }
 // allinea gli sprite alle rotazioni scritte nell'HTML (markup statico o ricostruito con innerHTML)
 // Comportamento unico per tutte le manopole (come nei VST): trascinamento verticale,
@@ -8374,6 +8413,10 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
   // ---------------------------------------------------------------------
   const FONT5X7 = {
     ' ': [0x00,0x00,0x00,0x00,0x00,0x00,0x00],
+    '+': [0x00,0x04,0x04,0x1F,0x04,0x04,0x00],
+    '=': [0x00,0x00,0x1F,0x00,0x1F,0x00,0x00],
+    '/': [0x01,0x02,0x02,0x04,0x08,0x08,0x10],
+    '_': [0x00,0x00,0x00,0x00,0x00,0x00,0x1F],
     '-': [0x00,0x00,0x00,0x1F,0x00,0x00,0x00],
     '.': [0x00,0x00,0x00,0x00,0x00,0x18,0x18],
     '0': [0x0E,0x11,0x13,0x15,0x19,0x11,0x0E],
@@ -8940,7 +8983,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
 
   function generateDiagReport() {
     const isDark = document.documentElement.getAttribute('data-skin') === 'elektron';
-    const themeName = isDark ? 'Access Virus TI2 Dark Star' : 'Access Virus TI Snow';
+    const themeName = isDark ? 'Access Virus TI2 Desktop' : 'Access Virus TI Snow';
     const midiOut = selectedOutput ? selectedOutput.name : 'Nessuna porta connessa';
     const midiIn = selectedInput ? selectedInput.name : 'Nessuna porta connessa';
     const activeTab = document.querySelector('.segmented-tab.active')?.textContent.trim() || 'PANEL';
@@ -10628,7 +10671,7 @@ function exportCurrentPatchSyx() {
       badge: 'SINGLE',
       steps: [
         { title: 'Editing a 3 Oscillatori', desc: 'Naviga tra le pagine OSC 1, OSC 2, OSC 3/NOISE, FILTER, AMP, LFO 1 e FX per scolpire ogni dettaglio della parte attiva (P1..P4).' },
-        { title: 'Display Grafico & Curve Filtro', desc: 'Visualizzazione OLED vettoriale con curve di filtro passa-basso/alto/banda, inviluppi ADSR e valori numerici precisi.' },
+        { title: 'Display Grafico & Curve Filtro', desc: 'Display LCD con curve di filtro passa-basso/alto/banda, inviluppi ADSR e valori numerici precisi.' },
         { title: 'Strumenti Creativi (Random/Mutate)', desc: 'Genera patch musicali con <code>🎲 RANDOM</code>, crea variazioni sottili con <code>🧬 MUTATE</code> ed esporta il dump con <code>💾 SALVA .SYX</code>.' },
         { title: 'Pagina Editor Dedicata a Schermo Intero', desc: 'Clicca su <code>↗️ EDITOR DEDICATO</code> per aprire la suite espansa con oscilloscopio in tempo reale, curve Bode dei doppi filtri, editor ADSR interattivo e Modulation Matrix completa a 6 slot.' }
       ],
@@ -10650,7 +10693,7 @@ function exportCurrentPatchSyx() {
     const partBox = document.createElement('div');
     partBox.style.cssText = 'display: flex; align-items: center; gap: 6px;';
     const partLabel = document.createElement('span');
-    partLabel.style.cssText = 'color: #8e97a8; font-family: monospace; font-size: 11px; font-weight: bold; letter-spacing: 0.05em;';
+    partLabel.style.cssText = 'color: var(--hw-print); font-family: monospace; font-size: 11px; font-weight: bold; letter-spacing: 0.05em;';
     partLabel.textContent = 'PARTE:';
     partBox.appendChild(partLabel);
 
@@ -10839,7 +10882,7 @@ function exportCurrentPatchSyx() {
         <span style="font-size: 8.5px; font-weight: 800; letter-spacing: 0.12em; color: var(--fg); opacity: 0.85;">BPM / LFO</span>
       </div>
       <div style="font-weight: 900; font-size: 11px; letter-spacing: 0.14em; color: var(--fg); font-family: 'Inter', sans-serif;" id="singleLcdModelBadge">
-        ${isCurrentDark ? 'VIRUS TI2 <span style="font-weight: 300; opacity: 0.5;">|</span> DARK STAR' : 'VIRUS <span style="font-weight: 300; opacity: 0.5;">|</span> TI SNOW'}
+        VIRUS H <span style="font-weight: 300; opacity: 0.5;">|</span> SINGLE
       </div>
     `;
 
@@ -10859,7 +10902,11 @@ function exportCurrentPatchSyx() {
     elektronLcd.style.background = 'transparent';
     elektronLcd.style.display = 'block';
 
-    screenRecess.appendChild(elektronLcd);
+    const lcdWindow = document.createElement('div');
+    lcdWindow.className = 'single-lcd-window';
+    lcdWindow.style.cssText = 'position: relative; width: 100%; max-width: 480px;';
+    lcdWindow.appendChild(elektronLcd);
+    screenRecess.appendChild(lcdWindow);
     leftCol.appendChild(screenRecess);
 
     // --- Page Buttons (Authentic Tactile Buttons with Dome LEDs) ---
@@ -11295,37 +11342,14 @@ function exportCurrentPatchSyx() {
 
     const isDark = document.documentElement.getAttribute('data-skin') === 'elektron';
 
-    if (isDark) {
-      // VIRUS DARK STAR: Deep OLED Black with white & crimson accents
-      ctx.fillStyle = '#090b0e';
-      ctx.fillRect(0, 0, w, h);
-
-      // Fine scanlines
-      ctx.fillStyle = 'rgba(255, 255, 255, 0.025)';
-      for(let sy = 0; sy < h; sy += 2) {
-        ctx.fillRect(0, sy, w, 1);
-      }
-    } else {
-      // VIRUS TI SNOW: Iconic backlit ice-blue LCD matching physical hardware
-      const bgGrad = ctx.createLinearGradient(0, 0, 0, h);
-      bgGrad.addColorStop(0, '#d9ecf8');
-      bgGrad.addColorStop(1, '#c4ddf1');
-      ctx.fillStyle = bgGrad;
-      ctx.fillRect(0, 0, w, h);
-
-      // Fine LCD scanlines
-      ctx.fillStyle = 'rgba(20, 36, 52, 0.035)';
-      for(let sy = 0; sy < h; sy += 2) {
-        ctx.fillRect(0, sy, w, 1);
-      }
-    }
+    drawAccessoryLcdBackground(ctx, w, h, isDark);
 
     // Palette selection
-    const fgPrimary = isDark ? '#ffffff' : '#142434';
-    const fgSecondary = isDark ? '#94a1b2' : '#33485c';
-    const fgDim = isDark ? '#404654' : '#6d8296';
-    const fgGrid = isDark ? '#1b2029' : '#a8c0d4';
-    const headerSep = isDark ? '#222834' : '#9bb5cb';
+    const fgPrimary = isDark ? '#344137' : '#142434';
+    const fgSecondary = isDark ? '#536451' : '#33485c';
+    const fgDim = isDark ? '#76816b' : '#6d8296';
+    const fgGrid = isDark ? '#aab69b' : '#a8c0d4';
+    const headerSep = isDark ? '#88977f' : '#9bb5cb';
 
     const headerH = 46;
     const leftW = 86;
@@ -11343,16 +11367,16 @@ function exportCurrentPatchSyx() {
 
     // Badge box
     if (isDark) {
-      // Dark Star Red Badge
-      ctx.fillStyle = '#e02424';
+      // Inverted neutral TI2 LCD badge
+      ctx.fillStyle = '#344137';
       ctx.fillRect(10, 9, 64, 28);
       ctx.lineWidth = 1;
-      ctx.strokeStyle = '#ff4d4d';
+      ctx.strokeStyle = '#667660';
       ctx.strokeRect(10, 9, 64, 28);
 
       ctx.fillStyle = '#ffffff';
       ctx.shadowColor = '#ffffff';
-      ctx.shadowBlur = limitedGlow(2);
+      ctx.shadowBlur = 0;
       ctx.fillText(progLabel, 14, 12);
     } else {
       // TI Snow Inverted Navy Badge
@@ -11374,8 +11398,8 @@ function exportCurrentPatchSyx() {
     const pName = (patchInput && patchInput.value) ? patchInput.value.toUpperCase().substring(0, 12) : (multiParts[pIdx]?.name ? multiParts[pIdx].name.toUpperCase().substring(0, 12) : 'VIRUS TI');
     
     ctx.fillStyle = fgPrimary;
-    ctx.shadowColor = isDark ? '#ffffff' : 'rgba(0,0,0,0)';
-    ctx.shadowBlur = isDark ? limitedGlow(2) : 0;
+    ctx.shadowColor = isDark ? '#344137' : 'rgba(0,0,0,0)';
+    ctx.shadowBlur = 0;
     ctx.fillText(pName, 84, 7);
 
     // Header Right: Menu Icon & Tempo
@@ -11393,8 +11417,8 @@ function exportCurrentPatchSyx() {
     ctx.beginPath(); ctx.moveTo(menuX + 4, 28); ctx.lineTo(menuX + 18, 28); ctx.stroke();
 
     ctx.fillStyle = fgPrimary;
-    ctx.shadowColor = isDark ? '#ffffff' : 'rgba(0,0,0,0)';
-    ctx.shadowBlur = isDark ? limitedGlow(1.5) : 0;
+    ctx.shadowColor = isDark ? '#344137' : 'rgba(0,0,0,0)';
+    ctx.shadowBlur = 0;
     ctx.fillText('120.0', w - 14, 11);
 
     // Header separator line
@@ -11411,14 +11435,14 @@ function exportCurrentPatchSyx() {
 
     // Page Name Box
     const pageParts = currentPage.split(' ');
-    ctx.fillStyle = isDark ? '#141822' : '#c5dcee';
+    ctx.fillStyle = isDark ? '#bdc6ac' : '#c5dcee';
     ctx.fillRect(10, headerH + 10, leftW - 20, 56);
-    ctx.strokeStyle = isDark ? '#2d3546' : '#2d4458';
+    ctx.strokeStyle = isDark ? '#667660' : '#2d4458';
     ctx.strokeRect(10, headerH + 10, leftW - 20, 56);
 
     ctx.fillStyle = fgPrimary;
-    ctx.shadowColor = isDark ? '#ffffff' : 'rgba(0,0,0,0)';
-    ctx.shadowBlur = isDark ? limitedGlow(2) : 0;
+    ctx.shadowColor = isDark ? '#344137' : 'rgba(0,0,0,0)';
+    ctx.shadowBlur = 0;
     if (pageParts.length > 1) {
       ctx.font = '22px "VT323", monospace';
       ctx.fillText(pageParts[0], leftW / 2, headerH + 14);
@@ -11453,8 +11477,8 @@ function exportCurrentPatchSyx() {
 
     // Level indicator bar
     ctx.fillStyle = fgPrimary;
-    ctx.shadowColor = isDark ? '#ffffff' : 'rgba(0,0,0,0)';
-    ctx.shadowBlur = isDark ? limitedGlow(2) : 0;
+    ctx.shadowColor = isDark ? '#344137' : 'rgba(0,0,0,0)';
+    ctx.shadowBlur = 0;
     ctx.fillRect(meterX + 3, meterY + meterH * 0.35, meterW - 6, meterH * 0.65 - 3);
 
     // Line separating left column
@@ -11504,7 +11528,7 @@ function exportCurrentPatchSyx() {
          if (isDark) {
            ctx.fillStyle = 'rgba(224, 36, 36, 0.20)';
            ctx.fillRect(1, 1, cellW - 2, cellH - 2);
-           ctx.strokeStyle = '#e02424';
+           ctx.strokeStyle = '#344137';
            ctx.lineWidth = 1.5;
            ctx.strokeRect(1, 1, cellW - 2, cellH - 2);
          } else {
@@ -11521,9 +11545,9 @@ function exportCurrentPatchSyx() {
        ctx.font = '20px "VT323", monospace';
        ctx.textAlign = 'center';
        ctx.textBaseline = 'top';
-       ctx.fillStyle = isParamActive ? (isDark ? '#ffffff' : '#08121c') : fgSecondary;
-       ctx.shadowColor = isDark ? '#ffffff' : 'rgba(0,0,0,0)';
-       ctx.shadowBlur = isDark ? limitedGlow(isParamActive ? 3 : 0) : 0;
+       ctx.fillStyle = isParamActive ? (isDark ? '#344137' : '#08121c') : fgSecondary;
+       ctx.shadowColor = isDark ? '#344137' : 'rgba(0,0,0,0)';
+       ctx.shadowBlur = 0;
        ctx.fillText(pDef.short.toUpperCase(), cellW / 2, 4);
        ctx.restore();
 
@@ -11532,13 +11556,13 @@ function exportCurrentPatchSyx() {
        ctx.translate(cellW/2, cellH/2 - 2);
 
        const idLower = paramId.toLowerCase();
-       const drawColor = isParamActive ? (isDark ? '#ffffff' : '#08121c') : (isDark ? '#e0e5ed' : '#142434');
+       const drawColor = isParamActive ? (isDark ? '#344137' : '#08121c') : (isDark ? '#344137' : '#142434');
 
        ctx.save();
        ctx.scale(2.3, 2.3);
        ctx.lineWidth = 1 / 2.3;
-       ctx.shadowColor = isDark ? (isParamActive ? '#e02424' : '#ffffff') : 'rgba(0,0,0,0)';
-       ctx.shadowBlur = isDark ? limitedGlow(isParamActive ? 4 : 1) : 0;
+       ctx.shadowColor = isDark ? (isParamActive ? '#344137' : '#ffffff') : 'rgba(0,0,0,0)';
+       ctx.shadowBlur = 0;
 
        if (idLower.includes('wave') || idLower.includes('shape')) {
          drawWav(ctx, val, drawColor);
@@ -11569,9 +11593,9 @@ function exportCurrentPatchSyx() {
        ctx.font = 'bold 20px "VT323", monospace';
        ctx.textAlign = 'center';
        ctx.textBaseline = 'bottom';
-       ctx.fillStyle = isParamActive ? (isDark ? '#ffffff' : '#08121c') : (isDark ? '#d0d6e2' : '#142434');
-       ctx.shadowColor = isDark ? '#ffffff' : 'rgba(0,0,0,0)';
-       ctx.shadowBlur = isDark ? limitedGlow(isParamActive ? 3 : 1) : 0;
+       ctx.fillStyle = isParamActive ? (isDark ? '#344137' : '#08121c') : (isDark ? '#344137' : '#142434');
+       ctx.shadowColor = isDark ? '#344137' : 'rgba(0,0,0,0)';
+       ctx.shadowBlur = 0;
 
        let valStr = String(val);
        if (pDef.bipolar) {
@@ -12647,20 +12671,9 @@ function exportCurrentPatchSyx() {
     const PRG_DOT = 1.5, PRG_GAP = 1, PRG_CELL = PRG_DOT + PRG_GAP;
 
     let w = 0, h = 0, dpr = 1;
-    let revealCols = 0;
-    let revealTimer = null;
-    let flickerDots = [];
-
-    function now(){
-      return (typeof performance !== 'undefined' && performance.now) ? performance.now() : Date.now();
-    }
 
     function getName(){
       return (multiParts[index].name || 'init').toUpperCase();
-    }
-
-    function totalCols(text){
-      return Math.max(0, text.length * (FONT_COLS + 1) - 1);
     }
 
     function render(){
@@ -12671,20 +12684,19 @@ function exportCurrentPatchSyx() {
       // Fondo chiaro, testi e icone grigie
       const isElektron = document.documentElement.getAttribute('data-skin') === 'elektron';
       const colors = isElektron ? {
-        bg: '#0f141a',
-        grid: '#1b2633',
-        active: '#88c0d0',
-        inactive: '#4b6580'
+        bg: '#c6ccb7',
+        grid: 'rgba(52,65,55,.045)',
+        active: '#344137',
+        inactive: '#536451'
       } : {
         bg: '#d4e7f5',
-        grid: '#c6d9e7',
+        grid: 'rgba(53,92,102,.045)',
         active: '#1c2a38',
         inactive: '#4b5e70'
       };
 
       // Background fill & subtle LCD grid dots
-      ctx.fillStyle = colors.bg;
-      ctx.fillRect(0, 0, w, h);
+      drawAccessoryLcdBackground(ctx, w, h, isElektron);
 
       const cols = Math.floor((w + GAP) / CELL);
       const rows = Math.floor((h + GAP) / CELL);
@@ -12711,10 +12723,12 @@ function exportCurrentPatchSyx() {
         px += (FONT_COLS + 1) * PRG_CELL;
       }
 
-      // Main patch name right beside it, revealed column by column
+      // Stable complete patch name beside the program number
       const text = getName();
-      const textH = FONT_ROWS * CELL - GAP; // 7 * 3 - 1 = 20px
       const ox = px + 12;
+      const nameCell = Math.min(CELL, Math.max(1, (w - ox - 5) / Math.max(1, text.length * (FONT_COLS + 1) - 1)));
+      const nameDot = Math.min(DOT, nameCell * 2 / 3);
+      const textH = FONT_ROWS * nameCell - (nameCell - nameDot);
       const oy = Math.max(3, Math.floor((h - textH) / 2));
 
       ctx.fillStyle = colors.active;
@@ -12722,11 +12736,9 @@ function exportCurrentPatchSyx() {
       for (const ch of text){
         const glyph = glyphFor(ch);
         for (let col = 0; col < FONT_COLS; col++){
-          if (gcol < revealCols){
-            for (let row = 0; row < FONT_ROWS; row++){
-              if (glyph[row] & (1 << (FONT_COLS - 1 - col))){
-                ctx.fillRect(ox + gcol * CELL, oy + row * CELL, DOT, DOT);
-              }
+          for (let row = 0; row < FONT_ROWS; row++){
+            if (glyph[row] & (1 << (FONT_COLS - 1 - col))){
+              ctx.fillRect(ox + gcol * nameCell, oy + row * nameCell, nameDot, nameDot);
             }
           }
           gcol++;
@@ -12734,27 +12746,11 @@ function exportCurrentPatchSyx() {
         gcol++; // gap column between characters
       }
 
-      // Idle flicker dots
-      const t = now();
-      flickerDots = flickerDots.filter(d => d.until > t);
-      ctx.fillStyle = colors.active;
-      flickerDots.forEach(d => {
-        ctx.fillRect(d.x * CELL, d.y * CELL, DOT, DOT);
-      });
     }
 
     function startReveal(){
-      revealCols = 0;
-      const target = totalCols(getName());
-      if (revealTimer) clearInterval(revealTimer);
-      revealTimer = setInterval(() => {
-        revealCols++;
-        render();
-        if (revealCols >= target){
-          clearInterval(revealTimer);
-          revealTimer = null;
-        }
-      }, 60);
+      // Hardware LCDs show a complete stable name, without decorative flicker.
+      render();
     }
 
     function resize(){
@@ -12767,22 +12763,6 @@ function exportCurrentPatchSyx() {
       if (ctx) ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
       render();
     }
-
-    setInterval(() => {
-      const cols = Math.floor((w + GAP) / CELL);
-      const rows = Math.floor((h + GAP) / CELL);
-      if (cols <= 0 || rows <= 0) return;
-      const count = 1 + Math.floor(Math.random() * 2);
-      for (let i = 0; i < count; i++){
-        flickerDots.push({
-          x: Math.floor(Math.random() * cols),
-          y: Math.floor(Math.random() * rows),
-          until: now() + 250
-        });
-      }
-      render();
-      setTimeout(render, 260);
-    }, 3000);
 
     wrap.addEventListener('click', () => {
       currentPartIndex = index;
@@ -12823,20 +12803,7 @@ function exportCurrentPatchSyx() {
 
   // ---- Icona strumento + colore di ogni parte (MULTI): per capire subito a cosa serve la parte.
   // Scelta dall'utente (salvata in questo browser); se non scelta, proposta dalla categoria della patch.
-  const PART_ICONS = {
-    lead:    ['Lead',     '<path d="M3 17 9 7v10l6-10v10l6-10"/>'],
-    bass:    ['Bass',     '<path d="M5 6c4-1 8 1 8 5 0 5-5 8-9 9"/><circle cx="17" cy="8" r="1.2"/><circle cx="17" cy="14" r="1.2"/>'],
-    pad:     ['Pad',      '<path d="M7 18h10a4 4 0 0 0 0-8 6 6 0 0 0-11.5 1.5A3.3 3.3 0 0 0 7 18z"/>'],
-    keys:    ['Keys',     '<rect x="3" y="5" width="18" height="14" rx="1"/><path d="M8 5v14M13 5v14M18 5v14"/><path d="M6.5 5v8M11 5v8M16 5v8" stroke-width="3"/>'],
-    pluck:   ['Pluck',    '<path d="M12 21C7 17 5 12 5 8a7 4 0 0 1 14 0c0 4-2 9-7 13z"/>'],
-    bell:    ['Bell',     '<path d="M6 17V11a6 6 0 0 1 12 0v6l2 2H4z"/><path d="M10 21a2 2 0 0 0 4 0"/>'],
-    strings: ['Strings',  '<path d="M7 4v16M11 4v16M15 4v16M19 4v16"/><path d="M3 15 21 7"/>'],
-    brass:   ['Brass',    '<path d="M3 10h9l7-5v14l-7-5H3z"/><path d="M7 10v4"/>'],
-    arp:     ['Arp',      '<path d="M3 19h4v-4h4v-4h4V7h4V3"/>'],
-    drums:   ['Drums',    '<ellipse cx="12" cy="8" rx="8" ry="3"/><path d="M4 8v8c0 1.7 3.6 3 8 3s8-1.3 8-3V8"/><path d="M4 4l5 3M20 4l-5 3"/>'],
-    vocal:   ['Vocal',    '<rect x="9" y="3" width="6" height="11" rx="3"/><path d="M5 11a7 7 0 0 0 14 0M12 18v3M9 21h6"/>'],
-    fx:      ['FX',       '<path d="M12 3v4M12 17v4M3 12h4M17 12h4M6 6l2.5 2.5M15.5 15.5 18 18M6 18l2.5-2.5M15.5 8.5 18 6"/>'],
-  };
+  const PART_ICONS = Object.fromEntries(VirusIcons.partIds.map(id => [id, [VirusIcons.catalog[id].label]]));
   const PART_LOOK_COLORS = ['#56b6c2', '#e59500', '#c678dd', '#74c476', '#e06c75', '#e5c07b', '#61afef', '#9aa0a6'];
   // categorie del firmware TI -> icona proposta
   const CAT_TO_ICON = { 1: 'lead', 2: 'bass', 3: 'pad', 4: 'bell', 5: 'pluck', 6: 'bass', 7: 'keys', 8: 'arp', 9: 'fx', 10: 'drums', 11: 'drums', 12: 'vocal', 13: 'vocal', 17: 'keys', 18: 'keys', 19: 'strings', 20: 'bell', 21: 'lead', 22: 'fx' };
@@ -12859,7 +12826,7 @@ function exportCurrentPatchSyx() {
     const all = loadPartLooks(); all[i] = { ...(all[i] || {}), ...change };
     try { localStorage.setItem(PART_LOOK_KEY, JSON.stringify(all)); } catch (e) {}
   }
-  const partIconSvg = (id, size = 22) => `<svg viewBox="0 0 24 24" width="${size}" height="${size}" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${PART_ICONS[id][1]}</svg>`;
+  const partIconSvg = (id, size = 22) => VirusIcons.svg(id, size);
 
   function paintPartBadge(badge, i) {
     const look = partLook(i);
@@ -18894,7 +18861,7 @@ function exportCurrentPatchSyx() {
       u._apply(Math.round(lo + Math.max(0, Math.min(1, n)) * (hi - lo)));
     };
     const lcd = () => document.documentElement.getAttribute('data-skin') === 'elektron'
-      ? { bg0: '#5c0710', bg1: '#1c0003', ink: '#ff2a3b', hi: '#ffffff', dim: 'rgba(255,90,100,0.28)', grid: 'rgba(0,0,0,0.35)', glow: 'rgba(255,42,59,0.7)' }
+      ? { bg0: '#c6ccb7', bg1: '#bcc4ab', ink: '#344137', hi: '#26352a', dim: 'rgba(52,65,55,0.22)', grid: 'rgba(52,65,55,0.025)', glow: 'rgba(0,0,0,0)' }
       : { bg0: '#e4eff8', bg1: '#d0e4f2', ink: '#1c2a38', hi: '#0f2233', dim: 'rgba(28,42,56,0.22)', grid: 'rgba(28,42,56,0.06)', glow: 'rgba(0,0,0,0)' };
     const CURVES = ['OFF', 'LIGHT', 'SOFT', 'MIDDLE', 'HARD', 'DIGITAL', 'SHAPER', 'RECTIF', 'BITRED', 'RATERED', 'RATE+F', 'LOWPASS', 'LOW+F', 'HIGHPASS', 'HIGH+F'];
 
@@ -18904,8 +18871,8 @@ function exportCurrentPatchSyx() {
       if (!w || !h) return null;
       if (cv.width !== Math.round(w * dpr)) { cv.width = Math.round(w * dpr); cv.height = Math.round(h * dpr); }
       const ctx = cv.getContext('2d'); ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-      const c = lcd(), g = ctx.createLinearGradient(0, 0, 0, h);
-      g.addColorStop(0, c.bg0); g.addColorStop(1, c.bg1); ctx.fillStyle = g; ctx.fillRect(0, 0, w, h);
+      const c = lcd();
+      drawAccessoryLcdBackground(ctx, w, h, document.documentElement.getAttribute('data-skin') === 'elektron');
       ctx.fillStyle = c.grid; for (let y = 0; y < h; y += 3) ctx.fillRect(0, y, w, 1); for (let x = 0; x < w; x += 3) ctx.fillRect(x, 0, 1, h);
       ctx.font = '700 10px "VT323", ui-monospace, monospace'; ctx.textBaseline = 'top';
       ctx.shadowColor = c.glow; ctx.shadowBlur = c.glow === 'rgba(0,0,0,0)' ? 0 : 6;

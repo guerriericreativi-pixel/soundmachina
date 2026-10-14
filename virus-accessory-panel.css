@@ -1,0 +1,243 @@
+/* Accessory instruments share the PANEL's native studio materials and controls.
+   Keep the original 9-slice footprints so every live control retains its position. */
+:root {
+  --accessory-body: url("assets/panel/accessory-top-snow.webp?v=accessory-depth-v2");
+  --accessory-lcd-substrate: url("assets/panel/accessory-snow-lcd-surface.webp?v=snow-lcd-v3");
+  --accessory-lcd-ink: #355c66;
+  --accessory-lcd-header: #3c5d66;
+}
+html[data-skin="elektron"] {
+  --accessory-body: url("assets/panel/accessory-top-dark.webp?v=accessory-depth-v3");
+  --accessory-lcd-substrate: url("assets/panel/ti2-lcd-surface.webp?v=accessory-depth-v2");
+  --accessory-lcd-ink: #344137;
+  --accessory-lcd-header: #344137;
+}
+html[data-skin="elektron"] body {
+  background-color: #242729;
+  background-image: url("assets/panel/studio-anthracite.webp?v=desktop-metal-v1-preview");
+}
+html[data-skin] .hardware-chassis:not(#snowHardwareChassis) {
+  background: var(--accessory-body) center / 100% 100% no-repeat !important;
+  border: none !important;
+  box-shadow: none !important;
+  overflow: visible !important;
+  margin-bottom: 64px !important;
+}
+html[data-skin] .hardware-chassis.hardware-chassis:not(#snowHardwareChassis)::before {
+  /* The bent sides and inset front sit over the flat painted top surface. */
+  z-index: 0 !important;
+}
+html[data-skin] .hardware-chassis .chassis-hardware-topbar > span {
+  color: var(--hw-print) !important;
+}
+html[data-skin] .hardware-chassis .chassis-knob-outer {
+  --knob-sprite: url("assets/panel/snow-knob.webp?v=snow-natural-v14-preview") !important;
+}
+html[data-skin="elektron"] .hardware-chassis .chassis-knob-outer {
+  --knob-sprite: url("assets/panel/ti2-knob.webp") !important;
+}
+html[data-skin] .hardware-chassis .chassis-knob-outer::after {
+  background-size: 800% 800% !important;
+  background-position: calc(var(--akx, 4) * 100% / 7) calc(var(--aky, 4) * 100% / 7) !important;
+}
+html[data-skin="elektron"] .hardware-chassis .chassis-knob-outer::after {
+  /* TI2 cells frame 1.777778 diameters, compared with Snow's 1.6. */
+  inset: -38.8889%;
+}
+html[data-skin] .hardware-chassis .arp-hw-step-pad {
+  --key-sprite: url("assets/panel/snow-key.webp?v=snow-natural-v14-preview") !important;
+  color: #242a29 !important;
+}
+html[data-skin="elektron"] .hardware-chassis .arp-hw-step-pad {
+  --key-sprite: url("assets/panel/ti2-key.webp") !important;
+  color: #eee !important;
+}
+html[data-skin] .hardware-chassis .arp-hw-step-pad.active {
+  color: #202625 !important;
+}
+html[data-skin="elektron"] .hardware-chassis .arp-hw-step-pad::before {
+  /* Caps remain neutral ABS; the separate red LED carries the step state. */
+  filter: saturate(0);
+}
+html[data-skin="elektron"] .hardware-chassis .arp-hw-step-pad.active {
+  color: #fff !important;
+}
+
+/* Rigid ABS buttons use the native crown and its studio-light gradient. */
+html[data-skin] .hardware-chassis:not(#snowHardwareChassis) :is(
+  .chassis-page-btn, .arp-hw-preset-btn, .seq-page-btn, .part-stepper-btn,
+  .seq-subtoolbar-btn, .fx-part-btn, .seq-trk-btn, .seq-trk-mute-btn,
+  .seq-trk-solo-btn, .arp-hw-btn-hold, .chassis-key
+):not(.part-pick) {
+  background: none !important;
+  border: 1px solid transparent !important;
+  border-image: var(--hw-btn-up) 38 38 43 38 fill / 9px 9px 10px 9px / 6px 6px 8px 6px stretch !important;
+  box-shadow: none !important;
+  color: var(--hw-btn-text) !important;
+}
+html[data-skin] .hardware-chassis:not(#snowHardwareChassis) :is(
+  .chassis-page-btn, .arp-hw-preset-btn, .seq-page-btn, .part-stepper-btn,
+  .seq-subtoolbar-btn, .fx-part-btn, .seq-trk-btn, .seq-trk-mute-btn,
+  .seq-trk-solo-btn, .arp-hw-btn-hold, .chassis-key
+):not(.part-pick):is(:active, .active, .active-view, .active-trk) {
+  border-image: var(--hw-btn-down) 38 38 40 38 fill / 9px 9px 9.5px 9px / 6px 6px 7px 6px stretch !important;
+}
+
+/* Native clear covers replace the old chrome surround and diagonal glare. */
+html[data-skin] .hardware-chassis:not(#snowHardwareChassis) .multi-lcd-frame {
+  background: none !important;
+  border: 2px solid transparent !important;
+  border-image: var(--hw-bezel) 60 fill / 30px / 9px stretch !important;
+  box-shadow: none !important;
+}
+html[data-skin] .hardware-chassis:not(#snowHardwareChassis) .multi-lcd {
+  box-shadow: none !important;
+}
+html[data-skin] .hardware-chassis:not(#snowHardwareChassis) .lcd-glass {
+  border: 1px solid transparent !important;
+  border-image: var(--hw-bezel) 60 fill / 30px / 9px stretch !important;
+  box-shadow: none !important;
+}
+html[data-skin] .hardware-chassis:not(#snowHardwareChassis) :is(
+  .lcd-glass, .virus-snow-lcd-front, .multi-lcd, .xy-pad-surface
+)::after {
+  background: url("assets/panel/snow-lcd-glass.webp?v=snow-natural-v14-preview") center / 100% 100% no-repeat !important;
+  opacity: 0.65;
+  pointer-events: none;
+}
+
+/* Recessed LCD windows: native substrate, black gasket and clear studio cover. */
+html[data-skin] .hardware-chassis:not(#snowHardwareChassis) :is(
+  .virus-snow-lcd-front, .multi-lcd, .xy-pad-surface, .part-display
+) {
+  background: var(--accessory-lcd-substrate) center / 100% 100% no-repeat !important;
+  color: var(--accessory-lcd-ink) !important;
+  border-color: #202724 !important;
+  box-shadow: inset 0 3px 5px rgba(0,0,0,.35), inset 0 -1px 1px rgba(245,250,240,.4), 0 1px 0 rgba(245,250,240,.2) !important;
+  text-shadow: none !important;
+}
+html[data-skin] .hardware-chassis:not(#snowHardwareChassis) :is(
+  .lcd-bank-prog, .lcd-patch-name, .lcd-footer-bar, .lcd-footer-bar span,
+  .arp-hw-display-val, .arp-hw-display-line, .seq-hw-display-line
+) {
+  color: var(--accessory-lcd-ink) !important;
+  text-shadow: none !important;
+}
+html[data-skin] .hardware-chassis:not(#snowHardwareChassis) .lcd-header-bar {
+  background: var(--accessory-lcd-header) !important;
+  color: #e9efe4 !important;
+  text-shadow: none !important;
+}
+html[data-skin] .hardware-chassis:not(#snowHardwareChassis) :is(
+  .lcd-header-bar, .lcd-footer-bar
+) { border-color: rgba(52,65,55,.25) !important; }
+html[data-skin] .hardware-chassis:not(#snowHardwareChassis) .lcd-badge {
+  background: #d7e2d3 !important;
+  color: var(--accessory-lcd-header) !important;
+  text-shadow: none !important;
+  box-shadow: none !important;
+}
+html[data-skin] .hardware-chassis:not(#snowHardwareChassis) .fx-scope-canvas {
+  border-color: #202724 !important;
+  background: var(--accessory-lcd-substrate) center / 100% 100% no-repeat !important;
+  box-shadow: inset 0 3px 5px rgba(0,0,0,.35) !important;
+}
+html[data-skin] .hardware-chassis:not(#snowHardwareChassis) :is(
+  .fx-scope-canvas, #elektronLcd, .virus-snow-lcd-front, .multi-lcd, .xy-pad-surface, .part-display
+) {
+  border: 3px solid transparent !important;
+  border-image: url("assets/panel/lcd-gasket.webp?v=accessory-depth-v2") 60 / 12px / 5px stretch !important;
+}
+html[data-skin] .hardware-chassis:not(#snowHardwareChassis) .xy-coords-badge {
+  background: var(--accessory-lcd-header) !important;
+  color: #e9efe4 !important;
+}
+html[data-skin] .hardware-chassis:not(#snowHardwareChassis) :is(
+  .xy-crosshair-x, .xy-crosshair-y
+) { background: rgba(52,65,55,.3) !important; box-shadow: none !important; }
+/* Screen-print ink is matte and slightly off-white on dark powder coating. */
+html[data-skin="elektron"] .hardware-chassis:not(#snowHardwareChassis) :is(
+  .chassis-logo, .fx-rack-title, .chassis-knob-label, .fx-knob-label, .fx-unit-name
+) { color: #cbd0c9 !important; text-shadow: none !important; }
+
+/* Printed group shapes follow the powder-coated surface beneath the ink. */
+html[data-skin] .hardware-chassis:not(#snowHardwareChassis) :is(
+  .chassis-hardware-topbar, .multi-routing-control-bar, .single-macros,
+  .fx-unit, .fx-target-selector, .part-row,
+  div[style*="background: rgba(0, 0, 0, 0."]:not([class*="lcd"], .xy-pad-surface, .part-display),
+  div[style*="background: rgb(19, 20, 26)"],
+  div[style*="background: rgb(12, 13, 17)"]
+) {
+  background: rgba(64,73,69,.50) !important;
+  color: #e0e4db;
+  border-color: rgba(48,58,53,.16) !important;
+  box-shadow: none !important;
+}
+html[data-skin="elektron"] .hardware-chassis:not(#snowHardwareChassis) :is(
+  .chassis-hardware-topbar, .multi-routing-control-bar, .single-macros,
+  .fx-unit, .fx-target-selector, .part-row,
+  div[style*="background: rgba(0, 0, 0, 0."]:not([class*="lcd"], .xy-pad-surface, .part-display),
+  div[style*="background: rgb(19, 20, 26)"],
+  div[style*="background: rgb(12, 13, 17)"]
+) { background: rgba(130,145,145,.10) !important; }
+html[data-skin] .hardware-chassis:not(#snowHardwareChassis) :is(
+  .chassis-hardware-topbar, .multi-routing-control-bar, .single-macros,
+  .fx-unit, .fx-target-selector, .part-row,
+  div[style*="background: rgba(0, 0, 0, 0."]:not([class*="lcd"], .xy-pad-surface, .part-display),
+  div[style*="background: rgb(19, 20, 26)"],
+  div[style*="background: rgb(12, 13, 17)"]
+)::after { display: none !important; }
+html[data-skin] .hardware-chassis:not(#snowHardwareChassis) :is(
+  .fx-unit, .single-macros, .part-row,
+  div[style*="background: rgba(0, 0, 0, 0."]:not([class*="lcd"], .xy-pad-surface, .part-display)
+) :is(.chassis-knob-label, .fx-knob-label, .fx-knob-val, .fx-unit-name, .chassis-knob-value) {
+  color: #e0e4db !important;
+  text-shadow: none !important;
+}
+
+/* Snow accessory optics: the cover sits above live pixels, so the recessed
+   edge remains visible even when a canvas paints an opaque LCD background. */
+html[data-skin="te"] .hardware-chassis:not(#snowHardwareChassis) :is(
+  .lcd-glass, .single-lcd-window, .virus-snow-lcd-front,
+  .multi-lcd, .xy-pad-surface, .part-display, .patch-panel
+) { position: relative; }
+html[data-skin="te"] .hardware-chassis:not(#snowHardwareChassis) :is(
+  .lcd-glass, .single-lcd-window, .virus-snow-lcd-front,
+  .multi-lcd, .xy-pad-surface, .part-display, .patch-panel
+)::after {
+  content: "";
+  display: block !important;
+  position: absolute;
+  inset: 3px;
+  z-index: 6;
+  border-radius: 2px;
+  background: url("assets/panel/accessory-snow-lcd-glass.webp?v=snow-lcd-v3") center / 100% 100% no-repeat !important;
+  box-shadow: inset 0 4px 7px rgba(9,35,43,.27), inset 0 -1px 2px rgba(227,248,249,.65);
+  opacity: .9;
+  pointer-events: none;
+}
+html[data-skin="te"] .hardware-chassis:not(#snowHardwareChassis) :is(
+  .fx-scope-canvas, #elektronLcd, .virus-snow-lcd-front,
+  .multi-lcd, .xy-pad-surface, .part-display
+) {
+  border-image-width: 18px !important;
+}
+html[data-skin="te"] #patchManagerContent {
+  --pm-ink: #24454f;
+  --pm-dim: #47646d;
+  --pm-line: rgba(40,77,88,.22);
+  --pm-card: rgba(208,230,233,.38);
+  --pm-field: rgba(228,242,243,.62);
+}
+html[data-skin="te"] #patchManagerContent .patch-panel {
+  background: var(--accessory-lcd-substrate) center / 100% 100% no-repeat !important;
+  border: 3px solid transparent !important;
+  border-image: url("assets/panel/lcd-gasket.webp?v=accessory-depth-v2") 60 / 20px / 4px stretch !important;
+  box-shadow: inset 0 5px 9px rgba(9,35,43,.26) !important;
+  border-radius: 3px;
+}
+html[data-skin="te"] #patchManagerContent :is(.pm-part-name, .lib-item .name) {
+  font-family: "VT323", monospace;
+  font-size: 18px;
+  letter-spacing: .02em;
+}
