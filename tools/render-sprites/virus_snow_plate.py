@@ -32,6 +32,8 @@ s.render.resolution_x=1920;s.render.resolution_y=1080;s.render.resolution_percen
 s.cycles.samples=96;s.cycles.use_denoising=True
 s.render.image_settings.file_format='PNG'
 s.render.filepath=ROOT+'/output/blender/snow-plate.png'
+bpy.data.objects['Scrivania studio'].is_shadow_catcher=True
+s.render.film_transparent=True
 s.view_layers[0].update()
 def proj(x,y,z=fp.T):
     mx,my=fp.M(x,y);c=world_to_camera_view(s,s.camera,Vector((mx,my,z)))

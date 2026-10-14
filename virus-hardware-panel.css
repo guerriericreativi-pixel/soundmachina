@@ -18,17 +18,17 @@
 }
 #virusFaceplate.studio-snow {
   aspect-ratio: 16/9;
-  background: url("assets/panel/snow-studio.webp?v=snow-rigid-v4") center/100%
+  background: url("assets/panel/snow-studio.webp?v=snow-rigid-v6") center/100%
     100% no-repeat;
   border: 0;
   box-shadow: none;
   border-radius: 0;
 }
 #virusFaceplate.studio-snow .fp-knob::after {
-  background-image: url("assets/panel/snow-knob.webp?v=snow-rigid-v4") !important;
+  background-image: url("assets/panel/snow-knob.webp?v=snow-rigid-v6") !important;
 }
 #virusFaceplate.studio-snow .fp-key::before {
-  background-image: url("assets/panel/snow-key.webp?v=snow-rigid-v4") !important;
+  background-image: url("assets/panel/snow-key.webp?v=snow-rigid-v6") !important;
 }
 #virusFaceplate.studio-snow .fp-key.pressed {
   transform: translate(-50%, -50%) !important;
@@ -225,7 +225,7 @@ html[data-skin="elektron"] #btnTabSnow.active {
 
 /* Snow LCD: physical raster substrate and acrylic reflections, with live text. */
 #virusFaceplate.studio-snow #frontLcdScreen {
-  background: #c0e1e7 url("assets/panel/snow-lcd-surface.webp?v=snow-rigid-v4")
+  background: #c0e1e7 url("assets/panel/snow-lcd-surface.webp?v=snow-rigid-v6")
     center/100% 100% no-repeat !important;
   box-shadow: none !important;
   border: 0 !important;
@@ -238,7 +238,7 @@ html[data-skin="elektron"] #btnTabSnow.active {
   content: none !important;
 }
 #virusFaceplate.studio-snow #frontLcdScreen::after {
-  background: url("assets/panel/snow-lcd-glass.webp?v=snow-rigid-v4")
+  background: url("assets/panel/snow-lcd-glass.webp?v=snow-rigid-v6")
     center/100% 100% no-repeat !important;
   box-shadow: none !important;
   animation: none !important;
@@ -270,4 +270,27 @@ html[data-skin="elektron"] #btnTabSnow.active {
   border-top: 0;
   font-family: "VT323", monospace;
   font-weight: 400;
+}
+
+/* The studio desk continues behind the instrument and application controls. */
+.hardware-viewport { background: transparent; }
+.app-header {
+  background-color: rgba(235, 236, 232, 0.92);
+  border-radius: 8px;
+  padding: 12px;
+}
+html[data-skin="elektron"] .app-header { background-color: rgba(27, 29, 31, 0.94); }
+.hardware-tools label {
+  background: rgba(235, 236, 232, 0.94);
+  color: #222;
+  border-radius: 6px;
+  padding: 8px 10px;
+}
+html body {
+  background-color: #666965;
+  background-image: url("assets/panel/studio-grey-wood.webp?v=studio-desk-v1");
+  background-size: cover !important;
+  background-repeat: no-repeat;
+  background-position: center;
+  background-attachment: fixed;
 }

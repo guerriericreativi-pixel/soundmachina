@@ -81,3 +81,13 @@ Manopole più spesse (altezza normalizzata 1,09), zigrinatura profonda 0,055,
 indice bianco largo 0,125 e alto 0,07. Verifica a zoom 250% nel browser:
 `output/qa/snow-shadow-fix-zoom.png`, nessun riquadro visibile. Nessun errore
 in console, zoom riportato al 100%, nessuna modifica ai comandi MIDI.
+
+## Piano di studio continuo
+
+Sfondo tecnico a puntini rimosso da tutta l’app. Texture di legno grigio
+renderizzata in Blender con camera dall’alto, estesa alla pagina con cover.
+Lo Snow è esportato con scocca e ombra su trasparenza, così il piano continua
+tra intestazione, strumento e comandi inferiori senza cornice rettangolare.
+Intestazione e Zoom hanno superfici uniformi per mantenere il contrasto.
+Riscontro: `output/qa/snow-full-wood-local.png`; pagina a 1142×900,
+scrollWidth 1142, background-size cover, nessun errore in console.

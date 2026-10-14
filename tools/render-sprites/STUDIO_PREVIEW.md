@@ -107,3 +107,8 @@ Le manopole Snow aggiornate hanno altezza 1,09, profondità delle 14 righe
 0,055 e indice bianco 0,125×0,84×0,07. Per il WebP di produzione eseguire
 `pack_snow_knobs.py` con Python/Pillow dopo l’export Blender: il confezionamento
 rimuove il velo residuo del catcher e verifica tutti i bordi alfa.
+
+Per il piano continuo: renderizzare `virus_studio_desk.py` e convertire il PNG
+in `studio-grey-wood.webp`. `virus_snow_plate.py` ora esporta la scocca su
+trasparenza; confezionare il PNG con `pack_snow_plate.py` (Python/Pillow).
+Il background della pagina mostra il legno da una camera ortografica verticale.
