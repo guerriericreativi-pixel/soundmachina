@@ -1,0 +1,21 @@
+{
+  "file": "ti2-led.webp",
+  "widthPixels": 128,
+  "heightPixels": 128,
+  "cellPhysicalWidth": 0.6,
+  "lensPhysicalDiameter": 0.156,
+  "attachment": {
+    "x": 50,
+    "y": 50
+  },
+  "source": "LED acceso.002",
+  "sourceWorldPoint": [
+    -17.082918167114258,
+    3.3767528533935547,
+    5.36375617980957
+  ],
+  "panelTiltDegrees": 12,
+  "cameraTiltDegrees": 18,
+  "material": "LED TI2 rosso",
+  "emissionStrength": 3.2
+}

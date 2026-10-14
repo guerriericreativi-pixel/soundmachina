@@ -1,0 +1,223 @@
+.hardware-viewport {
+  width: 100%;
+  overflow: auto;
+  --panel-zoom: 1;
+  border-radius: 8px;
+  background: #17191a;
+  scrollbar-width: thin;
+}
+.hardware-viewport [hidden] {
+  display: none !important;
+}
+.hardware-viewport .faceplate,
+.desktop-faceplate {
+  width: calc(100% * var(--panel-zoom));
+  max-width: none;
+  margin: 0;
+  flex-shrink: 0;
+}
+#virusFaceplate.studio-snow {
+  aspect-ratio: 16/9;
+  background: url("assets/panel/snow-studio.webp") center/100% 100% no-repeat;
+  border: 0;
+  box-shadow: none;
+  border-radius: 0;
+}
+#virusFaceplate.studio-snow .fp-knob::after {
+  background-image: url("assets/panel/snow-knob.webp") !important;
+}
+#virusFaceplate.studio-snow .fp-key::before {
+  background-image: url("assets/panel/snow-key.webp") !important;
+}
+#virusFaceplate.studio-snow .fp-key.pressed {
+  transform: translate(-50%, -50%) !important;
+}
+#virusFaceplate.studio-snow .fp-key {
+  border-radius: 9%;
+}
+#virusFaceplate.studio-snow .fp-lcd {
+  padding: 0;
+}
+.desktop-faceplate {
+  position: relative;
+  aspect-ratio: 2;
+  background: url("assets/panel/ti2-desktop.webp") center/100% 100% no-repeat;
+}
+.desktop-knob,
+.desktop-key,
+.desktop-led {
+  position: absolute;
+  left: calc(var(--x) * 1%);
+  top: calc(var(--y) * 1%);
+  transform: translate(-50%, -50%);
+  width: calc(var(--w) * 1%);
+}
+.desktop-knob {
+  aspect-ratio: 1;
+  border-radius: 50%;
+  cursor: ns-resize;
+  touch-action: none;
+  outline: none;
+}
+.desktop-knob::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 177.7778%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  background-image: url("assets/panel/ti2-knob.webp");
+  background-size: 800% 800%;
+  background-position: calc(var(--kx, 0) * 100% / 7)
+    calc(var(--ky, 0) * 100% / 7);
+  pointer-events: none;
+}
+.desktop-key {
+  height: calc(var(--h) * 1%);
+  border: 0;
+  padding: 0;
+  background: none;
+  box-shadow: none;
+  min-width: 0;
+  min-height: 0;
+  cursor: pointer;
+  border-radius: 9%;
+  touch-action: manipulation;
+}
+.desktop-key::before {
+  content: "";
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 178.575%;
+  aspect-ratio: 1;
+  transform: translate(-50%, -50%);
+  background: url("assets/panel/ti2-key.webp") 0 0/200% 100% no-repeat;
+  pointer-events: none;
+}
+.desktop-key.pressed::before,
+.desktop-key:active::before {
+  background-position: 100% 0;
+}
+.desktop-key:focus-visible,
+.desktop-knob:focus-visible {
+  outline: 2px solid #70e5df;
+  outline-offset: 3px;
+}
+.desktop-key.latched {
+  outline: 1px solid #ff8c82;
+  outline-offset: 2px;
+}
+.desktop-lcd {
+  position: absolute;
+  left: calc(var(--x) * 1%);
+  top: calc(var(--y) * 1%);
+  width: calc(var(--w) * 1%);
+  height: calc(var(--h) * 1%);
+  box-sizing: border-box;
+  padding: 0.25% 0.4%;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  overflow: hidden;
+  container-type: inline-size;
+  background: #c0c9be;
+  color: #34473d;
+  font-family: "VT323", monospace;
+  box-shadow: inset 0 0 4px #455347;
+}
+.desktop-lcd span {
+  font-size: 6cqw;
+  line-height: 1;
+  white-space: nowrap;
+}
+.desktop-lcd strong {
+  font-size: 9cqw;
+  font-weight: 400;
+  line-height: 1;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+.desktop-led {
+  aspect-ratio: 1;
+  border-radius: 50%;
+  pointer-events: none;
+  background: transparent;
+}
+.desktop-led.on {
+  width: 1.17647%;
+  background: url("assets/panel/ti2-led.webp") center/contain no-repeat;
+  box-shadow: none;
+}
+.hardware-tools {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 0;
+}
+.hardware-tools select,
+.hardware-tool {
+  font: 600 11px inherit;
+  color: var(--text, #ccc);
+  background: var(--panel, #252728);
+  border: 1px solid #7776;
+  border-radius: 5px;
+  padding: 7px 10px;
+  cursor: pointer;
+}
+.hardware-tools label {
+  display: flex;
+  align-items: center;
+  gap: 7px;
+  font-size: 11px;
+  margin-left: auto;
+}
+.hardware-tools input {
+  width: 100px;
+  accent-color: #95c9c5;
+}
+.hardware-tools output {
+  min-width: 34px;
+}
+.hardware-status {
+  font-size: 11px;
+  color: var(--text, #ccc);
+  padding: 0 0 8px;
+  min-height: 16px;
+}
+
+.hardware-tools select,
+.hardware-tools button {
+  font-family: inherit;
+  font-size: 11px;
+  text-transform: none;
+}
+.hardware-tool[aria-expanded="true"] {
+  border-color: #86cfc9;
+  background: #326763;
+}
+/* Long hardware dump diagnostics must not push the MIDI dialog off-screen. */
+#settingsModal .modal-content {
+  max-height: calc(100dvh - 48px);
+  overflow-y: auto;
+  box-sizing: border-box;
+}
+#settingsModal #midi-debug {
+  max-height: 100px;
+  overflow: auto;
+}
+.hardware-viewport {
+  max-height: calc(100dvh - 210px);
+}
+@media (max-width: 860px) {
+  .hardware-viewport {
+    max-height: calc(100dvh - 300px);
+  }
+}
+html[data-skin="elektron"] #btnTabSnow.active {
+  color: #e2ebee;
+  background: #333b42;
+}

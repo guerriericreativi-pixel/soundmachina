@@ -1,0 +1,23 @@
+{
+  "file": "ti2-key.webp",
+  "frames": 2,
+  "columns": 2,
+  "rows": 1,
+  "cellPixels": 192,
+  "cellPhysicalWidth": 2.25,
+  "attachment": {
+    "x": 50,
+    "y": 50
+  },
+  "source": "Tasto EDIT",
+  "sourceWorldPoint": [
+    -14.47506332397461,
+    4.997903347015381,
+    5.677672386169434
+  ],
+  "panelTiltDegrees": 12,
+  "cameraTiltDegrees": 18,
+  "pressDisplacementLocalNormal": -0.08,
+  "buttonPhysicalWidth": 1.259975,
+  "buttonPhysicalHeight": 1.118414
+}

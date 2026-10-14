@@ -1,0 +1,102 @@
+const { test } = require('node:test');
+const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const path = require('node:path');
+const vm = require('node:vm');
+const acorn = require('acorn');
+const { JSDOM } = require('jsdom');
+const html = fs.readFileSync(path.join(__dirname, '..', 'index.html'), 'utf8');
+const functions = new Map();
+for (const match of html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)) {
+  const source = match[1];
+  function visit(node) {
+    if (!node || typeof node !== 'object') return;
+    if (node.type === 'FunctionDeclaration') functions.set(node.id.name, source.slice(node.start, node.end));
+    Object.values(node).forEach(value => Array.isArray(value) ? value.forEach(visit) : visit(value));
+  }
+  visit(acorn.parse(source, { ecmaVersion: 'latest' }));
+}
+function setup(extra = {}) {
+  const dom = new JSDOM(html);
+  const context = vm.createContext({ document: dom.window.document, window: {}, console, selectedOutput: null,
+    SYSEX_PREFIX: [0xF0, 0, 0x20, 0x33, 1], ...extra });
+  for (const name of ['selectPatchSource', 'preparePatchForBuffer', 'getSoundEditBuffer', 'loadPatchToActiveBuffer', 'renderMultiLibrary', 'renderLibrary']) {
+    vm.runInContext(functions.get(name), context);
+  }
+  return context;
+}
+function dump(size) {
+  const bytes = new Uint8Array(size);
+  bytes.set([0xF0, 0, 0x20, 0x33, 1, 0x10, 0x10, 1, 5]);
+  bytes.fill(12, 9, size - 2);
+  bytes[size - 1] = 0xF7;
+  return bytes;
+}
+
+test('PATCH tabs expose one source and maintain keyboard focus and accessible selection', () => {
+  const c = setup();
+  c.selectPatchSource('multis', true);
+  assert.equal(c.document.getElementById('pmMultis').hidden, false);
+  assert.equal(c.document.getElementById('pmSounds').hidden, true);
+  assert.equal(c.document.getElementById('pmBanks').hidden, true);
+  assert.equal(c.document.activeElement.id, 'pmTabMultis');
+  assert.equal(c.document.getElementById('pmTabMultis').getAttribute('aria-selected'), 'true');
+});
+
+test('Multi search filters names and keeps the total library count', () => {
+  const c = setup({ loadMultiLibrary: () => ({ Ambient: {}, Bass: {} }) });
+  c.document.getElementById('libSearchInput').value = 'BASS';
+  c.renderMultiLibrary();
+  assert.equal(c.document.querySelectorAll('#multiLibList .lib-item').length, 1);
+  assert.equal(c.document.querySelector('#multiLibList .name').textContent, 'Bass');
+  assert.equal(c.document.getElementById('pmMultisCount').textContent, '2');
+  c.document.getElementById('libSearchInput').value = 'unknown';
+  c.renderMultiLibrary();
+  assert.match(c.document.getElementById('multiLibList').textContent, /Nessun Multi/);
+});
+
+test('Sound rows show one explicit load destination and filter by name', () => {
+  const c = setup({ loadLibrary: () => ({ 'Analog Pad': Array.from(dump(524)), 'Bass': Array.from(dump(267)) }), currentPartIndex: 2 });
+  c.window.currentSynthMode = 'multi';
+  c.document.getElementById('libSearchInput').value = 'pad';
+  c.renderLibrary();
+  assert.equal(c.document.querySelectorAll('#libList .lib-item').length, 1);
+  assert.equal(c.document.querySelector('#libList button').textContent, 'Carica → P3');
+  assert.equal(c.document.querySelectorAll('#libList button').length, 3);
+  assert.equal(c.document.getElementById('pmSoundsCount').textContent, '2');
+});
+
+test('Readdressing both standard and TI dumps preserves source bytes and fixes the checksum', () => {
+  const c = setup();
+  for (const size of [267, 524]) {
+    const original = dump(size);
+    const snapshot = Array.from(original);
+    const prepared = c.preparePatchForBuffer(original, 2, 0);
+    assert.equal(prepared[5], 0);
+    assert.equal(prepared[7], 0);
+    assert.equal(prepared[8], 2);
+    const expected = Array.from(prepared.slice(5, -2)).reduce((a, b) => a + b, 0) & 0x7F;
+    assert.equal(prepared[size - 2], expected);
+    assert.deepEqual(Array.from(original), snapshot);
+    assert.deepEqual(Array.from(prepared.slice(9, -2)), snapshot.slice(9, -2));
+  }
+});
+
+test('Loading a sound targets the selected Multi part rather than the inactive Single buffer', () => {
+  const sent = [];
+  const c = setup({ currentPartIndex: 2, selectedOutput: {}, deviceId: () => 0x10,
+    sendMidiBytes: bytes => { sent.push(Array.from(bytes)); return true; },
+    applyDumpToActivePatch() {}, renderMultiPartsOverview() {}, setLastAction() {}, uiAlert: message => { throw new Error(message); } });
+  c.window.currentSynthMode = 'multi';
+  c.loadPatchToActiveBuffer(dump(524));
+  assert.equal(sent.length, 1);
+  assert.equal(sent[0][8], 2);
+  assert.equal(c.window.lastReceivedDump[8], 2);
+});
+
+test('Foreign or truncated SysEx is rejected before loading', () => {
+  const c = setup();
+  assert.throws(() => c.preparePatchForBuffer([0xF0, 0xF7], 0, 0), /non valido/);
+  const foreign = dump(267); foreign[2] = 1;
+  assert.throws(() => c.preparePatchForBuffer(foreign, 0, 0), /non valido/);
+});

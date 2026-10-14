@@ -9,6 +9,8 @@
 <meta name="theme-color" content="#111317">
 <meta name="format-detection" content="telephone=no">
 <title>Virus H — editor per Virus TI</title>
+<link rel="stylesheet" href="multi-setup.css">
+<link rel="stylesheet" href="virus-hardware-panel.css">
 <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>❄️</text></svg>">
 <style>
   @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;600;800&family=Press+Start+2P&family=VT323&family=JetBrains+Mono:wght@400;700&display=swap');
@@ -7078,6 +7080,45 @@
   .pm-bank { border: 1px dashed var(--pm-line); border-radius: 4px; min-height: 48px; }
   .pm-empty { color: var(--pm-dim); font-size: 12px; text-align: center; padding: 16px; }
   .pm-keys { position: absolute !important; left: 24px; bottom: 16px; margin: 0 !important; }
+  /* PATCH workspace: fixed controls, one browsable source at a time. */
+  #patchManagerContent { overflow: auto; }
+  #patchManagerContent > .hardware-chassis { width: 100%; max-width: none; margin: 0; min-height: 0; height: auto !important; max-height: none !important; display: block !important; overflow: visible !important; padding: 44px 16px 16px; box-sizing: border-box; }
+  #patchManagerContent .chassis-logo { top: 16px; left: 20px; font-size: 16px; }
+  .pm-workspace { position: relative; z-index: 1; width: 100%; min-width: 0; }
+  #patchManagerContent .patch-panel { max-width: none; margin: 0; padding: 16px; border-radius: 6px; min-width: 0; }
+  #patchManagerContent .pm-head { margin-bottom: 10px; padding-bottom: 10px; gap: 12px; }
+  #patchManagerContent .pm-hint { line-height: 1.5; margin-top: 5px; }
+  #patchManagerContent .pm-parts { grid-template-columns: repeat(4,minmax(0,1fr)); gap: 8px; margin-bottom: 14px; }
+  #patchManagerContent .pm-part-card { min-width: 0; border-color: var(--pm-line); }
+  #patchManagerContent .pm-part-card.is-selected { border-color: var(--pm-ink) !important; box-shadow: inset 0 3px var(--pm-ink); }
+  #patchManagerContent .pm-part-select { border: 0 !important; padding: 5px 0 !important; background: none !important; box-shadow: none !important; color: var(--pm-ink); text-align: left; width: 100%; font: 700 14px/1.4 'Inter',sans-serif; text-transform: none !important; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; cursor: pointer; }
+  .pm-part-position { font: 10px/1.5 'JetBrains Mono',monospace; color: var(--pm-dim); }
+  .pm-toolbar { display: flex; gap: 8px; align-items: center; padding: 12px 0; border-top: 1px solid var(--pm-line); }
+  .pm-backup { position: relative; font-size: 12px; }
+  .pm-backup summary { padding: 10px; cursor: pointer; white-space: nowrap; }
+  .pm-backup > div { position: absolute; right: 0; top: 100%; z-index: 10; padding: 8px; display: grid; gap: 6px; border: 1px solid var(--pm-line); background: var(--pm-field); box-shadow: 0 8px 20px #0002; white-space: nowrap; }
+  .pm-source-row { display: flex; justify-content: space-between; align-items: center; gap: 10px; border-bottom: 1px solid var(--pm-line); margin-bottom: 16px; }
+  .pm-tabs { display: flex; gap: 4px; }
+  #patchManagerContent .pm-tabs button { padding: 12px 14px !important; background: none !important; box-shadow: none !important; border: 0 !important; border-bottom: 3px solid transparent !important; border-radius: 0 !important; color: var(--pm-dim); font: 700 12px/1.2 'Inter',sans-serif; text-transform: none !important; cursor: pointer; }
+  #patchManagerContent .pm-tabs button[aria-selected="true"] { border-bottom-color: var(--pm-ink) !important; color: var(--pm-ink); }
+  .pm-tabs span { margin-left: 6px; font: 10px/1 monospace; background: var(--pm-line); padding: 3px 5px; border-radius: 3px; }
+  .pm-target { font: 700 11px/1.5 'JetBrains Mono',monospace; white-space: nowrap; }
+  .pm-source[hidden] { display: none !important; }
+  .pm-save-row { display: grid; grid-template-columns: 1fr minmax(280px,1.1fr); gap: 14px; align-items: center; margin-bottom: 16px; }
+  .pm-save-row .pm-row { margin: 0; }
+  .pm-save-row .pm-grow { flex-basis: 120px; }
+  #patchManagerContent .chassis-page-btn, #patchManagerContent .lib-item button { min-height: 34px; font-size: 11px; text-transform: none !important; }
+  #patchManagerContent button:disabled { opacity: 0.45; cursor: default; }
+  #patchManagerContent .pm-primary { background: var(--pm-ink) !important; color: var(--pm-field) !important; }
+  #patchManagerContent .lib-list { max-height: min(42vh,420px); overflow-y: auto; border: 1px solid var(--pm-line); border-radius: 4px; margin: 0; }
+  #patchManagerContent .lib-item { gap: 12px; min-height: 44px; }
+  #patchManagerContent .lib-item .name { flex: 1; min-width: 0; font-family: 'Inter',sans-serif; font-weight: 600; }
+  #patchManagerContent .lib-item .btns { flex: 0 0 auto; }
+  #patchManagerContent .pm-empty { padding: 34px 16px; line-height: 1.7; }
+  .pm-footer { display: flex; justify-content: space-between; align-items: center; gap: 10px; padding-top: 14px; font-size: 11px; color: var(--pm-dim); }
+  #patchManagerContent button:focus-visible, .pm-backup summary:focus-visible { outline: 2px solid var(--pm-ink); outline-offset: 2px; }
+  @media (max-width: 1050px) { .pm-save-row { grid-template-columns: 1fr; } #patchManagerContent .patch-panel { padding: 12px; } }
+  @media (max-width: 850px) { #patchManagerContent { flex: 0 0 auto; overflow: visible; } #patchManagerContent .pm-parts { grid-template-columns: repeat(2,minmax(0,1fr)); } .pm-source-row { flex-wrap: wrap; } .pm-toolbar { flex-wrap: wrap; } }
   /* ARP */
   .arp-lcd-wrap { flex: 1 1 420px; display: flex; flex-direction: column; gap: 6px; }
   .arp-lcd { display: flex; flex-direction: column; gap: 4px; }
@@ -7381,6 +7422,14 @@
       <label>device id</label>
       <select id="deviceIdSelect"></select>
     </div>
+    <div class="field" style="margin-top:12px;">
+      <label for="synthModeSelect">Modalità sul display del Virus</label>
+      <select id="synthModeSelect">
+        <option value="single">Single</option>
+        <option value="multi">Multi / Sequencer</option>
+      </select>
+      <small>Indica il modo attivo per leggere ed editare il buffer giusto. Non cambia la modalità del synth.</small>
+    </div>
     <div id="midi-debug" style="font-family: monospace; color: #80c090; background: #111; padding: 4px 8px; border-radius: 4px; font-size: 12px; text-align: center; margin-top: 10px;">
       MIDI: ...
     </div>
@@ -7498,50 +7547,55 @@
         </div>
       </div>
     </div>
-    <div style="z-index: 1; width: 100%; display: flex; flex-direction: column; align-items: center; margin-top: 40px; padding: 0 40px;">
+    <div class="pm-workspace">
       <div class="section section-lib patch-panel">
         <div class="pm-head">
-          <h2>SUONI ATTIVI <span>P1–P4</span></h2>
-          <button id="btnSyncMultiParts" class="chassis-page-btn" type="button">leggi parti dal synth</button>
+          <div><h2>PARTI DEL VIRUS</h2><p class="pm-hint" id="pmPartHint">Seleziona la destinazione del suono.</p></div>
+          <button id="btnSyncMultiParts" class="chassis-page-btn" type="button">Leggi parti dal Virus</button>
         </div>
         <div id="multiPartsOverview" class="pm-parts"></div>
-
-        <div class="pm-box">
-          <div class="pm-row">
-            <input type="search" id="libSearchInput" class="pm-field pm-grow" placeholder="Cerca un suono o un multi per nome…" aria-label="Cerca nelle librerie">
-            <button id="btnImportSyx" class="chassis-page-btn" type="button">importa .syx / .mid</button>
-            <input type="file" id="fileSyxInput" accept=".syx,.mid,.midi" style="display:none" multiple>
-            <button id="btnExportBackup" class="chassis-page-btn" type="button" title="Salva libreria e impostazioni in un file">backup</button>
-            <button id="btnRestoreBackup" class="chassis-page-btn" type="button" title="Ricarica un backup">ripristina</button>
-            <input type="file" id="fileBackupInput" accept=".json" style="display:none">
+        <div class="pm-toolbar">
+          <input type="search" id="libSearchInput" class="pm-field pm-grow" placeholder="Cerca per nome…" aria-label="Cerca nelle librerie">
+          <button id="btnImportSyx" class="chassis-page-btn" type="button">Importa .syx / .mid</button>
+          <input type="file" id="fileSyxInput" accept=".syx,.mid,.midi" hidden multiple>
+          <details class="pm-backup"><summary>Archivio</summary><div>
+            <button id="btnExportBackup" class="chassis-page-btn" type="button" title="Salva libreria e impostazioni in un file">Esporta backup</button>
+            <button id="btnRestoreBackup" class="chassis-page-btn" type="button" title="Ricarica un backup">Ripristina backup</button>
+          </div></details>
+          <input type="file" id="fileBackupInput" accept=".json" hidden>
+        </div>
+        <div class="pm-source-row">
+          <div class="pm-tabs" role="tablist" aria-label="Sorgente patch">
+            <button type="button" role="tab" id="pmTabSounds" aria-selected="true" aria-controls="pmSounds" data-pm-source="sounds">Suoni <span id="pmSoundsCount">0</span></button>
+            <button type="button" role="tab" id="pmTabMultis" aria-selected="false" aria-controls="pmMultis" data-pm-source="multis" tabindex="-1">Multi <span id="pmMultisCount">0</span></button>
+            <button type="button" role="tab" id="pmTabBanks" aria-selected="false" aria-controls="pmBanks" data-pm-source="banks" tabindex="-1">Banchi Virus</button>
           </div>
-          <p class="pm-hint">Puoi anche trascinare un file <b>.syx</b> o <b>.mid</b> sulla pagina per importarlo.</p>
+          <span class="pm-target" id="pmTarget" aria-live="polite">Destinazione: P1</span>
         </div>
-
-        <h2 class="pm-title">LIBRERIA SUONI</h2>
-        <div class="pm-row">
-          <input type="text" id="patchName" class="pm-field pm-grow" placeholder="nome del suono" aria-label="Nome del suono da salvare">
-          <button id="btnSavePatch" class="chassis-page-btn" type="button" title="Salva nella libreria il suono letto dal Virus">salva suono</button>
-        </div>
-        <div class="lib-list" id="libList"></div>
-
-        <h2 class="pm-title">LIBRERIA MULTI</h2>
-        <div class="pm-row">
-          <input type="text" id="multiName" class="pm-field pm-grow" placeholder="nome del multi (es. DM-Personal-Jesus)" aria-label="Nome del multi da salvare">
-          <button id="btnSaveMulti" class="chassis-page-btn" type="button" title="Legge le 4 parti dal Virus e le salva come multi">leggi e salva multi</button>
-        </div>
-        <div class="lib-list" id="multiLibList"></div>
-
-        <h2 class="pm-title">BANCHI DEL VIRUS</h2>
-        <div class="pm-row">
-          <select id="bankPickSelect" class="pm-field pm-grow" aria-label="Banco del Virus"></select>
-          <button id="btnReadBank" class="chassis-page-btn" type="button" title="Mostra le 128 patch del banco">leggi</button>
-          <button id="btnFetchBank" class="chassis-page-btn" type="button" title="Salva tutte le 128 patch del banco nella libreria">cattura</button>
-        </div>
-        <div class="lib-list pm-bank" id="synthBankList">
-          <div class="pm-empty">nessun banco letto</div>
-        </div>
-        <div class="chassis-keys pm-keys"><button type="button" class="chassis-key fp-key" data-midi-key aria-expanded="false" title="Mostra / nascondi stato MIDI, azioni e guida di collegamento">MIDI</button></div>
+        <section id="pmSounds" class="pm-source" role="tabpanel" aria-labelledby="pmTabSounds">
+          <div class="pm-save-row"><div><h2>Libreria suoni</h2><p class="pm-hint">Salva la patch letta dal Virus nella libreria di questo browser.</p></div>
+            <div class="pm-row"><input type="text" id="patchName" class="pm-field pm-grow" placeholder="Nome del suono" aria-label="Nome del suono da salvare">
+              <button id="pmReadCurrent" class="chassis-page-btn" type="button">Leggi parte</button>
+              <button id="btnSavePatch" class="chassis-page-btn pm-primary" type="button" title="Salva nella libreria il suono letto dal Virus">Salva suono</button></div>
+          </div>
+          <div class="lib-list" id="libList"></div>
+        </section>
+        <section id="pmMultis" class="pm-source" role="tabpanel" aria-labelledby="pmTabMultis" hidden>
+          <div class="pm-save-row"><div><h2>Libreria Multi</h2><p class="pm-hint">Un Multi conserva suoni e impostazioni delle quattro parti.</p></div>
+            <div class="pm-row"><input type="text" id="multiName" class="pm-field pm-grow" placeholder="Nome del Multi" aria-label="Nome del multi da salvare">
+              <button id="btnSaveMulti" class="chassis-page-btn pm-primary" type="button" title="Legge le 4 parti dal Virus e le salva come multi">Leggi e salva Multi</button></div>
+          </div>
+          <div class="lib-list" id="multiLibList"></div>
+        </section>
+        <section id="pmBanks" class="pm-source" role="tabpanel" aria-labelledby="pmTabBanks" hidden>
+          <div class="pm-save-row"><div><h2>Banchi del Virus</h2><p class="pm-hint">Leggi i suoni del banco o acquisiscili nella libreria locale.</p></div>
+            <div class="pm-row"><select id="bankPickSelect" class="pm-field pm-grow" aria-label="Banco del Virus"></select>
+              <button id="btnReadBank" class="chassis-page-btn" type="button" title="Mostra le 128 patch del banco">Leggi banco</button>
+              <button id="btnFetchBank" class="chassis-page-btn pm-primary" type="button" title="Salva tutte le 128 patch del banco nella libreria">Acquisisci banco</button></div>
+          </div>
+          <div class="lib-list pm-bank" id="synthBankList"><div class="pm-empty">Scegli un banco e premi «Leggi banco».</div></div>
+        </section>
+        <div class="pm-footer"><span>File .syx / .mid: trascinali qui per importarli.</span><button type="button" class="chassis-page-btn" data-midi-key aria-expanded="false">MIDI e diagnostica</button></div>
       </div>
     </div>
     <div class="chassis-wood-strip"></div>
@@ -7752,6 +7806,7 @@
           </div>
           <div class="mc-row">
             <span class="mc-label">PARTI</span>
+            <button id="btnNewMultiSetup" class="chassis-page-btn" type="button">NUOVO SETUP A 4 PARTI</button>
             <button id="btnSyncMultiInView" class="chassis-page-btn" type="button" title="Interroga le 4 parti attive del Virus">LEGGI 4 PARTI</button>
             <span class="mc-label">VISTA</span>
             <button id="btnMultiLayoutGrid" class="chassis-page-btn" type="button" title="Griglia 2x2: tutte le 4 parti insieme">2×2</button>
@@ -7899,6 +7954,9 @@
   </div>
 </div>
 
+<script src="multi-setup.js"></script>
+<script src="virus-panel-layouts.js"></script>
+<script src="virus-hardware-panel.js"></script>
 <script>
 
 // Finestre di dialogo interne: alert/confirm/prompt del browser non funzionano
@@ -8123,6 +8181,8 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
     v.style.display = 'block';
     document.getElementById('btnTabPatchManager').classList.add('active');
     if (typeof renderMultiPartsOverview === 'function') renderMultiPartsOverview();
+    renderLibrary();
+    renderMultiLibrary();
     updateControlRoomStatus();
   });
 
@@ -8436,12 +8496,12 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
     const isDark = (theme === 'elektron');
     if (isDark){
       document.documentElement.setAttribute('data-skin', 'elektron');
-      themeToggle.textContent = '● DARK';
-      themeToggle.title = 'Finitura scura (clicca per Snow)';
+      themeToggle.textContent = '● TI2 DESKTOP';
+      themeToggle.title = 'Pannello Virus TI2 Desktop (clicca per Snow)';
     } else {
       document.documentElement.setAttribute('data-skin', 'te');
       themeToggle.textContent = '○ SNOW';
-      themeToggle.title = 'Finitura Snow (clicca per Dark)';
+      themeToggle.title = 'Pannello Virus TI Snow (clicca per TI2 Desktop)';
     }
 
     const frontSwitchText = document.getElementById('frontThemeSwitchText');
@@ -8694,6 +8754,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
 
   function openSettingsModal(){
     if (!settingsModal) return;
+    document.getElementById('synthModeSelect').value = window.currentSynthMode || 'single';
     settingsModal.classList.add('open');
     btnSettings?.setAttribute('aria-expanded', 'true');
     setLastAction('midi settings open');
@@ -8708,6 +8769,17 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
 
   btnSettings?.addEventListener('click', openSettingsModal);
   btnCloseSettings?.addEventListener('click', closeSettingsModal);
+  document.getElementById('synthModeSelect').addEventListener('change', (event) => {
+    clearTimeout(window.virusSync?.timer);
+    window.virusSync = null;
+    window.setSynthMode(event.target.value, false);
+    window.virusModeConfirmed = true;
+    if (selectedOutput) {
+      if (event.target.value === 'multi') syncAllMultiParts();
+      else requestDump(0);
+    }
+    setLastAction('Modo indicato dal display del Virus: ' + event.target.value.toUpperCase());
+  });
   settingsModal?.addEventListener('click', (event) => {
     if (event.target === settingsModal) closeSettingsModal();
   });
@@ -8987,7 +9059,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
 
     // Apply Page A parameters (starts at byte offset 9)
     PARAMS.forEach(p => {
-      if (p.cc !== undefined && p.cc < 128) {
+      if (p.cc !== null && p.cc !== undefined && p.cc < 128) {
         const val = msgBytes[9 + p.cc];
         if (val !== undefined && val <= 127) {
           patch[p.id] = val;
@@ -8997,6 +9069,8 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
 
     const pIdx = currentPartIndex || 0;
     if (multiParts && multiParts[pIdx]) {
+      delete multiParts[pIdx]._hardwareValues;
+      delete multiParts[pIdx]._cc;
       multiParts[pIdx].name = name;
       multiParts[pIdx].dump = Array.from(msgBytes);
       multiParts[pIdx].dumpAt = Date.now();
@@ -9022,7 +9096,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
       const curProg = multiParts[pIdx].values.program;
 
       // Memorizza il vero nome letto dal synth nella cache del banco per questo preset
-      if (!window.__skipNameCache && name && (typeof isDummyPatchName === 'function' ? !isDummyPatchName(name) : true) && curBank !== undefined && curProg !== undefined) {
+      if (msgBytes[7] !== 0x00 && !window.__skipNameCache && name && (typeof isDummyPatchName === 'function' ? !isDummyPatchName(name) : true) && curBank !== undefined && curProg !== undefined) {
         if (typeof saveBankSoundName === 'function') {
           saveBankSoundName(curBank, curProg, name);
         }
@@ -9051,6 +9125,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
     }
 
     refreshAllKnobs();
+    if (typeof updateSingleOledDisplay === 'function') updateSingleOledDisplay();
     if (typeof initElektronLcd === 'function') initElektronLcd();
   }
 
@@ -9229,10 +9304,19 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
 
     // Processa ogni messaggio SysEx completo
     for (const msgBytes of sysexMessages) {
+      window.virusHardware?.receive(msgBytes);
       if (msgBytes[1] === 0x00 && msgBytes[2] === 0x20 && msgBytes[3] === 0x33 && msgBytes[5] < 0x10) window.virusDeviceId = msgBytes[5];
       // Multi dump (0x11): nome del Multi e banco/programma/canale reali delle parti
       // layout: header 9 + 4 byte + nome (13..22) ... Part Bank Select 41.., Program 57.., MIDI channel 73..
       if (msgBytes[6] === 0x11 && msgBytes.length > 90 && msgBytes[2] === 0x20 && msgBytes[3] === 0x33) {
+        if (window.multiSetupPendingMulti && msgBytes[7] === 0x00) {
+          const pending = window.multiSetupPendingMulti;
+          window.multiSetupPendingMulti = null;
+          clearTimeout(pending.timer);
+          const confirmed = pending.parts.every((part, i) => msgBytes[73 + i] === part.channel && msgBytes[153 + i] === part.volume);
+          if (confirmed) pending.resolve();
+          else pending.reject(new Error('Il Virus non ha confermato canali e volumi del setup. Controlla la modalità Multi e le impostazioni MIDI.'));
+        }
         window.virusMultiName = String.fromCharCode(...msgBytes.slice(13, 23)).replace(/[^\x20-\x7e]/g, ' ').trim() || 'Multi';
         // byte 12 = numero del Multi (0..63, sul Virus "gruppo-numero": 63 = 8-8); nel dump dell'edit buffer (prog 127) dice quale Multi e' caricato
         if (msgBytes[8] === 127 && msgBytes[12] < 128) {
@@ -9251,6 +9335,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
           if (msgBytes[57 + i] < 128) v.program = msgBytes[57 + i];
           v.posUnknown = false;
           if (msgBytes[73 + i] < 16) v.channel = msgBytes[73 + i];
+          if (msgBytes[153 + i] < 128) v.volume = msgBytes[153 + i];
         }
         if (typeof buildMultiView === 'function') buildMultiView();
         if (typeof updateVirusSnowMasterDisplay === 'function') updateVirusSnowMasterDisplay(currentPartIndex || 0);
@@ -9263,7 +9348,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
       // si rilegge Multi e parti, cosi' nome e suoni seguono il Virus anche quando si usa il synth
       // Se e' la risposta a un cambio appena fatto dall'app si rilegge solo quella parte (il segnale arriva a suono caricato),
       // altrimenti il Multi intero (rileggerlo riporterebbe indietro banco/numero appena scelti).
-      if (msgBytes.length === 11 && msgBytes[6] >= 0x70 && msgBytes[6] <= 0x73 && msgBytes[7] < 16 && window.currentSynthMode === 'multi' && selectedOutput) {
+      if (!window.multiSetupApplying && msgBytes.length === 11 && msgBytes[6] >= 0x70 && msgBytes[6] <= 0x73 && msgBytes[7] < 16 && window.currentSynthMode === 'multi' && selectedOutput) {
         if (Date.now() - (window.__lastOwnChange || 0) < 2000) {
           clearTimeout(window.__ownPartRead);
           window.__ownPartRead = setTimeout(() => requestPartDump(window.__lastOwnPart || 0, true), 120);
@@ -9274,7 +9359,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
       }
       // Il byte "parte" dei parametri che il Virus manda rivela il modo: 0x40 = Single, 0..15 = parte del Multi.
       // (Il Snow non risponde a Request Global, ma dopo un cambio di modo o di programma manda 73 pp ...)
-      if (msgBytes.length === 11 && msgBytes[6] >= 0x70 && msgBytes[6] <= 0x73 && msgBytes[2] === 0x20 && msgBytes[3] === 0x33) {
+      if (msgBytes.length === 11 && msgBytes[6] >= 0x70 && msgBytes[6] <= 0x72 && msgBytes[2] === 0x20 && msgBytes[3] === 0x33) {
         const m = msgBytes[7] === 0x40 ? 'single' : (msgBytes[7] < 16 ? 'multi' : null);
         if (m) window.__virusModeSeen = m;
         if (m && m !== window.currentSynthMode) {
@@ -9287,7 +9372,8 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
       if (msgBytes.length === 11 && msgBytes[6] === 0x73 && msgBytes[8] === 122) {
         window.__virusPlayMode = msgBytes[9];
         window.setSynthMode(msgBytes[9] === 0 ? 'single' : 'multi', !window.virusSync);
-        if (window.virusSync && window.virusSync.step === 'global') window.virusSync.askDump(window.currentSynthMode);
+        window.virusModeConfirmed = true;
+        if (window.virusSync && window.virusSync.step === 'global') window.virusSync.askDump(window.currentSynthMode, true);
         if (window.snowPanel && window.snowPanel.state === 'play') window.snowPanel.render();
         continue;
       }
@@ -9301,29 +9387,34 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
         if (window.virusSync && msgBytes[6] === 0x10 && msgBytes[7] === 0x00 &&
             msgBytes[8] === (window.virusSync.step === 'single' ? 0x40 : 0x00)) {
           const isSingle = msgBytes[8] === 0x40;
+          const modeConfirmed = window.virusSync.modeConfirmed;
           clearTimeout(window.virusSync.timer);
           window.virusSync = null;
           window.currentSynthMode = isSingle ? 'single' : 'multi';
           if (!isSingle) setTimeout(() => syncAllMultiParts(), 300);
           if (isSingle) { currentPartIndex = 0; window.activeSinglePartIndex = 0; }
           window.__skipNameCache = true;   // l'edit buffer non dice banco/numero: non scrivere nella cache
+          window.lastReceivedDump = new Uint8Array(msgBytes);
           if (typeof applyDumpToActivePatch === 'function') applyDumpToActivePatch(msgBytes);
           window.__skipNameCache = false;
           const part = multiParts[currentPartIndex || 0];
           if (part) part.name = patchName;
           updateVirusSnowFrontPanel(currentPartIndex || 0);
-          setLastAction(`Sincronizzato col Virus: ${isSingle ? 'SINGLE' : 'MULTI'} · ${patchName}`);
+          setLastAction(modeConfirmed
+            ? `Sincronizzato col Virus: ${isSingle ? 'SINGLE' : 'MULTI'} · ${patchName}`
+            : `Letto buffer ${isSingle ? 'SINGLE' : 'MULTI'} · ${patchName} — verifica il modo del Virus in MIDI`);
           continue;
         }
 
         // Caso 1: Fetch di una Parte Multi (Part 1..4)
-        if (window.multiFetchState && window.multiFetchState.active) {
+        if (isExpectedMultiFetchDump(msgBytes)) {
+          clearTimeout(window.multiFetchState.timer);
           window.multiFetchState.dumps[window.multiFetchState.currentPart] = Array.from(msgBytes);
           document.getElementById('midi-debug').textContent = '🔥 MULTI FETCH: Part ' + (window.multiFetchState.currentPart + 1) + '/4 ricevuto (' + patchName + ')...';
 
           window.multiFetchState.currentPart++;
           if (window.multiFetchState.currentPart < 4) {
-            setTimeout(() => { requestDump(window.multiFetchState.currentPart); }, 50);
+            setTimeout(requestNextMultiFetch, 50);
           } else {
             finishMultiFetch();
           }
@@ -9451,7 +9542,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
           } else window.placePartByName(pIdx, patchName);
           if (msgBytes.length > 50) {
             multiParts[pIdx].sound['f1_cutoff'] = msgBytes[49];
-            multiParts[pIdx].sound['f1_resonance'] = msgBytes[50];
+            multiParts[pIdx].sound['f1_resonance'] = msgBytes[51];
           }
           if (partDisplays[pIdx] && partDisplays[pIdx]._startReveal) {
             partDisplays[pIdx]._startReveal();
@@ -9467,7 +9558,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
           const curProg = multiParts[pIdx].values.program;
           // non si salva il nome nella cache del banco: l'edit buffer non dice da quale
           // banco/numero viene il suono (prima scriveva lo stesso nome su piu' patch)
-          if (window.activeSinglePartIndex === pIdx) {
+          if (isActiveSoundDump(msgBytes)) {
             window.lastReceivedDump = new Uint8Array(msgBytes);
             applyDumpToActivePatch(msgBytes);
           }
@@ -9482,6 +9573,9 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
         }
 
         // Caso 4: Ricezione Singola Patch (Editor o Librarian)
+        // The inactive Single buffer also responds in Multi mode. It must not
+        // replace the selected Multi part when an earlier request arrives late.
+        if (msgBytes[7] === 0x00 && !isActiveSoundDump(msgBytes)) continue;
         window.lastReceivedDump = new Uint8Array(msgBytes);
         applyDumpToActivePatch(msgBytes);
         if (msgBytes[7] === 0x00 && msgBytes[8] === 0x40) {          // edit buffer Single
@@ -9549,9 +9643,10 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
       setTimeout(() => updateVirusSnowFrontPanel(currentPartIndex || 0), 2500);
     };
     // 2) chiede l'edit buffer giusto per il modo: Single (0x40) o parte 1 del Multi (0x00)
-    const askDump = (mode) => {
+    const askDump = (mode, modeConfirmed = !!window.virusModeConfirmed) => {
       clearTimeout(window.virusSync.timer);
       window.virusSync.step = mode;
+      window.virusSync.modeConfirmed = modeConfirmed;
       ask(mode === 'single' ? 0x40 : 0x00);
       window.virusSync.timer = setTimeout(fail, 1500);
     };
@@ -9804,28 +9899,31 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
     return true;
   }
 
-  function buildSysEx(cc, value, part = 0x40){
+  function getSoundEditBuffer(partIndex = currentPartIndex || 0, forceMulti = false) {
+    return forceMulti || window.currentSynthMode === 'multi' ? (partIndex & 0x0F) : 0x40;
+  }
+
+  function isActiveSoundDump(bytes) {
+    return bytes[6] === 0x10 && bytes[7] === 0x00 && bytes[8] === getSoundEditBuffer();
+  }
+
+  function buildSysEx(cc, value, part = getSoundEditBuffer()){
     return new Uint8Array([...SYSEX_PREFIX, deviceId(), 0x70, part & 0x7F, cc & 0x7F, value & 0x7F, 0xF7]);
   }
 
   function sendParam(param, value){
     const paramDef = typeof param === 'string' ? PARAMS.find(p => p.id === param) : param;
     if (!paramDef) return;
+    window.virusHardware?.refresh();
     if (selectedOutput){
       try{
         if (paramDef.cc === null || paramDef.cc === undefined) {
           setLastAction(`${paramDef.name}: parametro Page B, non controllabile via CC`);
-        } else if (paramDef.cc < 120) {
-          // Send standard MIDI CC
-          const channel = parseInt(document.getElementById('midiChannel').value, 10) - 1;
-          const bytes = new Uint8Array([0xB0 | channel, paramDef.cc, value & 0x7F]);
-          selectedOutput.send(bytes);
-          recordMidiTx('cc ' + paramDef.cc, bytes);
         } else {
-          // Fallback to SysEx if no standard CC exists
-          const bytes = buildSysEx(paramDef.cc, value);
-          selectedOutput.send(bytes);
-          recordMidiTx('sysex param ' + paramDef.short, bytes);
+          // Sound edits target the same buffer as reads, independently of
+          // shared MIDI channels and the Virus MIDI Control LowPage setting.
+          sendVirusParam(0x70, getSoundEditBuffer(), paramDef.cc, value,
+            'sound param ' + paramDef.cc);
         }
       } catch(e){ console.error('MIDI send error', e); }
     } else {
@@ -11494,6 +11592,7 @@ function exportCurrentPatchSyx() {
       window.macroRefs.forEach(m => m && typeof m._render === 'function' && m._render());
     }
     if (typeof initElektronLcd === 'function') initElektronLcd();
+    window.virusHardware?.refresh();
   }
 
   function applyPatchObject(p, send){
@@ -11644,28 +11743,10 @@ function exportCurrentPatchSyx() {
       btns.style.cssText = 'display: flex; gap: 4px; align-items: center;';
 
       const btnLoad = document.createElement('button');
-      btnLoad.textContent = 'carica';
-      btnLoad.title = 'Carica nell\'editor singolo e ascolta';
-      btnLoad.addEventListener('click', () => {
-        const raw = new Uint8Array(p.bytes);
-        applyDumpToActivePatch(raw);
-        raw[7] = 0x00;
-        raw[8] = 0x40;
-        sendMidiBytes(raw, 'load patch ' + p.name);
-        document.getElementById('midi-debug').innerHTML = `<span style="color:#80c090;">🔊 CARICATA: <b>${escapeHtml(p.fullName)}</b></span>`;
-      });
+      btnLoad.textContent = 'Carica nella parte';
+      btnLoad.title = 'Carica nella destinazione selezionata';
+      btnLoad.addEventListener('click', () => loadPatchToActiveBuffer(p.bytes));
       btns.appendChild(btnLoad);
-
-      for (let part = 0; part < 4; part++) {
-        const pBtn = document.createElement('button');
-        pBtn.textContent = 'P' + (part + 1);
-        pBtn.title = `Carica nella Parte ${part + 1} del Multi`;
-        pBtn.style.cssText = 'padding: 2px 6px; font-size: 11px;';
-        pBtn.addEventListener('click', () => {
-          loadPatchToPart(p.bytes, part);
-        });
-        btns.appendChild(pBtn);
-      }
 
       const btnSyx = document.createElement('button');
       btnSyx.textContent = '.syx';
@@ -11778,8 +11859,8 @@ function exportCurrentPatchSyx() {
       // 0x30 = Single Dump Request: F0 00 20 33 01 <deviceId> 30 <bank> <prog> F7
       // bank 0, prog 0x40 (64) = Single Mode Edit Buffer
       // bank 0, prog 0x00..0x03 = Multi Mode Part 1..4 Edit Buffer
-      const isMulti = window.multiFetchState && window.multiFetchState.active;
-      const prog = isMulti ? (partIndex & 0x0F) : 0x40;
+      const prog = getSoundEditBuffer(partIndex, !!window.multiFetchState?.active);
+      const isMulti = prog !== 0x40;
       const bytes = new Uint8Array([
         ...SYSEX_PREFIX, deviceId(), 0x30, 0x00, prog, 0xF7
       ]);
@@ -11797,7 +11878,7 @@ function exportCurrentPatchSyx() {
       // 0x30 = Single Dump Request: F0 00 20 33 01 <deviceId> 30 00 <buffer> F7
       // buffer 0x40 = edit buffer Single (Virus in SINGLE), 0..15 = parte del Multi.
       // In SINGLE la parte 1 del Multi resta ferma: chiederla restituiva sempre lo stesso suono.
-      const buffer = (window.currentSynthMode === 'single' && !multiPart) ? 0x40 : (partIndex & 0x0F);
+      const buffer = getSoundEditBuffer(partIndex, multiPart);
       const bytes = new Uint8Array([
         ...SYSEX_PREFIX, deviceId(), 0x30, 0x00, buffer, 0xF7
       ]);
@@ -11851,13 +11932,20 @@ function exportCurrentPatchSyx() {
     const container = document.getElementById('multiPartsOverview');
     if (!container) return;
     container.innerHTML = '';
+    document.getElementById('pmPartHint').textContent = selectedOutput
+      ? 'Seleziona la destinazione del suono.' : 'MIDI non connesso. Collega il Virus per leggere le parti.';
+    document.getElementById('btnSyncMultiParts').disabled = !selectedOutput;
+    document.getElementById('pmReadCurrent').disabled = !selectedOutput;
+    const saveButton = document.getElementById('btnSavePatch');
+    if (saveButton) saveButton.disabled = !window.lastReceivedDump || !isActiveSoundDump(window.lastReceivedDump);
+    const target = document.getElementById('pmTarget');
+    if (target) target.textContent = window.currentSynthMode === 'multi' ? `Destinazione: P${(currentPartIndex || 0) + 1}` : 'Destinazione: Single';
 
     for (let i = 0; i < NUM_PARTS; i++) {
       const part = multiParts[i];
       const card = document.createElement('div');
       card.style.cssText = 'background: var(--pm-card); border: 1px solid var(--pm-line); border-radius: 4px; padding: 10px 12px; display: flex; flex-direction: column; gap: 6px; font-family: monospace; transition: border-color 0.2s;';
-      card.onmouseenter = () => card.style.borderColor = 'var(--accent)';
-      card.onmouseleave = () => card.style.borderColor = 'var(--pm-line)';
+      card.className = 'pm-part-card' + (i === (currentPartIndex || 0) ? ' is-selected' : '');
 
       const topRow = document.createElement('div');
       topRow.style.cssText = 'display: flex; justify-content: space-between; align-items: center;';
@@ -11873,8 +11961,19 @@ function exportCurrentPatchSyx() {
       topRow.appendChild(badge);
       topRow.appendChild(chLabel);
 
-      const nameEl = document.createElement('div');
-      nameEl.style.cssText = 'color: var(--pm-ink); font-size: 13px; font-weight: 600; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; padding: 4px 0;';
+      const nameEl = document.createElement('button');
+      nameEl.type = 'button';
+      nameEl.className = 'pm-part-select';
+      nameEl.disabled = window.currentSynthMode !== 'multi' && i > 0;
+      nameEl.setAttribute('aria-pressed', String(i === (currentPartIndex || 0)));
+      nameEl.setAttribute('aria-label', `Seleziona P${i + 1}: ${part.name || 'Init'}`);
+      nameEl.addEventListener('click', () => {
+        currentPartIndex = i; window.activeSinglePartIndex = i;
+        window.lastReceivedDump = part.dump && isActiveSoundDump(part.dump) ? new Uint8Array(part.dump) : null;
+        document.getElementById('patchName').value = part.name || '';
+        renderMultiPartsOverview(); renderLibrary();
+        updateVirusSnowFrontPanel(i); updateKeyboardPartDisplay();
+      });
       nameEl.textContent = part.name || 'Init';
       nameEl.title = part.name || 'INIT';
 
@@ -11886,6 +11985,7 @@ function exportCurrentPatchSyx() {
       btnRead.style.cssText = 'font-size: 10px; padding: 3px 6px; flex: 1;';
       btnRead.textContent = 'leggi';
       btnRead.title = `Leggi il suono di P${i + 1} dal synth`;
+      btnRead.disabled = !selectedOutput || (window.currentSynthMode !== 'multi' && i > 0);
       btnRead.addEventListener('click', () => {
         requestPartDump(i);
       });
@@ -11894,11 +11994,12 @@ function exportCurrentPatchSyx() {
       btnEdit.className = 'chassis-page-btn';
       btnEdit.style.cssText = 'font-size: 10px; padding: 3px 6px; flex: 1;';
       btnEdit.textContent = 'modifica';
-      btnEdit.title = `Apri P${i + 1} nella vista Multi`;
+      btnEdit.title = `Apri P${i + 1} nell'editor SINGLE`;
+      btnEdit.disabled = window.currentSynthMode !== 'multi' && i > 0;
       btnEdit.addEventListener('click', () => {
         currentPartIndex = i;
         window.activeSinglePartIndex = i;
-        const tab = document.getElementById('btnTabMultipart');
+        const tab = document.getElementById('btnTabSynth');
         if (tab) tab.click();
         if (typeof selectPartRowUI === 'function') selectPartRowUI(i);
         if (typeof updateVirusSnowMasterDisplay === 'function') updateVirusSnowMasterDisplay(i);
@@ -11910,42 +12011,86 @@ function exportCurrentPatchSyx() {
 
       card.appendChild(topRow);
       card.appendChild(nameEl);
+      const position = document.createElement('div');
+      position.className = 'pm-part-position';
+      position.textContent = `${BANK_NAMES[part.values.bank] || '—'} · ${part.values.program + 1}${i === (currentPartIndex || 0) ? ' · selezionata' : ''}`;
+      card.appendChild(position);
       card.appendChild(btnRow);
       container.appendChild(card);
     }
   }
 
+  function isExpectedMultiFetchDump(bytes) {
+    const fetch = window.multiFetchState;
+    return !!fetch?.active && bytes.length >= 267 && SYSEX_PREFIX.every((byte, i) => bytes[i] === byte) && bytes[6] === 0x10 && bytes[7] === 0 && bytes[8] === fetch.currentPart;
+  }
+
+  function requestNextMultiFetch() {
+    const fetch = window.multiFetchState;
+    if (!fetch?.active) return;
+    clearTimeout(fetch.timer);
+    fetch.progress?.(`Lettura dal Virus: P${fetch.currentPart + 1} di 4…`);
+    fetch.timer = setTimeout(() => {
+      if (window.multiFetchState !== fetch) return;
+      window.multiFetchState = null;
+      fetch.reject(new Error(`Nessuna risposta dal Virus per P${fetch.currentPart + 1}. Controlla MIDI IN e Device ID.`));
+    }, 3000);
+    requestDump(fetch.currentPart);
+  }
+
+  function captureMultiPreset(name, progress, roles = []) {
+    return new Promise((resolve, reject) => {
+      if (!selectedOutput || !selectedInput) { reject(new Error('Collega MIDI IN e OUT del Virus.')); return; }
+      if (window.currentSynthMode !== 'multi') { reject(new Error('Imposta il Virus e l’app in modalità Multi.')); return; }
+      if (window.multiFetchState?.active || multiRead || window.bankFetchState?.active || window.quickBankScanState?.active) {
+        reject(new Error('Una lettura MIDI è già in corso. Attendi che termini.')); return;
+      }
+      window.multiFetchState = { active: true, currentPart: 0, name, dumps: [], roles, progress, resolve, reject, timer: 0 };
+      requestNextMultiFetch();
+    });
+  }
+
   function finishMultiFetch() {
+    const fetch = window.multiFetchState;
+    if (!fetch || !Array.from({ length: NUM_PARTS }, (_, i) => fetch.dumps[i]?.[8] === i).every(Boolean)) return;
+    clearTimeout(fetch.timer);
     const lib = loadMultiLibrary();
     const preset = {
-      name: window.multiFetchState.name,
+      name: fetch.name,
       parts: []
     };
     for (let i = 0; i < NUM_PARTS; i++) {
       preset.parts.push({
+        name: extractPatchName(fetch.dumps[i]),
+        role: fetch.roles?.[i] || '',
         enabled: multiParts[i].enabled,
         values: JSON.parse(JSON.stringify(multiParts[i].values)), // deep copy mixer params
-        dump: window.multiFetchState.dumps[i] // The raw bytes array for this part
+        dump: fetch.dumps[i] // The raw bytes array for this part
       });
     }
-    lib[window.multiFetchState.name] = preset;
-    saveMultiLibrary(lib);
+    lib[fetch.name] = preset;
+    try { saveMultiLibrary(lib); }
+    catch (error) { window.multiFetchState = null; fetch.reject(error); return; }
     window.multiFetchState = null;
     document.getElementById('midi-debug').textContent = '✅ MULTI PRESET SAVED!';
     setLastAction('multi preset saved');
     document.getElementById('multiName').value = '';
     renderMultiLibrary();
+    fetch.resolve(preset);
   }
 
   function renderMultiLibrary(){
     const lib = loadMultiLibrary();
     const list = document.getElementById('multiLibList');
     list.innerHTML = '';
-    const names = Object.keys(lib).sort();
+    const query = (document.getElementById('libSearchInput')?.value || '').trim().toLowerCase();
+    const names = Object.keys(lib).sort().filter(name => name.toLowerCase().includes(query));
+    const count = document.getElementById('pmMultisCount');
+    if (count) count.textContent = String(Object.keys(lib).length);
     if (names.length === 0){
       const empty = document.createElement('div');
-      empty.className = 'small';
-      empty.textContent = 'nessun multi salvato';
+      empty.className = 'pm-empty';
+      empty.textContent = query ? 'Nessun Multi corrisponde alla ricerca.' : 'La libreria Multi è vuota. Leggi e salva le quattro parti del Virus per conservarle insieme.';
       list.appendChild(empty);
       return;
     }
@@ -11961,12 +12106,15 @@ function exportCurrentPatchSyx() {
       btns.className = 'btns';
 
       const loadBtn = document.createElement('button');
-      loadBtn.textContent = 'load';
+      loadBtn.textContent = 'Carica Multi';
+      loadBtn.disabled = !selectedOutput || window.currentSynthMode !== 'multi';
+      loadBtn.title = 'Carica tutte le quattro parti. Il Virus deve essere in Multi.';
       loadBtn.addEventListener('click', () => {
         const preset = lib[name];
         for (let i = 0; i < NUM_PARTS; i++) {
           const pData = preset.parts[i];
           multiParts[i].enabled = pData.enabled;
+          multiParts[i].role = pData.role || '';
           multiParts[i].values = JSON.parse(JSON.stringify(pData.values));
 
           // Invia parametri Mixer (Volume, Pan, Output, ecc.)
@@ -11991,7 +12139,8 @@ function exportCurrentPatchSyx() {
 
       const delBtn = document.createElement('button');
       delBtn.className = 'delete';
-      delBtn.textContent = 'x';
+      delBtn.textContent = '×';
+      delBtn.setAttribute('aria-label', `Elimina ${name} dalla libreria`);
       delBtn.addEventListener('click', async () => {
         if (await uiConfirm('Cancellare questo multi preset?')){
           delete lib[name];
@@ -12013,28 +12162,10 @@ function exportCurrentPatchSyx() {
       uiAlert('MIDI Output non connesso!');
       return;
     }
-    const dump = new Uint8Array(rawBytesArray);
-
-    // Formato Access Virus Single Dump:
-    // dump[5] = Device ID
-    // dump[6] = 0x10 (Single Dump)
-    // dump[7] = Bank (0x00 = Edit Buffer)
-    // dump[8] = Program (0x00..0x03 per Multi Part 1..4, 0x40 per Single Mode Edit Buffer)
-    // dump[9..264] = 256 byte di parametri
-    // dump[265] = Checksum (somma byte 7..264 modulo 128)
-    // dump[266] = 0xF7
-    if (dump.length >= 267) {
-      dump[5] = deviceId();
-      dump[7] = 0x00; // Edit Buffer del synth
-      dump[8] = partIndex & 0x0F; // 0=Part 1, 1=Part 2, 2=Part 3, 3=Part 4
-
-      // Ricalcola il Checksum valido
-      let sum = 0;
-      for (let i = 7; i <= 264; i++) {
-        sum += dump[i];
-      }
-      dump[265] = sum & 0x7F;
-    }
+    let dump;
+    try {
+      dump = preparePatchForBuffer(rawBytesArray, partIndex & 0x0F, window.virusDeviceId ?? deviceId());
+    } catch (error) { uiAlert(error.message); return; }
 
     try {
       selectedOutput.send(dump);
@@ -12043,7 +12174,7 @@ function exportCurrentPatchSyx() {
       // Aggiorna valori di Cutoff/Resonance per la parte se presenti
       if (dump.length > 50) {
         multiParts[partIndex].sound['f1_cutoff'] = dump[49];
-        multiParts[partIndex].sound['f1_resonance'] = dump[50];
+        multiParts[partIndex].sound['f1_resonance'] = dump[51];
       }
 
       // Estrai il nome della patch e aggiorna il display della Parte
@@ -12215,10 +12346,59 @@ function exportCurrentPatchSyx() {
   });
 
   // Search input event
+  function selectPatchSource(source, focus = false) {
+    document.querySelectorAll('[data-pm-source]').forEach(tab => {
+      const selected = tab.dataset.pmSource === source;
+      tab.setAttribute('aria-selected', String(selected));
+      tab.tabIndex = selected ? 0 : -1;
+      document.getElementById(tab.getAttribute('aria-controls')).hidden = !selected;
+      if (selected && focus) tab.focus();
+    });
+  }
+  document.querySelectorAll('[data-pm-source]').forEach(tab => {
+    tab.addEventListener('click', () => selectPatchSource(tab.dataset.pmSource));
+    tab.addEventListener('keydown', event => {
+      const sources = ['sounds', 'multis', 'banks'];
+      const index = sources.indexOf(tab.dataset.pmSource);
+      const next = event.key === 'ArrowRight' ? (index + 1) % 3
+        : event.key === 'ArrowLeft' ? (index + 2) % 3
+        : event.key === 'Home' ? 0 : event.key === 'End' ? 2 : -1;
+      if (next >= 0) { event.preventDefault(); selectPatchSource(sources[next], true); }
+    });
+  });
+  document.getElementById('pmReadCurrent').addEventListener('click', () => requestDump(currentPartIndex || 0));
+
+  // Readdress a complete Virus dump, including its checksum, without changing
+  // the stored library bytes or writing a preset to permanent synth memory.
+  function preparePatchForBuffer(bytes, buffer, id) {
+    const dump = new Uint8Array(bytes);
+    if (dump.length < 267 || !SYSEX_PREFIX.every((byte, i) => dump[i] === byte) || dump[6] !== 0x10 || dump[dump.length - 1] !== 0xF7) {
+      throw new Error('File patch Virus non valido.');
+    }
+    dump[5] = id; dump[7] = 0; dump[8] = buffer;
+    let sum = 0;
+    for (let i = 5; i < dump.length - 2; i++) sum += dump[i];
+    dump[dump.length - 2] = sum & 0x7F;
+    return dump;
+  }
+  function loadPatchToActiveBuffer(bytes) {
+    if (!selectedOutput) { uiAlert('Collega MIDI OUT prima di caricare un suono nel Virus.'); return; }
+    try {
+      const buffer = getSoundEditBuffer();
+      const dump = preparePatchForBuffer(bytes, buffer, window.virusDeviceId ?? deviceId());
+      if (!sendMidiBytes(dump, 'load active patch')) return;
+      window.lastReceivedDump = dump;
+      applyDumpToActivePatch(dump);
+      renderMultiPartsOverview();
+      setLastAction('Suono caricato in ' + (buffer === 0x40 ? 'Single' : 'P' + (buffer + 1)));
+    } catch (error) { uiAlert(error.message); }
+  }
+
   const libSearchInput = document.getElementById('libSearchInput');
   if (libSearchInput) {
     libSearchInput.addEventListener('input', () => {
       renderLibrary();
+      renderMultiLibrary();
       if (window.bankFetchState && window.bankFetchState.active === false) {
         renderSynthBankList(window.bankFetchState);
       }
@@ -12245,6 +12425,8 @@ function exportCurrentPatchSyx() {
     list.innerHTML = '';
     const searchVal = (document.getElementById('libSearchInput')?.value || '').trim().toLowerCase();
     let names = Object.keys(lib).sort();
+    const count = document.getElementById('pmSoundsCount');
+    if (count) count.textContent = String(names.length);
 
     if (searchVal) {
       names = names.filter(n => n.toLowerCase().includes(searchVal));
@@ -12252,9 +12434,8 @@ function exportCurrentPatchSyx() {
 
     if (names.length === 0){
       const empty = document.createElement('div');
-      empty.className = 'small';
-      empty.style.cssText = 'color: var(--pm-dim); font-family: monospace; padding: 8px 0;';
-      empty.textContent = searchVal ? `nessuna patch trovata per "${searchVal}"` : 'nessuna patch salvata';
+      empty.className = 'pm-empty';
+      empty.textContent = searchVal ? `Nessun suono trovato per "${searchVal}".` : 'La libreria suoni è vuota. Importa un file .syx / .mid oppure leggi una parte dal Virus e salvala qui.';
       list.appendChild(empty);
       return;
     }
@@ -12274,28 +12455,11 @@ function exportCurrentPatchSyx() {
       btns.style.cssText = 'display: flex; gap: 4px; align-items: center;';
 
       const editBtn = document.createElement('button');
-      editBtn.textContent = 'carica';
-      editBtn.title = 'Carica nell\'editor singolo e ascolta';
-      editBtn.addEventListener('click', () => {
-        const raw = new Uint8Array(lib[name]);
-        applyDumpToActivePatch(raw);
-        raw[7] = 0x00;
-        raw[8] = 0x40;
-        sendMidiBytes(raw, 'load patch ' + name);
-        document.getElementById('btnTabSynth').click();
-      });
+      editBtn.textContent = window.currentSynthMode === 'multi' ? `Carica → P${(currentPartIndex || 0) + 1}` : 'Carica → Single';
+      editBtn.disabled = !selectedOutput;
+      editBtn.title = 'Carica nella destinazione selezionata, senza salvare nella memoria del Virus';
+      editBtn.addEventListener('click', () => loadPatchToActiveBuffer(lib[name]));
       btns.appendChild(editBtn);
-
-      for(let i=0; i<4; i++){
-        const btn = document.createElement('button');
-        btn.textContent = 'P' + (i+1);
-        btn.title = `Carica nella Parte ${i + 1} del Multi`;
-        btn.style.cssText = 'padding: 2px 6px; font-size: 11px;';
-        btn.addEventListener('click', () => {
-          loadPatchToPart(lib[name], i);
-        });
-        btns.appendChild(btn);
-      }
 
       const syxBtn = document.createElement('button');
       syxBtn.textContent = '.syx';
@@ -12307,7 +12471,8 @@ function exportCurrentPatchSyx() {
       btns.appendChild(syxBtn);
 
       const delBtn = document.createElement('button');
-      delBtn.textContent = 'x';
+      delBtn.textContent = '×';
+      delBtn.setAttribute('aria-label', `Elimina ${name} dalla libreria`);
       delBtn.className = 'delete';
       delBtn.title = 'Cancella patch';
       delBtn.addEventListener('click', async () => {
@@ -13235,6 +13400,9 @@ function exportCurrentPatchSyx() {
     const part = multiParts[pIdx];
     if (!part) return;
     part.values.posUnknown = false;
+    if (part.values.bank !== bankIndex || part.values.program !== programIndex) {
+      delete part._hardwareValues; delete part._cc; delete part.dump;
+    }
 
     const bank = clamp7(bankIndex);
     const prog = clamp7(programIndex);
@@ -14074,6 +14242,7 @@ function exportCurrentPatchSyx() {
     setFrontKnob('frontKnobResonance', 'frontKnobResonanceInd', 'frontValResonance', resVal);
 
     updateKeyboardPartDisplay();
+    window.virusHardware?.refresh();
   }
 
   function buildSnowFrontView() {
@@ -14146,7 +14315,7 @@ function exportCurrentPatchSyx() {
         frontStatusEl.style.color = '#00705a';
         frontStatusEl.textContent = 'Lettura dal synth...';
       }
-      requestDump(0);
+      requestDump(currentPartIndex || 0);
       setLastAction('Richiesta patch attiva dal Virus (SysEx)');
     });
 
@@ -14179,20 +14348,20 @@ function exportCurrentPatchSyx() {
     // manual ufficiale (Kemper Digital 2008, cap. "Modus Operandi" / "Edit Pages").
     // Stati: play | menu (pagina di edit) | bank | part | mode.  EDIT/SHIFT = shift.
     // =====================================================================
-    const NO_CC = null;   // parametro Page B: visibile ma non controllabile via CC
+    const NO_CC = null;   // riservato a parametri non disponibili
     const EASY_MENUS = {
       frontBtnOsc1:    ['OSC 1',   [{ n: 'Shape', cc: 17 },
-                                    { n: 'PulseWdt', cc: 18, alt: { n: 'WaveSel', cc: 19, when: v => v(17) < 64 } },
+                                    { n: 'PulseWdt', cc: 18, alt: { n: 'WaveSel', cc: 19, max:63, when: v => v(17) < 64 } },
                                     { n: 'OscBal', cc: 33, bip: true }]],
       frontBtnOsc2:    ['OSC 2',   [{ n: 'Shape', cc: 22 },
-                                    { n: 'PulseWdt', cc: 23, alt: { n: 'WaveSel', cc: 24, when: v => v(22) < 64 } },
+                                    { n: 'PulseWdt', cc: 23, alt: { n: 'WaveSel', cc: 24, max:63, when: v => v(22) < 64 } },
                                     { n: 'FM Amt', cc: 27 }]],
-      frontBtnFilters: ['FILTERS', [{ n: 'Cutoff2', cc: 41 }, { n: 'SatCurve', cc: 49 }, { n: 'OscVol', cc: 36, bip: true }]],
-      frontBtnMod:     ['MOD',     [{ n: 'LFO1 Rate', cc: 67 }, { n: 'LFO2 Rate', cc: 79 }, { n: 'LFO3 Rate', cc: NO_CC }]],
+      frontBtnFilters: ['FILTERS', [{ n: 'Cutoff2', cc: 41 }, { n: 'SatCurve', cc: 49, max: 14 }, { n: 'OscVol', cc: 36, bip: true }]],
+      frontBtnMod:     ['MOD',     [{ n: 'LFO1 Rate', cc: 67 }, { n: 'LFO2 Rate', cc: 79 }, { n: 'LFO3 Rate', cc: 7, page: 0x71 }]],
       frontBtnEnv:     ['ENV',     [{ n: 'AmpAtk', cc: 59 }, { n: 'FltAtk', cc: 54 }, { n: 'FltEnvAmt', cc: 44 }]],
-      frontBtnEffects: ['EFFECTS', [{ n: 'DelaySend', cc: 113 }, { n: 'RevSend', cc: NO_CC }, { n: 'PhaserMix', cc: NO_CC }]],
-      frontBtnArp:     ['ARP',     [{ n: 'ArpMode', cc: NO_CC }, { n: 'Pattern', cc: NO_CC }, { n: 'Length', cc: NO_CC }]],
-      frontBtnCommon:  ['COMMON',  [{ n: 'KeyMode', cc: 94 }, { n: 'Porta', cc: 5 }, { n: 'Transp', cc: 93, bip: true }]],
+      frontBtnEffects: ['EFFECTS', [{ n: 'DelaySend', cc: 113 }, { n: 'RevSend', cc: 2, page: 0x6e }, { n: 'PhaserMix', cc: 85, page: 0x71 }]],
+      frontBtnArp:     ['ARP',     [{ n: 'ArpMode', cc: 15, page: 0x71, max: 7 }, { n: 'Pattern', cc: 2, page: 0x71, max: 63 }, { n: 'Length', cc: 5, page: 0x71 }]],
+      frontBtnCommon:  ['COMMON',  [{ n: 'KeyMode', cc: 94, max: 5 }, { n: 'Porta', cc: 5 }, { n: 'Transp', cc: 93, bip: true }]],
     };
     // In play mode: SHIFT+VALUE 1/2/3 = Patch Volume, Transpose (ottave), Panorama (serigrafia sotto)
     const PLATE = [{ n: 'PatchVol', cc: 91 }, { n: 'Transp', cc: 93, bip: true, oct: true }, { n: 'Pan', cc: 10, bip: true }];
@@ -14209,8 +14378,13 @@ function exportCurrentPatchSyx() {
     const curPart = () => multiParts[currentPartIndex || 0];
     const partCh = () => { const p = curPart(); return p && p.values.channel !== undefined ? p.values.channel : (currentPartIndex || 0); };
     const ccVals = () => { const p = curPart(); if (!p._cc) p._cc = {}; return p._cc; };
-    const getCC = cc => (ccVals()[cc] ?? 64);
-    const setCC = (cc, v) => { ccVals()[cc] = v; sendCC(partCh(), cc, v); };
+    const getCC = (cc, page = 0x70) => window.virusHardware ? window.virusHardware.read(VirusHardwarePanel.param(page,cc,'Snow')) : (ccVals()[cc] ?? 64);
+    const setCC = (cc, v, page = 0x70) => {
+      if (window.virusHardware) {window.virusHardware.write(VirusHardwarePanel.param(page,cc,'Snow'),v);return;}
+      ccVals()[cc] = v;
+      if (!selectedOutput) { setLastAction('connect midi output first'); return; }
+      sendVirusParam(0x70, getSoundEditBuffer(), cc, v, 'sound param ' + cc);
+    };
     const fmt = (prm, v) => {
       if (prm.cc === NO_CC) return 'n/d';
       if (prm.oct) return `${Math.round((v - 64) / 12) >= 0 ? '+' : ''}${Math.round((v - 64) / 12)}oct`;
@@ -14267,7 +14441,7 @@ function exportCurrentPatchSyx() {
       const setBig = (a, b) => { if (big1) big1.textContent = a; if (big2) big2.textContent = b; };
       if (panel.state === 'menu') {
         const prm = softParams()[panel.sel];
-        setBig(prm.n, fmt(prm, prm.cc === NO_CC ? null : getCC(prm.cc)));
+        setBig(prm.n, fmt(prm, prm.cc === NO_CC ? null : getCC(prm.cc,prm.page)));
       } else if (panel.state === 'bank') setBig('Bank', 'Select ROM/RAM 1-8');
       else if (panel.state === 'part') setBig(`Part ${(currentPartIndex || 0) + 1}`, 'Select Part 1-4');
       else if (panel.state === 'mode') setBig('Mode', MODES[panel.modeIdx]);
@@ -14275,7 +14449,7 @@ function exportCurrentPatchSyx() {
       const params = softParams();
       soft.forEach((el, i) => {
         if (!el) return;
-        const prm = params[i]; const v = prm.cc === NO_CC ? null : getCC(prm.cc);
+        const prm = params[i]; const v = prm.cc === NO_CC ? null : getCC(prm.cc,prm.page);
         const sk = !panel.shift && part.dump && SOFTKNOB_NAMES[part.dump[9 + 128 + 51 + i]];
         const txt = panel.state === 'menu' ? `${prm.n}: ${fmt(prm, v)}` : (sk || prm.n);   // in play solo i nomi, come il display reale
         el.textContent = panel.state === 'menu' && i === panel.sel ? `▸${txt}` : txt;
@@ -14285,7 +14459,7 @@ function exportCurrentPatchSyx() {
         const prm = params[i]; const k = document.getElementById(id);
         if (!k) return;
         k.title = `Value ${i + 1}: ${prm.n}${prm.cc === NO_CC ? ' (non controllabile via CC)' : ` (CC ${prm.cc})`}`;
-        if (prm.cc !== NO_CC) setFrontKnob(id, id + 'Ind', 'none', getCC(prm.cc));
+        if (prm.cc !== NO_CC) setFrontKnob(id, id + 'Ind', 'none', getCC(prm.cc,prm.page));
       });
     }
     panel.render = render;
@@ -14335,7 +14509,7 @@ function exportCurrentPatchSyx() {
           if (panel.state === 'menu') {
             const prm = softParams()[panel.sel];
             if (prm.cc === NO_CC) { setLastAction(`${prm.n}: parametro Page B, non controllabile via CC`); return; }
-            setCC(prm.cc, Math.max(0, Math.min(127, getCC(prm.cc) + d))); render(); return;
+            setCC(prm.cc, Math.max(0, Math.min(prm.max ?? 127, getCC(prm.cc,prm.page) + d)),prm.page); render(); return;
           }
           panel.shift = false;
           goSnow(pos.rom, pos.n, (pos.p64 + d + 64) % 64); render(); return;
@@ -14469,7 +14643,7 @@ function exportCurrentPatchSyx() {
       if (prm.cc === NO_CC) { setLastAction(`${prm.n}: parametro Page B, non controllabile via CC`); return; }
       let val = v;
       if (prm.oct) val = 64 + Math.max(-4, Math.min(4, Math.round((v - 64) / 16))) * 12;   // Transpose a ottave
-      setCC(prm.cc, val);
+      setCC(prm.cc, Math.min(prm.max ?? 127,val),prm.page);
       const part = curPart();
       if (part && prm.cc === 10) part.values.pan = val;
       if (part && prm.cc === 93) part.values.transpose = val - 64;
@@ -14535,7 +14709,7 @@ function exportCurrentPatchSyx() {
     window.lastReceivedDump = null;
     setLastAction('waiting for single dump');
     document.getElementById('midi-debug').textContent = 'REQUEST: Single edit buffer...';
-    requestDump(0);
+    requestDump(currentPartIndex || 0);
   });
 
   document.getElementById('btnSendCurrent').addEventListener('click', () => {
@@ -14608,7 +14782,7 @@ function exportCurrentPatchSyx() {
       return;
     }
     if (!window.lastReceivedDump) {
-      uiAlert('Nessun Dump ricevuto! Invia prima un Single Dump dal synth premendo STORE.');
+      uiAlert('Leggi prima la parte dal Virus con «Leggi parte», poi salva il suono nella libreria.');
       return;
     }
     const lib = loadLibrary();
@@ -14629,14 +14803,7 @@ function exportCurrentPatchSyx() {
       uiAlert('MIDI Output non connesso!');
       return;
     }
-    document.getElementById('midi-debug').textContent = '🔥 MULTI FETCH: Richiesta Part 1...';
-    window.multiFetchState = {
-      active: true,
-      currentPart: 0,
-      name: name,
-      dumps: []
-    };
-    requestDump(0);
+    captureMultiPreset(name).catch(error => uiAlert(error.message));
   });
 
   (function fillBankPick() {
@@ -18857,6 +19024,84 @@ function exportCurrentPatchSyx() {
     if (typeof window.drawTubeCurve === 'function') setTimeout(window.drawTubeCurve, 60);
   };
 
+  async function applyGuidedMultiSetup(draft, progress) {
+    if (!selectedInput || !selectedOutput) throw new Error('Collega MIDI IN e OUT del Virus.');
+    const validation = VirusMultiSetup.validateDraft(draft, BANK_NAMES.length);
+    if (validation) throw new Error(validation);
+    if (multiRead || window.multiFetchState?.active || window.bankFetchState?.active || window.quickBankScanState?.active) {
+      throw new Error('Attendi la fine della lettura MIDI già in corso.');
+    }
+    const pause = ms => new Promise(resolve => setTimeout(resolve, ms));
+    window.multiSetupApplying = true;
+    clearTimeout(window.virusSync?.timer); window.virusSync = null;
+    clearTimeout(window.__modeReload); clearTimeout(window.__multiFollow); clearTimeout(window.__ownPartRead);
+    try {
+      progress('Impostazione della modalità Multi…');
+      window.setSynthMode('multi', false);
+      sendVirusParam(0x73, 0, 122, 2, 'guided setup: Multi mode');
+      await pause(300);
+      for (let i = 0; i < NUM_PARTS; i++) {
+        if (!selectedOutput || !selectedInput) throw new Error('Connessione MIDI interrotta.');
+        const choice = draft.parts[i], part = multiParts[i];
+        progress(`Configurazione di P${i + 1} di 4…`);
+        const channel = draft.routing === 'layer' ? 0 : i;
+        part.enabled = true;
+        Object.assign(part.values, { channel, volume: choice.volume, output: 1, lowkey: 0, highkey: 127 });
+        partMuteState[i] = false;
+        // Address by part, not MIDI channel: layer parts can share channel 1
+        // without a Program Change replacing every sound on that channel.
+        const params = [[34, channel], [PART_ENABLE_PARAM, 1], [PART_VOL_ENABLE_PARAM, 1], [39, choice.volume], [41, 1], [35, 0], [36, 127]];
+        if (choice.source === 'bank') {
+          params.push([31, choice.bank], [33, choice.program]);
+          part.values.bank = choice.bank; part.values.program = choice.program;
+        }
+        for (const [param, value] of params) {
+          sendVirusParam(0x72, i, param, value, `guided setup P${i + 1} param ${param}`);
+          await pause(25);
+        }
+      }
+      activeSoloPart = -1;
+      window.multiRoutingMode = draft.routing;
+      await pause(350);
+      progress('Verifica di canali e volumi dal Virus…');
+      await new Promise((resolve, reject) => {
+        const pending = { resolve, reject, parts: draft.parts.map((part, i) => ({ channel: draft.routing === 'layer' ? 0 : i, volume: part.volume })) };
+        pending.timer = setTimeout(() => {
+          if (window.multiSetupPendingMulti === pending) window.multiSetupPendingMulti = null;
+          reject(new Error('Il Virus non risponde alla verifica del Multi.'));
+        }, 3000);
+        window.multiSetupPendingMulti = pending;
+        const bytes = new Uint8Array([...SYSEX_PREFIX, window.virusDeviceId ?? deviceId(), 0x31, 0, 0, 0xF7]);
+        try { selectedOutput.send(bytes); recordMidiTx('guided setup: verify Multi', bytes); }
+        catch (error) { clearTimeout(pending.timer); window.multiSetupPendingMulti = null; reject(error); }
+      });
+      const preset = await captureMultiPreset(draft.name.trim(), progress, draft.parts.map(part => part.role.trim()));
+      draft.parts.forEach((part, i) => {
+        part.name = preset.parts[i].name;
+        multiParts[i].name = preset.parts[i].name;
+        multiParts[i].dump = preset.parts[i].dump;
+        multiParts[i].role = part.role.trim();
+      });
+      buildMultiView(); renderMultiPartsOverview();
+    } finally {
+      window.multiSetupApplying = false;
+    }
+  }
+
+  const guidedMultiSetup = VirusMultiSetup.create({
+    banks: BANK_NAMES, parts: () => multiParts.map(part => ({ ...part, name: part.dump ? part.name : 'Da leggere dal Virus' })),
+    patchName: (bank, program) => {
+      const name = getBankSoundCache(bank)?.[program];
+      return name && !isDummyPatchName(name) ? name : '';
+    },
+    connected: () => !!selectedInput && !!selectedOutput,
+    exists: name => Object.hasOwn(loadMultiLibrary(), name),
+    apply: applyGuidedMultiSetup,
+    configureMidi: openSettingsModal,
+    openLibrary: () => { document.getElementById('btnTabPatchManager').click(); selectPatchSource('multis'); }
+  });
+  document.getElementById('btnNewMultiSetup').addEventListener('click', guidedMultiSetup.open);
+
   buildSnowFrontView();
   buildMultiView();
   buildFxRackView();
@@ -18872,6 +19117,93 @@ function exportCurrentPatchSyx() {
       changePartSound(i, multiParts[i].values.bank, multiParts[i].values.program, false);
     }
   }
+
+
+  // The two rendered instruments share the selected sound, edit buffer and MIDI
+  // transport. Extended TI pages are cached per part, never across parts.
+  const hardwareGlobals = {};
+  const hardwareKey = p => `${p.page}:${p.index}`;
+  const hardwarePart = () => multiParts[currentPartIndex || 0];
+  const hardwareParam = p => p.page === 0x70 ? PARAMS.find(t => t.cc === p.index) : null;
+  function cacheHardwareValue(p, value) {
+    const global = p.page === 0x73 && p.index === 127;
+    const part = hardwarePart();
+    const cache = global ? hardwareGlobals : (part._hardwareValues ||= {});
+    cache[hardwareKey(p)] = value;
+    const definition = hardwareParam(p);
+    if (definition) {
+      patch[definition.id] = value;
+      part.sound[definition.id] = value;
+      renderKnobsForParam(definition.id);
+    }
+    if (p.page === 0x70) {
+      (part._cc ||= {})[p.index] = value;
+      const aliases = {40:'f1_cutoff',42:'f1_resonance',91:'volume',10:'pan',93:'transpose'};
+      if (aliases[p.index]) part.values[aliases[p.index]] = p.index === 93 ? value-64 : value;
+    }
+    // Keep a loaded sound dump consistent for PATCH library exports.
+    const offset = VirusHardwarePanel.offset(p.page);
+    if (!global && part.dump && offset !== undefined && offset+p.index < part.dump.length-2) {
+      part.dump[offset+p.index] = value;
+      let sum = 0;
+      for (let i=5; i<part.dump.length-2; i++) sum += part.dump[i];
+      part.dump[part.dump.length-2] = sum & 0x7f;
+    }
+  }
+  VirusHardwarePanel.mount({
+    part: () => currentPartIndex || 0,
+    buffer: () => getSoundEditBuffer(),
+    connected: () => !!selectedOutput,
+    info: () => ({name:hardwarePart().name || 'Init',mode:window.currentSynthMode}),
+    read: p => {
+      const part = hardwarePart(), global = p.page === 0x73 && p.index === 127;
+      const definition = hardwareParam(p);
+      if (p.page===0x70 && [40,42].includes(p.index)) {const v=part.values[p.index===40?'f1_cutoff':'f1_resonance'];if(v!==undefined)return v;}
+      if (definition && part.sound[definition.id] !== undefined) return part.sound[definition.id];
+      const cache = global ? hardwareGlobals : part._hardwareValues;
+      if (cache && cache[hardwareKey(p)] !== undefined) return cache[hardwareKey(p)];
+      if (p.page === 0x70 && part._cc?.[p.index] !== undefined) return part._cc[p.index];
+      const off = VirusHardwarePanel.offset(p.page);
+      if (off !== undefined && part.dump && off+p.index < part.dump.length-2) return part.dump[off+p.index];
+      return p.initial;
+    },
+    receive: (p,value) => cacheHardwareValue(p,value),
+    write: (p,value) => {
+      if (selectedOutput) {
+        try { sendVirusParam(p.page,p.page===0x73 && p.index===127 ? 0 : getSoundEditBuffer(),p.index,value,p.name); }
+        catch(error) { setLastAction('Errore MIDI: '+error.message); return; }
+      }
+      cacheHardwareValue(p,value);
+      setLastAction(`${p.name}: ${value}${selectedOutput ? '' : ' · MIDI OUT non collegata'}`);
+      updateVirusSnowFrontPanel(currentPartIndex || 0);
+    },
+    action: (action,value) => {
+      if (action === 'config') openSettingsModal();
+      if (action === 'store' || action === 'search') {
+        document.getElementById('btnTabPatchManager').click();
+        setTimeout(() => {const el=document.getElementById(action==='store'?'patchName':'libSearchInput');el?.focus();},100);
+        if(action==='store') setLastAction('STORE: salva il suono nella libreria PATCH');
+      }
+      if (action === 'part') {
+        if (window.currentSynthMode !== 'multi') {setLastAction('Seleziona MULTI per scegliere P1–P4');return;}
+        currentPartIndex = (currentPartIndex+value+NUM_PARTS)%NUM_PARTS;
+        window.activeSinglePartIndex = currentPartIndex;
+        selectPartRowUI(currentPartIndex);
+        updateVirusSnowFrontPanel(currentPartIndex);
+        updateVirusSnowMasterDisplay(currentPartIndex);
+      }
+      if (action === 'mode') {sendVirusMode(value);updateVirusSnowFrontPanel(currentPartIndex);}
+      if (action === 'program') {
+        const part=hardwarePart();delete part._hardwareValues;delete part._cc;
+        changePartSound(currentPartIndex,part.values.bank,(part.values.program+value+128)%128,true);
+        updateVirusSnowFrontPanel(currentPartIndex);
+      }
+      if (action === 'audition') {playNote(60,100);setTimeout(()=>stopNote(60),300);}
+    }
+  }).then(panel => {window.virusHardware=panel;panel.refresh();}).catch(error=>{
+    console.error('PANEL assets',error);
+    setLastAction('Impossibile caricare il pannello: '+error.message);
+  });
 
   appReady = true;
   if (typeof initElektronLcd === 'function') initElektronLcd();
@@ -18892,6 +19224,9 @@ function exportCurrentPatchSyx() {
 (function () {
   const H = {
     btnTabSnow: ['PANEL — il frontale del Virus', [
+      ['Due strumenti distinti', 'Scegli <b>Virus TI Snow</b> o <b>Virus TI2 Desktop</b> sotto il pannello. Il cambio di modello mantiene la parte e il suono. <b>Zoom</b> ingrandisce fino al 250%: scorri il pannello per raggiungere i controlli.'],
+      ['TI2 Desktop', 'Tutte le manopole sono attive. <b>SELECT</b> sceglie oscillatore, LFO, filtro o effetto; <b>EDIT</b> apre i parametri sulle tre VALUE. <b>SHIFT</b> attiva le funzioni alternative. Il nome e il valore effettivi compaiono sul display e sotto il pannello. <b>UNDO</b> annulla l’ultima modifica della parte.'],
+      ['Tasti Desktop', '<b>MULTI / SINGLE</b> cambiano il modo; le frecce PART scelgono P1–P4 in Multi. <b>TAP</b> imposta il tempo; <b>STORE</b> apre la libreria PATCH per salvare; <b>SEARCH</b> cerca suoni, con SHIFT suona una nota di prova. <b>CONFIG</b> apre le porte MIDI.'],
       ['Scegliere un suono', 'Con <b>EDIT/SHIFT spento</b>: la fila di tasti in alto sceglie il gruppo (1–8), quella in basso il suono dentro il gruppo. Per cambiare banco premi <b>BANK</b>, poi un tasto in alto (ROM 1–8) o in basso (RAM 1–8).'],
       ['Modificare il suono', 'Premi <b>EDIT/SHIFT</b> (LED acceso) e poi <b>OSC 1 … COMMON</b>: il display mostra 3 parametri, li regoli con <b>VALUE 1–3</b>. <b>PARAMETERS &lt; &gt;</b> sceglie il parametro, <b>VALUE − / +</b> lo cambia. <b>EXIT</b> torna al suono.'],
       ['Manopole', '<b>VALUE 1–3</b> muovono i soft knob della patch (i nomi sono in basso sul display). Con EDIT/SHIFT diventano Part Volume, Transpose, Panorama. <b>CUTOFF / RESONANCE</b>: filtro; con EDIT/SHIFT inviluppo filtro e amp.'],
@@ -18918,8 +19253,8 @@ function exportCurrentPatchSyx() {
       ['Macro', '<b>1: CUTOFF, 2: RESO, 3: SATUR, 4: FX SEND</b>: comandi rapidi sui parametri principali della parte.'],
     ]],
     btnTabPatchManager: ['PATCH — libreria e file', [
-      ['Suoni attivi', 'Le 4 parti con icona, canale e nome. <b>leggi</b> rilegge dal Virus il suono di una parte, <b>modifica</b> la apre in MULTI. <b>leggi parti dal synth</b> le rilegge tutte.'],
-      ['File', '<b>importa .syx / .mid</b> (o trascina il file sulla pagina). <b>backup</b> salva librerie e impostazioni in un file, <b>ripristina</b> le ricarica. Il campo di ricerca filtra le librerie per nome.'],
+      ['Suoni attivi', 'Le 4 parti con icona, canale e nome. <b>leggi</b> rilegge dal Virus il suono di una parte, <b>modifica</b> la apre nell’editor SINGLE. <b>leggi parti dal synth</b> le rilegge tutte.'],
+      ['File', '<b>importa .syx / .mid</b> (o trascina il file sulla pagina). <b>backup</b> salva librerie e impostazioni in un file, <b>ripristina</b> le ricarica. Il campo di ricerca filtra Suoni, Multi e il banco letto per nome.'],
       ['Librerie', '<b>salva suono</b> mette nella libreria il suono letto dal Virus, con il nome che scrivi. <b>leggi e salva multi</b> legge le 4 parti e le salva come multi.'],
       ['Banchi del Virus', 'Scegli il banco (RAM-A…D, ROM-A…Z): <b>leggi</b> mostra le 128 patch, <b>cattura</b> le salva tutte nella libreria.'],
     ]],

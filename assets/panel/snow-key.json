@@ -1,0 +1,25 @@
+{
+  "frames": 2,
+  "columns": 2,
+  "rows": 1,
+  "cell": 192,
+  "physicalCellWidth": 2.7,
+  "keySize": 1.5,
+  "sourcePoint": [
+    1.559999942779541,
+    3.6500000953674316,
+    2.01200008392334
+  ],
+  "origin": [
+    0,
+    0,
+    0
+  ],
+  "cameraTiltDegrees": 18,
+  "originInCell": [
+    0.5,
+    0.5
+  ],
+  "pressedDisplacement": -0.1,
+  "samples": 48
+}

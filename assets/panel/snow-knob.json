@@ -1,0 +1,29 @@
+{
+  "frames": 64,
+  "columns": 8,
+  "rows": 8,
+  "cell": 192,
+  "physicalCellWidth": 3.072,
+  "radius": 0.96,
+  "angles": [
+    -135,
+    135
+  ],
+  "rotationSign": -1,
+  "sourcePoint": [
+    -5.860000133514404,
+    -3.7100000381469727,
+    2.015000104904175
+  ],
+  "origin": [
+    0,
+    0,
+    0
+  ],
+  "cameraTiltDegrees": 18,
+  "originInCell": [
+    0.5,
+    0.5
+  ],
+  "samples": 32
+}

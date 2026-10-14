@@ -1,0 +1,24 @@
+{
+  "file": "ti2-knob.webp",
+  "frames": 64,
+  "columns": 8,
+  "rows": 8,
+  "cellPixels": 192,
+  "cellPhysicalWidth": 3.2,
+  "rotorRadius": 0.9,
+  "attachment": {
+    "x": 50,
+    "y": 50
+  },
+  "source": "Manopola SHAPE",
+  "sourceWorldPoint": [
+    -4.307356834411621,
+    5.464670181274414,
+    5.787109851837158
+  ],
+  "panelTiltDegrees": 12,
+  "cameraTiltDegrees": 18,
+  "angleStartDegrees": 135,
+  "angleEndDegrees": -135,
+  "valueConvention": "ascending clockwise: frame0 lower-left, frame32 up, frame63 lower-right"
+}

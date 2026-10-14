@@ -9,7 +9,10 @@ ROOT="$(cd "$HERE/../.." && pwd)"
 WEB="$HERE/resources/web"
 
 rm -rf "$WEB"
-mkdir -p "$WEB/assets/sprites" "$WEB/assets/faceplate"
+mkdir -p "$WEB/assets/sprites" "$WEB/assets/faceplate" "$WEB/assets/panel"
+
+cp "$ROOT/multi-setup.js" "$ROOT/multi-setup.css" "$ROOT/virus-panel-layouts.js" "$ROOT/virus-hardware-panel.js" "$ROOT/virus-hardware-panel.css" "$WEB/"
+cp "$ROOT"/assets/panel/*.webp "$ROOT"/assets/panel/*.json "$WEB/assets/panel/"
 
 cp "$HERE/web-src/web-midi-shim.js" "$HERE/web-src/plugin-brand.js" "$WEB/"
 cp "$ROOT"/assets/sprites/*.webp "$WEB/assets/sprites/"
