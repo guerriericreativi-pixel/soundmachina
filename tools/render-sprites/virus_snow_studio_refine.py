@@ -24,7 +24,7 @@ def tapered_chassis():
     old = bpy.data.objects['body']
     mat = old.data.materials[0]
     bpy.data.objects.remove(old, do_unlink=True)
-    radius = 0.22
+    radius = 0.55
     profile = [(-fp.A, 0.12), (-fp.A, fp.T - radius)]
     for step in range(1, 17):
         angle = math.pi - step * math.pi / 32
@@ -99,7 +99,7 @@ def rigid_key_mesh():
 
 def rigid_knobs(scene):
     """ABS uniforme, corpo alto a cono tronco e indice chiaro in rilievo."""
-    plastic = vs.plastic('ABS uniforme manopola Snow', vs.srgb('#b2b5b1'),
+    plastic = vs.plastic('ABS uniforme manopola Snow', vs.srgb('#a6a9a5'),
                          0.45, coat=0.04, bump=0.02)
     pointer_mat = vs.plastic('Indice chiaro in rilievo Snow', vs.srgb('#f4f4ed'),
                              0.40, coat=0.02)

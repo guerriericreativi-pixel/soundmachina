@@ -121,3 +121,6 @@ Fondi delle sezioni #818682, leggermente più chiari ma distinti dai controlli.
 La scocca Snow è una fascia con due pieghe laterali a 90° (sinistra/destra).
 Spessore 0,055 e raggio di piegatura 0,22: il raccordo deriva dalla piega
 della lamiera, senza parete frontale aggiunta o angoli da guscio stampato.
+
+Ultimo raccordo: raggio delle pieghe laterali 0,55 per una curvatura più
+morbida; manopole in ABS uniforme #a6a9a5, leggermente più scuro.

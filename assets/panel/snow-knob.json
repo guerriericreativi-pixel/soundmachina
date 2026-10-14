@@ -27,11 +27,12 @@
   ],
   "samples": 32,
   "webpQuality": 95,
+  "shadowMatte": "adaptive border floor with smooth transparent margin",
   "geometry": "uniform ABS tall truncated cone, flat cap and raised pointer",
   "normalizedHeight": 1.09,
   "fluteDepth": 0.055,
   "pointerWidth": 0.125,
   "pointerHeight": 0.07,
   "flutes": 14,
-  "shadowMatte": "adaptive border floor with smooth transparent margin"
+  "bodyColor": "#a6a9a5"
 }

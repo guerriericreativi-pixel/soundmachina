@@ -112,3 +112,16 @@ ancoraggi dei controlli invariati. Quote ricostruite fotograficamente.
 Verifica finale nell’app: `output/qa/snow-side-bends-local.png`, 1142×900,
 console senza errori. I 31 test Node passano; geometria e materiali aggiornati
 senza cambiare gli ancoraggi o il comportamento MIDI dei controlli.
+
+## Pieghe più tonde e manopole più scure
+
+Raggio delle due pieghe laterali aumentato da 0,22 a 0,55: raccordo
+più ampio tra piano e fianchi. Plastica uniforme delle manopole scurita
+leggermente da #b2b5b1 a #a6a9a5; indice bianco e zigrinatura conservati.
+Rigenerati sfondo e 64 fotogrammi nativi Blender, con pulizia dell’alfa
+per mantenere le ombre senza riquadri. Nessuna modifica ai controlli MIDI.
+
+Confronto a camera e scala identiche: `output/qa/snow-soft-bends-comparison.png`
+(prima a sinistra, dopo a destra). Verifica nel browser in
+`output/qa/snow-soft-bends-grey-local.png`: nessun errore in console.
+Verificate superfici opache e margini trasparenti di tutti i 64 sprite.
