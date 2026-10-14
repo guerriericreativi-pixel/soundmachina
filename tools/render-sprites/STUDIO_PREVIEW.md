@@ -78,3 +78,27 @@ Il controllo dei parametri usa le pagine TI A, B, E, F e D, con limiti verificat
 [definizioni TI di gearmulator](https://github.com/dsp56300/gearmulator/blob/main/source/axel/osTIrusJucePlugin/parameterDescriptions_TI.json).
 
 Confronti e verifica finale: `design-qa.md`, immagini in `output/qa/`.
+
+## Snow: materiali e geometria dal riferimento fotografico
+
+La scocca è in acciaio verniciato a polvere, con micro-porosità fine. I fondi
+grafici delle due sezioni sono più scuri dei controlli. I tasti ABS sono bassi
+e piani, con un raccordo minimo agli angoli (3,2% della larghezza). Le sei
+manopole hanno corpo più alto a cono tronco, 14 leggere righe laterali,
+plastica grigia uniforme e indice chiaro in rilievo, senza scanalatura superiore.
+Il piano è legno grigio medio, illuminato da softbox con ombre di contatto.
+
+Rigenerazione con Blender, dalla radice del progetto:
+
+```sh
+Blender -b -P tools/render-sprites/virus_snow_studio_refine.py
+Blender -b -P tools/render-sprites/virus_snow_plate.py
+Blender -b -P tools/render-sprites/virus_snow_key_atlas.py
+Blender -b -P tools/render-sprites/virus_snow_knob_atlas.py
+Blender -b -P tools/render-sprites/virus_snow_lcd.py
+```
+
+Il display usa un substrato LCD raster e una copertura trasparente renderizzata
+separatamente; il testo vivo resta leggibile sopra il substrato. PNG e scene
+Blender rimangono in `output/blender/`, WebP di produzione in `assets/panel/`.
+La geometria è ricostruita dalle fotografie, senza quote CAD certificate.

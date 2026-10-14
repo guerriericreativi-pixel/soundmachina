@@ -1,4 +1,4 @@
-"""Snow: scocca svasata, tasti bombati e luce di studio più direzionale.
+"""Snow: scocca metallica verniciata a polvere e controlli in plastica rigida.
 
 Blender -b -P tools/render-sprites/virus_snow_studio_refine.py -- [--preview]
 La svasatura è stimata dalle foto, non da quote CAD del produttore.
@@ -37,14 +37,16 @@ def tapered_chassis():
     return body
 
 
-def crowned_key_mesh():
-    """Angoli raccordati e bombatura di 0.04 unità: evita una faccia superiore piatta."""
-    profiles = [(0.500, 0.085, 0.012), (0.500, 0.085, 0.185),
-                (0.493, 0.085, 0.250), (0.474, 0.079, 0.278),
-                (0.435, 0.072, 0.288), (0.360, 0.060, 0.300),
-                (0.240, 0.040, 0.311), (0.120, 0.020, 0.318)]
+def rigid_key_mesh():
+    """Tasto basso, piano, con piccoli raccordi da plastica stampata rigida.
+
+    La foto mostra una faccia quadrata quasi piana: il raccordo interessa
+    soltanto gli spigoli, senza la bombatura estesa del modello precedente.
+    """
+    profiles = [(0.500, 0.032, 0.012), (0.500, 0.032, 0.105),
+                (0.494, 0.029, 0.119), (0.485, 0.025, 0.125)]
     vertices, faces = [], []
-    count = len(vp.rrect(0.5, 0.5, 0.085, segs=8))
+    count = len(vp.rrect(0.5, 0.5, 0.032, segs=8))
     for half, radius, z in profiles:
         vertices.extend((x, y, z) for x, y in vp.rrect(half, half, radius, segs=8))
     for ring in range(len(profiles) - 1):
@@ -52,21 +54,78 @@ def crowned_key_mesh():
         for j in range(count):
             k = (j + 1) % count
             faces.append((base + j, base + k, upper + k, upper + j))
-    center = len(vertices)
-    vertices.append((0, 0, 0.320))
     last = (len(profiles) - 1) * count
-    for j in range(count):
-        faces.append((center, last + j, last + (j + 1) % count))
+    faces.append(tuple(last + j for j in range(count)))
     faces.append(tuple(reversed(range(count))))
-    mesh = bpy.data.meshes.new('Tasto Snow raccordato e bombato')
+    mesh = bpy.data.meshes.new('Tasto Snow rigido basso e piano')
     mesh.from_pydata(vertices, [], faces)
     mesh.update()
+    # Flat normals retain the broad planar face and straight side walls.
     for polygon in mesh.polygons:
-        polygon.use_smooth = polygon.index != len(mesh.polygons) - 1
-    mat = vs.plastic('Superficie tasto Snow satinata', vs.srgb('#989b98'),
-                     0.62, coat=0.02, bump=0.08)
-    mesh.materials.append(mat)
+        polygon.use_smooth = False
+    mesh.materials.append(vs.plastic('ABS rigido tasto Snow', vs.srgb('#a7aba9'),
+                                   0.43, coat=0.045, bump=0.025))
     return mesh
+
+
+def rigid_knobs(scene):
+    """ABS uniforme, corpo alto a cono tronco e indice chiaro in rilievo."""
+    plastic = vs.plastic('ABS uniforme manopola Snow', vs.srgb('#b2b5b1'),
+                         0.45, coat=0.04, bump=0.02)
+    pointer_mat = vs.plastic('Indice chiaro in rilievo Snow', vs.srgb('#e4e5df'),
+                             0.40, coat=0.02)
+    for name in fp.KNOBS:
+        rotor = bpy.data.objects[name]
+        for child in list(rotor.children_recursive):
+            bpy.data.objects.remove(child, do_unlink=True)
+        grip = vs.fluted_skirt(plastic, r_bottom=1.0, r_top=0.91,
+                               height=0.85, flutes=14, depth=0.021)
+        cap = vs.revolve('Tappo piano senza scanalatura Snow',
+                         [(0, 0.96), (0.810, 0.96), (0.843, 0.955),
+                          (0.856, 0.944), (0.86, 0.910), (0.85, 0.84)], plastic)
+        for polygon in cap.data.polygons:
+            if polygon.index % 5 == 0:
+                polygon.use_smooth = False
+        pointer = vs.beveled_box('Indice sopraelevato Snow', (0.075, 0.84, 0.035),
+                                  0.008, pointer_mat, (0, 0.38, 0.9775), segments=3)
+        for obj in (grip, cap, pointer):
+            obj.parent = rotor
+
+
+def section_backgrounds():
+    """Serigrafia grigia più scura dei controlli, come nel riferimento Snow."""
+    mat = studio.grain_material('Fondo grafico sezioni Snow', '#747975',
+                                0.62, 0, 115, 0.004, contrast=0.012)
+    for name in ('rec-matrix', 'rec-bottom'):
+        bpy.data.objects[name].data.materials[0] = mat
+
+
+def grey_wood_desk():
+    mat = studio.wood()
+    mat.name = 'Legno grigio medio Snow'
+    shader = mat.node_tree.nodes['Principled BSDF']
+    shader.inputs['Roughness'].default_value = 0.68
+    for node in mat.node_tree.nodes:
+        if node.type == 'VALTORGB':
+            node.color_ramp.elements[0].color = (*vs.srgb('#5e5f5c'), 1)
+            node.color_ramp.elements[1].color = (*vs.srgb('#8d8c86'), 1)
+    bpy.data.objects['Scrivania studio'].data.materials[0] = mat
+
+
+def powder_coated_steel(body):
+    """Opaque powder coating over steel: dielectric paint, not bare metal.
+
+    The micro-bump represents fine paint porosity, rather than moulded plastic
+    or exposed polished steel. Object coordinates keep grain size consistent.
+    """
+    mat = studio.grain_material('Acciaio Snow verniciato a polvere',
+                                '#dee0dc', 0.57, 0.0, 115, 0.012, contrast=0.018)
+    shader = mat.node_tree.nodes['Principled BSDF']
+    shader.inputs['Specular IOR Level'].default_value = 0.34
+    shader.inputs['Coat Weight'].default_value = 0.0
+    body.data.materials[0] = mat
+    body['substrate'] = 'steel'
+    body['surface_finish'] = 'fine porous powder coat'
 
 
 def studio_lighting(scene):
@@ -95,8 +154,12 @@ def main():
     vp.reset(10, 10)
     bpy.ops.wm.open_mainfile(filepath=SOURCE)
     scene = bpy.context.scene
-    tapered_chassis()
-    mesh = crowned_key_mesh()
+    body = tapered_chassis()
+    powder_coated_steel(body)
+    rigid_knobs(scene)
+    section_backgrounds()
+    grey_wood_desk()
+    mesh = rigid_key_mesh()
     keys = [obj for obj in scene.objects if obj.type == 'MESH'
             and obj.name.startswith('key') and obj.parent and obj.parent.name.startswith('frontBtn')]
     if len(keys) != len(fp.KEYS):
@@ -112,7 +175,7 @@ def main():
     scene.render.filepath = os.path.join(studio.OUT, NAME + '.png')
     bpy.context.preferences.filepaths.save_version = 0
     bpy.ops.wm.save_as_mainfile(filepath=os.path.join(studio.OUT, NAME + '.blend'))
-    print(f'Scocca svasata, {len(keys)} tasti bombati, luce di studio controllata.', flush=True)
+    print(f'Scocca in acciaio verniciato a polvere, {len(keys)} tasti piatti e bassi, manopole rigide.', flush=True)
     studio.render(scene, NAME)
 
 

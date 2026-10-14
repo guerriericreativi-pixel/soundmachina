@@ -20,7 +20,7 @@ Nessun problema P0/P1/P2 aperto.
 
 - Identità: due strumenti diversi, Snow bianco a 6 manopole/21 tasti e TI2 Desktop a 32 manopole/43 tasti. Il riferimento scelto è il TI2 Desktop senza tastiera, non il Darkstar con tastiera.
 - Immagini: sfondo, scocche, manopole, tasti e LED Desktop provengono dalle scene Blender. Nessuna attrezzatura di studio copre il pannello. Asset WebP trasparenti correttamente allineati alle posizioni proiettate.
-- Superfici e luci: mantenuti scocca Snow rastremata, tasti bombati con angoli morbidi, illuminazione contenuta e ombre. Lo sfondo statico conserva le ombre della scocca; gli sprite includono le ombre dei controlli mobili.
+- Superfici e luci: mantenuti scocca Snow rastremata, tasti bassi e piani con angoli appena raccordati, illuminazione contenuta e ombre. Lo sfondo statico conserva le ombre della scocca; gli sprite includono le ombre dei controlli mobili.
 - Tipografia: serigrafia del render invariata; LCD vivo proporzionale al suo riquadro. Il nome del parametro completo appare anche sotto il Desktop. Le etichette della barra strumenti restano leggibili e non sovrapposte allo strumento.
 - Spaziatura: proporzioni originali 16:9 Snow e 2:1 Desktop; MIDI/SOUNDS/WAVES spostati fuori dalla scocca. Il pannello entra per intero al 100%. Lo zoom scorre dentro il proprio contenitore, senza allargare l'intera pagina.
 - Colori: Desktop grigio scuro e LCD neutro; Snow chiaro con LCD azzurro. Gli stati selezionati e il focus hanno contrasto visibile.
@@ -47,3 +47,27 @@ Nessun problema P0/P1/P2 aperto.
 ## Limiti pratici
 
 La verifica fisica copre lettura del suono e cutoff/Undo sul Virus collegato, non ogni parametro di tutti i modelli hardware. Tutte le associazioni dei controlli sono verificate a livello software/protocollo. I controlli piccoli della replica richiedono zoom per l'uso touch preciso; sono accessibili anche da tastiera. Non è stata ricompilata né reinstallata la distribuzione AU/VST3/app nativa. Smartphone esclusi dallo scopo richiesto.
+
+## Aggiornamento Snow — 14 ottobre 2026
+
+Riferimenti fotografici: `B_ACCESS_virustisnow 2.jpg` per tasti e manopole,
+`B_ACCESS_virustisnow 3.jpg` per LCD, entrambi forniti dall’utente.
+
+- Scocca: acciaio con verniciatura a polvere fine, non plastica lucida.
+- Serigrafia: fondi delle sezioni più scuri di tasti e manopole.
+- Tasti: faccia piana, altezza ridotta, raccordo minimo (3,2%).
+- Manopole: cono tronco alto, 14 righe leggere laterali, ABS dello stesso colore
+  su cap e fianchi; indice chiaro sopraelevato e nessuna scanalatura superiore.
+- Ambiente: legno grigio medio, luce da studio e ombre, senza oggetti aggiuntivi.
+- LCD: substrato raster azzurro con copertura trasparente renderizzata in Blender;
+  testo vivo leggibile, senza cornice CSS cromata o riflesso diagonale intenso.
+- Camera, ancoraggi e dispatch dei controlli mantenuti. Nessuna nuova scrittura MIDI
+  richiesta per verificare i materiali. Test Node: 31 pass, 0 fail.
+
+La ricostruzione delle forme è fotografica; altezza e conicità non sono quote CAD.
+Le precedenti verifiche funzionali restano riportate sopra come storico.
+
+Verifica visiva nel browser a 1142×900: `output/qa/snow-refined-panel.png`;
+confronto con dettaglio fotografico in `output/qa/snow-reference-controls.png`.
+Verificati apertura ARP con Edit/Shift e ritorno con Exit/Mode; nessun errore
+in console. Fondi più scuri dei controlli e tappo privo di scanalatura visibili.

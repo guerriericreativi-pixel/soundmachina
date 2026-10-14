@@ -254,7 +254,7 @@ def render_to_array(path):
     return arr.reshape(h, w, 4)            # righe dal basso verso l'alto (convenzione Blender)
 
 
-def save_sheet(frames, cols, cell, name):
+def save_sheet(frames, cols, cell, name, quality=82):
     rows = math.ceil(len(frames) / cols)
     W, H = cols * cell, rows * cell
     sheet = np.zeros((H, W, 4), dtype=np.float32)
@@ -269,7 +269,7 @@ def save_sheet(frames, cols, cell, name):
     img.pixels.foreach_set(sheet.ravel())
     img.filepath_raw = os.path.join(OUT, name + '.webp')
     img.file_format = 'WEBP'
-    bpy.context.scene.render.image_settings.quality = 82
+    bpy.context.scene.render.image_settings.quality = quality
     img.save()
     print(f'{name}: {W}x{H}  {os.path.getsize(img.filepath_raw) // 1024} KB')
 
