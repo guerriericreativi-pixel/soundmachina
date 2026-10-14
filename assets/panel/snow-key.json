@@ -23,7 +23,8 @@
   "pressedDisplacement": -0.045,
   "samples": 48,
   "webpQuality": 95,
-  "geometry": "rigid flat key",
-  "normalizedHeight": 0.125,
+  "geometry": "rigid low key with shallow convex surface",
+  "normalizedHeight": 0.165,
+  "crownHeight": 0.04,
   "cornerRadius": 0.032
 }

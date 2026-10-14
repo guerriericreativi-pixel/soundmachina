@@ -112,3 +112,12 @@ Per il piano continuo: renderizzare `virus_studio_desk.py` e convertire il PNG
 in `studio-grey-wood.webp`. `virus_snow_plate.py` ora esporta la scocca su
 trasparenza; confezionare il PNG con `pack_snow_plate.py` (Python/Pillow).
 Il background della pagina mostra il legno da una camera ortografica verticale.
+
+Ultima rifinitura Snow: i tasti bassi hanno una curvatura lieve della faccia
+(corona 0,04) che produce la sfumatura superiore/inferiore nel render.
+Usare `pack_snow_keys.py` (Python/Pillow) dopo l’export dei due stati.
+Fondi delle sezioni #818682, leggermente più chiari ma distinti dai controlli.
+
+La scocca Snow è una fascia con due pieghe laterali a 90° (sinistra/destra).
+Spessore 0,055 e raggio di piegatura 0,22: il raccordo deriva dalla piega
+della lamiera, senza parete frontale aggiunta o angoli da guscio stampato.

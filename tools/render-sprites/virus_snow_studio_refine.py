@@ -4,6 +4,7 @@ Blender -b -P tools/render-sprites/virus_snow_studio_refine.py -- [--preview]
 La svasatura è stimata dalle foto, non da quote CAD del produttore.
 """
 import os
+import math
 import sys
 
 import bpy
@@ -19,36 +20,64 @@ SOURCE = os.path.join(studio.OUT, 'virus-ti-snow-panel-focus.blend')
 
 
 def tapered_chassis():
-    """Piano superiore leggermente più stretto davanti, con bordo ripiegato morbido."""
+    """Fascia in lamiera con due pieghe laterali a 90°, non un guscio chiuso."""
     old = bpy.data.objects['body']
     mat = old.data.materials[0]
     bpy.data.objects.remove(old, do_unlink=True)
-    edge = 0.20
-    profile = [(-edge, fp.T, 0)]
-    profile += [(off, z, 0) for off, z in vp.quarter(-edge, fp.T, edge, 12)[1:]]
-    profile += [(0, 0.15, 0), (-0.12, 0.0, 0)]
-    body = vp.sweep('body', fp.A, fp.B, 0.45, profile, [mat], center_mat=0)
-    for vertex in body.data.vertices:
-        # Rastrematura del 6% al fronte; la superficie che ospita i controlli rimane a z=T.
-        along = min(1.0, max(0.0, (vertex.co.y + fp.B) / (2 * fp.B)))
-        vertex.co.x *= 0.94 + 0.06 * along
-    body.data.update()
+    radius = 0.22
+    profile = [(-fp.A, 0.12), (-fp.A, fp.T - radius)]
+    for step in range(1, 17):
+        angle = math.pi - step * math.pi / 32
+        profile.append((-fp.A + radius + radius * math.cos(angle),
+                        fp.T - radius + radius * math.sin(angle)))
+    profile.append((fp.A - radius, fp.T))
+    for step in range(1, 17):
+        angle = math.pi / 2 - step * math.pi / 32
+        profile.append((fp.A - radius + radius * math.cos(angle),
+                        fp.T - radius + radius * math.sin(angle)))
+    profile.append((fp.A, 0.12))
+    count = len(profile)
+    vertices = [(x * taper, y, z) for y, taper in ((-fp.B, 0.94), (fp.B, 1.0))
+                for x, z in profile]
+    faces = [(j, j + 1, count + j + 1, count + j) for j in range(count - 1)]
+    mesh = bpy.data.meshes.new('Lamiera Snow con due pieghe laterali')
+    mesh.from_pydata(vertices, [], faces)
+    mesh.materials.append(mat)
+    mesh.update()
+    for polygon in mesh.polygons:
+        polygon.use_smooth = polygon.index not in (0, 17, count - 2)
+    body = bpy.data.objects.new('body', mesh)
+    bpy.context.scene.collection.objects.link(body)
+    thickness = body.modifiers.new('Spessore della lamiera', 'SOLIDIFY')
+    thickness.thickness = 0.055
+    thickness.offset = -1
+    thickness.use_even_offset = True
     body['front_width_ratio'] = 0.94
+    body['construction'] = 'powder coated sheet with left and right 90 degree bends'
+    body['bend_radius'] = radius
+    body['sheet_thickness'] = 0.055
     return body
 
 
 def rigid_key_mesh():
-    """Tasto basso, piano, con piccoli raccordi da plastica stampata rigida.
+    """Tasto ABS basso, con raccordi minimi e corona appena convessa.
 
-    La foto mostra una faccia quadrata quasi piana: il raccordo interessa
-    soltanto gli spigoli, senza la bombatura estesa del modello precedente.
+    La curvatura della faccia genera la sfumatura sotto il softbox senza
+    aumentare lo spessore delle pareti o arrotondare troppo gli angoli.
     """
     profiles = [(0.500, 0.032, 0.012), (0.500, 0.032, 0.105),
                 (0.494, 0.029, 0.119), (0.485, 0.025, 0.125)]
+    # Dense concentric contours resolve the shallow crown without faceting.
+    crown_start = len(profiles)
+    profiles += [(half, min(0.025, half * 0.1), 0.125)
+                 for half in (0.45, 0.40, 0.35, 0.30, 0.25, 0.20, 0.15, 0.10, 0.05)]
     vertices, faces = [], []
     count = len(vp.rrect(0.5, 0.5, 0.032, segs=8))
-    for half, radius, z in profiles:
-        vertices.extend((x, y, z) for x, y in vp.rrect(half, half, radius, segs=8))
+    for index, (half, radius, z) in enumerate(profiles):
+        for x, y in vp.rrect(half, half, radius, segs=8):
+            if index >= crown_start:
+                z = 0.125 + 0.04 * (1 - (x / 0.485) ** 2) * (1 - (y / 0.485) ** 2)
+            vertices.append((x, y, z))
     for ring in range(len(profiles) - 1):
         base, upper = ring * count, (ring + 1) * count
         for j in range(count):
@@ -57,14 +86,14 @@ def rigid_key_mesh():
     last = (len(profiles) - 1) * count
     faces.append(tuple(last + j for j in range(count)))
     faces.append(tuple(reversed(range(count))))
-    mesh = bpy.data.meshes.new('Tasto Snow rigido basso e piano')
+    mesh = bpy.data.meshes.new('Tasto Snow basso con superficie lievemente convessa')
     mesh.from_pydata(vertices, [], faces)
     mesh.update()
-    # Flat normals retain the broad planar face and straight side walls.
+    # Keep straight ABS walls; smooth only the bevel and shallow crown.
     for polygon in mesh.polygons:
-        polygon.use_smooth = False
+        polygon.use_smooth = 2 * count <= polygon.index < (len(profiles) - 1) * count
     mesh.materials.append(vs.plastic('ABS rigido tasto Snow', vs.srgb('#a7aba9'),
-                                   0.43, coat=0.045, bump=0.025))
+                                   0.34, coat=0.065, bump=0.025))
     return mesh
 
 
@@ -94,7 +123,7 @@ def rigid_knobs(scene):
 
 def section_backgrounds():
     """Serigrafia grigia più scura dei controlli, come nel riferimento Snow."""
-    mat = studio.grain_material('Fondo grafico sezioni Snow', '#747975',
+    mat = studio.grain_material('Fondo grafico sezioni Snow', '#818682',
                                 0.62, 0, 115, 0.004, contrast=0.012)
     for name in ('rec-matrix', 'rec-bottom'):
         bpy.data.objects[name].data.materials[0] = mat
@@ -175,7 +204,7 @@ def main():
     scene.render.filepath = os.path.join(studio.OUT, NAME + '.png')
     bpy.context.preferences.filepaths.save_version = 0
     bpy.ops.wm.save_as_mainfile(filepath=os.path.join(studio.OUT, NAME + '.blend'))
-    print(f'Scocca in acciaio verniciato a polvere, {len(keys)} tasti piatti e bassi, manopole rigide.', flush=True)
+    print(f'Scocca in acciaio verniciato a polvere, {len(keys)} tasti bassi e lievemente convessi, manopole rigide.', flush=True)
     studio.render(scene, NAME)
 
 

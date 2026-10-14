@@ -91,3 +91,24 @@ tra intestazione, strumento e comandi inferiori senza cornice rettangolare.
 Intestazione e Zoom hanno superfici uniformi per mantenere il contrasto.
 Riscontro: `output/qa/snow-full-wood-local.png`; pagina a 1142×900,
 scrollWidth 1142, background-size cover, nessun errore in console.
+
+## Superficie dei tasti e fondo delle sezioni
+
+I tasti Snow ora hanno faccia leggermente convessa, con pareti basse e raccordi
+minimi conservati. Corona normalizzata 0,04, altezza massima 0,165. Sfumatura
+generata dalla geometria e dall’illuminazione Blender in entrambi gli stati.
+Nel fotogramma normale la zona superiore è mediamente RGB 143/147/147,
+quella inferiore 136/139/139; riscontro in `output/qa/snow-curved-key-detail.png`.
+Fondo serigrafato schiarito da #747975 a #818682; resta più scuro dei controlli.
+
+## Costruzione della scocca Snow
+
+Correzione su indicazione dell’utente: le due pieghe a 90° sono laterali,
+a sinistra e a destra. Mesh a fascia aperta, con lamiera spessa 0,055 e
+raggio delle pieghe 0,22 (unità del modello), anziché un guscio chiuso
+arrotondato su tutto il perimetro. Piano superiore alla stessa quota;
+ancoraggi dei controlli invariati. Quote ricostruite fotograficamente.
+
+Verifica finale nell’app: `output/qa/snow-side-bends-local.png`, 1142×900,
+console senza errori. I 31 test Node passano; geometria e materiali aggiornati
+senza cambiare gli ancoraggi o il comportamento MIDI dei controlli.

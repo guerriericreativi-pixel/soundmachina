@@ -34,4 +34,4 @@ for pressed in [False,True]:
     frames.append(vs.render_to_array('/tmp/snow-key-%s.png'%('pressed' if pressed else 'idle')))
 vs.OUT=ROOT+'/assets/panel'
 vs.save_sheet(frames,2,192,'snow-key',quality=95)
-with open(vs.OUT+'/snow-key.json','w')as f:json.dump({'frames':2,'columns':2,'rows':1,'cell':192,'physicalCellWidth':2.7,'keySize':1.5,'sourcePoint':list(source),'origin':[0,0,0],'cameraTiltDegrees':18,'originInCell':[.5,.5],'pressedDisplacement':-.045,'samples':48,'webpQuality':95,'geometry':'rigid flat key','normalizedHeight':.125,'cornerRadius':.032},f,indent=2)
+with open(vs.OUT+'/snow-key.json','w')as f:json.dump({'frames':2,'columns':2,'rows':1,'cell':192,'physicalCellWidth':2.7,'keySize':1.5,'sourcePoint':list(source),'origin':[0,0,0],'cameraTiltDegrees':18,'originInCell':[.5,.5],'pressedDisplacement':-.045,'samples':48,'webpQuality':95,'geometry':'rigid low key with shallow convex surface','normalizedHeight':.165,'crownHeight':.04,'cornerRadius':.032},f,indent=2)
