@@ -20,7 +20,7 @@ function setup(extra = {}) {
   const dom = new JSDOM(html);
   const context = vm.createContext({ document: dom.window.document, window: {}, console, selectedOutput: null,
     SYSEX_PREFIX: [0xF0, 0, 0x20, 0x33, 1], ...extra });
-  for (const name of ['selectPatchSource', 'preparePatchForBuffer', 'getSoundEditBuffer', 'loadPatchToActiveBuffer', 'renderMultiLibrary', 'renderLibrary']) {
+  for (const name of ['updatePatchResultCount', 'selectPatchSource', 'preparePatchForBuffer', 'getSoundEditBuffer', 'loadPatchToActiveBuffer', 'renderMultiLibrary', 'renderLibrary']) {
     vm.runInContext(functions.get(name), context);
   }
   return context;
@@ -99,4 +99,28 @@ test('Foreign or truncated SysEx is rejected before loading', () => {
   assert.throws(() => c.preparePatchForBuffer([0xF0, 0xF7], 0, 0), /non valido/);
   const foreign = dump(267); foreign[2] = 1;
   assert.throws(() => c.preparePatchForBuffer(foreign, 0, 0), /non valido/);
+});
+
+
+test('PATCH result count follows the active source and contextual search', () => {
+  const c = setup();
+  c.updatePatchResultCount('sounds', 2, 12);
+  assert.equal(c.document.getElementById('pmSearchStatus').textContent, '2 di 12 suoni');
+  c.updatePatchResultCount('multis', 4, 4);
+  assert.equal(c.document.getElementById('pmSearchStatus').textContent, '2 di 12 suoni');
+  c.selectPatchSource('multis');
+  assert.equal(c.document.getElementById('pmSearchStatus').textContent, '4 Multi');
+  assert.equal(c.document.querySelector('.pm-search-label').textContent, 'Cerca nei Multi');
+  c.selectPatchSource('banks');
+  assert.match(c.document.getElementById('pmSearchStatus').textContent, /Leggi un banco/);
+});
+
+test('An empty sound library offers import and bank navigation without transmitting MIDI', () => {
+  const c = setup({ loadLibrary: () => ({}) });
+  c.renderLibrary();
+  const buttons = c.document.querySelectorAll('#libList button');
+  assert.equal(buttons[0].textContent, 'Importa suoni');
+  buttons[1].click();
+  assert.equal(c.document.getElementById('pmBanks').hidden, false);
+  assert.equal(c.document.activeElement.id, 'pmTabBanks');
 });

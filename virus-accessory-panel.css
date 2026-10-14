@@ -199,11 +199,11 @@ html[data-skin] .hardware-chassis:not(#snowHardwareChassis) :is(
    edge remains visible even when a canvas paints an opaque LCD background. */
 html[data-skin="te"] .hardware-chassis:not(#snowHardwareChassis) :is(
   .lcd-glass, .single-lcd-window, .virus-snow-lcd-front,
-  .multi-lcd, .xy-pad-surface, .part-display, .patch-panel
+  .multi-lcd, .xy-pad-surface, .part-display, .pm-target
 ) { position: relative; }
 html[data-skin="te"] .hardware-chassis:not(#snowHardwareChassis) :is(
   .lcd-glass, .single-lcd-window, .virus-snow-lcd-front,
-  .multi-lcd, .xy-pad-surface, .part-display, .patch-panel
+  .multi-lcd, .xy-pad-surface, .part-display, .pm-target
 )::after {
   content: "";
   display: block !important;
@@ -222,22 +222,118 @@ html[data-skin="te"] .hardware-chassis:not(#snowHardwareChassis) :is(
 ) {
   border-image-width: 18px !important;
 }
+/* PATCH controls sit on powder-coated metal; only the destination readout is LCD. */
 html[data-skin="te"] #patchManagerContent {
-  --pm-ink: #24454f;
-  --pm-dim: #47646d;
-  --pm-line: rgba(40,77,88,.22);
-  --pm-card: rgba(208,230,233,.38);
-  --pm-field: rgba(228,242,243,.62);
+  --pm-ink: #262d2c;
+  --pm-dim: #4b5351;
+  --pm-line: rgba(30,39,36,.22);
+  --pm-card: rgba(91,101,97,.14);
+  --pm-field: rgba(236,238,231,.65);
 }
-html[data-skin="te"] #patchManagerContent .patch-panel {
-  background: var(--accessory-lcd-substrate) center / 100% 100% no-repeat !important;
-  border: 3px solid transparent !important;
-  border-image: url("assets/panel/lcd-gasket.webp?v=accessory-depth-v2") 60 / 20px / 4px stretch !important;
-  box-shadow: inset 0 5px 9px rgba(9,35,43,.26) !important;
-  border-radius: 3px;
+html[data-skin] #patchManagerContent .patch-panel {
+  background: transparent !important;
+  border: 0 !important;
+  border-image: none !important;
+  box-shadow: none !important;
 }
-html[data-skin="te"] #patchManagerContent :is(.pm-part-name, .lib-item .name) {
-  font-family: "VT323", monospace;
-  font-size: 18px;
-  letter-spacing: .02em;
+html[data-skin] #patchManagerContent .pm-target {
+  flex: 0 0 auto;
+  min-width: 160px;
+  min-height: 49px;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 5px;
+  padding: 9px 14px;
+  border: 2px solid transparent;
+  border-image: url("assets/panel/lcd-gasket.webp?v=accessory-depth-v2") 60 / 9px / 2px stretch;
+  border-radius: 2px;
+  background: var(--accessory-lcd-substrate) center / 100% 100% no-repeat;
+  color: var(--accessory-lcd-ink);
+  font: 10px/1.2 'JetBrains Mono',monospace;
+  box-shadow: inset 0 3px 5px #18343d44;
 }
+html[data-skin] #patchManagerContent .pm-target strong {
+  font: 19px/1 'VT323',monospace;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  max-width: 210px;
+}
+
+/* PATCH: keep the physical enclosure, give browsing the dominant work area. */
+#patchManagerContent .patch-panel {
+  display: grid;
+  grid-template-columns: 230px minmax(0,1fr);
+  gap: 22px;
+  padding: 22px !important;
+  align-items: start;
+}
+#patchManagerContent .pm-destination {
+  min-width: 0;
+  padding-right: 20px;
+  border-right: 1px solid var(--pm-line);
+}
+#patchManagerContent .pm-head { display: flex; flex-direction: column; align-items: stretch; gap: 10px; }
+#patchManagerContent .pm-head h2 { font-size: 11px; }
+#patchManagerContent .pm-parts { grid-template-columns: 1fr; gap: 7px; margin-bottom: 10px; }
+#patchManagerContent .pm-part-card { padding: 6px 9px !important; gap: 2px !important; }
+#patchManagerContent .pm-part-card.is-selected { box-shadow: inset 3px 0 var(--pm-ink); background: var(--pm-field) !important; }
+#patchManagerContent .pm-part-select { padding: 0 !important; min-height: 22px !important; height: 22px !important; line-height: 22px; font-size: 13px; }
+#patchManagerContent .pm-part-actions[hidden] { display: none !important; }
+#patchManagerContent .pm-part-actions button { min-height: 30px; height: 30px; }
+#patchManagerContent .pm-part-position { font-size: 9px; line-height: 13px; }
+#patchManagerContent .pm-browser { min-width: 0; }
+#patchManagerContent .pm-browser-heading { display: flex; align-items: center; justify-content: space-between; gap: 10px; padding: 0 0 14px; }
+#patchManagerContent .pm-browser-heading h2 { font-size: 15px; letter-spacing: .05em; }
+
+#patchManagerContent .pm-toolbar { border-top: 0; padding: 0 0 12px; align-items: flex-end; }
+#patchManagerContent .pm-search { flex: 1 1 180px; min-width: 0; }
+#patchManagerContent .pm-search-label { display: block; font-size: 10px; font-weight: 700; margin-bottom: 6px; color: var(--pm-dim); }
+#patchManagerContent .pm-search-field { position: relative; display: flex; }
+#patchManagerContent #libSearchInput { width: 100%; padding-right: 36px !important; height: 38px; font-size: 14px; }
+#patchManagerContent #libSearchInput::-webkit-search-cancel-button { display: none; }
+#patchManagerContent .pm-clear { position: absolute; right: 4px; top: 4px; width: 30px; height: 30px; min-height: 0; padding: 0; border: 0; border-radius: 3px; color: var(--pm-ink); background: transparent; font-size: 22px; cursor: pointer; }
+#patchManagerContent .pm-clear[hidden] { display: none; }
+#patchManagerContent .pm-source-row { margin: 0; }
+#patchManagerContent .pm-tabs { flex: 1; }
+#patchManagerContent .pm-tabs button { flex: 1; padding: 12px 10px !important; }
+#patchManagerContent .pm-search-status { min-height: 16px; margin: 10px 0; color: var(--pm-dim); font: 11px/1.5 'JetBrains Mono',monospace; }
+#patchManagerContent .pm-save { border: 1px solid var(--pm-line); border-radius: 4px; margin: 0 0 12px; }
+#patchManagerContent .pm-save summary { padding: 11px 12px; font-size: 11px; font-weight: 600; cursor: pointer; }
+#patchManagerContent .pm-save[open] summary { border-bottom: 1px solid var(--pm-line); }
+#patchManagerContent .pm-save .pm-save-row { padding: 12px; margin: 0; grid-template-columns: 1fr; gap: 10px; }
+#patchManagerContent .pm-save .pm-row { flex-wrap: wrap; }
+#patchManagerContent .pm-save-row { grid-template-columns: 1fr; gap: 10px; }
+#patchManagerContent .lib-list { max-height: min(49vh,520px); min-height: 200px; background: var(--pm-card); scrollbar-gutter: stable; }
+#patchManagerContent .lib-item { padding: 9px 12px !important; gap: 8px; }
+#patchManagerContent .lib-item:hover { background: var(--pm-field); }
+#patchManagerContent .lib-item .btns { gap: 8px !important; }
+#patchManagerContent .lib-item .delete { margin-left: 8px; }
+#patchManagerContent .pm-empty { padding: 30px 20px; max-width: 500px; margin: 0 auto; font-size: 12px; }
+#patchManagerContent .pm-empty strong { display: inline-block; color: var(--pm-ink); font-size: 17px; margin-bottom: 10px; }
+#patchManagerContent .pm-empty-actions { display: flex; justify-content: center; flex-wrap: wrap; gap: 8px; margin-top: 20px; }
+#patchManagerContent .pm-footer { align-items: center; font-size: 10px; }
+#patchManagerContent .pm-backup summary { padding: 9px 4px; }
+#patchManagerContent :is(input,select,summary):focus-visible { outline: 2px solid var(--pm-ink); outline-offset: 2px; }
+@media (max-width: 1000px) {
+  #patchManagerContent .patch-panel { grid-template-columns: 190px minmax(0,1fr); gap: 14px; padding: 16px !important; }
+  #patchManagerContent .pm-destination { padding-right: 14px; }
+  #patchManagerContent .pm-browser-heading { align-items: flex-start; flex-direction: column; }
+}
+@media (max-width: 760px) {
+  #patchManagerContent .patch-panel { grid-template-columns: 1fr; }
+  #patchManagerContent .pm-destination { border-right: 0; border-bottom: 1px solid var(--pm-line); padding: 0 0 12px; }
+  #patchManagerContent .pm-head { flex-direction: row; align-items: center; }
+  #patchManagerContent .pm-parts { grid-template-columns: repeat(2,minmax(0,1fr)); margin: 0; }
+  #patchManagerContent .pm-toolbar { flex-wrap: wrap; }
+  #patchManagerContent .pm-search { flex-basis: 100%; }
+  #patchManagerContent .pm-browser-heading { flex-direction: row; }
+  #patchManagerContent .pm-browser-heading h2 { font-size: 13px; }
+  #patchManagerContent .pm-target { font-size: 10px; }
+  #patchManagerContent .lib-item { flex-wrap: wrap; }
+  #patchManagerContent .lib-item .name { flex-basis: 100%; }
+  #patchManagerContent .pm-footer { flex-wrap: wrap; }
+}
+html[data-skin="elektron"] #btnTabPatchManager.active { color: #edf0ee !important; }

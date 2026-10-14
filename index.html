@@ -7178,7 +7178,7 @@
     #lightLimiter { margin-left: 0 !important; }
   }
 </style>
-<link rel="stylesheet" href="virus-accessory-panel.css?v=snow-lcd-v3-preview">
+<link rel="stylesheet" href="virus-accessory-panel.css?v=patch-ux-v5-preview">
 <style>
 .virus-icon { display: inline-block; flex: none; vertical-align: middle; }
 [data-virus-icon] { display: inline-flex; align-items: center; vertical-align: middle; margin-right: 4px; }
@@ -7557,13 +7557,17 @@
     </div>
     <div class="pm-workspace">
       <div class="section section-lib patch-panel">
+        <aside class="pm-destination" aria-label="Destinazione dei suoni">
         <div class="pm-head">
-          <div><h2>PARTI DEL VIRUS</h2><p class="pm-hint" id="pmPartHint">Seleziona la destinazione del suono.</p></div>
+          <div><h2>Destinazione</h2><p class="pm-hint" id="pmPartHint">Seleziona la destinazione del suono.</p></div>
           <button id="btnSyncMultiParts" class="chassis-page-btn" type="button">Leggi parti dal Virus</button>
         </div>
         <div id="multiPartsOverview" class="pm-parts"></div>
+        </aside>
+        <div class="pm-browser">
+        <div class="pm-browser-heading"><div><h2>Esplora le patch</h2><p class="pm-hint">Trova un suono e caricalo nella destinazione scelta.</p></div><span class="pm-target" id="pmTarget" aria-live="polite">Destinazione: P1</span></div>
         <div class="pm-toolbar">
-          <input type="search" id="libSearchInput" class="pm-field pm-grow" placeholder="Cerca per nome…" aria-label="Cerca nelle librerie">
+          <div class="pm-search"><label for="libSearchInput" class="pm-search-label">Cerca nei suoni</label><div class="pm-search-field"><input type="search" id="libSearchInput" class="pm-field pm-grow" placeholder="Nome del suono…" aria-label="Cerca nelle librerie"><button type="button" id="pmClearSearch" class="pm-clear" aria-label="Cancella ricerca" hidden>×</button></div></div>
           <button id="btnImportSyx" class="chassis-page-btn" type="button">Importa .syx / .mid</button>
           <input type="file" id="fileSyxInput" accept=".syx,.mid,.midi" hidden multiple>
           <details class="pm-backup"><summary>Archivio</summary><div>
@@ -7578,32 +7582,35 @@
             <button type="button" role="tab" id="pmTabMultis" aria-selected="false" aria-controls="pmMultis" data-pm-source="multis" tabindex="-1">Multi <span id="pmMultisCount">0</span></button>
             <button type="button" role="tab" id="pmTabBanks" aria-selected="false" aria-controls="pmBanks" data-pm-source="banks" tabindex="-1">Banchi Virus</button>
           </div>
-          <span class="pm-target" id="pmTarget" aria-live="polite">Destinazione: P1</span>
         </div>
+        <p id="pmSearchStatus" class="pm-search-status" role="status" aria-live="polite">0 suoni</p>
         <section id="pmSounds" class="pm-source" role="tabpanel" aria-labelledby="pmTabSounds">
-          <div class="pm-save-row"><div><h2>Libreria suoni</h2><p class="pm-hint">Salva la patch letta dal Virus nella libreria di questo browser.</p></div>
+          <details class="pm-save"><summary>Salva un suono dal Virus</summary><div class="pm-save-row"><div><h2>Salva nella libreria</h2><p class="pm-hint">Leggi la parte selezionata, assegna un nome e salva in questo browser.</p></div>
             <div class="pm-row"><input type="text" id="patchName" class="pm-field pm-grow" placeholder="Nome del suono" aria-label="Nome del suono da salvare">
               <button id="pmReadCurrent" class="chassis-page-btn" type="button">Leggi parte</button>
               <button id="btnSavePatch" class="chassis-page-btn pm-primary" type="button" title="Salva nella libreria il suono letto dal Virus">Salva suono</button></div>
           </div>
+          </details>
           <div class="lib-list" id="libList"></div>
         </section>
         <section id="pmMultis" class="pm-source" role="tabpanel" aria-labelledby="pmTabMultis" hidden>
-          <div class="pm-save-row"><div><h2>Libreria Multi</h2><p class="pm-hint">Un Multi conserva suoni e impostazioni delle quattro parti.</p></div>
+          <details class="pm-save"><summary>Salva un setup a 4 parti</summary><div class="pm-save-row"><div><h2>Libreria Multi</h2><p class="pm-hint">Un Multi conserva suoni e impostazioni delle quattro parti.</p></div>
             <div class="pm-row"><input type="text" id="multiName" class="pm-field pm-grow" placeholder="Nome del Multi" aria-label="Nome del multi da salvare">
               <button id="btnSaveMulti" class="chassis-page-btn pm-primary" type="button" title="Legge le 4 parti dal Virus e le salva come multi">Leggi e salva Multi</button></div>
           </div>
+          </details>
           <div class="lib-list" id="multiLibList"></div>
         </section>
         <section id="pmBanks" class="pm-source" role="tabpanel" aria-labelledby="pmTabBanks" hidden>
-          <div class="pm-save-row"><div><h2>Banchi del Virus</h2><p class="pm-hint">Leggi i suoni del banco o acquisiscili nella libreria locale.</p></div>
+          <div class="pm-save-row"><div><h2>Banchi del Virus</h2><p class="pm-hint">Leggi il banco per esplorarlo. Importa in libreria per conservarne i suoni in questo browser.</p></div>
             <div class="pm-row"><select id="bankPickSelect" class="pm-field pm-grow" aria-label="Banco del Virus"></select>
               <button id="btnReadBank" class="chassis-page-btn" type="button" title="Mostra le 128 patch del banco">Leggi banco</button>
-              <button id="btnFetchBank" class="chassis-page-btn pm-primary" type="button" title="Salva tutte le 128 patch del banco nella libreria">Acquisisci banco</button></div>
+              <button id="btnFetchBank" class="chassis-page-btn pm-primary" type="button" title="Salva tutte le 128 patch del banco nella libreria">Importa in libreria</button></div>
           </div>
           <div class="lib-list pm-bank" id="synthBankList"><div class="pm-empty">Scegli un banco e premi «Leggi banco».</div></div>
         </section>
         <div class="pm-footer"><span>File .syx / .mid: trascinali qui per importarli.</span><button type="button" class="chassis-page-btn" data-midi-key aria-expanded="false">MIDI e diagnostica</button></div>
+        </div>
       </div>
     </div>
     <div class="chassis-wood-strip"></div>
@@ -11685,6 +11692,7 @@ function exportCurrentPatchSyx() {
       patches = patches.filter(p => (p.name || '').toLowerCase().includes(searchVal) || (p.fullName || '').toLowerCase().includes(searchVal));
     }
 
+    updatePatchResultCount('banks', patches.length, Object.keys(bState.readPatches).length);
     if (patches.length === 0) {
       list.innerHTML = `
         <div style="color: #ff8888; font-size: 12px; text-align: center; padding: 16px; font-family: monospace;">
@@ -11965,7 +11973,13 @@ function exportCurrentPatchSyx() {
     const saveButton = document.getElementById('btnSavePatch');
     if (saveButton) saveButton.disabled = !window.lastReceivedDump || !isActiveSoundDump(window.lastReceivedDump);
     const target = document.getElementById('pmTarget');
-    if (target) target.textContent = window.currentSynthMode === 'multi' ? `Destinazione: P${(currentPartIndex || 0) + 1}` : 'Destinazione: Single';
+    if (target) {
+      const label = document.createElement('span');
+      label.textContent = window.currentSynthMode === 'multi' ? `Destinazione: P${(currentPartIndex || 0) + 1}` : 'Destinazione: Single';
+      const name = document.createElement('strong');
+      name.textContent = multiParts[currentPartIndex || 0]?.name || 'Init';
+      target.replaceChildren(label, name);
+    }
 
     for (let i = 0; i < NUM_PARTS; i++) {
       const part = multiParts[i];
@@ -12004,12 +12018,15 @@ function exportCurrentPatchSyx() {
       nameEl.title = part.name || 'INIT';
 
       const btnRow = document.createElement('div');
+      btnRow.className = 'pm-part-actions';
+      btnRow.hidden = i !== (currentPartIndex || 0);
       btnRow.style.cssText = 'display: flex; gap: 6px; margin-top: 4px;';
 
       const btnRead = document.createElement('button');
       btnRead.className = 'chassis-page-btn';
       btnRead.style.cssText = 'font-size: 10px; padding: 3px 6px; flex: 1;';
-      btnRead.textContent = 'leggi';
+      btnRead.textContent = 'Leggi';
+      btnRead.setAttribute('aria-label', `Leggi P${i + 1} dal Virus`);
       btnRead.title = `Leggi il suono di P${i + 1} dal synth`;
       btnRead.disabled = !selectedOutput || (window.currentSynthMode !== 'multi' && i > 0);
       btnRead.addEventListener('click', () => {
@@ -12019,7 +12036,8 @@ function exportCurrentPatchSyx() {
       const btnEdit = document.createElement('button');
       btnEdit.className = 'chassis-page-btn';
       btnEdit.style.cssText = 'font-size: 10px; padding: 3px 6px; flex: 1;';
-      btnEdit.textContent = 'modifica';
+      btnEdit.textContent = 'Modifica';
+      btnEdit.setAttribute('aria-label', `Modifica P${i + 1} in SINGLE`);
       btnEdit.title = `Apri P${i + 1} nell'editor SINGLE`;
       btnEdit.disabled = window.currentSynthMode !== 'multi' && i > 0;
       btnEdit.addEventListener('click', () => {
@@ -12113,6 +12131,7 @@ function exportCurrentPatchSyx() {
     const names = Object.keys(lib).sort().filter(name => name.toLowerCase().includes(query));
     const count = document.getElementById('pmMultisCount');
     if (count) count.textContent = String(Object.keys(lib).length);
+    updatePatchResultCount('multis', names.length, Object.keys(lib).length);
     if (names.length === 0){
       const empty = document.createElement('div');
       empty.className = 'pm-empty';
@@ -12372,6 +12391,14 @@ function exportCurrentPatchSyx() {
   });
 
   // Search input event
+  function updatePatchResultCount(source, shown, total) {
+    const panel = document.getElementById({ sounds: 'pmSounds', multis: 'pmMultis', banks: 'pmBanks' }[source]);
+    if (!panel) return;
+    const noun = source === 'multis' ? 'Multi' : source === 'banks' ? 'patch' : 'suoni';
+    panel.dataset.resultCount = shown === total ? `${total} ${noun}` : `${shown} di ${total} ${noun}`;
+    const status = document.getElementById('pmSearchStatus');
+    if (status && !panel.hidden) status.textContent = panel.dataset.resultCount;
+  }
   function selectPatchSource(source, focus = false) {
     document.querySelectorAll('[data-pm-source]').forEach(tab => {
       const selected = tab.dataset.pmSource === source;
@@ -12379,7 +12406,16 @@ function exportCurrentPatchSyx() {
       tab.tabIndex = selected ? 0 : -1;
       document.getElementById(tab.getAttribute('aria-controls')).hidden = !selected;
       if (selected && focus) tab.focus();
+      if (selected) {
+        const panel = document.getElementById(tab.getAttribute('aria-controls'));
+        const status = document.getElementById('pmSearchStatus');
+        if (status) status.textContent = panel.dataset.resultCount || (source === 'banks' ? 'Leggi un banco per esplorarne le patch.' : '0 elementi');
+      }
     });
+    const searchLabel = document.querySelector('.pm-search-label');
+    if (searchLabel) searchLabel.textContent = { sounds: 'Cerca nei suoni', multis: 'Cerca nei Multi', banks: 'Cerca nel banco letto' }[source];
+    const input = document.getElementById('libSearchInput');
+    if (input) input.placeholder = source === 'multis' ? 'Nome del Multi…' : 'Nome del suono…';
   }
   document.querySelectorAll('[data-pm-source]').forEach(tab => {
     tab.addEventListener('click', () => selectPatchSource(tab.dataset.pmSource));
@@ -12423,6 +12459,7 @@ function exportCurrentPatchSyx() {
   const libSearchInput = document.getElementById('libSearchInput');
   if (libSearchInput) {
     libSearchInput.addEventListener('input', () => {
+      document.getElementById('pmClearSearch').hidden = !libSearchInput.value;
       renderLibrary();
       renderMultiLibrary();
       if (window.bankFetchState && window.bankFetchState.active === false) {
@@ -12430,6 +12467,12 @@ function exportCurrentPatchSyx() {
       }
     });
   }
+
+  document.getElementById('pmClearSearch').addEventListener('click', () => {
+    libSearchInput.value = '';
+    libSearchInput.dispatchEvent(new Event('input', { bubbles: true }));
+    libSearchInput.focus();
+  });
 
   // ---------------------------------------------------------------------
   // Patch library (localStorage)
@@ -12458,10 +12501,28 @@ function exportCurrentPatchSyx() {
       names = names.filter(n => n.toLowerCase().includes(searchVal));
     }
 
+    updatePatchResultCount('sounds', names.length, Object.keys(lib).length);
     if (names.length === 0){
       const empty = document.createElement('div');
       empty.className = 'pm-empty';
       empty.textContent = searchVal ? `Nessun suono trovato per "${searchVal}".` : 'La libreria suoni è vuota. Importa un file .syx / .mid oppure leggi una parte dal Virus e salvala qui.';
+      if (!searchVal) {
+        const title = document.createElement('strong');
+        title.textContent = 'La tua libreria parte da qui';
+        empty.prepend(title, document.createElement('br'));
+        const actions = document.createElement('div');
+        actions.className = 'pm-empty-actions';
+        const importButton = document.createElement('button');
+        importButton.className = 'chassis-page-btn pm-primary';
+        importButton.textContent = 'Importa suoni';
+        importButton.addEventListener('click', () => document.getElementById('btnImportSyx').click());
+        const bankButton = document.createElement('button');
+        bankButton.className = 'chassis-page-btn';
+        bankButton.textContent = 'Esplora i banchi Virus';
+        bankButton.addEventListener('click', () => selectPatchSource('banks', true));
+        actions.append(importButton, bankButton);
+        empty.appendChild(actions);
+      }
       list.appendChild(empty);
       return;
     }
@@ -14492,7 +14553,7 @@ function exportCurrentPatchSyx() {
         case 'frontBtnStore':
           toPlay();
           document.getElementById('btnTabPatchManager')?.click();
-          setTimeout(() => { const pInput = document.getElementById('patchName'); if (pInput) { pInput.focus(); pInput.select(); } }, 100);
+          setTimeout(() => { const pInput = document.getElementById('patchName'); if (pInput) { selectPatchSource('sounds'); pInput.closest('details').open = true; pInput.focus(); pInput.select(); } }, 100);
           return;
       }
     }));
@@ -19150,7 +19211,7 @@ function exportCurrentPatchSyx() {
       if (action === 'config') openSettingsModal();
       if (action === 'store' || action === 'search') {
         document.getElementById('btnTabPatchManager').click();
-        setTimeout(() => {const el=document.getElementById(action==='store'?'patchName':'libSearchInput');el?.focus();},100);
+        setTimeout(() => {const el=document.getElementById(action==='store'?'patchName':'libSearchInput');if(action==='store'){selectPatchSource('sounds');el.closest('details').open=true;}el?.focus();},100);
         if(action==='store') setLastAction('STORE: salva il suono nella libreria PATCH');
       }
       if (action === 'part') {

@@ -247,3 +247,19 @@ Status: passed (local preview); rendering approval and publication pending.
 - Verification: all 31 existing Node tests passed; inline JavaScript syntax, twelve renderers and git diff whitespace checks passed. No browser console errors. Visually checked actual MULTI picker and catalog at 18/26 px on light/dark backgrounds.
 - Evidence: `output/qa/icons-integrated-multi.png`, `output/qa/icons-integrated-catalog.png`, `output/qa/icon-integration-tests.txt`. Preview: `/output/qa/icon-implementation-review.html`.
 - No commit or push: awaiting the user's rendering approval as requested.
+
+## PATCH UX workspace — 2026-10-15
+Status: passed locally; user rendering approval pending, no commit/push.
+- Grounded in the approved physical enclosure/LCD assets and current PATCH screenshots. Destination cards move to a compact left column; active part retains read/edit actions. Search/library becomes the dominant central work area.
+- Added contextual search labels, source-specific result counts with live status, clear-search button, actionable empty library, expandable sound/Multi save controls, and clearer bank import wording. Existing IDs and all MIDI loading paths retained.
+- STORE shortcuts now expand the sound-save controls before focusing the name input. Keyboard tab navigation and focus retained.
+- Browser QA: actual app on Snow and Desktop, 1280×720; tablet 1024×768 and 768×1024, document width equals viewport in both tablet sizes. Checked clear search, empty search, expandable save controls and tab navigation. No console errors. Local library is empty; populated rows, name filtering and correct load destination are covered by existing Node tests.
+- 33 Node tests passed, including new tests for source-specific counts/search labels and empty-library navigation. git diff --check passed. Plugin web resources synchronized; native binaries not rebuilt.
+- Compared before/after in output/qa/patch-ux-comparison.png; library/search now appear beside destinations rather than below four tall cards. Evidence: patch-ux-after.png, patch-ux-desktop-dark.png, patch-ux-tablet.png, patch-ux-tablet-portrait.png; test log patch-ux-tests.txt.
+
+### PATCH v5 — restrained LCD allocation
+Status: passed locally; awaiting rendering approval.
+- User rejected the full blue workspace. Removed LCD substrate, gasket and PMMA overlay from the overall PATCH panel. Controls, destination cards and library now sit on the actual neutral powder-coated body map.
+- Reserved the optical LCD treatment for the small destination readout, with destination and current sound name. Snow uses its native blue LCD; Desktop uses its own gray-green substrate. Updated static accessory review PATCH images to avoid stale previews.
+- Verified both skins in the actual browser; no console errors. 33 tests passed and diff whitespace clean. Plugin web resources updated; no commit/push.
+- Evidence: output/qa/patch-ux-v5-snow.png and patch-ux-v5-dark.png.
