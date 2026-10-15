@@ -24,3 +24,7 @@ Gli ARP esterni richiedono la pagina aperta: quando diventa nascosta, i motori s
 ## Verifiche
 
 `node --test tests/arp-parts.test.cjs` verifica quattro flussi MIDI contemporanei, canali personalizzati, indirizzi SysEx, isolamento dei controlli, HOLD, stop, cancellazione dei gate e vincoli SINGLE/canali duplicati. La suite completa passa con 141 test. Verifica UI in `.local/arp-parts-qa.html` su 8773 con accesso MIDI disabilitato; nessuna nota inviata al Virus fisico durante i test. L'ascolto hardware delle quattro parti insieme resta da effettuare.
+
+## Pubblicazione
+
+Disponibile online dal 16 ottobre 2026, versione `d27fb961`. Verificata la presenza dei quattro motori nella risposta autenticata dell’editor; la prova di ascolto hardware rimane distinta dai controlli di pubblicazione.

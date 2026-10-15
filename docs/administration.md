@@ -73,8 +73,26 @@ server locale di verifica, incluse le copertine presenti nel backup corrente.
   relativi modelli/gestori client. Navigazione, performance e caricamento nel buffer
   MIDI rimangono disponibili agli utenti.
 
-Queste modifiche sono implementate e verificate localmente, **non ancora pubblicate**.
-La pubblicazione deve includere access.php, index.php, app.php, banks.php e gli
-asset aggiornati, aggiungendo admin_hash alla configurazione privata esistente
-senza sovrascrivere l’invito utente. La directory del catalogo va mantenuta tra i
-rilasci; non copiarla in una directory pubblica di asset.
+## Pubblicazione verificata · 16 ottobre 2026
+
+Pubblicata la versione `d27fb96114f4915fb383821e94e1c27bca777571` su
+https://tools.guerriericreativi.it/tools/virus-ti-snow/.
+
+La configurazione privata esistente è stata salvata in una copia di sicurezza
+nella directory protetta `.access`, poi aggiornata aggiungendo solo `admin_hash`.
+Il codice utente e gli altri valori della configurazione sono stati conservati.
+Lo script temporaneo di migrazione si è rimosso dopo l’esecuzione (404 verificato).
+Nessun banco di riferimento privato è stato trasferito al catalogo pubblico.
+
+Verifiche HTTP di produzione:
+
+- Codice amministratore accettato e ruolo `admin` nella sessione dell’editor.
+- Codice utente precedente accettato e ruolo `user`.
+- Catalogo leggibile da entrambi; scritture utente e scritture amministratore
+  prive di CSRF respinte con 403.
+- Catalogo anonimo 401; editor anonimo reindirizzato all’accesso.
+- Cookie HTTPS Secure/HttpOnly e logout verificati per entrambi i ruoli.
+- Percorsi privati e PHP interni 403; hash dei nuovi script pubblicati verificati.
+
+Le librerie locali rimangono sul dispositivo. Per i rilasci successivi conservare
+`.access/config.php` e `.access/banks/`, senza sovrascriverli con build locali.
