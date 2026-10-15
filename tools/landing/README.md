@@ -27,8 +27,7 @@ node --test tests/*.test.cjs
 
 Requires a hosting plan executing PHP and Apache/LiteSpeed `.htaccess`, HTTPS,
 PHP sessions and writable private storage. A static-only hosting target cannot
-run this gate. Current production stays unchanged until rendering approval and
-explicit publication.
+run this gate. Publish only after rendering approval and explicit authorization.
 
 1. Build the entry into the Tools public directory using the updated sync script.
    It removes the previous public static editor, protects its private copy, and

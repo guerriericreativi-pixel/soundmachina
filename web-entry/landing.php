@@ -25,7 +25,7 @@
       <figure class="instrument"><img id="heroInstrument" src="assets/landing/hero-snow.webp" alt="Access Virus TI Snow, scocca chiara e display azzurro" width="1600" height="1000" fetchpriority="high"><figcaption><span class="status-dot" aria-hidden="true"></span><span id="instrumentCaption">VIRUS TI SNOW</span><span>Hardware. In primo piano.</span></figcaption></figure>
       <aside class="invite" id="accesso" aria-labelledby="invite-title">
         <p class="eyebrow">Il tuo accesso allo studio</p>
-        <h2 id="invite-title">Entra nel<br>tuo studio.</h2>
+        <h2 id="invite-title">Entra nel<br> tuo studio.</h2>
         <?php if (vh_authenticated()): ?>
           <p class="invite-copy">Il tuo invito è attivo.<br>È il momento di fare suono.</p>
           <a class="primary-button" href="app.php">Apri VIRUS-H <img src="assets/landing/arrow-right.svg" alt="" width="22" height="22"></a>

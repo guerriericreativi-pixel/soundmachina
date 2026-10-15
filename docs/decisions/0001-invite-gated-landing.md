@@ -1,6 +1,6 @@
 # Invite-gated VIRUS-H landing
 
-Date: 2026-10-15. Status: implemented locally, publication pending.
+Date: 2026-10-15. Status: deployed and verified on Hostinger.
 
 The editor stays a standalone web document for the native plugin. A separate PHP
 entry supplies the public landing and a server-side shared-invite session. This

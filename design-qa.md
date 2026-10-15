@@ -304,3 +304,17 @@ configuration and verification of PHP + Apache/LiteSpeed before activation.
 
 Evidence: landing-snow-desktop.png, landing-dark-desktop.png, landing-snow-full.png,
 landing-dark-full.png, landing-tablet.png and landing-tests.txt in output/qa/.
+
+### Hostinger production publication — 2026-10-15
+Final result: passed. PHP execution verified on the real app directory (PHP 8.3.35).
+Private hash configuration installed separately from Git under server-denied .access/.
+Live HTTP checks passed: public landing, both hero assets, anonymous app.php and
+legacy index.html redirect to invitation entry, .editor and config paths return403,
+CSRF-backed wrong-code feedback returns401, valid login opens the real editor,
+HTTPS session cookie is Secure, logout revokes access. Evidence is in
+output/qa/landing-production-verification.json. Production URL:
+https://tools.guerriericreativi.it/tools/virus-ti-snow/ .
+40 automated tests passed before publication; Tools Vite build passed. The local
+pytest command and bundled pytest module are unavailable; the changed projects
+are covered by the actual Node/PHP integration suite. Narrow layouts retain the
+word boundary in the invite heading when its line break is hidden.
