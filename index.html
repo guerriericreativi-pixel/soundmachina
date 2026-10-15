@@ -7984,7 +7984,7 @@
 <script src="virus-icons.js?v=1"></script>
 <script src="multi-setup.js"></script>
 <script src="virus-sound-bank.js?v=5"></script>
-<script src="patch-bank-library.js?v=5"></script>
+<script src="patch-bank-library.js?v=6"></script>
 <link rel="stylesheet" href="patch-bank-library.css?v=4">
 <script src="forma-bank.js?v=2"></script>
 <script src="studio-instruments.js?v=6"></script>
@@ -9478,7 +9478,10 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
       }
       // Un Single Patch Dump del Virus TI ha almeno 265 bytes (tipicamente 267 bytes)
       if (msgBytes.length >= 250) {
-        // Studio captures only actual MIDI replies, never a host-side load.
+        if (msgBytes[6] === 0x10 && [267,524].includes(msgBytes.length)) {
+        document.dispatchEvent(new CustomEvent('virus-patch-dump', {detail:{bytes:Array.from(msgBytes)}}));
+      }
+      // Studio captures only actual MIDI replies, never a host-side load.
         if (msgBytes[6] === 0x10 && msgBytes[7] === 0 && isActiveSoundDump(msgBytes)) {
           document.dispatchEvent(new CustomEvent('virus-studio-received', {detail:{bytes:Array.from(msgBytes)}}));
         }
@@ -18364,11 +18367,23 @@ function exportCurrentPatchSyx() {
 
 
 
+  const archiveTransfer=VirusPatchBanks.createTransfer({
+    context:()=>{const buffer=getSoundEditBuffer(),device=window.virusDeviceId??deviceId();return {
+      connected:!!selectedOutput,input:!!selectedInput,sysex:midiAccess?.sysexEnabled,
+      buffer,device,output:selectedOutput,
+      key:[selectedOutput?.id,selectedInput?.id,buffer,device].join(':')
+    };},
+    prepare:preparePatchForBuffer,
+    send:(context,bytes)=>{context.output.send(Uint8Array.from(bytes));recordMidiTx('Banchi: caricamento verificato',bytes);},
+    subscribe:callback=>{const handler=event=>callback(event.detail.bytes);document.addEventListener('virus-patch-dump',handler);return()=>document.removeEventListener('virus-patch-dump',handler);}
+  });
   window.virusBankArchive=VirusPatchBanks.create(document.getElementById('patchBankArchive'),{
     bank:VirusSoundBank,
     sidebar:document.getElementById('pmBankSidebar'),
-    context:()=>({connected:!!selectedOutput,label:window.currentSynthMode==='multi'?'P'+((currentPartIndex||0)+1):'Single'}),
-    load:bytes=>loadPatchToActiveBuffer(bytes),download:downloadBlob
+    context:()=>({connected:!!selectedOutput,mode:window.currentSynthMode,label:window.currentSynthMode==='multi'?'P'+((currentPartIndex||0)+1):'Single'}),
+    setMode:mode=>{window.setSynthMode(mode,false);renderMultiPartsOverview();},
+    verified:true,
+    load:async bytes=>{const reply=await archiveTransfer.load(bytes);window.lastReceivedDump=Uint8Array.from(reply);applyDumpToActivePatch(reply);renderMultiPartsOverview();return true;},download:downloadBlob
   });
   renderLibrary();
   renderMultiLibrary();

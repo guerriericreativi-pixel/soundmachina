@@ -91,3 +91,21 @@ archivio e gli stessi controlli, senza duplicare le raccolte.
 La scocca PATCH mantiene i bordi piegati, con illuminazione più bassa e diffusa:
 gradiente ampio sul metallo satinato, riflessi laterali attenuati e ombre contenute.
 La modifica è limitata a PATCH e non altera l’illuminazione degli altri strumenti.
+
+## Caricamento verificato sul Virus · 16 ottobre 2026
+
+L’archivio ora espone la modalità di destinazione SINGLE/MULTI. Il comando Carica
+imposta esplicitamente quella modalità sul Virus (Global Play Mode), attende il
+cambio, invia il dump al buffer scelto e richiede la rilettura dello stesso buffer.
+Porta, Device ID e parte rimangono fissati per tutta la transazione; un cambio di
+destinazione interrompe l’operazione con un errore.
+
+Il messaggio «confermato dal Virus» richiede una vera risposta MIDI IN corrispondente
+ai parametri della patch. L’assenza di risposta o una patch differente mostrano un
+errore invece del precedente successo ottimistico. MIDI IN e autorizzazione SysEx
+sono necessari; i messaggi indicano cosa controllare. Le importazioni e la scelta
+nel catalogo restano senza invii MIDI; i preset RAM permanenti non vengono scritti.
+
+Verifica: `tests/patch-transfer.test.cjs` copre ordine degli invii, attese, rilettura,
+SINGLE/MULTI, Device ID, timeout, risposta differente, cambi di destinazione,
+concorrenza e permessi. Suite completa: 146 test superati.

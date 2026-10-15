@@ -3,6 +3,46 @@
   'use strict';
   const MAX_FILE=8*1024*1024;
   const requireWrite=()=>root.VirusAccess?.requireWrite();
+  // MIDIOutput.send confirms queueing only. Read the same hardware buffer back
+  // before reporting success, with a pinned port, part and explicit play mode.
+  function createTransfer(io){
+    let busy=false;
+    async function load(bytes){
+      if(busy)throw Error('Un caricamento è già in corso.');
+      const context=io.context();
+      if(!context.connected)throw Error('Collega MIDI OUT per caricare.');
+      if(context.sysex===false)throw Error('Consenti MIDI e SysEx nelle impostazioni del sito, poi ricarica la pagina.');
+      if(!context.input)throw Error('Seleziona anche MIDI IN: serve per verificare la ricezione del Virus.');
+      const expected=io.prepare(bytes,context.buffer,context.device);
+      busy=true;
+      try{return await new Promise((resolve,reject)=>{
+        let finished=false,requested=false,unsubscribe=()=>{};const timers=[];
+        const valid=()=>io.context().key===context.key;
+        const finish=(error,reply)=>{if(finished)return;finished=true;timers.forEach(clearTimeout);unsubscribe();if(error)reject(error);else resolve(reply);};
+        const send=data=>{if(!valid())throw Error('Porta o destinazione MIDI cambiata: riprova il caricamento.');io.send(context,data);};
+        unsubscribe=io.subscribe(reply=>{
+          if(!requested||reply[6]!==16||reply[7]!==0||reply[8]!==context.buffer||reply[5]!==context.device&&context.device!==16)return;
+          if(!valid()){finish(Error('Porta o destinazione MIDI cambiata.'));return;}
+          const same=[...expected.slice(9,265)].every((v,i)=>reply[9+i]===v)
+            &&(expected.length!==524||reply.length===524&&[...expected.slice(266,522)].every((v,i)=>reply[266+i]===v));
+          if(!same){finish(Error('Il Virus ha restituito un suono diverso: caricamento non confermato. Controlla MIDI Dump RX e la modalità SINGLE/MULTI.'));return;}
+          finish(null,Array.from(reply));
+        });
+        timers.push(setTimeout(()=>finish(Error('Nessuna conferma dal Virus. Controlla MIDI IN, Device ID e MIDI Dump RX, poi riprova.')),4500));
+        try{
+          send([240,0,32,51,1,context.device===16?0:context.device,115,0,122,context.buffer===64?0:2,247]);
+          timers.push(setTimeout(()=>{
+            try{
+              send(expected);
+              // DIN MIDI needs ~170 ms for a TI dump; allow mode/patch processing too.
+              timers.push(setTimeout(()=>{try{requested=true;send([240,0,32,51,1,context.device,48,0,context.buffer,247]);}catch(error){finish(error);}},600));
+            }catch(error){finish(error);}
+          },200));
+        }catch(error){finish(error);}
+      });}finally{busy=false;}
+    }
+    return {load};
+  }
   function createRemoteStore({bank,crypto,access,fetch}){
     async function request(body){const response=await fetch(access.remote,{method:body?'POST':'GET',credentials:'same-origin',cache:'no-store',headers:body?{'Content-Type':'application/json','X-CSRF-Token':access.csrf}:{},...(body?{body:JSON.stringify(body)}:{})});const data=await response.json();if(!response.ok)throw Error(data.error||'Catalogo non disponibile.');return data;}
     return {
@@ -86,8 +126,15 @@
     const model=createModel({store,bank:bridge.bank,crypto});
     let records=[],selected=null,query='',busy=false;
     const sorted=items=>items.sort((a,b)=>a.filename.localeCompare(b.filename));
-    container.innerHTML='<div class="pba-head"><div><h2>I tuoi banchi</h2><p>Conserva i file .mid e .syx. Scegli un banco, poi un suono da caricare.</p></div><div><button type="button" data-bank-action="import">Importa banchi</button><button type="button" data-bank-action="backup">Backup banchi</button><button type="button" data-bank-action="restore">Ripristina banchi</button></div></div><input type="file" data-bank-files accept=".mid,.midi,.syx" multiple hidden><input type="file" data-bank-backup accept=".json" hidden><p class="pba-status" role="status" aria-live="polite"></p><div class="pba-layout"><nav class="pba-banks" aria-label="Banchi archiviati"></nav><section class="pba-detail" aria-label="Suoni del banco"></section></div><p class="pba-note">Salvati in questo browser e su questo indirizzo. Esporta un backup per conservarli anche fuori dal browser. Carica usa solo il buffer Single o la parte Multi scelta.</p>';
+    container.innerHTML='<div class="pba-head"><div><h2>I tuoi banchi</h2><p>Conserva i file .mid e .syx. Scegli un banco, poi un suono da caricare.</p></div><div><button type="button" data-bank-action="import">Importa banchi</button><button type="button" data-bank-action="backup">Backup banchi</button><button type="button" data-bank-action="restore">Ripristina banchi</button></div></div><input type="file" data-bank-files accept=".mid,.midi,.syx" multiple hidden><input type="file" data-bank-backup accept=".json" hidden><p class="pba-status" role="status" aria-live="polite"></p><div class="pba-layout"><nav class="pba-banks" aria-label="Banchi archiviati"></nav><section class="pba-detail" aria-label="Suoni del banco"></section></div><p class="pba-note">Esporta un backup per conservare i banchi. Carica usa il buffer Single o la parte Multi scelta, senza sovrascrivere i preset nella memoria del Virus.</p>';
     const status=container.querySelector('.pba-status'),list=container.querySelector('.pba-banks'),detail=container.querySelector('.pba-detail');
+    let modeSelect;
+    if(bridge.setMode){
+      const label=document.createElement('label');label.textContent='Destinazione sul Virus ';
+      modeSelect=document.createElement('select');modeSelect.setAttribute('aria-label','Modalità destinazione Virus');
+      for(const [value,text] of [['single','SINGLE'],['multi','MULTI · parte selezionata']]){const option=document.createElement('option');option.value=value;option.textContent=text;modeSelect.append(option);}
+      modeSelect.value=bridge.context().mode||'single';modeSelect.onchange=()=>{bridge.setMode(modeSelect.value);render();};label.append(modeSelect);container.querySelector('.pba-head').append(label);
+    }
     // Reuse the space below the part destinations, leaving the full browser
     // width for the cover and patches. The same nav keeps its live handlers.
     if(bridge.sidebar){bridge.sidebar.append(list);container.classList.add('pba-has-sidebar');}
@@ -96,6 +143,7 @@
     function button(text,action){const b=el('button',text);b.type='button';b.addEventListener('click',action);return b;}
     function render(){
       list.replaceChildren();detail.replaceChildren();
+      if(modeSelect){modeSelect.value=bridge.context().mode||'single';modeSelect.disabled=busy;}
       container.querySelectorAll('[data-bank-action]').forEach(b=>b.disabled=busy);
       const visible=records.filter(r=>!query||r.filename.toLowerCase().includes(query)||r.patches.some(p=>p.name.toLowerCase().includes(query)));
       const active=visible.find(r=>r.id===selected)||visible[0];if(active)selected=active.id;
@@ -113,12 +161,12 @@
       detail.append(el('p',patches.length+' / '+record.patches.length+' patch · destinazione '+bridge.context().label));
       const rows=el('div',null,'pba-patches');
       for(const patch of patches){const row=el('div',null,'pba-patch');row.append(el('span',String(patch.position).padStart(3,'0')),el('strong',patch.name));
-        const load=button('Carica → '+bridge.context().label,async()=>{if(busy)return;busy=true;refresh();try{if(!bridge.context().connected)throw Error('Collega MIDI OUT per caricare.');const result=await bridge.load(patch.bytes);if(result===false)throw Error('Invio non riuscito.');status.textContent=patch.name+' inviato a '+bridge.context().label+'.';}catch(error){status.textContent=error.message;}finally{busy=false;render();}});load.dataset.bankLoad='';load.disabled=busy||!bridge.context().connected;
+        const load=button('Carica → '+bridge.context().label,async()=>{if(busy)return;busy=true;refresh();try{if(!bridge.context().connected)throw Error('Collega MIDI OUT per caricare.');status.textContent='Caricamento di '+patch.name+'… attendo conferma dal Virus.';const target=bridge.context().label;const result=await bridge.load(patch.bytes);if(result===false)throw Error('Invio non riuscito.');status.textContent=patch.name+(bridge.verified?' confermato dal Virus in ':' inviato a ')+target+'.';}catch(error){status.textContent=error.message;}finally{busy=false;render();}});load.dataset.bankLoad='';load.disabled=busy||!bridge.context().connected;
         row.append(load,button('.mid ↓',()=>bridge.download(bridge.bank.midiFromDumps([patch.bytes],patch.name),patch.name.replace(/[^a-z0-9_-]/gi,'_')+'.mid','audio/midi')));rows.append(row);}
       detail.append(rows);
     }
     function cover(record,className){if(record.cover){const img=el('img',null,className);img.src=validateCover(record.cover);img.alt=className==='pba-thumb'?'':'Copertina di '+record.filename;return img;}const placeholder=el('span','VH',className+' pba-cover-empty');placeholder.setAttribute('aria-hidden','true');return placeholder;}
-    function refresh(){container.querySelectorAll('[data-bank-load]').forEach(b=>{b.disabled=busy||!bridge.context().connected;b.textContent='Carica → '+bridge.context().label;});}
+    function refresh(){if(modeSelect){modeSelect.value=bridge.context().mode||'single';modeSelect.disabled=busy;}container.querySelectorAll('[data-bank-load]').forEach(b=>{b.disabled=busy||!bridge.context().connected;b.textContent='Carica → '+bridge.context().label;});}
     async function operation(action,success){if(busy)return;busy=true;render();try{const added=await action();records=sorted(await model.list());status.textContent=success||(added===0?'Banchi già presenti: nessun duplicato creato.':added+(added===1?' banco salvato.':' banchi salvati.')+' Nessun invio MIDI.');}catch(error){status.textContent='Archivio: '+error.message;}finally{busy=false;render();}}
     coverFile.onchange=async()=>{const file=coverFile.files[0],id=coverTarget;coverFile.value='';if(file&&id)await operation(async()=>model.setCover(id,await prepareCover(file,document)),'Copertina salvata. Nessun invio MIDI.');};
     const files=container.querySelector('[data-bank-files]'),backup=container.querySelector('[data-bank-backup]');
@@ -130,5 +178,5 @@
     const ready=model.list().then(r=>{records=sorted(r);render();}).catch(e=>{status.textContent=e.message;render();});render();
     return {ready,model,refresh,async reload(){records=sorted(await model.list());render();},search(value){query=String(value).trim().toLowerCase();render();},async importBytes(bytes,name){await ready;await operation(()=>model.importFiles([{name,bytes}]));}};
   }
-  const api={createStore,createRemoteStore,createModel,create,validateCover};if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.VirusPatchBanks=api;
+  const api={createTransfer,createStore,createRemoteStore,createModel,create,validateCover};if(typeof module!=='undefined'&&module.exports)module.exports=api;else root.VirusPatchBanks=api;
 })(typeof window!=='undefined'?window:globalThis);
