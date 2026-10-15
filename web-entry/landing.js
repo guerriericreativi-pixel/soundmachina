@@ -8,7 +8,7 @@
     const dark = theme === 'dark';
     root.dataset.theme = dark ? 'dark' : 'snow';
     themeButtons.forEach(button => button.setAttribute('aria-pressed', String(button.dataset.themeChoice === root.dataset.theme)));
-    hero.src = `assets/landing/hero-${root.dataset.theme}.webp`;
+    hero.src = `assets/landing/hero-${root.dataset.theme}-transparent.png`;
     hero.alt = dark ? 'Access Virus TI2 Desktop, scocca scura e pannello completo' : 'Access Virus TI Snow, scocca chiara e display azzurro';
     const activeFeature = document.querySelector('[data-feature][aria-selected="true"]')?.dataset.feature || 'panel';
     document.getElementById('featureImage').src = `assets/landing/detail-${activeFeature}-${root.dataset.theme}.webp`;

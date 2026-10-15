@@ -7,8 +7,8 @@
 <meta name="description" content="Il controllo del tuo Access Virus TI, nel browser. Esplora le patch, costruisci setup a quattro parti e lavora sul suono. Accesso su invito.">
 <meta name="theme-color" content="#e9e9e3">
 <link rel="icon" href="assets/icons/lucide/audio-waveform.svg" type="image/svg+xml">
-<link rel="stylesheet" href="landing.css?v=1">
-<script src="landing.js?v=1" defer></script>
+<link rel="stylesheet" href="landing.css?v=4">
+<script src="landing.js?v=3" defer></script>
 </head>
 <body>
 <a class="skip-link" href="#contenuto">Vai al contenuto</a>
@@ -19,10 +19,11 @@
   <div class="theme-switch" role="group" aria-label="Scegli l’ambiente"><button type="button" data-theme-choice="snow" aria-pressed="true">Snow</button><button type="button" data-theme-choice="dark" aria-pressed="false">Dark</button></div>
 </header>
 <main id="contenuto">
-  <section class="hero wrap" aria-labelledby="hero-title">
+  <section class="hero" aria-labelledby="hero-title">
+    <div class="wrap">
     <div class="hero-intro"><p class="eyebrow">Due anime. Un solo studio.</p><h1 id="hero-title">Più spazio<br class="compact-break"> al suono.</h1><p class="hero-subtitle">Il controllo del tuo Virus,<br class="compact-break"> finalmente a portata di mano.</p></div>
     <div class="hero-stage">
-      <figure class="instrument"><img id="heroInstrument" src="assets/landing/hero-snow.webp" alt="Access Virus TI Snow, scocca chiara e display azzurro" width="1600" height="1000" fetchpriority="high"><figcaption><span class="status-dot" aria-hidden="true"></span><span id="instrumentCaption">VIRUS TI SNOW</span><span>Hardware. In primo piano.</span></figcaption></figure>
+      <figure class="instrument"><img id="heroInstrument" src="assets/landing/hero-snow-transparent.png" alt="Access Virus TI Snow, scocca chiara e display azzurro" width="1600" height="1000" fetchpriority="high"><figcaption><span class="status-dot" aria-hidden="true"></span><span id="instrumentCaption">VIRUS TI SNOW</span><span>Hardware. In primo piano.</span></figcaption></figure>
       <aside class="invite" id="accesso" aria-labelledby="invite-title">
         <p class="eyebrow">Il tuo accesso allo studio</p>
         <h2 id="invite-title">Entra nel<br> tuo studio.</h2>
@@ -44,6 +45,7 @@
       </aside>
     </div>
     <div class="hero-bottom"><span>Per Virus TI Snow e TI2 Desktop</span><a href="#perche">Scopri cosa cambia nel tuo studio <img src="assets/landing/arrow-down.svg" alt="" width="18" height="18"></a></div>
+    </div>
   </section>
   <section class="why section wrap" id="perche" aria-labelledby="why-title">
     <div class="section-label"><span>01 / PERCHÉ</span><span>Il suono resta al centro.</span></div>

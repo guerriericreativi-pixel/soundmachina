@@ -11,11 +11,13 @@ function page(){
 test('Snow/Dark switch updates the actual hardware hero, feature images and editor theme',()=>{
  const w=page(),d=w.document;d.querySelector('[data-theme-choice="dark"]').click();
  assert.equal(d.documentElement.dataset.theme,'dark');
- assert.match(d.getElementById('heroInstrument').src,/hero-dark.webp$/);
+ assert.match(d.getElementById('heroInstrument').src,/hero-dark-transparent.png$/);
  assert.equal(d.querySelector('[data-theme-choice="dark"]').getAttribute('aria-pressed'),'true');
  assert.match(d.getElementById('featureImage').src,/detail-panel-dark.webp$/);
  assert.equal(w.localStorage.getItem('virusTiSnow_theme'),'elektron');
- d.querySelector('[data-theme-choice="snow"]').click();assert.match(d.getElementById('featureImage').src,/detail-panel-snow.webp$/);
+ d.querySelector('[data-theme-choice="snow"]').click();
+ assert.match(d.getElementById('featureImage').src,/detail-panel-snow.webp$/);
+ assert.match(d.getElementById('heroInstrument').src,/hero-snow-transparent.png$/);
  w.close();
 });
 test('Feature exploration supports keyboard navigation and updates description and image',()=>{
