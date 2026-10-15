@@ -19,7 +19,7 @@
   const b = (i, n, max, initial, min) => param(B, i, n, max, initial, min);
   const e = (i, n, max, initial, min) => param(E, i, n, max, initial, min);
   const f = (i, n, max, initial, min) => param(F, i, n, max, initial, min);
-  const offset = (page) => ({ [A]: 9, [B]: 137, [E]: 265, [0x6f]: 393 })[page];
+  const offset = (page) => ({ [A]: 9, [B]: 137, [E]: 266, [0x6f]: 394 })[page];
   const buttonNames = [
     "Destinazione precedente",
     "Destinazione successiva",

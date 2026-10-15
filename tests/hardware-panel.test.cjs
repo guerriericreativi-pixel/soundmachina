@@ -170,11 +170,11 @@ test("Tap computes tempo; external actions target mode, part, PATCH and MIDI", (
     ["program", 1],
   ]);
 });
-test("TI dump offsets preserve 128-byte pages", () => {
+test("TI dump offsets skip the intermediate A/B checksum", () => {
   assert.equal(offset(0x70), 9);
   assert.equal(offset(0x71), 137);
-  assert.equal(offset(0x6e), 265);
-  assert.equal(offset(0x6f), 393);
+  assert.equal(offset(0x6e), 266);
+  assert.equal(offset(0x6f), 394);
   assert.equal(offset(0x73), undefined);
 });
 test("Shift uses TI F121 Unison, A50 Ring and valid saturation/semitone ranges", () => {

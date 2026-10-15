@@ -46,3 +46,10 @@ plugin/VirusH/resources/web/
 # Never version invitation deployment state
 **/.access/config.php
 **/invite-code.txt
+
+# Private administrator credentials
+**/admin-code.txt
+
+# Browser QA captures and generated local reports
+.playwright-cli/
+output/

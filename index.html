@@ -7178,7 +7178,12 @@
     #lightLimiter { margin-left: 0 !important; }
   }
 </style>
-<link rel="stylesheet" href="virus-accessory-panel.css?v=folded-shell-v1">
+<link rel="stylesheet" href="virus-accessory-panel.css?v=compact-shell-v1">
+<link rel="stylesheet" href="sound-paths.css?v=6">
+<link rel="stylesheet" href="sound-studio.css?v=8">
+<link rel="stylesheet" href="studio-instruments.css?v=8">
+<link rel="stylesheet" href="studio-effects.css?v=1">
+<link rel="stylesheet" href="dx7-studio.css?v=2">
 <style>
 .virus-icon { display: inline-block; flex: none; vertical-align: middle; }
 [data-virus-icon] { display: inline-flex; align-items: center; vertical-align: middle; margin-right: 4px; }
@@ -7277,10 +7282,11 @@
       <button class="segmented-tab" id="btnTabMultipart">MULTI</button>
       <button class="segmented-tab" id="btnTabSynth">SINGLE</button>
       <button class="segmented-tab" id="btnTabFxRack"><span data-virus-icon="rack" aria-hidden="true"></span> FX RACK</button>
-      <button class="segmented-tab" id="btnTabPatchManager">PATCH</button>
+      <button class="segmented-tab" id="btnTabPatchManager">BANCHI</button>
       <button class="segmented-tab" id="btnTabArp">ARP</button>
       <button class="segmented-tab" id="btnTabSequencer">SEQ</button>
       <button class="segmented-tab" id="btnTabSong">SONG</button>
+      <button class="segmented-tab" id="btnTabSoundPaths">STUDIO</button>
     </div>
   </div>
 
@@ -7551,7 +7557,7 @@
           <div style="font-weight: 700; display: flex; align-items: center; gap: 4px;">
             <span>💡</span> <span>SUGGERIMENTO</span>
           </div>
-          <div>Trascina direttamente i file <code>.syx</code> o <code>.mid</code> nella finestra per caricarli e inviarli al sintetizzatore in pochi secondi.</div>
+          <div>Trascina direttamente i file <code>.syx</code> o <code>.mid</code> nella finestra per archiviarli. Scegli poi una patch e premi Carica per inviarla al Virus.</div>
         </div>
       </div>
     </div>
@@ -7563,9 +7569,10 @@
           <button id="btnSyncMultiParts" class="chassis-page-btn" type="button">Leggi parti dal Virus</button>
         </div>
         <div id="multiPartsOverview" class="pm-parts"></div>
+        <section id="pmBankSidebar" class="pba-sidebar" aria-label="La tua collezione di banchi" hidden><h2>Banchi archiviati</h2></section>
         </aside>
         <div class="pm-browser">
-        <div class="pm-browser-heading"><div><h2>Esplora le patch</h2><p class="pm-hint">Trova un suono e caricalo nella destinazione scelta.</p></div><span class="pm-target" id="pmTarget" aria-live="polite">Destinazione: P1</span></div>
+        <div class="pm-browser-heading"><div><h2>Esplora le patch</h2><p id="pmAccessRole" class="pm-hint"></p><p class="pm-hint">Trova un suono e caricalo nella destinazione scelta.</p></div><span class="pm-target" id="pmTarget" aria-live="polite">Destinazione: P1</span></div>
         <div class="pm-toolbar">
           <div class="pm-search"><label for="libSearchInput" class="pm-search-label">Cerca nei suoni</label><div class="pm-search-field"><input type="search" id="libSearchInput" class="pm-field pm-grow" placeholder="Nome del suono…" aria-label="Cerca nelle librerie"><button type="button" id="pmClearSearch" class="pm-clear" aria-label="Cancella ricerca" hidden>×</button></div></div>
           <button id="btnImportSyx" class="chassis-page-btn" type="button">Importa .syx / .mid</button>
@@ -7580,11 +7587,13 @@
           <div class="pm-tabs" role="tablist" aria-label="Sorgente patch">
             <button type="button" role="tab" id="pmTabSounds" aria-selected="true" aria-controls="pmSounds" data-pm-source="sounds">Suoni <span id="pmSoundsCount">0</span></button>
             <button type="button" role="tab" id="pmTabMultis" aria-selected="false" aria-controls="pmMultis" data-pm-source="multis" tabindex="-1">Multi <span id="pmMultisCount">0</span></button>
+            <button type="button" role="tab" id="pmTabArchive" aria-selected="false" aria-controls="pmArchive" data-pm-source="archive" tabindex="-1">I miei banchi <span id="pmArchiveCount">0</span></button>
             <button type="button" role="tab" id="pmTabBanks" aria-selected="false" aria-controls="pmBanks" data-pm-source="banks" tabindex="-1">Banchi Virus</button>
           </div>
         </div>
         <p id="pmSearchStatus" class="pm-search-status" role="status" aria-live="polite">0 suoni</p>
         <section id="pmSounds" class="pm-source" role="tabpanel" aria-labelledby="pmTabSounds">
+          <div class="pm-original-bank"><div><strong>DIRECTIONS 01</strong><span>20 patch originali · Trance, Psytrance, Techno, Ambient, Synthwave</span></div><button class="chassis-page-btn" id="pmAddOriginalBank" type="button">Aggiungi 20 suoni</button><button class="chassis-page-btn" id="pmExportOriginalBank" type="button">Scarica .mid</button><button class="chassis-page-btn" id="pmExportOriginalBankSyx" type="button">.syx</button><p id="pmOriginalBankStatus" role="status" aria-live="polite">Revisione 3 · da verificare all’ascolto sul Virus.</p></div>
           <details class="pm-save"><summary>Salva un suono dal Virus</summary><div class="pm-save-row"><div><h2>Salva nella libreria</h2><p class="pm-hint">Leggi la parte selezionata, assegna un nome e salva in questo browser.</p></div>
             <div class="pm-row"><input type="text" id="patchName" class="pm-field pm-grow" placeholder="Nome del suono" aria-label="Nome del suono da salvare">
               <button id="pmReadCurrent" class="chassis-page-btn" type="button">Leggi parte</button>
@@ -7601,6 +7610,7 @@
           </details>
           <div class="lib-list" id="multiLibList"></div>
         </section>
+        <section id="pmArchive" class="pm-source" role="tabpanel" aria-labelledby="pmTabArchive" hidden><div id="patchBankArchive"></div></section>
         <section id="pmBanks" class="pm-source" role="tabpanel" aria-labelledby="pmTabBanks" hidden>
           <div class="pm-save-row"><div><h2>Banchi del Virus</h2><p class="pm-hint">Leggi il banco per esplorarlo. Importa in libreria per conservarne i suoni in questo browser.</p></div>
             <div class="pm-row"><select id="bankPickSelect" class="pm-field pm-grow" aria-label="Banco del Virus"></select>
@@ -7623,6 +7633,7 @@
 <!-- 64-STEP SEQUENCER -->
 <div id="sequencerContent" class="main-content single-view" style="display: none; padding-bottom: 240px;"></div>
 <div id="songContent" class="main-content" style="display: none;"></div>
+<div id="soundPathsContent" class="main-content" style="display:none;"></div>
 
 <!-- STUDIO FX RACK & MACRO PERFORMANCE -->
 <div id="fxRackContent" class="main-content" style="display: none; padding-bottom: 240px;"></div>
@@ -7884,7 +7895,7 @@
       </div>
     </div>
     <div style="display: flex; gap: 8px; align-items: center;">
-      <button id="btnToggleWebAudio" class="chassis-page-btn" style="font-size: 10px; padding: 3px 8px; color: var(--accent);" title="Abilita/disabilita audio diretto dagli altoparlanti del Mac">🔊 AUDIO MAC: ON</button>
+      <button id="btnToggleWebAudio" class="chassis-page-btn" style="font-size: 10px; padding: 3px 8px; color: var(--accent);" title="Suono guida generato dal browser. Per il timbro reale ascolta le uscite audio del Virus.">🔊 SUONO GUIDA: ON</button>
       <button id="btnAuditionNote" class="chassis-page-btn" style="font-size: 10px; padding: 3px 8px;">▶ PROVA NOTA</button>
       <button id="btnToggleKeyboardSize" class="chassis-page-btn" style="font-size: 10px; padding: 3px 8px;" title="Riduci/Espandi tastiera">▲ RIDUCI</button>
       <button id="btnCloseKeyboard" class="chassis-page-btn" style="font-size: 11px; padding: 4px 14px; font-weight: bold; color: #fff; background: #e06c75; border-color: #e06c75; cursor: pointer;" title="Chiudi e nascondi completamente la tastiera">✕ CHIUDI TASTIERA</button>
@@ -7969,10 +7980,21 @@
   </div>
 </div>
 
+<script src="access-controls.js?v=1"></script>
 <script src="virus-icons.js?v=1"></script>
 <script src="multi-setup.js"></script>
+<script src="virus-sound-bank.js?v=5"></script>
+<script src="patch-bank-library.js?v=5"></script>
+<link rel="stylesheet" href="patch-bank-library.css?v=4">
+<script src="forma-bank.js?v=2"></script>
+<script src="studio-instruments.js?v=6"></script>
+<script src="mac-keyboard.js?v=2"></script>
+<script src="dx7-studio.js?v=4"></script>
+<script src="studio-effects.js?v=1"></script>
+<script src="sound-studio.js?v=16"></script>
+<script src="sound-paths.js?v=8"></script>
 <script src="virus-panel-layouts.js?v=snow-natural-v14-preview"></script>
-<script src="virus-hardware-panel.js"></script>
+<script src="virus-hardware-panel.js?v=ti-checksums-v2"></script>
 <script>
 
 // Finestre di dialogo interne: alert/confirm/prompt del browser non funzionano
@@ -8135,11 +8157,14 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
     if (rail) rail.style.display = show ? 'grid' : 'none';
     if (strip) strip.style.display = show ? 'flex' : 'none';
     // in PANEL e SINGLE stato/azioni/guida MIDI stanno dietro il tasto MIDI della scocca
-    document.body.classList.toggle('panel-view', ['snow', 'single', 'multi', 'fx', 'patch', 'arp', 'seq', 'song'].includes(view));
+    document.body.classList.toggle('panel-view', ['snow', 'single', 'multi', 'fx', 'patch', 'arp', 'seq', 'song', 'paths'].includes(view));
     if (!show && diag) diag.classList.add('hidden');
   }
 
   function hideAllViews() {
+    window.VirusMacKeys?.releaseAll();
+    window.VirusDx7?.panic();
+    if (['#percorsi','#studio'].includes(location.hash)) history.replaceState(null, '', location.pathname + location.search);
     const snow = document.getElementById('snowFrontView');
     if (snow) snow.style.display = 'none';
     document.getElementById('singleView').style.display = 'none';
@@ -8150,9 +8175,19 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
     document.getElementById('arpContent').style.display = 'none';
     document.getElementById('sequencerContent').style.display = 'none';
     document.getElementById('songContent').style.display = 'none';
+    document.getElementById('soundPathsContent').style.display = 'none';
 
     document.querySelectorAll('.segmented-tab').forEach(btn => btn.classList.remove('active'));
   }
+
+  document.getElementById('btnTabSoundPaths').addEventListener('click', () => {
+    hideAllViews();
+    updateTopPanelsVisibility('paths');
+    document.getElementById('soundPathsContent').style.display = 'block';
+    document.getElementById('btnTabSoundPaths').classList.add('active');
+    history.replaceState(null, '', '#studio');
+    soundPaths.refresh();
+  });
 
   const btnTabFxRack = document.getElementById('btnTabFxRack');
   if (btnTabFxRack) {
@@ -8231,6 +8266,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
     if (typeof renderMultiPartsOverview === 'function') renderMultiPartsOverview();
     renderLibrary();
     renderMultiLibrary();
+    if(window.VirusAccess?.isAdmin===false)selectPatchSource('archive');
     updateControlRoomStatus();
   });
 
@@ -9070,6 +9106,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
     }
     wasConnected = (outConnected || inConnected);
     updateControlRoomStatus();
+    document.dispatchEvent(new CustomEvent('virus-studio-context'));
     if (window.arpEngine && typeof window.arpEngine.updateUI === 'function') {
       window.arpEngine.updateUI();
     }
@@ -9229,6 +9266,16 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
     const bytes = event.data;
     midiStats.rx++;
     midiMonitorLog('in', bytes);
+    if(window.VirusDx7?.midi(bytes))return;
+    // A MIDI keyboard can address each running lane on that part's channel.
+    if (bytes.length === 3 && [0x80, 0x90].includes(bytes[0] & 0xF0) && window.arpEngines) {
+      const lane = window.arpEngines.find(engine => engine.running && engine.getTargetChannel() === (bytes[0] & 15));
+      if (lane) {
+        if ((bytes[0] & 0xF0) === 0x90 && bytes[2]) lane.noteDown(bytes[1]);
+        else lane.noteUp(bytes[1]);
+        return;
+      }
+    }
 
     // Ignora il Clock (F8) e Active Sensing (FE) per non intasare il debug
     if (bytes[0] !== 0xF8 && bytes[0] !== 0xFE) {
@@ -9431,6 +9478,10 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
       }
       // Un Single Patch Dump del Virus TI ha almeno 265 bytes (tipicamente 267 bytes)
       if (msgBytes.length >= 250) {
+        // Studio captures only actual MIDI replies, never a host-side load.
+        if (msgBytes[6] === 0x10 && msgBytes[7] === 0 && isActiveSoundDump(msgBytes)) {
+          document.dispatchEvent(new CustomEvent('virus-studio-received', {detail:{bytes:Array.from(msgBytes)}}));
+        }
         const patchName = extractPatchName(msgBytes);
 
         // Caso 0: risposta alla sincronizzazione d'avvio
@@ -9776,6 +9827,7 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
   }
 
   function onOutputChange(){
+    window.stopAllArps?.();
     const id = outSelect.value;
     selectedOutput = (midiAccess && id) ? midiAccess.outputs.get(id) : null;
     if (selectedOutput && !selectedOutput.__monitored) {
@@ -10022,7 +10074,9 @@ document.addEventListener('DOMContentLoaded', () => syncKnobSprites());
   window.lastSynthMode = () => { try { return localStorage.getItem('virusH_synthMode') || 'single'; } catch (e) { return 'single'; } };
   window.setSynthMode = (m, reload = true) => {
     const changed = m !== window.currentSynthMode;
+    if (changed) window.stopAllArps?.();
     window.currentSynthMode = m; try { localStorage.setItem('virusH_synthMode', m); } catch (e) {}
+    window.arpEngine?.updateUI();
     // il Virus ha cambiato modo: si rilegge cio' che ora suona (le 4 parti del Multi, oppure il suono Single)
     if (changed && reload && selectedOutput) {
       clearTimeout(window.__modeReload);
@@ -10848,6 +10902,7 @@ function exportCurrentPatchSyx() {
     // 2. MAIN WORKSTATION LAYOUT: SCREEN (LEFT) + ENCODERS & MACROS (RIGHT)
     // =========================================================================
     const innerLayout = document.createElement('div');
+    innerLayout.className = 'accessory-layout';
     innerLayout.style.cssText = 'display: flex; flex-direction: row; gap: 48px; align-items: flex-start; justify-content: center; flex-wrap: wrap; margin-top: 18px; width: 100%; box-sizing: border-box; z-index: 1; padding-bottom: 24px;';
 
     const leftCol = document.createElement('div');
@@ -11648,6 +11703,7 @@ function exportCurrentPatchSyx() {
   }
 
   function saveMultiLibrary(lib){
+    window.VirusAccess?.requireWrite();
     localStorage.setItem(MULTI_LIB_KEY, JSON.stringify(lib));
   }
 
@@ -11963,6 +12019,7 @@ function exportCurrentPatchSyx() {
   window.multiReadNameOnly = () => !!multiRead && multiRead.step === NUM_PARTS + 1;
 
   function renderMultiPartsOverview() {
+    window.virusBankArchive?.refresh();
     const container = document.getElementById('multiPartsOverview');
     if (!container) return;
     container.innerHTML = '';
@@ -12242,49 +12299,11 @@ function exportCurrentPatchSyx() {
   // ---------------------------------------------------------------------
   // Universal .syx / .mid Import & JSON Backup Logic
   // ---------------------------------------------------------------------
-  function parseAndImportSysex(buffer, filename = 'soundset.syx') {
-    let i = 0;
-    const patchesFound = [];
-    while (i < buffer.length) {
-      if (buffer[i] === 0xF0) {
-        const start = i;
-        while (i < buffer.length && buffer[i] !== 0xF7) {
-          i++;
-        }
-        if (i < buffer.length && buffer[i] === 0xF7) {
-          const msg = buffer.slice(start, i + 1);
-          // Verifica se è SysEx di Access Virus TI: F0 00 20 33 01
-          if (msg.length >= 250 && msg[1] === 0x00 && msg[2] === 0x20 && msg[3] === 0x33 && msg[4] === 0x01) {
-            const name = extractPatchName(msg);
-            patchesFound.push({ name: name, bytes: Array.from(msg) });
-          }
-        }
-      }
-      i++;
-    }
-
-    if (patchesFound.length === 0) {
-      uiAlert('Nessun dump valido per Access Virus TI trovato nel file (supportati file SysEx .syx e .mid).');
-      return;
-    }
-
-    const lib = loadLibrary();
-    patchesFound.forEach(p => {
-      lib[p.name] = p.bytes;
-    });
-    saveLibrary(lib);
-    renderLibrary();
-
-    if (patchesFound.length === 1) {
-      const p = patchesFound[0];
-      window.lastReceivedDump = new Uint8Array(p.bytes);
-      applyDumpToActivePatch(window.lastReceivedDump);
-      document.getElementById('midi-debug').innerHTML = `<span style="color:#80c090;">📂 Patch importata: <b>${escapeHtml(p.name)}</b></span>`;
-      uiAlert(`Patch "${p.name}" importata e caricata!`);
-    } else {
-      document.getElementById('midi-debug').innerHTML = `<span style="color:#80c090;">📂 Banco importato: <b>${patchesFound.length} patch</b> da ${escapeHtml(filename)}</span>`;
-      uiAlert(`Importate con successo ${patchesFound.length} patch dal file "${filename}" nella libreria!`);
-    }
+  async function parseAndImportSysex(buffer, filename = 'soundset.syx') {
+    if(window.VirusAccess?.isAdmin===false){uiAlert('Solo l’amministratore può importare patch e banchi.');return;}
+    document.getElementById('btnTabPatchManager').click();
+    selectPatchSource('archive');
+    await window.virusBankArchive.importBytes(buffer,filename);
   }
 
   // File import inputs & triggers
@@ -12311,16 +12330,20 @@ function exportCurrentPatchSyx() {
   const fileBackupInput = document.getElementById('fileBackupInput');
 
   if (btnExportBackup) {
-    btnExportBackup.addEventListener('click', () => {
+    btnExportBackup.addEventListener('click', async () => {
+      try {
       const backupData = {
         app: 'soundmachina-virus-ti',
-        version: 1,
+        version: 2,
+        bankArchive: await window.virusBankArchive.model.backup(),
         exportedAt: new Date().toISOString(),
         patches: loadLibrary(),
+        soundStudio: soundPaths.exportState(),
         multiPresets: loadMultiLibrary()
       };
       const jsonStr = JSON.stringify(backupData, null, 2);
       downloadBlob(new TextEncoder().encode(jsonStr), `Virus_TI_Library_Backup_${new Date().toISOString().slice(0,10)}.json`, 'application/json');
+      } catch(error) { uiAlert('Backup non riuscito: '+error.message); }
     });
   }
 
@@ -12330,10 +12353,12 @@ function exportCurrentPatchSyx() {
       const file = e.target.files[0];
       if (!file) return;
       const reader = new FileReader();
-      reader.onload = () => {
+      reader.onload = async () => {
         try {
           const data = JSON.parse(reader.result);
           if (data && data.patches) {
+            if (data.bankArchive) { await window.virusBankArchive.model.restore(data.bankArchive); await window.virusBankArchive.reload(); }
+            if (data.soundStudio) soundPaths.importState(data.soundStudio);
             const currentLib = loadLibrary();
             const mergedLib = Object.assign({}, currentLib, data.patches);
             saveLibrary(mergedLib);
@@ -12362,15 +12387,18 @@ function exportCurrentPatchSyx() {
   });
   window.addEventListener('drop', (e) => {
     e.preventDefault();
+    if(window.VirusAccess?.isAdmin===false){uiAlert('Solo l’amministratore può importare patch e banchi.');return;}
     if (e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files.length > 0) {
       const files = Array.from(e.dataTransfer.files);
       files.forEach(file => {
         if (file.name.endsWith('.json')) {
           const reader = new FileReader();
-          reader.onload = () => {
+          reader.onload = async () => {
             try {
               const data = JSON.parse(reader.result);
               if (data && data.patches) {
+                if (data.bankArchive) { await window.virusBankArchive.model.restore(data.bankArchive); await window.virusBankArchive.reload(); }
+                if (data.soundStudio) soundPaths.importState(data.soundStudio);
                 const merged = Object.assign({}, loadLibrary(), data.patches);
                 saveLibrary(merged);
                 renderLibrary();
@@ -12400,6 +12428,8 @@ function exportCurrentPatchSyx() {
     if (status && !panel.hidden) status.textContent = panel.dataset.resultCount;
   }
   function selectPatchSource(source, focus = false) {
+    const bankSidebar=document.getElementById('pmBankSidebar');
+    if(bankSidebar)bankSidebar.hidden=source!=='archive';
     document.querySelectorAll('[data-pm-source]').forEach(tab => {
       const selected = tab.dataset.pmSource === source;
       tab.setAttribute('aria-selected', String(selected));
@@ -12413,18 +12443,18 @@ function exportCurrentPatchSyx() {
       }
     });
     const searchLabel = document.querySelector('.pm-search-label');
-    if (searchLabel) searchLabel.textContent = { sounds: 'Cerca nei suoni', multis: 'Cerca nei Multi', banks: 'Cerca nel banco letto' }[source];
+    if (searchLabel) searchLabel.textContent = { sounds: 'Cerca nei suoni', multis: 'Cerca nei Multi', banks: 'Cerca nel banco letto', archive: 'Cerca nei banchi archiviati' }[source];
     const input = document.getElementById('libSearchInput');
     if (input) input.placeholder = source === 'multis' ? 'Nome del Multi…' : 'Nome del suono…';
   }
   document.querySelectorAll('[data-pm-source]').forEach(tab => {
     tab.addEventListener('click', () => selectPatchSource(tab.dataset.pmSource));
     tab.addEventListener('keydown', event => {
-      const sources = ['sounds', 'multis', 'banks'];
+      const sources = ['sounds', 'multis', 'archive', 'banks'];
       const index = sources.indexOf(tab.dataset.pmSource);
-      const next = event.key === 'ArrowRight' ? (index + 1) % 3
-        : event.key === 'ArrowLeft' ? (index + 2) % 3
-        : event.key === 'Home' ? 0 : event.key === 'End' ? 2 : -1;
+      const next = event.key === 'ArrowRight' ? (index + 1) % sources.length
+        : event.key === 'ArrowLeft' ? (index + sources.length - 1) % sources.length
+        : event.key === 'Home' ? 0 : event.key === 'End' ? sources.length - 1 : -1;
       if (next >= 0) { event.preventDefault(); selectPatchSource(sources[next], true); }
     });
   });
@@ -12438,22 +12468,29 @@ function exportCurrentPatchSyx() {
       throw new Error('File patch Virus non valido.');
     }
     dump[5] = id; dump[7] = 0; dump[8] = buffer;
+    // TI includes the legacy A/B checksum before its two extension pages.
+    if (dump.length === 524) {
+      let legacySum = 0;
+      for (let i = 5; i < 265; i++) legacySum += dump[i];
+      dump[265] = legacySum & 0x7f;
+    }
     let sum = 0;
     for (let i = 5; i < dump.length - 2; i++) sum += dump[i];
     dump[dump.length - 2] = sum & 0x7F;
     return dump;
   }
   function loadPatchToActiveBuffer(bytes) {
-    if (!selectedOutput) { uiAlert('Collega MIDI OUT prima di caricare un suono nel Virus.'); return; }
+    if (!selectedOutput) { uiAlert('Collega MIDI OUT prima di caricare un suono nel Virus.'); return false; }
     try {
       const buffer = getSoundEditBuffer();
       const dump = preparePatchForBuffer(bytes, buffer, window.virusDeviceId ?? deviceId());
-      if (!sendMidiBytes(dump, 'load active patch')) return;
+      if (!sendMidiBytes(dump, 'load active patch')) return false;
       window.lastReceivedDump = dump;
       applyDumpToActivePatch(dump);
       renderMultiPartsOverview();
       setLastAction('Suono caricato in ' + (buffer === 0x40 ? 'Single' : 'P' + (buffer + 1)));
-    } catch (error) { uiAlert(error.message); }
+      return true;
+    } catch (error) { uiAlert(error.message); return false; }
   }
 
   const libSearchInput = document.getElementById('libSearchInput');
@@ -12462,6 +12499,7 @@ function exportCurrentPatchSyx() {
       document.getElementById('pmClearSearch').hidden = !libSearchInput.value;
       renderLibrary();
       renderMultiLibrary();
+      window.virusBankArchive?.search(libSearchInput.value);
       if (window.bankFetchState && window.bankFetchState.active === false) {
         renderSynthBankList(window.bankFetchState);
       }
@@ -12484,8 +12522,29 @@ function exportCurrentPatchSyx() {
   }
 
   function saveLibrary(lib){
+    window.VirusAccess?.requireWrite();
     localStorage.setItem(LIB_KEY, JSON.stringify(lib));
   }
+
+  function addOriginalSounds(ids) {
+    const result = VirusSoundBank.addToLibrary(loadLibrary(), ids);
+    saveLibrary(result.library);
+    renderLibrary();
+    return result.added;
+  }
+  document.getElementById('pmAddOriginalBank').addEventListener('click', () => {
+    const status = document.getElementById('pmOriginalBankStatus');
+    try {
+      const added = addOriginalSounds();
+      status.textContent = added ? added + ' suoni aggiunti alla libreria. Nessun invio MIDI.' : 'I 20 nomi sono già presenti. I tuoi suoni sono stati conservati.';
+    } catch (error) { status.textContent = 'Salvataggio non riuscito: ' + error.message; }
+  });
+  document.getElementById('pmExportOriginalBank').addEventListener('click', () => {
+    downloadBlob(VirusSoundBank.midiBytes(), 'VIRUS-H-Directions-01.mid', 'audio/midi');
+  });
+  document.getElementById('pmExportOriginalBankSyx').addEventListener('click', () => {
+    downloadBlob(VirusSoundBank.bankBytes(), 'VIRUS-H-Directions-01.syx');
+  });
 
   function renderLibrary(){
     const lib = loadLibrary();
@@ -12515,11 +12574,13 @@ function exportCurrentPatchSyx() {
         const importButton = document.createElement('button');
         importButton.className = 'chassis-page-btn pm-primary';
         importButton.textContent = 'Importa suoni';
+        importButton.dataset.adminOnly='';
         importButton.addEventListener('click', () => document.getElementById('btnImportSyx').click());
         const bankButton = document.createElement('button');
         bankButton.className = 'chassis-page-btn';
-        bankButton.textContent = 'Esplora i banchi Virus';
-        bankButton.addEventListener('click', () => selectPatchSource('banks', true));
+        bankButton.textContent = window.VirusAccess?.isAdmin===false?'Sfoglia i banchi disponibili':'Esplora i banchi Virus';
+        bankButton.addEventListener('click', () => selectPatchSource(window.VirusAccess?.isAdmin===false?'archive':'banks', true));
+        if(window.VirusAccess?.isAdmin===false)empty.textContent='Scegli un banco da «I miei banchi» per trovare i suoni disponibili.';
         actions.append(importButton, bankButton);
         empty.appendChild(actions);
       }
@@ -13815,6 +13876,7 @@ function exportCurrentPatchSyx() {
     const channels = [];
     for (let c = 1; c <= 16; c++) channels.push(String(c));
     const chField = createSelectField('ch', channels, part.values.channel, (v) => {
+      window.arpEngines?.[index]?.stop();
       part.values.channel = v;
       sendMultiPartParam(index, 34, v);
       if (typeof renderMultiPartsOverview === 'function') renderMultiPartsOverview();
@@ -14784,6 +14846,7 @@ function exportCurrentPatchSyx() {
   });
 
   document.getElementById('btnPanic').addEventListener('click', () => {
+    window.stopAllArps?.();
     if (!selectedOutput) {
       setLastAction('connect midi output first');
       return;
@@ -15280,7 +15343,11 @@ function exportCurrentPatchSyx() {
   }
 
   function playNote(noteNumber, velocity = currentVelocity) {
+    if(window.VirusDx7?.active()){window.VirusDx7.noteOn(noteNumber,velocity);highlightPianoKey(noteNumber,true);return;}
     if (window.arpEngine && window.arpEngine.running) {
+      const owner = arpKeyboardOwners.get(noteNumber);
+      if (owner) owner.noteUp(noteNumber);
+      arpKeyboardOwners.set(noteNumber, window.arpEngine);
       window.arpEngine.noteDown(noteNumber);
       return;
     }
@@ -15317,10 +15384,11 @@ function exportCurrentPatchSyx() {
     if (typeof renderKeyboardSplitVisualizer === 'function') renderKeyboardSplitVisualizer();
   }
 
-  function stopNote(noteNumber) {
-    if (window.arpEngine && window.arpEngine.running) {
-      window.arpEngine.noteUp(noteNumber);
-      return;
+  function stopNote(noteNumber, forceHardware=false) {
+    if(!forceHardware&&window.VirusDx7?.active()){window.VirusDx7.noteOff(noteNumber);highlightPianoKey(noteNumber,false);return;}
+    if (arpKeyboardOwners.has(noteNumber)) {
+      arpKeyboardOwners.get(noteNumber).noteUp(noteNumber);
+      arpKeyboardOwners.delete(noteNumber); return;
     }
 
     if (!activeNotes.has(noteNumber)) return;
@@ -15503,43 +15571,12 @@ function exportCurrentPatchSyx() {
     if (disp) disp.textContent = String(currentVelocity);
   }
 
-  window.addEventListener('keydown', (e) => {
-    if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) return;
-    if (e.repeat) return;
-    getAudioContext(); // Attiva AudioContext al primo tocco
-
-    if (e.code === 'KeyZ') {
-      changeOctave(-1);
-      return;
-    }
-    if (e.code === 'KeyX') {
-      changeOctave(1);
-      return;
-    }
-    if (e.code === 'KeyC') {
-      changeVelocity(-15);
-      return;
-    }
-    if (e.code === 'KeyV') {
-      changeVelocity(15);
-      return;
-    }
-
-    if (PC_KEY_MAP[e.code] !== undefined) {
-      const semitone = PC_KEY_MAP[e.code];
-      const note = (currentOctave + 1) * 12 + semitone;
-      playNote(note, currentVelocity);
-    }
-  });
-
-  window.addEventListener('keyup', (e) => {
-    if (e.target.tagName === 'INPUT' || e.target.tagName === 'SELECT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) return;
-
-    if (PC_KEY_MAP[e.code] !== undefined) {
-      const semitone = PC_KEY_MAP[e.code];
-      const note = (currentOctave + 1) * 12 + semitone;
-      stopNote(note);
-    }
+  window.VirusMacKeys=VirusMacKeyboard.bind({
+    window,map:PC_KEY_MAP,octave:()=>currentOctave,velocity:()=>currentVelocity,
+    software:()=>window.VirusDx7?.selected()?window.VirusDx7:null,
+    play:playNote,stop:note=>stopNote(note,true),highlight:highlightPianoKey,
+    shortcuts:code=>{const action={KeyZ:()=>changeOctave(-1),KeyX:()=>changeOctave(1),KeyC:()=>changeVelocity(-15),KeyV:()=>changeVelocity(15)}[code];if(action){action();return true;}return false;},
+    error:error=>setLastAction('Tastiera Mac: '+error.message)
   });
 
   document.getElementById('btnOctDown')?.addEventListener('click', () => changeOctave(-1));
@@ -15551,7 +15588,7 @@ function exportCurrentPatchSyx() {
   btnWebAudio?.addEventListener('click', () => {
     getAudioContext();
     webAudioEnabled = !webAudioEnabled;
-    btnWebAudio.textContent = webAudioEnabled ? '🔊 AUDIO MAC: ON' : '🔇 AUDIO MAC: OFF';
+    btnWebAudio.textContent = webAudioEnabled ? '🔊 SUONO GUIDA: ON' : '🔇 SUONO GUIDA: OFF';
     btnWebAudio.style.color = webAudioEnabled ? 'var(--accent)' : '#777';
   });
 
@@ -15647,7 +15684,7 @@ function exportCurrentPatchSyx() {
     return names[((n % 12) + 12) % 12] + oct;
   }
 
-  const arpEngine = {
+  const arpTemplate = {
     running: false,
     timerId: null,
     bpm: 124,
@@ -15675,71 +15712,49 @@ function exportCurrentPatchSyx() {
     upDownDir: 1,
     activeNotesPlaying: new Set(),
     tapTimes: [],
-    targetCh: 0, // default Channel 1 (ch 0 = Canale 1 MIDI, standard per Single e Part 1)
 
     getTargetChannel() {
-      if (this.targetCh !== null && this.targetCh !== undefined) {
-        return this.targetCh & 0x0F;
+      if (this.playChannel !== null) return this.playChannel;
+      if (window.currentSynthMode !== 'multi') {
+        return ((parseInt(document.getElementById('midiChannel')?.value || '1', 10) - 1) & 15);
       }
-      return getActiveMidiChannel();
+      return (multiParts[this.partIndex]?.values?.channel ?? this.partIndex) & 15;
     },
 
-    toggle() {
-      if (this.running) this.stop();
-      else this.start();
-    },
+    toggle() { if (this.running) this.stop(); else this.start(); },
 
     start() {
       if (this.running) return;
-      this.running = true;
-      this.currentStep = 0;
-      this.cycleIndex = 0;
-      this.upDownDir = 1;
-
-      const ch = this.getTargetChannel();
-      unmuteAndSetVolume(ch);
-      if (selectedOutput) {
-        try {
-          // Volume CC 7 max, Expression CC 11 max e Out 1 L+R (CC 41 = 0) al synth hardware
-          selectedOutput.send(new Uint8Array([0xB0 | ch, 7, 127]));
-          selectedOutput.send(new Uint8Array([0xB0 | ch, 11, 127]));
-          selectedOutput.send(new Uint8Array([0xB0 | ch, 41, 0]));
-          if (ch === 0) {
-            selectedOutput.send(new Uint8Array([0xB0, 7, 127]));
-            selectedOutput.send(new Uint8Array([0xB0, 11, 127]));
-          }
-          // Assicura che l'Arp interno del synth Virus sia disattivato per far suonare le note esterne
-          selectedOutput.send(new Uint8Array([...SYSEX_PREFIX, deviceId(), 0x10, 0x01, 78, 0x00, 0xF7]));
-        } catch(e) {}
+      if (window.currentSynthMode !== 'multi' && this.partIndex !== 0) {
+        setLastAction('Per usare P2–P4 attiva MULTI sul Virus.'); return;
       }
-
-      this.scheduleNextTick();
-      this.updateUI();
-      setLastAction(`Arp START (BPM ${this.bpm}, ch ${ch + 1})`);
-      const dbg = document.getElementById('midi-debug');
-      if (dbg) dbg.innerHTML = `<span style="color:#e0e4ec;">▶ ARP ATTIVO: ${this.bpm} BPM | Rate: ${this.rates[this.rateIdx].name} | MIDI Ch ${ch + 1}</span>`;
+      const ch = this.getTargetChannel();
+      if (arpEngines.some(e => e !== this && e.running && e.getTargetChannel() === ch)) {
+        setLastAction('Le parti ARP devono avere canali MIDI diversi: controlla MULTI.'); return;
+      }
+      this.playChannel = ch;
+      this.playOutput = selectedOutput;
+      // External notes must not be arpeggiated a second time by the native engine.
+      // Page B / parameter 15 addresses the sound part, not its MIDI channel.
+      if (selectedOutput) {
+        try { sendVirusParam(0x71, window.currentSynthMode === 'multi' ? this.partIndex : 0x40, 15, 0, 'ARP esterno P' + (this.partIndex + 1)); }
+        catch (e) { setLastAction('Impossibile preparare ARP: ' + e.message); this.playOutput = null; this.playChannel = null; return; }
+      }
+      this.running = true;
+      this.currentStep = 0; this.cycleIndex = 0; this.upDownDir = 1;
+      this.nextTickAt = performance.now();
+      this.tick(); this.scheduleNextTick(); this.updateUI();
+      setLastAction(`ARP P${this.partIndex + 1} avviato · CH ${ch + 1}`);
     },
 
     stop() {
-      if (!this.running) return;
       this.running = false;
-      if (this.timerId) {
-        clearTimeout(this.timerId);
-        this.timerId = null;
-      }
-      this.activeNotesPlaying.forEach(n => this.rawStop(n));
-      this.activeNotesPlaying.clear();
-      if (selectedOutput) {
-        const ch = this.getTargetChannel();
-        try {
-          selectedOutput.send(new Uint8Array([0xB0 | ch, 123, 0])); // All Notes Off
-        } catch(e) {}
-      }
-      this.currentStep = 0;
-      this.updateUI();
-      setLastAction('Arp STOPPED');
-      const dbg = document.getElementById('midi-debug');
-      if (dbg) dbg.innerHTML = `<span style="color:#aaa;">⏹ ARP FERMATO</span>`;
+      clearTimeout(this.timerId); this.timerId = null;
+      this.gateTimers.forEach(id => clearTimeout(id)); this.gateTimers.clear();
+      this.activeNotesPlaying.forEach(n => this.rawStop(n)); this.activeNotesPlaying.clear();
+      this.heldNotes = [];
+      this.playOutput = null; this.playChannel = null;
+      this.currentStep = 0; this.updateUI();
     },
 
     tapTempo() {
@@ -15822,6 +15837,7 @@ function exportCurrentPatchSyx() {
     },
 
     refreshStepsUI() {
+      if (this !== arpEngine) return;
       for (let i = 0; i < 16; i++) {
         const pad = document.getElementById(`arpStepBtn${i}`);
         if (pad) {
@@ -15841,14 +15857,12 @@ function exportCurrentPatchSyx() {
     scheduleNextTick() {
       if (!this.running) return;
       const stepMs = this.getStepMs();
-      let delay = stepMs;
-      if (this.swingPercent > 0 && (this.currentStep % 2 === 1)) {
-        delay += stepMs * (this.swingPercent / 100) * 0.33;
-      }
-      this.timerId = setTimeout(() => {
-        this.tick();
-        this.scheduleNextTick();
-      }, Math.max(20, delay));
+      // Complementary long/short steps keep swing within the common tempo.
+      const swing = stepMs * this.swingPercent / 100 * 0.33;
+      this.nextTickAt += stepMs + (this.currentStep % 2 ? swing : -swing);
+      const now = performance.now();
+      if (this.nextTickAt < now) this.nextTickAt = now;
+      this.timerId = setTimeout(() => { this.tick(); this.scheduleNextTick(); }, Math.max(1, this.nextTickAt - now));
     },
 
     tick() {
@@ -15857,10 +15871,11 @@ function exportCurrentPatchSyx() {
       this.activeNotesPlaying.forEach(n => this.rawStop(n));
       this.activeNotesPlaying.clear();
 
+      this.gateTimers.forEach(id => clearTimeout(id)); this.gateTimers.clear();
       const step = this.currentStep;
       this.highlightStepUI(step);
 
-      if (this.steps[step]) {
+      if (this.steps[step] && (this.heldNotes.length || this.hold)) {
         const notes = this.calcStepNotes();
         this.lastStepNotes = notes;
         const gateMs = Math.max(25, (this.getStepMs() * (this.gatePercent / 100)) - 10);
@@ -15869,16 +15884,18 @@ function exportCurrentPatchSyx() {
         notes.forEach(noteNum => {
           this.rawPlay(noteNum, vel);
           this.activeNotesPlaying.add(noteNum);
-          setTimeout(() => {
+          const gateTimer = setTimeout(() => {
+            this.gateTimers.delete(gateTimer);
             if (this.activeNotesPlaying.has(noteNum)) {
               this.rawStop(noteNum);
               this.activeNotesPlaying.delete(noteNum);
             }
           }, gateMs);
+          this.gateTimers.add(gateTimer);
         });
 
         const notesEl = document.getElementById('arpOledNotes');
-        if (notesEl && notes.length) {
+        if (this === arpEngine && notesEl && notes.length) {
           notesEl.textContent = `NOTES: [ ${notes.map(midiNoteName).join(' ')} ]`;
         }
       }
@@ -15920,6 +15937,7 @@ function exportCurrentPatchSyx() {
       if (mode === 'Up/Dn') {
         fullPool.sort((a, b) => a - b);
         if (fullPool.length <= 1) return [fullPool[0]];
+        this.cycleIndex = Math.max(0, Math.min(fullPool.length - 1, this.cycleIndex));
         const n = fullPool[this.cycleIndex];
         this.cycleIndex += this.upDownDir;
         if (this.cycleIndex >= fullPool.length - 1) {
@@ -15943,13 +15961,13 @@ function exportCurrentPatchSyx() {
     },
 
     rawPlay(noteNumber, velocity) {
-      if (webAudioEnabled) {
+      if (webAudioEnabled && this === arpEngine) {
         playWebAudioNote(noteNumber, velocity);
       }
-      if (selectedOutput) {
+      if (this.playOutput) {
         const ch = this.getTargetChannel();
         try {
-          selectedOutput.send(new Uint8Array([0x90 | ch, noteNumber & 0x7F, velocity & 0x7F]));
+          this.playOutput.send(new Uint8Array([0x90 | ch, noteNumber & 0x7F, velocity & 0x7F]));
           recordMidiTx('arp on ' + noteNumber + ' (ch ' + (ch + 1) + ')', [0x90 | ch, noteNumber, velocity]);
         } catch(e) {}
       }
@@ -15957,13 +15975,13 @@ function exportCurrentPatchSyx() {
     },
 
     rawStop(noteNumber) {
-      if (webAudioEnabled) {
+      if (webAudioEnabled && this === arpEngine) {
         stopWebAudioNote(noteNumber);
       }
-      if (selectedOutput) {
+      if (this.playOutput) {
         const ch = this.getTargetChannel();
         try {
-          selectedOutput.send(new Uint8Array([0x80 | ch, noteNumber & 0x7F, 0]));
+          this.playOutput.send(new Uint8Array([0x80 | ch, noteNumber & 0x7F, 0]));
         } catch(e) {}
       }
       highlightPianoKey(noteNumber, false);
@@ -15975,7 +15993,7 @@ function exportCurrentPatchSyx() {
         this.latchNotes = [...this.heldNotes];
       }
       const notesEl = document.getElementById('arpOledNotes');
-      if (notesEl) {
+      if (this === arpEngine && notesEl) {
         notesEl.textContent = `NOTES: [ ${this.heldNotes.map(midiNoteName).join(' ')} ]`;
       }
       if (!this.running && this.modes[this.modeIdx] !== 'Off') {
@@ -15988,14 +16006,15 @@ function exportCurrentPatchSyx() {
       if (idx !== -1) {
         this.heldNotes.splice(idx, 1);
       }
+      if (!this.heldNotes.length && !this.hold) {
+        this.activeNotesPlaying.forEach(note => this.rawStop(note)); this.activeNotesPlaying.clear();
+      }
     },
 
-    syncHardwareArp() {
-      const ch = this.getTargetChannel();
-      unmuteAndSetVolume(ch);
-    },
+    syncHardwareArp() { this.updateUI(); },
 
     highlightStepUI(step) {
+      if (this !== arpEngine) return;
       for (let i = 0; i < 16; i++) {
         const led = document.getElementById(`arpLedStep${i}`);
         if (led) {
@@ -16013,6 +16032,8 @@ function exportCurrentPatchSyx() {
     },
 
     updateUI() {
+      renderArpLanes();
+      if (this !== arpEngine) return;
       const btn = document.getElementById('arpBtnPlayStop');
       if (btn) {
         if (this.running) {
@@ -16054,9 +16075,9 @@ function exportCurrentPatchSyx() {
         const ch = this.getTargetChannel();
         chEl.textContent = `CH ${ch + 1}`;
       }
-      const dest = document.getElementById('arpTargetSelect')?.value || '0';
+      const dest = String(this.partIndex);
       const destEl = document.getElementById('arpDisplayDest');
-      if (destEl) destEl.textContent = dest === 'auto' ? 'AUTO' : `P${+dest + 1}`;
+      if (destEl) destEl.textContent = `P${this.partIndex + 1}`;
       document.querySelectorAll('.arp-dest-btn').forEach(b => b.classList.toggle('active', b.dataset.dest === dest));
       const hint = document.getElementById('arpDisplayHint');
       if (hint) hint.hidden = this.running;
@@ -16076,7 +16097,46 @@ function exportCurrentPatchSyx() {
     }
   };
 
+  // Each part owns its note pool, timers and pattern. Only the tempo is shared.
+  let arpTempo = 124;
+  const arpKeyboardOwners = new Map();
+  const arpEngines = Array.from({ length: 4 }, (_, partIndex) => {
+    const engine = { ...arpTemplate, partIndex, steps: [...arpTemplate.steps], heldNotes: [],
+      latchNotes: [60, 64, 67], lastStepNotes: [], activeNotesPlaying: new Set(), gateTimers: new Set(),
+      tapTimes: [], playChannel: null, playOutput: null, hold: false };
+    Object.defineProperty(engine, 'bpm', { get: () => arpTempo, set: value => {
+      arpTempo = Math.max(40, Math.min(240, Number(value) || 124));
+    }});
+    return engine;
+  });
+  let arpEngine = arpEngines[0];
   window.arpEngine = arpEngine;
+  window.arpEngines = arpEngines;
+  window.stopAllArps = () => {
+    arpEngines.forEach(engine => engine.stop()); arpKeyboardOwners.clear();
+  };
+  window.addEventListener('pagehide', () => window.stopAllArps());
+  document.addEventListener('visibilitychange', () => { if (document.hidden) window.stopAllArps(); });
+
+  function selectArpPart(index) {
+    arpEngine = arpEngines[index]; window.arpEngine = arpEngine;
+    buildArpView(); // Rebind controls and knob positions without stopping other parts.
+  }
+
+  function renderArpLanes() {
+    document.querySelectorAll('[data-arp-lane]').forEach(row => {
+      const engine = arpEngines[Number(row.dataset.arpLane)];
+      const edit = row.querySelector('[data-arp-edit]');
+      edit.setAttribute('aria-pressed', String(engine === arpEngine));
+      row.querySelector('[data-arp-state]').textContent =
+        window.currentSynthMode !== 'multi' && engine.partIndex > 0 ? 'Richiede MULTI' :
+        `CH ${engine.getTargetChannel() + 1} · ${engine.modes[engine.modeIdx]} · ${engine.rates[engine.rateIdx].name}`;
+      const play = row.querySelector('[data-arp-play]');
+      play.textContent = engine.running ? '■ Ferma' : '▶ Avvia';
+      play.setAttribute('aria-pressed', String(engine.running));
+    });
+  }
+
 
   function buildArpView() {
     const root = document.getElementById('arpContent');
@@ -16105,7 +16165,7 @@ function exportCurrentPatchSyx() {
       steps: [
         { title: 'Motore Pattern a 16 Step', desc: 'Pattern poliritmico con risoluzione da 1/4 a 1/32T, controllo Swing e modalità Up, Down, Up&Down, Random e As Played.' },
         { title: 'Pad Hardware & Slider Step', desc: '16 pad tattili in silicone con LED a cupola per attivare/disattivare step e regolare velocity, gate e trasposizione per step.' },
-        { title: 'Destinazione MIDI (Target)', desc: 'Invia l\'arpeggio a una traccia specifica (P1, P2, P3, P4) oppure mantieni AUTO per seguire la parte selezionata.' },
+        { title: 'Quattro parti indipendenti', desc: 'P1–P4 hanno pattern, accordi, risoluzione e trasporto separati. Il tempo è comune. Il motore esterno invia le note al Virus in MULTI.' },
         { title: 'Preset & Funzione Hold', desc: 'Preset di genere pronti all\'uso (Trance, Acid, Melodic Techno). Attiva <code>HOLD</code> per mantenere l\'arpeggio attivo a mani libere.' }
       ],
       tip: 'Usa la tastiera a schermo o una tastiera MIDI esterna per cambiare gli accordi dell\'arpeggiatore in tempo reale.'
@@ -16114,6 +16174,7 @@ function exportCurrentPatchSyx() {
     elektronWrapper.appendChild(arpInfo);
 
     const innerLayout = document.createElement('div');
+    innerLayout.className = 'accessory-layout';
     innerLayout.style.cssText = 'display: flex; flex-direction: column; gap: 16px; align-items: center; margin-top: 24px; width: 100%; box-sizing: border-box; z-index: 1; padding-bottom: 24px;';
 
     // =========================================================================
@@ -16133,7 +16194,6 @@ function exportCurrentPatchSyx() {
     btnPlayStop.title = 'Avvia / Ferma riproduzione in tempo reale dell\'Arpeggiatore';
     btnPlayStop.addEventListener('click', () => {
       getAudioContext();
-      unmuteAndSetVolume(arpEngine.getTargetChannel());
       arpEngine.toggle();
     });
     transportBox.appendChild(btnPlayStop);
@@ -16146,6 +16206,9 @@ function exportCurrentPatchSyx() {
     btnHold.addEventListener('click', () => {
       arpEngine.hold = !arpEngine.hold;
       arpEngine.syncHardwareArp();
+      if (!arpEngine.hold && !arpEngine.heldNotes.length) {
+        arpEngine.activeNotesPlaying.forEach(note => arpEngine.rawStop(note)); arpEngine.activeNotesPlaying.clear();
+      }
       arpEngine.updateUI();
     });
     transportBox.appendChild(btnHold);
@@ -16157,23 +16220,12 @@ function exportCurrentPatchSyx() {
     btnTestHwArp.textContent = 'test synth';
     btnTestHwArp.title = 'Invia una nota di prova hardware al synth Virus TI';
     btnTestHwArp.addEventListener('click', () => {
-      const ch = arpEngine.getTargetChannel();
-      unmuteAndSetVolume(ch);
-      if (selectedOutput) {
-        try {
-          selectedOutput.send(new Uint8Array([0xB0 | ch, 7, 127]));
-          selectedOutput.send(new Uint8Array([0xB0 | ch, 11, 127]));
-          selectedOutput.send(new Uint8Array([0xB0 | ch, 41, 0]));
-          selectedOutput.send(new Uint8Array([0x90 | ch, 60, 120]));
-          setLastAction(`🔊 TEST INVIATO A ${selectedOutput.name}! Ascolta da PHONES/OUT 1`);
-          setTimeout(() => {
-            selectedOutput.send(new Uint8Array([0x80 | ch, 60, 0]));
-          }, 800);
-        } catch(e) {}
-      } else {
-        openSettingsModal();
-        setLastAction('⚠️ Seleziona prima la porta MIDI OUT');
-      }
+      const output = selectedOutput, ch = arpEngine.getTargetChannel();
+      if (!output) { openSettingsModal(); return; }
+      try {
+        output.send(new Uint8Array([0x90 | ch, 60, 100]));
+        setTimeout(() => { try { output.send(new Uint8Array([0x80 | ch, 60, 0])); } catch (e) {} }, 400);
+      } catch (e) { setLastAction('Test MIDI non riuscito'); }
     });
     transportBox.appendChild(btnTestHwArp);
 
@@ -16198,55 +16250,45 @@ function exportCurrentPatchSyx() {
           <span id="arpDisplayOct">OCT 1</span><span id="arpDisplayGate">GATE 75%</span><span id="arpDisplaySwing">SWING 0%</span>
         </div>
       </div>
-      <p class="arp-hint" id="arpDisplayHint">Tieni premute delle note (tastiera <b>KEYS</b> o controller) e premi <b>start arp</b>.</p>
+      <p class="arp-hint" id="arpDisplayHint">Premi <b>start arp</b>, poi suona le note da <b>KEYS</b> o dal controller. <b>HOLD</b> le mantiene dopo il rilascio.</p>
       <span id="arpDisplayMidiOut" hidden></span>
-      <select id="arpTargetSelect" hidden>
-        <option value="0" selected>P1</option><option value="1">P2</option><option value="2">P3</option><option value="3">P4</option><option value="auto">AUTO</option>
-      </select>
+
     `;
     topBar.appendChild(lcdDisp);
-    // destinazione: tasti P1-P4 con le icone delle parti + AUTO
-    const destRow = document.createElement('div');
-    destRow.className = 'arp-dest';
-    destRow.innerHTML = '<span class="fx-target-label">DEST</span>' +
-      [0, 1, 2, 3].map(i => `<button type="button" class="fx-part-btn arp-dest-btn" data-part="${i}" data-dest="${i}">P${i + 1}</button>`).join('') +
-      '<button type="button" class="fx-part-btn arp-dest-btn" data-dest="auto" title="Segue la parte della pagina attiva">AUTO</button>';
-    destRow.addEventListener('click', e => {
-      const b = e.target.closest('.arp-dest-btn'); if (!b) return;
-      const sel = document.getElementById('arpTargetSelect');
-      sel.value = b.dataset.dest; sel.dispatchEvent(new Event('change'));
-    });
-    transportBox.appendChild(destRow);
-
+    document.getElementById('arpTargetSelect')?.remove();
+    const lanes = document.createElement('div');
+    lanes.className = 'arp-lanes';
+    lanes.style.cssText = 'width:100%;max-width:960px;display:grid;grid-template-columns:repeat(auto-fit,minmax(210px,1fr));gap:8px';
+    for (const engine of arpEngines) {
+      const row = document.createElement('div'); row.dataset.arpLane = engine.partIndex;
+      row.style.cssText = 'padding:10px;border:1px solid var(--border);border-radius:5px;display:flex;flex-wrap:wrap;gap:8px;align-items:center';
+      const edit = document.createElement('button'); edit.type = 'button'; edit.dataset.arpEdit = '';
+      edit.className = 'fx-part-btn arp-dest-btn'; edit.textContent = `P${engine.partIndex + 1}`;
+      edit.title = 'Modifica arpeggio P' + (engine.partIndex + 1);
+      edit.onclick = () => selectArpPart(engine.partIndex);
+      const status = document.createElement('small'); status.dataset.arpState = '';
+      const play = document.createElement('button'); play.type = 'button'; play.dataset.arpPlay = '';
+      play.className = 'arp-hw-preset-btn'; play.onclick = () => { getAudioContext(); engine.toggle(); };
+      row.append(edit, status, play); lanes.appendChild(row);
+    }
+    innerLayout.appendChild(lanes);
+    const note = document.createElement('div');
+    note.style.cssText = 'width:100%;max-width:960px;display:flex;align-items:center;flex-wrap:wrap;gap:12px;font-size:12px';
+    const help = document.createElement('span');
+    help.textContent = '4 ARP esterni · tempo comune · seleziona P1–P4 per modificare pattern e accordi. HOLD mantiene le note rilasciate. Per quattro suoni servono MULTI e canali distinti.';
+    const multi = document.createElement('button'); multi.type = 'button'; multi.className = 'arp-hw-preset-btn';
+    multi.textContent = 'Attiva MULTI'; multi.onclick = () => { window.stopAllArps(); sendVirusMode(1); };
+    const all = document.createElement('button'); all.type = 'button'; all.className = 'arp-hw-preset-btn';
+    all.textContent = 'Avvia tutti'; all.onclick = () => {
+      if (window.currentSynthMode !== 'multi') { setLastAction('Attiva MULTI prima di avviare quattro parti.'); return; }
+      const channels = arpEngines.map(engine => engine.getTargetChannel());
+      if (new Set(channels).size !== 4) { setLastAction('Assegna quattro canali MIDI distinti nella vista MULTI.'); return; }
+      getAudioContext(); arpEngines.forEach(engine => engine.start());
+    };
+    const stop = document.createElement('button'); stop.type = 'button'; stop.className = 'arp-hw-preset-btn';
+    stop.textContent = 'Ferma tutti'; stop.onclick = () => window.stopAllArps();
+    note.append(help, multi, all, stop); innerLayout.appendChild(note);
     innerLayout.appendChild(topBar);
-
-    // Gestione cambio canale target
-    setTimeout(() => {
-      const sel = document.getElementById('arpTargetSelect');
-      if (sel) {
-        sel.addEventListener('change', () => {
-          const val = sel.value;
-          if (val === 'auto') {
-            arpEngine.targetCh = null;
-          } else if (val === 'single') {
-            const chEl = document.getElementById('midiChannel');
-            arpEngine.targetCh = chEl ? (parseInt(chEl.value, 10) - 1) & 0x0F : 0;
-          } else {
-            arpEngine.targetCh = parseInt(val, 10) & 0x0F;
-          }
-          unmuteAndSetVolume(arpEngine.getTargetChannel());
-          arpEngine.updateUI();
-          setLastAction(`Arp Target: ${sel.options[sel.selectedIndex].text}`);
-        });
-      }
-
-      const midiBox = document.getElementById('arpMidiOutStatusBox');
-      if (midiBox) {
-        midiBox.addEventListener('click', () => {
-          if (typeof openSettingsModal === 'function') openSettingsModal();
-        });
-      }
-    }, 0);
 
     // =========================================================================
     // 2. ROTARY HARDWARE KNOBS SECTION
@@ -16348,6 +16390,7 @@ function exportCurrentPatchSyx() {
       [octKnob, () => `${arpEngine.octaves}`], [gateKnob, () => `${arpEngine.gatePercent}%`], [swingKnob, () => `${arpEngine.swingPercent}%`],
     ];
     const paintKnobVals = () => {
+      renderArpLanes();
       knobVals.forEach(([k, f]) => { let v = k.querySelector('.arp-knob-val'); if (!v) { v = document.createElement('span'); v.className = 'arp-knob-val'; k.appendChild(v); } v.textContent = f(); });
       const set = (id, t) => { const el = document.getElementById(id); if (el) el.textContent = t; };
       set('arpDisplayOct', `OCT ${arpEngine.octaves}`); set('arpDisplayGate', `GATE ${arpEngine.gatePercent}%`); set('arpDisplaySwing', `SWING ${arpEngine.swingPercent}%`);
@@ -16416,14 +16459,7 @@ function exportCurrentPatchSyx() {
     patternTools.style.cssText = 'display: flex; gap: 6px; flex-wrap: wrap; margin-top: 8px; justify-content: center; width: 100%; box-sizing: border-box;';
 
     const setPattern = (patternArr) => {
-      for (let i = 0; i < 16; i++) {
-        arpEngine.steps[i] = !!patternArr[i];
-        const btn = document.getElementById(`arpStepBtn${i}`);
-        if (btn) {
-          if (arpEngine.steps[i]) btn.classList.add('active');
-          else btn.classList.remove('active');
-        }
-      }
+      arpEngine.applyPreset(patternArr);
     };
 
     const addPresetBtn = (label, arr) => {
@@ -16457,6 +16493,7 @@ function exportCurrentPatchSyx() {
     elektronWrapper.appendChild(woodStrip);
 
     root.appendChild(elektronWrapper);
+    arpEngine.refreshStepsUI();
     arpEngine.updateUI();
   }
 
@@ -17317,6 +17354,7 @@ function exportCurrentPatchSyx() {
     elektronWrapper.appendChild(seqInfo);
 
     const innerLayout = document.createElement('div');
+    innerLayout.className = 'accessory-layout';
     innerLayout.style.cssText = 'display: flex; flex-direction: column; gap: 14px; align-items: center; margin-top: 24px; width: 100%; box-sizing: border-box; z-index: 1; padding-bottom: 24px;';
 
     // =========================================================================
@@ -17989,6 +18027,7 @@ function exportCurrentPatchSyx() {
     elektronWrapper.appendChild(songInfo);
 
     const innerLayout = document.createElement('div');
+    innerLayout.className = 'accessory-layout';
     innerLayout.style.display = 'flex';
     innerLayout.style.flexDirection = 'column';
     innerLayout.style.gap = '20px';
@@ -18325,6 +18364,12 @@ function exportCurrentPatchSyx() {
 
 
 
+  window.virusBankArchive=VirusPatchBanks.create(document.getElementById('patchBankArchive'),{
+    bank:VirusSoundBank,
+    sidebar:document.getElementById('pmBankSidebar'),
+    context:()=>({connected:!!selectedOutput,label:window.currentSynthMode==='multi'?'P'+((currentPartIndex||0)+1):'Single'}),
+    load:bytes=>loadPatchToActiveBuffer(bytes),download:downloadBlob
+  });
   renderLibrary();
   renderMultiLibrary();
   renderMultiPartsOverview();
@@ -19175,11 +19220,125 @@ function exportCurrentPatchSyx() {
     const offset = VirusHardwarePanel.offset(p.page);
     if (!global && part.dump && offset !== undefined && offset+p.index < part.dump.length-2) {
       part.dump[offset+p.index] = value;
+      if (part.dump.length === 524) {
+        let legacySum = 0;
+        for (let i=5; i<265; i++) legacySum += part.dump[i];
+        part.dump[265] = legacySum & 0x7f;
+      }
       let sum = 0;
       for (let i=5; i<part.dump.length-2; i++) sum += part.dump[i];
       part.dump[part.dump.length-2] = sum & 0x7f;
     }
   }
+  function soundPathContext() {
+    const sysexDenied = typeof midiAccess !== 'undefined' && midiAccess?.sysexEnabled === false;
+    return { connected: !!selectedOutput && !sysexDenied,
+      message: sysexDenied ? 'Autorizza MIDI e SysEx per applicare i parametri.' : '',
+      label: window.currentSynthMode === 'multi'
+      ? 'P' + ((currentPartIndex || 0) + 1) : 'Single' };
+  }
+
+  function applySoundPathRecipe(writes) {
+    VirusSoundPaths.validateRecipe(writes);
+    if (!selectedOutput) throw new Error('Uscita MIDI non collegata.');
+    if (!soundPathContext().connected) throw new Error('Autorizzazione SysEx necessaria.');
+    // One synchronous batch pins every write to the same active edit buffer.
+    const buffer = getSoundEditBuffer(currentPartIndex || 0);
+    const label = soundPathContext().label;
+    for (const p of writes) {
+      sendVirusParam(p.page, buffer, p.index, p.value, 'Percorsi: ' + p.name);
+      cacheHardwareValue(p, p.value);
+    }
+    refreshAllKnobs();
+    updateSingleOledDisplay();
+    window.virusHardware?.refresh();
+    return { label };
+  }
+
+  const guideBridge = {
+    bank: VirusSoundBank,
+    context: soundPathContext,
+    apply: applySoundPathRecipe,
+    loadSound: id => {
+      if (!soundPathContext().connected) throw Error('Collega MIDI OUT e autorizza SysEx.');
+      if (!loadPatchToActiveBuffer(VirusSoundBank.build(id))) throw Error('Caricamento del suono non riuscito.');
+      return {label:soundPathContext().label};
+    },
+    addSounds: ids => addOriginalSounds(ids),
+    exportSound: id => downloadBlob(VirusSoundBank.build(id), VirusSoundBank.programs.find(p=>p.id===id).name + '.syx'),
+    open: view => document.getElementById(view === 'multi' ? 'btnTabMultipart' : 'btnTabSynth').click(),
+    configureMidi: openSettingsModal
+  };
+
+  function studioContext() {
+    const context = soundPathContext(), buffer = getSoundEditBuffer();
+    const dump = hardwarePart()?.dump;
+    let signature = null;
+    if (dump && dump[7] === 0 && dump[8] === buffer) {
+      try { signature = VirusSoundStudio.signature(dump); } catch (error) {}
+    }
+    return {...context, signature, targetKey:(selectedOutput?.id || 'offline') + ':' + window.currentSynthMode + ':' + buffer};
+  }
+  function captureStudioSound() {
+    const context = studioContext(), buffer = getSoundEditBuffer();
+    if (!context.connected) return Promise.reject(new Error('Collega MIDI OUT e autorizza SysEx.'));
+    return new Promise((resolve,reject) => {
+      const cleanup = () => { clearTimeout(timer); document.removeEventListener('virus-studio-received', receive); };
+      const receive = event => {
+        const bytes = event.detail.bytes;
+        if (bytes[8] !== buffer) return;
+        cleanup();
+        if (studioContext().targetKey !== context.targetKey) { reject(new Error('La destinazione è cambiata durante la lettura.')); return; }
+        resolve({bytes,name:extractPatchName(bytes),label:context.label});
+      };
+      const timer = setTimeout(() => {cleanup();reject(new Error('Il Virus non ha risposto. Verifica MIDI IN e riprova.'));},4500);
+      document.addEventListener('virus-studio-received',receive);
+      try {
+        selectedOutput.send(new Uint8Array([...SYSEX_PREFIX,deviceId(),0x30,0,buffer,0xf7]));
+        recordMidiTx('Studio: leggi suono',new Uint8Array([...SYSEX_PREFIX,deviceId(),0x30,0,buffer,0xf7]));
+      } catch (error) {cleanup();reject(error);}
+    });
+  }
+  function updateStudioSound(next,previous,targetKey){
+    const context=studioContext();
+    if(!context.connected||context.targetKey!==targetKey)throw Error('La destinazione MIDI è cambiata. Ricarica il suono.');
+    const changes=VirusSoundStudio.parameterChanges(previous,next);
+    const buffer=getSoundEditBuffer();
+    for(const p of changes){
+      sendVirusParam(p.page,buffer,p.index,p.value,'Studio live: '+p.index);
+      cacheHardwareValue(p,p.value);
+    }
+    window.virusHardware?.refresh();
+    if(changes.length)setLastAction('Studio live · '+context.label+' · '+changes.length+' parametri');
+    return {label:context.label,targetKey:context.targetKey};
+  }
+  const soundPaths = VirusSoundStudio.create(document.getElementById('soundPathsContent'), {
+    bank:VirusSoundBank,
+    context:studioContext,
+    library:loadLibrary,
+    load:bytes => {
+      const context=studioContext();
+      if (!context.connected) throw Error('Collega MIDI OUT e autorizza SysEx.');
+      if (!loadPatchToActiveBuffer(bytes)) throw Error('Invio del suono non riuscito.');
+      return {label:context.label,targetKey:context.targetKey};
+    },
+    keyboard:()=>{setKeyboardDockVisible(true);rememberKeyboardDock(true);},
+    playNote:(note,velocity)=>playNote(note,velocity),stopNote:note=>stopNote(note,true),
+    downloadForma:()=>downloadBlob(VirusFormaBank.midi(VirusSoundBank),'VIRUS-H-FORMA-P-Classic-Studies.mid'),
+    createDx7:element=>{
+      const synth=VirusDx7Studio.create(element,{download:downloadBlob,extractMidi:VirusSoundBank.extractSysEx});
+      window.VirusDx7=synth;return synth;
+    },
+    update:updateStudioSound,
+    capture:captureStudioSound,
+    download:downloadBlob,
+    archive:()=>document.getElementById('btnTabPatchManager').click(),
+    import:()=>document.getElementById('btnImportSyx').click(),
+    advanced:()=>document.getElementById('btnTabSynth').click(),
+    midi:openSettingsModal,
+    createGuide:element=>VirusSoundPaths.create(element,guideBridge)
+  });
+
   VirusHardwarePanel.mount({
     part: () => currentPartIndex || 0,
     buffer: () => getSoundEditBuffer(),
@@ -19241,6 +19400,7 @@ function exportCurrentPatchSyx() {
   renderPianoKeys();
   updateKeyboardPartDisplay();
   updateTopPanelsVisibility('snow');
+  if (['#percorsi','#studio'].includes(location.hash)) document.getElementById('btnTabSoundPaths').click();
 })();
 
 </script>
@@ -19253,6 +19413,13 @@ function exportCurrentPatchSyx() {
 // e da sola la prima volta che entri in una sezione. Mostra sempre la guida della sezione attiva.
 (function () {
   const H = {
+    btnTabSoundPaths: ['STUDIO — trova, modifica, conserva', [
+      ['Trova un suono', 'Cerca per nome o carattere, scegli una collezione e filtra Basso, Lead o Pad. Selezionare un suono non invia MIDI. La stella lo aggiunge ai Preferiti.'],
+      ['Modella il timbro', 'Corpo, Brillantezza, Movimento e Spazio lavorano sui parametri del Virus. Le macro sono relative: zero conserva il timbro di partenza. Trascina in verticale; Shift regola con precisione.'],
+      ['Confronta A/B', 'A invia il suono di partenza; B invia la versione con le tue macro. Suona la tastiera collegata al Virus per ascoltare. Ogni invio riguarda la sola destinazione indicata e non salva nella memoria hardware.'],
+      ['Salva variante', 'Assegna un nome e dei caratteri, poi salva nella libreria di questo browser. L’originale resta intatto. Usa Backup Studio per conservare anche nomi, preferiti e varianti.'],
+      ['Dal Virus e dai file', 'Leggi il suono dal Virus attende una risposta MIDI reale. Importa accetta .mid e .syx; File e banchi apre l’archivio completo. Percorsi guidati conserva i cinque stili e i quattro caratteri sonori.']
+    ]],
     btnTabSnow: ['PANEL — il frontale del Virus', [
       ['Due strumenti distinti', 'Scegli <b>Virus TI Snow</b> o <b>Virus TI2 Desktop</b> sotto il pannello. Il cambio di modello mantiene la parte e il suono. <b>Zoom</b> ingrandisce fino al 250%: scorri il pannello per raggiungere i controlli.'],
       ['TI2 Desktop', 'Tutte le manopole sono attive. <b>SELECT</b> sceglie oscillatore, LFO, filtro o effetto; <b>EDIT</b> apre i parametri sulle tre VALUE. <b>SHIFT</b> attiva le funzioni alternative. Il nome e il valore effettivi compaiono sul display e sotto il pannello. <b>UNDO</b> annulla l’ultima modifica della parte.'],
@@ -19282,15 +19449,15 @@ function exportCurrentPatchSyx() {
       ['Display', 'I display mostrano l’effetto e seguono le manopole. Puoi anche <b>trascinarci sopra</b>: delay X = TIME, Y = FEEDBACK; saturazione X = CURVE, Y = SATUR; chorus X = RATE, Y = DEPTH.'],
       ['Macro', '<b>1: CUTOFF, 2: RESO, 3: SATUR, 4: FX SEND</b>: comandi rapidi sui parametri principali della parte.'],
     ]],
-    btnTabPatchManager: ['PATCH — libreria e file', [
+    btnTabPatchManager: ['BANCHI — archivio e file', [
       ['Suoni attivi', 'Le 4 parti con icona, canale e nome. <b>leggi</b> rilegge dal Virus il suono di una parte, <b>modifica</b> la apre nell’editor SINGLE. <b>leggi parti dal synth</b> le rilegge tutte.'],
       ['File', '<b>importa .syx / .mid</b> (o trascina il file sulla pagina). <b>backup</b> salva librerie e impostazioni in un file, <b>ripristina</b> le ricarica. Il campo di ricerca filtra Suoni, Multi e il banco letto per nome.'],
       ['Librerie', '<b>salva suono</b> mette nella libreria il suono letto dal Virus, con il nome che scrivi. <b>leggi e salva multi</b> legge le 4 parti e le salva come multi.'],
       ['Banchi del Virus', 'Scegli il banco (RAM-A…D, ROM-A…Z): <b>leggi</b> mostra le 128 patch, <b>cattura</b> le salva tutte nella libreria.'],
     ]],
     btnTabArp: ['ARP — arpeggiatore', [
-      ['Avvio', 'Tieni premute delle note dalla tastiera (<b>KEYS</b> in alto) o dal controller e premi <b>start arp</b>. <b>hold</b> tiene le note anche dopo che le rilasci. <b>test synth</b> suona una nota di prova.'],
-      ['Destinazione', '<b>DEST P1–P4</b> manda l’arpeggio a quella parte (con la sua icona); <b>AUTO</b> segue la parte della pagina attiva. Il display mostra parte e canale.'],
+      ['Avvio', 'Premi <b>start arp</b>, poi suona dalla tastiera (<b>KEYS</b> in alto) o dal controller. <b>hold</b> tiene le note anche dopo che le rilasci. <b>test synth</b> suona una nota di prova.'],
+      ['Quattro parti', '<b>P1–P4</b> seleziona il motore da modificare: ciascuno conserva pattern, accordi e impostazioni. <b>Avvia tutti</b> e <b>Ferma tutti</b> gestiscono le quattro parti. Servono MULTI e quattro canali MIDI distinti.'],
       ['Ritmo', '<b>TEMPO, ARP MODE, RESOLUTION, OCTAVES, GATE LENGTH, SWING</b>: il valore è sotto ogni manopola e sul display.'],
       ['Step', 'I 16 pad accendono/spengono gli step. I pulsanti sotto caricano pattern pronti (tutti on, 4/4, ottavi, offbeat, trance, acid).'],
     ]],

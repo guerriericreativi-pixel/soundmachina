@@ -17,8 +17,9 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST') {
         $result = vh_attempt(is_string($_POST['invite_code'] ?? null) ? trim($_POST['invite_code']) : '');
         if ($result['ok']) {
             session_regenerate_id(true);
-            $_SESSION['invite_stamp'] = hash('sha256', vh_config()['code_hash']);
-            $_SESSION['invite_expires'] = time() + 43200;
+            $_SESSION['access_role']=$result['role'];
+            $_SESSION['invite_stamp'] = hash('sha256', vh_config()[$result['role']==='admin'?'admin_hash':'code_hash']);
+            $_SESSION['invite_expires'] = time() + ($result['role']==='admin'?2592000:43200);
             $_SESSION['csrf'] = bin2hex(random_bytes(32));
             header('Location: app.php', true, 303); exit;
         }

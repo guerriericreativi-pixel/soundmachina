@@ -9,7 +9,7 @@
 <link rel="icon" href="assets/icons/lucide/audio-waveform.svg" type="image/svg+xml">
 <link rel="stylesheet" href="landing.css?v=5">
 <link rel="stylesheet" href="landing-carousel.css?v=2">
-<script src="landing.js?v=4" defer></script>
+<script src="landing.js?v=5" defer></script>
 <script src="landing-carousel.js?v=1" defer></script>
 </head>
 <body>
@@ -30,13 +30,13 @@
         <p class="eyebrow">Il tuo accesso allo studio</p>
         <h2 id="invite-title">Entra nel<br> tuo studio.</h2>
         <?php if (vh_authenticated()): ?>
-          <p class="invite-copy">Il tuo invito è attivo.<br>È il momento di fare suono.</p>
+          <p class="invite-copy"><?= vh_role()==='admin'?'Accesso amministratore attivo.':'Il tuo invito è attivo.' ?><br>È il momento di fare suono.</p>
           <a class="primary-button" href="app.php">Apri VIRUS-H <img src="assets/landing/arrow-right.svg" alt="" width="22" height="22"></a>
           <form method="post" action="index.php" class="logout-form"><input type="hidden" name="csrf" value="<?= vh_escape(vh_csrf()) ?>"><input type="hidden" name="action" value="logout"><button type="submit" class="text-button">Esci da questo dispositivo</button></form>
         <?php else: ?>
           <form method="post" action="index.php#accesso" id="inviteForm">
             <input type="hidden" name="csrf" value="<?= vh_escape(vh_csrf()) ?>">
-            <label for="inviteCode">Codice invito</label>
+            <label for="inviteCode">Codice di accesso</label>
             <div class="code-field"><input id="inviteCode" name="invite_code" type="password" placeholder="Inserisci il tuo codice" autocomplete="off" autocapitalize="none" spellcheck="false" maxlength="128" required <?= $error ? 'aria-invalid="true" aria-describedby="inviteError"' : '' ?>><button type="button" class="show-code" id="showCode" aria-label="Mostra codice invito" aria-pressed="false"><img src="assets/landing/eye.svg" alt="" width="20" height="20"></button></div>
             <?php if ($error): ?><p id="inviteError" class="form-error" role="alert"><?= vh_escape($error) ?></p><?php endif; ?>
             <button class="primary-button" type="submit">Accedi a VIRUS-H <img src="assets/landing/arrow-right.svg" alt="" width="22" height="22"></button>
@@ -72,35 +72,35 @@
       </div>
       <div class="carousel-track" id="featureTrack">
         <article class="carousel-slide" id="slide-panel" role="tabpanel" aria-labelledby="feature-panel" aria-hidden="false" tabindex="0">
-          <figure class="carousel-screen"><img src="assets/landing/feature-panel-snow.webp" data-feature-image="panel" alt="PANEL: schermata dell’editor VIRUS-H" loading="lazy" width="1280" height="900"></figure>
+          <figure class="carousel-screen"><img src="assets/landing/feature-panel-snow.webp?v=compact-shell-v1" data-feature-image="panel" alt="PANEL: schermata dell’editor VIRUS-H" loading="lazy" width="1280" height="900"></figure>
           <div class="carousel-copy"><div><p class="eyebrow">01 / PANEL</p><h3>Il Virus, davanti a te.</h3></div><div><p>Ritrova il frontale del tuo sintetizzatore: display, manopole e pulsanti in dialogo con l’hardware.</p><p class="carousel-details">Controllo diretto · Snow e TI2 Desktop</p></div></div>
         </article>
         <article class="carousel-slide" id="slide-single" role="tabpanel" aria-labelledby="feature-single" aria-hidden="true" tabindex="-1">
-          <figure class="carousel-screen"><img src="assets/landing/feature-single-snow.webp" data-feature-image="single" alt="SINGLE: schermata dell’editor VIRUS-H" loading="lazy" width="1280" height="900"></figure>
+          <figure class="carousel-screen"><img src="assets/landing/feature-single-snow.webp?v=compact-shell-v1" data-feature-image="single" alt="SINGLE: schermata dell’editor VIRUS-H" loading="lazy" width="1280" height="900"></figure>
           <div class="carousel-copy"><div><p class="eyebrow">02 / SINGLE</p><h3>Entra nel suono.</h3></div><div><p>Scegli la parte e lavora su oscillatori, filtri, inviluppi e modulazioni. Display e manopole seguono la pagina che stai modificando.</p><p class="carousel-details">P1–P4 · Oscillatori · Filtri · Inviluppi</p></div></div>
         </article>
         <article class="carousel-slide" id="slide-multi" role="tabpanel" aria-labelledby="feature-multi" aria-hidden="true" tabindex="-1">
-          <figure class="carousel-screen"><img src="assets/landing/feature-multi-snow.webp" data-feature-image="multi" alt="MULTI: schermata dell’editor VIRUS-H" loading="lazy" width="1280" height="900"></figure>
+          <figure class="carousel-screen"><img src="assets/landing/feature-multi-snow.webp?v=compact-shell-v1" data-feature-image="multi" alt="MULTI: schermata dell’editor VIRUS-H" loading="lazy" width="1280" height="900"></figure>
           <div class="carousel-copy"><div><p class="eyebrow">03 / MULTI</p><h3>Quattro parti. Un’idea.</h3></div><div><p>Assegna i suoni alle quattro parti e regola livelli, panorama e canali MIDI. Passa da un layer a quattro strumenti indipendenti.</p><p class="carousel-details">4 parti · Mixer · Routing MIDI</p></div></div>
         </article>
         <article class="carousel-slide" id="slide-fx-rack" role="tabpanel" aria-labelledby="feature-fx-rack" aria-hidden="true" tabindex="-1">
-          <figure class="carousel-screen"><img src="assets/landing/feature-fx-rack-snow.webp" data-feature-image="fx-rack" alt="FX RACK: schermata dell’editor VIRUS-H" loading="lazy" width="1280" height="900"></figure>
+          <figure class="carousel-screen"><img src="assets/landing/feature-fx-rack-snow.webp?v=compact-shell-v1" data-feature-image="fx-rack" alt="FX RACK: schermata dell’editor VIRUS-H" loading="lazy" width="1280" height="900"></figure>
           <div class="carousel-copy"><div><p class="eyebrow">04 / FX RACK</p><h3>Dai spazio al carattere.</h3></div><div><p>Delay, riverbero, saturazione e chorus in un rack dedicato. Seleziona la parte e usa le macro per raggiungere i controlli principali.</p><p class="carousel-details">Effetti per parte · Macro · Pad X/Y</p></div></div>
         </article>
         <article class="carousel-slide" id="slide-patch" role="tabpanel" aria-labelledby="feature-patch" aria-hidden="true" tabindex="-1">
-          <figure class="carousel-screen"><img src="assets/landing/feature-patch-snow.webp" data-feature-image="patch" alt="PATCH: schermata dell’editor VIRUS-H" loading="lazy" width="1280" height="900"></figure>
+          <figure class="carousel-screen"><img src="assets/landing/feature-patch-snow.webp?v=compact-shell-v1" data-feature-image="patch" alt="PATCH: schermata dell’editor VIRUS-H" loading="lazy" width="1280" height="900"></figure>
           <div class="carousel-copy"><div><p class="eyebrow">05 / PATCH</p><h3>Dai un posto alle idee.</h3></div><div><p>Cerca nelle patch, importa i tuoi file .syx e .mid e scegli la parte in cui caricare il suono. Conserva suoni e Multi nella libreria locale.</p><p class="carousel-details">Libreria · Importazione · Backup</p></div></div>
         </article>
         <article class="carousel-slide" id="slide-arp" role="tabpanel" aria-labelledby="feature-arp" aria-hidden="true" tabindex="-1">
-          <figure class="carousel-screen"><img src="assets/landing/feature-arp-snow.webp" data-feature-image="arp" alt="ARP: schermata dell’editor VIRUS-H" loading="lazy" width="1280" height="900"></figure>
+          <figure class="carousel-screen"><img src="assets/landing/feature-arp-snow.webp?v=compact-shell-v1" data-feature-image="arp" alt="ARP: schermata dell’editor VIRUS-H" loading="lazy" width="1280" height="900"></figure>
           <div class="carousel-copy"><div><p class="eyebrow">06 / ARP</p><h3>Trasforma le note in movimento.</h3></div><div><p>Scegli la parte di destinazione, imposta ritmo, ottave e swing. Attiva gli step e usa Hold per mantenere l’arpeggio.</p><p class="carousel-details">16 step · Pattern · Hold</p></div></div>
         </article>
         <article class="carousel-slide" id="slide-seq" role="tabpanel" aria-labelledby="feature-seq" aria-hidden="true" tabindex="-1">
-          <figure class="carousel-screen"><img src="assets/landing/feature-seq-snow.webp" data-feature-image="seq" alt="SEQ: schermata dell’editor VIRUS-H" loading="lazy" width="1280" height="900"></figure>
+          <figure class="carousel-screen"><img src="assets/landing/feature-seq-snow.webp?v=compact-shell-v1" data-feature-image="seq" alt="SEQ: schermata dell’editor VIRUS-H" loading="lazy" width="1280" height="900"></figure>
           <div class="carousel-copy"><div><p class="eyebrow">07 / SEQ</p><h3>Costruisci il tuo prossimo giro.</h3></div><div><p>Una traccia per parte, fino a 64 step. Modifica note, gate e accenti, poi salva i pattern da richiamare nel tuo studio.</p><p class="carousel-details">4 tracce · 64 step · Pattern</p></div></div>
         </article>
         <article class="carousel-slide" id="slide-song" role="tabpanel" aria-labelledby="feature-song" aria-hidden="true" tabindex="-1">
-          <figure class="carousel-screen"><img src="assets/landing/feature-song-snow.webp" data-feature-image="song" alt="SONG: schermata dell’editor VIRUS-H" loading="lazy" width="1280" height="900"></figure>
+          <figure class="carousel-screen"><img src="assets/landing/feature-song-snow.webp?v=compact-shell-v1" data-feature-image="song" alt="SONG: schermata dell’editor VIRUS-H" loading="lazy" width="1280" height="900"></figure>
           <div class="carousel-copy"><div><p class="eyebrow">08 / SONG</p><h3>Metti in ordine il brano.</h3></div><div><p>Collega i pattern salvati in SEQ. Per ogni passaggio scegli ripetizioni e trasposizione, poi ascolta la sequenza o ripetila in loop.</p><p class="carousel-details">Catena di pattern · Ripetizioni · Trasposizione</p></div></div>
         </article>
       </div>

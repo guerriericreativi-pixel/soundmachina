@@ -11,7 +11,7 @@
     hero.src = `assets/landing/hero-${root.dataset.theme}-transparent.png`;
     hero.alt = dark ? 'Access Virus TI2 Desktop, scocca scura e pannello completo' : 'Access Virus TI Snow, scocca chiara e display azzurro';
     document.querySelectorAll('[data-feature-image]').forEach(image => {
-      image.src = `assets/landing/feature-${image.dataset.featureImage}-${root.dataset.theme}.webp`;
+      image.src = `assets/landing/feature-${image.dataset.featureImage}-${root.dataset.theme}.webp?v=compact-shell-v1`;
     });
     caption.textContent = dark ? 'VIRUS TI2 DESKTOP' : 'VIRUS TI SNOW';
     document.querySelector('meta[name="theme-color"]').content = dark ? '#191d1c' : '#e9e9e3';

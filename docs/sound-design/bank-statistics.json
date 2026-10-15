@@ -1,0 +1,255 @@
+{
+  "analysisDate": "2026-10-15",
+  "scope": "Configured patch parameters; not audio quality measurements",
+  "quantum": {
+    "count": 14,
+    "oscillatorModels": [
+      "Grain Simple",
+      "Classic",
+      "Formant Complex",
+      "Wavetable",
+      "HyperSaw",
+      "Wave PWM"
+    ],
+    "unison": 11,
+    "saturation": 9,
+    "distortion": 14,
+    "chorusSend": 14,
+    "delaySend": 12,
+    "reverbSend": 13,
+    "phaser": 9,
+    "eq": 14,
+    "matrix": 14,
+    "matrixRoutes": 97,
+    "velocity": 13,
+    "activeArp": 6,
+    "volumeRange": [
+      92,
+      127
+    ]
+  },
+  "metropolis": {
+    "count": 116,
+    "oscillatorModels": [
+      "Classic",
+      "HyperSaw",
+      "Grain Complex",
+      "Formant Complex",
+      "Wavetable",
+      "Wave PWM"
+    ],
+    "unison": 104,
+    "saturation": 28,
+    "distortion": 111,
+    "chorusSend": 95,
+    "delaySend": 108,
+    "reverbSend": 87,
+    "phaser": 34,
+    "eq": 115,
+    "matrix": 101,
+    "matrixRoutes": 477,
+    "velocity": 98,
+    "activeArp": 23,
+    "volumeRange": [
+      75,
+      127
+    ]
+  },
+  "metropolisGroups": {
+    "bass": {
+      "count": 14,
+      "oscillatorModels": [
+        "Classic",
+        "HyperSaw",
+        "Grain Complex"
+      ],
+      "unison": 12,
+      "saturation": 5,
+      "distortion": 13,
+      "chorusSend": 12,
+      "delaySend": 12,
+      "reverbSend": 9,
+      "phaser": 5,
+      "eq": 14,
+      "matrix": 13,
+      "matrixRoutes": 73,
+      "velocity": 7,
+      "activeArp": 0,
+      "volumeRange": [
+        92,
+        127
+      ]
+    },
+    "bassArp": {
+      "count": 23,
+      "oscillatorModels": [
+        "Classic",
+        "HyperSaw"
+      ],
+      "unison": 18,
+      "saturation": 5,
+      "distortion": 21,
+      "chorusSend": 18,
+      "delaySend": 21,
+      "reverbSend": 10,
+      "phaser": 6,
+      "eq": 23,
+      "matrix": 17,
+      "matrixRoutes": 83,
+      "velocity": 21,
+      "activeArp": 23,
+      "volumeRange": [
+        87,
+        127
+      ]
+    },
+    "leadBrass": {
+      "count": 36,
+      "oscillatorModels": [
+        "Classic",
+        "HyperSaw",
+        "Formant Complex"
+      ],
+      "unison": 32,
+      "saturation": 7,
+      "distortion": 35,
+      "chorusSend": 28,
+      "delaySend": 34,
+      "reverbSend": 31,
+      "phaser": 9,
+      "eq": 35,
+      "matrix": 32,
+      "matrixRoutes": 161,
+      "velocity": 33,
+      "activeArp": 0,
+      "volumeRange": [
+        75,
+        127
+      ]
+    },
+    "pads": {
+      "count": 9,
+      "oscillatorModels": [
+        "Classic",
+        "Formant Complex",
+        "HyperSaw"
+      ],
+      "unison": 9,
+      "saturation": 1,
+      "distortion": 9,
+      "chorusSend": 9,
+      "delaySend": 8,
+      "reverbSend": 5,
+      "phaser": 4,
+      "eq": 9,
+      "matrix": 9,
+      "matrixRoutes": 40,
+      "velocity": 9,
+      "activeArp": 0,
+      "volumeRange": [
+        85,
+        109
+      ]
+    },
+    "keysPlucks": {
+      "count": 20,
+      "oscillatorModels": [
+        "Classic",
+        "Wavetable",
+        "Grain Complex",
+        "HyperSaw"
+      ],
+      "unison": 19,
+      "saturation": 6,
+      "distortion": 19,
+      "chorusSend": 16,
+      "delaySend": 19,
+      "reverbSend": 18,
+      "phaser": 7,
+      "eq": 20,
+      "matrix": 18,
+      "matrixRoutes": 55,
+      "velocity": 16,
+      "activeArp": 0,
+      "volumeRange": [
+        92,
+        127
+      ]
+    },
+    "bells": {
+      "count": 14,
+      "oscillatorModels": [
+        "Classic",
+        "Wavetable",
+        "Wave PWM"
+      ],
+      "unison": 14,
+      "saturation": 4,
+      "distortion": 14,
+      "chorusSend": 12,
+      "delaySend": 14,
+      "reverbSend": 14,
+      "phaser": 3,
+      "eq": 14,
+      "matrix": 12,
+      "matrixRoutes": 65,
+      "velocity": 12,
+      "activeArp": 0,
+      "volumeRange": [
+        91,
+        127
+      ]
+    }
+  },
+  "directions": {
+    "count": 20,
+    "oscillatorModels": [
+      "Classic",
+      "HyperSaw"
+    ],
+    "unison": 1,
+    "saturation": 0,
+    "distortion": 0,
+    "chorusSend": 11,
+    "delaySend": 8,
+    "reverbSend": 15,
+    "phaser": 0,
+    "eq": 0,
+    "matrix": 20,
+    "matrixRoutes": 20,
+    "velocity": 20,
+    "activeArp": 0,
+    "volumeRange": [
+      64,
+      78
+    ]
+  },
+  "forma": {
+    "count": 16,
+    "oscillatorModels": [
+      "Classic"
+    ],
+    "unison": 0,
+    "saturation": 0,
+    "distortion": 0,
+    "chorusSend": 13,
+    "delaySend": 0,
+    "reverbSend": 0,
+    "phaser": 0,
+    "eq": 0,
+    "matrix": 0,
+    "matrixRoutes": 0,
+    "velocity": 16,
+    "activeArp": 0,
+    "volumeRange": [
+      100,
+      100
+    ]
+  },
+  "caveats": [
+    "METROPOLIS matrixRoutes includes one unresolved source (127), leaving 476 resolved routes.",
+    "Send, matrix, unison and velocity counts describe configuration, not proven audible contribution.",
+    "QUANTUM comparison includes 14 selected musical presets from 39 messages.",
+    "Current original bank statistics describe the snapshot analyzed on 2026-10-15."
+  ]
+}

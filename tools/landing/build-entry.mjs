@@ -14,7 +14,9 @@ for (const folder of ['.editor', '.access']) writeFileSync(resolve(destination, 
 // The legacy URL is redirected through the PHP gate by .htaccess.
 // Do not leave an independently readable static copy of the editor behind.
 if (existsSync(resolve(destination, 'index.html'))) rmSync(resolve(destination, 'index.html'));
-for (const file of ['index.php','app.php','access.php','landing.php','landing.css','landing.js','landing-carousel.css','landing-carousel.js','.htaccess']) cpSync(resolve(root, 'web-entry', file), resolve(destination, file));
-for (const file of ['virus-icons.js','multi-setup.js','multi-setup.css','virus-hardware-panel.js','virus-hardware-panel.css','virus-accessory-panel.css','virus-panel-layouts.js']) cpSync(resolve(root,file),resolve(destination,file));
+for (const file of ['index.php','app.php','access.php','banks.php','landing.php','landing.css','landing.js','landing-carousel.css','landing-carousel.js','.htaccess']) cpSync(resolve(root, 'web-entry', file), resolve(destination, file));
+for (const file of ['access-controls.js','patch-bank-library.js','patch-bank-library.css','virus-icons.js','multi-setup.js','multi-setup.css','virus-hardware-panel.js','virus-hardware-panel.css','virus-accessory-panel.css','virus-panel-layouts.js','sound-paths.js','sound-paths.css','virus-sound-bank.js','sound-studio.js','sound-studio.css','studio-instruments.js','studio-instruments.css','dx7-studio.js','dx7-studio.css','mac-keyboard.js','forma-bank.js','studio-effects.js','studio-effects.css']) cpSync(resolve(root,file),resolve(destination,file));
 cpSync(resolve(root,'assets'),resolve(destination,'assets'),{recursive:true,filter:path=>!path.endsWith('.DS_Store')});
 console.log('Invite-gated entry assembled: '+destination);
+
+cpSync(resolve(root,'vendor/dx7'),resolve(destination,'vendor/dx7'),{recursive:true});

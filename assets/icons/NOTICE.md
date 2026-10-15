@@ -18,7 +18,7 @@ Original SVG files are retained in fontaudio/.
 
 https://lucide.dev/ — ISC license; full copyright/license in lucide/LICENSE.
 Used: piano, guitar, bell, drum, mic, audio-waveform, sliders-horizontal,
-message-circle. Original SVG files are retained in lucide/.
+message-circle, star (Studio favorites). Original SVG files are retained in lucide/.
 
 ## Game-icons
 

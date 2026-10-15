@@ -15,11 +15,11 @@ test('Snow/Dark switch updates every carousel screenshot and preserves the selec
  assert.equal(d.documentElement.dataset.theme,'dark');
  assert.match(d.getElementById('heroInstrument').src,/hero-dark-transparent.png$/);
  assert.equal(d.querySelector('[data-theme-choice="dark"]').getAttribute('aria-pressed'),'true');
- for(const img of d.querySelectorAll('[data-feature-image]')) assert.ok(img.src.endsWith(`feature-${img.dataset.featureImage}-dark.webp`));
+ for(const img of d.querySelectorAll('[data-feature-image]')) assert.ok(new URL(img.src).pathname.endsWith(`feature-${img.dataset.featureImage}-dark.webp`));
  assert.equal(d.querySelector('[data-feature][aria-selected="true"]').dataset.feature,'multi');
  assert.equal(w.localStorage.getItem('virusTiSnow_theme'),'elektron');
  d.querySelector('[data-theme-choice="snow"]').click();
- for(const img of d.querySelectorAll('[data-feature-image]')) assert.ok(img.src.endsWith(`feature-${img.dataset.featureImage}-snow.webp`));
+ for(const img of d.querySelectorAll('[data-feature-image]')) assert.ok(new URL(img.src).pathname.endsWith(`feature-${img.dataset.featureImage}-snow.webp`));
  assert.match(d.getElementById('heroInstrument').src,/hero-snow-transparent.png$/);
  w.close();
 });

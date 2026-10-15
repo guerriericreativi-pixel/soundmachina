@@ -1,5 +1,4 @@
-/* Accessory instruments share the PANEL's native studio materials and controls.
-   Keep the original 9-slice footprints so every live control retains its position. */
+/* Accessory instruments share the PANEL's native materials and folded sides. */
 :root {
   --accessory-body: url("assets/panel/accessory-top-snow.webp?v=accessory-depth-v2");
   --accessory-lcd-substrate: url("assets/panel/accessory-snow-lcd-surface.webp?v=snow-lcd-v3");
@@ -46,6 +45,39 @@ html[data-skin="elektron"] .hardware-chassis:not(#snowHardwareChassis) {
 html[data-skin] .hardware-chassis:not(#snowHardwareChassis) .chassis-screw,
 html[data-skin] .hardware-chassis:not(#snowHardwareChassis) > .chassis-wood-strip {
   display: none !important;
+}
+/* Fit the enclosure to the work surface, without scaling controls or type. */
+html[data-skin] .hardware-chassis:not(#snowHardwareChassis) {
+  width: calc(100% - 32px) !important;
+  max-width: 1100px !important;
+  padding: 44px 24px 24px !important;
+  gap: 12px !important;
+  margin: 16px auto 28px !important;
+}
+html[data-skin] :is(#singleView,#arpContent) .hardware-chassis {
+  max-width: 1040px !important;
+}
+.hardware-chassis .accessory-layout {
+  margin-top: 0 !important;
+  padding-bottom: 0 !important;
+  gap: 12px !important;
+}
+#singleView .accessory-layout { gap: 24px !important; }
+.hardware-chassis .single-top-bar {
+  margin-top: 0 !important;
+  padding: 6px 12px !important;
+}
+.hardware-chassis .chassis-keys { margin-bottom: 0; }
+.hardware-chassis .fx-rack-topbar { padding-bottom: 10px; margin-bottom: 0; }
+.hardware-chassis .fx-rack-grid { gap: 14px; }
+.hardware-chassis .fx-unit { padding: 12px 14px; gap: 10px; }
+#sequencerContent { padding-bottom: 20px !important; }
+@media(max-width:760px) {
+  html[data-skin] .hardware-chassis:not(#snowHardwareChassis) {
+    width: calc(100% - 16px) !important;
+    padding: 44px 20px 20px !important;
+    margin-block: 12px 24px !important;
+  }
 }
 html[data-skin] .hardware-chassis .chassis-hardware-topbar > span {
   color: var(--hw-print) !important;

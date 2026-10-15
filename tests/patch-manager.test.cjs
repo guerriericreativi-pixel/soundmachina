@@ -19,7 +19,7 @@ for (const match of html.matchAll(/<script\b[^>]*>([\s\S]*?)<\/script>/gi)) {
 function setup(extra = {}) {
   const dom = new JSDOM(html);
   const context = vm.createContext({ document: dom.window.document, window: {}, console, selectedOutput: null,
-    SYSEX_PREFIX: [0xF0, 0, 0x20, 0x33, 1], ...extra });
+    SYSEX_PREFIX: [0xF0, 0, 0x20, 0x33, 1], soundPaths:{refresh(){}}, ...extra });
   for (const name of ['updatePatchResultCount', 'selectPatchSource', 'preparePatchForBuffer', 'getSoundEditBuffer', 'loadPatchToActiveBuffer', 'renderMultiLibrary', 'renderLibrary']) {
     vm.runInContext(functions.get(name), context);
   }
@@ -78,7 +78,11 @@ test('Readdressing both standard and TI dumps preserves source bytes and fixes t
     const expected = Array.from(prepared.slice(5, -2)).reduce((a, b) => a + b, 0) & 0x7F;
     assert.equal(prepared[size - 2], expected);
     assert.deepEqual(Array.from(original), snapshot);
-    assert.deepEqual(Array.from(prepared.slice(9, -2)), snapshot.slice(9, -2));
+    if (size === 524) {
+      assert.deepEqual(Array.from(prepared.slice(9,265)), snapshot.slice(9,265));
+      assert.deepEqual(Array.from(prepared.slice(266,-2)), snapshot.slice(266,-2));
+      assert.equal(prepared[265], Array.from(prepared.slice(5,265)).reduce((a,b)=>a+b,0)&127);
+    } else assert.deepEqual(Array.from(prepared.slice(9, -2)), snapshot.slice(9, -2));
   }
 });
 
@@ -99,6 +103,48 @@ test('Foreign or truncated SysEx is rejected before loading', () => {
   assert.throws(() => c.preparePatchForBuffer([0xF0, 0xF7], 0, 0), /non valido/);
   const foreign = dump(267); foreign[2] = 1;
   assert.throws(() => c.preparePatchForBuffer(foreign, 0, 0), /non valido/);
+});
+
+test('Original TI programs keep both valid checksums when loading Single or P3',()=>{
+  const bank=require('../virus-sound-bank');
+  const c=setup();
+  const original=bank.build('skyline');
+  for(const buffer of [0x40,2]){
+    const bytes=c.preparePatchForBuffer(original,buffer,3);
+    assert.equal(bytes[265],Array.from(bytes.slice(5,265)).reduce((a,b)=>a+b,0)&127);
+    assert.equal(bytes[522],Array.from(bytes.slice(5,522)).reduce((a,b)=>a+b,0)&127);
+    assert.equal(bytes[296],1); // E30 oscillator model, after intermediate checksum
+    assert.equal(bytes[301],1); // E35
+    assert.equal(bytes[8],buffer);
+  }
+  assert.deepEqual(original,bank.build('skyline'));
+});
+
+test('Cached edits preserve both checksums and address the correct TI effect byte',()=>{
+  const bank=require('../virus-sound-bank');
+  const hardware=require('../virus-hardware-panel');
+  const part={dump:Array.from(bank.build('slow-bloom')),sound:{},values:{}};
+  const c=vm.createContext({VirusHardwarePanel:hardware,hardwarePart:()=>part,
+    hardwareKey:p=>p.page+':'+p.index,hardwareParam:()=>null,hardwareGlobals:{}});
+  vm.runInContext(functions.get('cacheHardwareValue'),c);
+  c.cacheHardwareValue({page:0x70,index:40},103);
+  c.cacheHardwareValue({page:0x6e,index:2},21);
+  assert.equal(part.dump[49],103);
+  assert.equal(part.dump[268],21);
+  assert.equal(part.dump[267],1); // Reverb mode has not been overwritten
+  assert.equal(part.dump[265],part.dump.slice(5,265).reduce((a,b)=>a+b,0)&127);
+  assert.equal(part.dump[522],part.dump.slice(5,522).reduce((a,b)=>a+b,0)&127);
+});
+
+test('The app archives imported banks without flattening names or changing the active sound',async()=>{
+  const bank=require('../virus-sound-bank'),archives=require('../patch-bank-library'),{webcrypto}=require('node:crypto');let records=[];
+  const model=archives.createModel({bank,crypto:webcrypto,store:{list:async()=>records,merge:async r=>{records.push(...r);return r.length;}}});
+  const c=setup({saveLibrary:()=>{throw Error('Must not overwrite flat library');}});
+  c.window.virusBankArchive={importBytes:async(bytes,name)=>model.importFiles([{name,bytes}])};
+  vm.runInContext(functions.get('parseAndImportSysex'),c);
+  await c.parseAndImportSysex(bank.midiBytes(),'Directions-01.mid');
+  assert.equal(records.length,1);assert.equal(records[0].patches.length,20);assert.equal(c.document.getElementById('pmArchive').hidden,false);
+  for(const [i,p] of bank.programs.entries())assert.deepEqual(records[0].patches[i].bytes,Array.from(bank.build(p.id)));
 });
 
 
