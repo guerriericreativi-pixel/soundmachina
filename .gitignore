@@ -39,3 +39,10 @@ plugin/VirusH/dist/
 plugin/VirusH/resources/web/
 !plugin/VirusH/resources/icon-1024.png
 !plugin/VirusH/resources/Images.xcassets/**/*.png
+
+# Local invite configuration and protected preview builds
+.local/
+
+# Never version invitation deployment state
+**/.access/config.php
+**/invite-code.txt

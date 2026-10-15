@@ -263,3 +263,44 @@ Status: passed locally; awaiting rendering approval.
 - Reserved the optical LCD treatment for the small destination readout, with destination and current sound name. Snow uses its native blue LCD; Desktop uses its own gray-green substrate. Updated static accessory review PATCH images to avoid stale previews.
 - Verified both skins in the actual browser; no console errors. 33 tests passed and diff whitespace clean. Plugin web resources updated; no commit/push.
 - Evidence: output/qa/patch-ux-v5-snow.png and patch-ux-v5-dark.png.
+
+## VIRUS-H landing — Snow / Dark invitation entry (2026-10-15)
+Final result: passed locally. Publication and rendering approval pending.
+
+Visual target: selected second landing direction, revised with Snow/Dark toggle:
+`exec-56327c4f-0513-4e8a-a7d5-a7cbf37e8508.png` in the conversation's generated_images folder.
+The user added a complete why/what/how narrative after the mock. These sections
+extend the source hero rather than alter the editor. Built-in imagegen produced
+two product-only raster assets using the supplied Snow and TI2 Desktop references.
+Native source/editor files are untouched.
+
+Visual comparison: opened target and implementation together in
+`output/qa/landing-reference-comparison.png`, then compared the complete Snow and
+Dark pages in `landing-full-comparison.png`. Hero preserves the selected editorial
+hierarchy, real hardware identity, right-hand invite form and neutral materials.
+Minor P3 variation: the photo is a contained product shot instead of extending
+behind the full page. The added story sections, navigation and credits follow the
+user's later requirements.
+
+Browser verification: 1440×1080 desktop, 1280×800 laptop and 834×1194 tablet;
+no document horizontal overflow in tested laptop/tablet sizes. Tested both themes,
+feature tabs, why/what/how navigation, expandable requirements, wrong-code feedback,
+real successful login into app.php, and logout back to the public form. The new
+origin's editor stayed disconnected; no hardware performance actions were used.
+
+Functional verification: all 40 Node tests passed, including actual PHP HTTP
+integration for anonymous/legacy route denial, private-path denial, CSRF rejection,
+wrong invite, valid invite, session rotation, logout, missing config fail-closed,
+and rate limiting across fresh sessions. UI tests cover theme-to-editor preference,
+hero/feature imagery, feature keyboard navigation and show/hide code. PHP syntax,
+JavaScript syntax and diff whitespace checks passed.
+
+Local preview: http://localhost:8766/ (PHP process). Invite config/code stay outside
+version control under .local/invite/. Protected bundle is .local/landing-preview/.
+Source landing/backend: web-entry/. Build helper and operational documentation:
+tools/landing/. A deployment manifest is prepared in the Tools repository but has
+not been run against its public assets. Production requires the private invite
+configuration and verification of PHP + Apache/LiteSpeed before activation.
+
+Evidence: landing-snow-desktop.png, landing-dark-desktop.png, landing-snow-full.png,
+landing-dark-full.png, landing-tablet.png and landing-tests.txt in output/qa/.

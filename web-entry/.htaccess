@@ -1,0 +1,16 @@
+Options -Indexes
+DirectoryIndex index.php
+<IfModule mod_headers.c>
+  Header always set X-Content-Type-Options "nosniff"
+  <FilesMatch "\.(php|html)$">
+    Header set Cache-Control "no-store, private"
+  </FilesMatch>
+</IfModule>
+<IfModule mod_rewrite.c>
+  RewriteEngine On
+  RewriteRule ^index\.html$ app.php [END]
+  RewriteRule ^\.(?:editor|access)(?:/|$) - [F,END]
+</IfModule>
+<FilesMatch "^(?:access|landing)\.php$">
+  Require all denied
+</FilesMatch>
