@@ -4,6 +4,16 @@ The root `index.html` remains the editor source and native-plugin resource.
 `web-entry/` is a separate public landing and PHP session gate. Both skins use
 local images/fonts. The why/what/how sections use actual editor screenshots.
 
+The “Cosa” carousel includes PANEL, SINGLE, MULTI, FX RACK, PATCH, ARP, SEQ,
+and SONG. `landing-carousel.js` keeps the tabs, arrows, keyboard navigation and
+native horizontal scrolling in sync, without automatic rotation. Its screenshots
+are real local editor views, captured without the contextual help overlay or a
+MIDI connection, and stored as `assets/landing/feature-{view}-{snow|dark}.webp`.
+Changing the landing theme updates every slide without changing the selection.
+The editor views are captured with a transparent page background and their native
+shadows. A single wood texture belongs to the scrolling viewport, so instruments
+move over a stationary continuous desk rather than carrying separate backdrops.
+
 ## Local preview
 
 Requires Node.js and PHP 8.1+. Do not use a static file server to test this gate.
