@@ -28,3 +28,13 @@ Gli ARP esterni richiedono la pagina aperta: quando diventa nascosta, i motori s
 ## Pubblicazione
 
 Disponibile online dal 16 ottobre 2026, versione `d27fb961`. Verificata la presenza dei quattro motori nella risposta autenticata dell’editor; la prova di ascolto hardware rimane distinta dai controlli di pubblicazione.
+
+## Pulsantiera retroilluminata
+
+I pulsanti ARP mantengono una luce ambra nello Snow e rossa nel Dark quando
+`aria-pressed=true`: parte selezionata, trasporti, HOLD, step del pattern e preset
+ritmico corrispondente. La luce resta visibile dopo il rilascio del mouse; il
+lampeggio del playhead è distinto dallo stato persistente dello step. Modificare
+uno step aggiorna anche l’indicatore del preset, senza cambiare le altre parti.
+Verificati accensione/spegnimento nel browser con MIDI disabilitato e sei test
+regressione ARP superati. Screenshot: `output/playwright/arp-backlights-dark.png`.

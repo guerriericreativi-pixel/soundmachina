@@ -7178,7 +7178,7 @@
     #lightLimiter { margin-left: 0 !important; }
   }
 </style>
-<link rel="stylesheet" href="virus-accessory-panel.css?v=compact-shell-v1">
+<link rel="stylesheet" href="virus-accessory-panel.css?v=arp-seq-backlights-v3">
 <link rel="stylesheet" href="sound-paths.css?v=6">
 <link rel="stylesheet" href="sound-studio.css?v=8">
 <link rel="stylesheet" href="studio-instruments.css?v=8">
@@ -15845,11 +15845,15 @@ function exportCurrentPatchSyx() {
         const pad = document.getElementById(`arpStepBtn${i}`);
         if (pad) {
           const on = this.steps[i];
+          pad.setAttribute('aria-pressed', String(on));
           if (on) pad.classList.add('active');
           else pad.classList.remove('active');
           pad.title = `Step ${i + 1}: ${on ? 'ATTIVO (ON)' : 'PAUSA (OFF)'}`;
         }
       }
+      document.querySelectorAll('[data-arp-pattern]').forEach(button => {
+        button.setAttribute('aria-pressed',String(button.dataset.arpPattern === this.steps.map(on=>on?'1':'0').join('')));
+      });
     },
 
     getStepMs() {
@@ -16048,8 +16052,10 @@ function exportCurrentPatchSyx() {
         }
       }
 
+      if (btn) btn.setAttribute('aria-pressed', String(this.running));
       const btnHold = document.getElementById('arpBtnHold');
       if (btnHold) {
+        btnHold.setAttribute('aria-pressed', String(this.hold));
         if (this.hold) {
           btnHold.textContent = 'hold: on';
           btnHold.classList.add('latched');
@@ -16447,6 +16453,7 @@ function exportCurrentPatchSyx() {
         if (on) stepBtn.classList.add('active');
         else stepBtn.classList.remove('active');
         stepBtn.title = `Step ${i + 1}: ${on ? 'ATTIVO' : 'PAUSA'}`;
+        arpEngine.refreshStepsUI();
       });
 
       padWell.appendChild(stepBtn);
@@ -16469,6 +16476,7 @@ function exportCurrentPatchSyx() {
       const b = document.createElement('button');
       b.className = 'arp-hw-preset-btn';
       b.textContent = label;
+      b.dataset.arpPattern = arr.map(on=>on?'1':'0').join('');
       b.addEventListener('click', () => setPattern(arr));
       patternTools.appendChild(b);
     };
@@ -16941,6 +16949,8 @@ function exportCurrentPatchSyx() {
 
         if (pad && numLabel && noteLabel) {
           const s = trk.steps[actualStep];
+          pad.setAttribute('aria-pressed', String(!!s?.active));
+          pad.setAttribute('aria-current', actualStep === trk.selectedStep ? 'step' : 'false');
           numLabel.textContent = String(actualStep + 1).padStart(2, '0');
           noteLabel.textContent = (s && s.active) ? midiNoteName(s.note) : '--';
 
@@ -16969,6 +16979,7 @@ function exportCurrentPatchSyx() {
       for (let p = 0; p < 4; p++) {
         const pBtn = document.getElementById(`seqPageBtn${p}`);
         if (pBtn) {
+          pBtn.setAttribute('aria-pressed', String(p === this.currentPage));
           if (p === this.currentPage) pBtn.classList.add('active-view');
           else pBtn.classList.remove('active-view');
         }
@@ -16983,10 +16994,12 @@ function exportCurrentPatchSyx() {
         const btnSolo = document.getElementById(`seqTrkSoloBtn${t}`);
 
         if (btnTrk) {
+          btnTrk.setAttribute('aria-pressed', String(t === this.selectedTrack));
           if (t === this.selectedTrack) btnTrk.classList.add('active-trk');
           else btnTrk.classList.remove('active-trk');
         }
         if (btnMute) {
+          btnMute.setAttribute('aria-pressed', String(!!trk.muted));
           if (trk.muted) {
             btnMute.classList.add('muted');
             btnMute.textContent = 'M';
@@ -16996,6 +17009,7 @@ function exportCurrentPatchSyx() {
           }
         }
         if (btnSolo) {
+          btnSolo.setAttribute('aria-pressed', String(!!trk.solo));
           if (trk.solo) {
             btnSolo.classList.add('soloed');
             btnSolo.textContent = 'S';
@@ -17066,10 +17080,12 @@ function exportCurrentPatchSyx() {
         noteBadge.style.color = (s && s.active) ? '#ffffff' : '#777';
       }
       if (tieBtn) {
+        tieBtn.setAttribute('aria-pressed', String(!!s?.tie));
         if (s && s.tie) tieBtn.classList.add('active');
         else tieBtn.classList.remove('active');
       }
       if (accentBtn) {
+        accentBtn.setAttribute('aria-pressed', String(!!s && s.velocity >= 120));
         if (s && s.velocity >= 120) accentBtn.classList.add('active');
         else accentBtn.classList.remove('active');
       }
@@ -17080,6 +17096,7 @@ function exportCurrentPatchSyx() {
       document.querySelectorAll('#sequencerContent .seq-trk-name').forEach((el, i) => { el.textContent = multiParts[i]?.name || '—'; el.parentElement.title = this.tracks[i]?.name || ''; });
       const playBtn = document.getElementById('seqBtnPlayStop');
       if (playBtn) {
+        playBtn.setAttribute('aria-pressed', String(this.running));
         if (this.running) {
           playBtn.innerHTML = '⏹ stop seq';
           playBtn.classList.add('running');
@@ -17090,6 +17107,7 @@ function exportCurrentPatchSyx() {
       }
       const followBtn = document.getElementById('seqBtnFollow');
       if (followBtn) {
+        followBtn.setAttribute('aria-pressed', String(this.followPage));
         if (this.followPage) {
           followBtn.textContent = 'follow: on';
           followBtn.classList.add('latched');
