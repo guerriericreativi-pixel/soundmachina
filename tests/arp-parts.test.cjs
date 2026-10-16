@@ -57,3 +57,18 @@ test('A later gate callback cannot stop the next repeated note',()=>{
   const oldGate=[...e[0].gateTimers][0];e[0].tick();
   assert.equal(timers.has(oldGate),false);assert.equal(e[0].activeNotesPlaying.has(60),true);
 });
+test('Explicit channel routing repairs duplicate P2 without changing sounds or levels',()=>{
+ const {c,engines:e,params}=setup();c.multiParts[1].values.channel=9;
+ c.multiParts.forEach((p,i)=>{p.name='Sound '+i;p.values.volume=80+i;});
+ const before=c.multiParts.map(p=>({name:p.name,volume:p.values.volume}));
+ assert.equal(c.assignArpChannels(),true);
+ assert.deepEqual(Array.from(c.multiParts,p=>p.values.channel),[0,1,2,3]);
+ assert.deepEqual(params.map(p=>p.slice(0,4)),[0,1,2,3].map(i=>[0x72,i,34,i]));
+ assert.deepEqual(c.multiParts.map(p=>({name:p.name,volume:p.values.volume})),before);
+ assert.equal(c.setArpPartChannel(1,7),true);assert.equal(e[1].getTargetChannel(),7);
+});
+test('Channel routing requires Multi and MIDI output and rejects invalid channels',()=>{
+ const {c,params}=setup('single');assert.equal(c.assignArpChannels(),false);assert.equal(params.length,0);
+ c.window.currentSynthMode='multi';assert.equal(c.setArpPartChannel(1,16),false);
+ c.selectedOutput=null;assert.equal(c.setArpPartChannel(1,1),false);assert.equal(params.length,0);
+});

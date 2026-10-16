@@ -38,3 +38,11 @@ lampeggio del playhead è distinto dallo stato persistente dello step. Modificar
 uno step aggiorna anche l’indicatore del preset, senza cambiare le altre parti.
 Verificati accensione/spegnimento nel browser con MIDI disabilitato e sei test
 regressione ARP superati. Screenshot: `output/playwright/arp-backlights-dark.png`.
+
+## Correzione canali condivisi
+
+Ogni corsia ARP espone il canale MIDI effettivo della parte. Un bordo ambra segnala
+canali condivisi. Il pulsante esplicito **Canali 1–4** assegna P1→1, P2→2, P3→3,
+P4→4 mediante Page C, parametro 34; non modifica suoni, volumi o pan. I trasporti
+interessati si fermano prima del cambio per rilasciare le note sul canale originale.
+Richiede MULTI e uscita MIDI; otto test ARP coprono anche la correzione dei duplicati.

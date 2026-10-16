@@ -430,3 +430,6 @@ html[data-skin] :is(#arpContent,#sequencerContent) button:is([aria-pressed="true
 #sequencerContent .seq-step-selected { outline: 2px solid #dce8e5 !important; outline-offset: 5px; }
 #sequencerContent .seq-trk-mute-btn { --arp-lamp: 255, 77, 72; }
 #sequencerContent .seq-trk-solo-btn { --arp-lamp: 125, 222, 145; }
+
+#arpContent [data-arp-channel] { max-width: 88px; padding: 5px 6px; font: inherit; border-radius: 4px; }
+#arpContent .arp-channel-shared [data-arp-channel] { outline: 1px solid #dba452; outline-offset: 2px; }

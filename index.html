@@ -7178,7 +7178,7 @@
     #lightLimiter { margin-left: 0 !important; }
   }
 </style>
-<link rel="stylesheet" href="virus-accessory-panel.css?v=arp-seq-backlights-v3">
+<link rel="stylesheet" href="virus-accessory-panel.css?v=arp-channels-v4">
 <link rel="stylesheet" href="sound-paths.css?v=6">
 <link rel="stylesheet" href="sound-studio.css?v=8">
 <link rel="stylesheet" href="studio-instruments.css?v=8">
@@ -16132,6 +16132,34 @@ function exportCurrentPatchSyx() {
     buildArpView(); // Rebind controls and knob positions without stopping other parts.
   }
 
+  function setArpPartChannel(index, channel) {
+    if (!Number.isInteger(index) || index < 0 || index > 3 || !Number.isInteger(channel) || channel < 0 || channel > 15) return false;
+    if (window.currentSynthMode !== 'multi') { setLastAction('Attiva MULTI per assegnare i canali delle parti.'); return false; }
+    if (!selectedOutput) { setLastAction('Collega MIDI OUT per assegnare i canali sul Virus.'); return false; }
+    if (typeof midiAccess !== 'undefined' && midiAccess?.sysexEnabled === false) { setLastAction('Autorizza SysEx per assegnare i canali.'); return false; }
+    arpEngines[index].stop();
+    try {
+      sendVirusParam(0x72, index, 34, channel, 'ARP: canale P' + (index + 1));
+      multiParts[index].values.channel = channel;
+      if (typeof renderMultiPartsOverview === 'function') renderMultiPartsOverview();
+      if (typeof updateKeyboardPartDisplay === 'function') updateKeyboardPartDisplay();
+      arpEngine.updateUI();
+      setLastAction(`P${index + 1} → CH ${channel + 1}`);
+      return true;
+    } catch (error) { setLastAction('Canale non assegnato: ' + error.message); return false; }
+  }
+
+  function assignArpChannels() {
+    // Explicit routing action: change channels only, preserving sounds and levels.
+    if (window.currentSynthMode !== 'multi' || !selectedOutput) {
+      setLastAction('Collega MIDI OUT e attiva MULTI per separare i canali.'); return false;
+    }
+    window.stopAllArps();
+    for (let i = 0; i < 4; i++) if (!setArpPartChannel(i, i)) return false;
+    setLastAction('Canali ARP separati: P1→1 · P2→2 · P3→3 · P4→4');
+    return true;
+  }
+
   function renderArpLanes() {
     document.querySelectorAll('[data-arp-lane]').forEach(row => {
       const engine = arpEngines[Number(row.dataset.arpLane)];
@@ -16139,7 +16167,15 @@ function exportCurrentPatchSyx() {
       edit.setAttribute('aria-pressed', String(engine === arpEngine));
       row.querySelector('[data-arp-state]').textContent =
         window.currentSynthMode !== 'multi' && engine.partIndex > 0 ? 'Richiede MULTI' :
-        `CH ${engine.getTargetChannel() + 1} · ${engine.modes[engine.modeIdx]} · ${engine.rates[engine.rateIdx].name}`;
+        `${engine.modes[engine.modeIdx]} · ${engine.rates[engine.rateIdx].name}`;
+      const channel = row.querySelector('[data-arp-channel]');
+      if (channel) {
+        channel.value = String(engine.getTargetChannel());
+        channel.disabled = window.currentSynthMode !== 'multi';
+        const shared = window.currentSynthMode === 'multi' && arpEngines.some(other=>other!==engine && other.getTargetChannel()===engine.getTargetChannel());
+        channel.title = shared ? 'Canale condiviso con un’altra parte: usa Canali 1–4 per separarli.' : 'Canale MIDI della parte';
+        row.classList.toggle('arp-channel-shared', shared);
+      }
       const play = row.querySelector('[data-arp-play]');
       play.textContent = engine.running ? '■ Ferma' : '▶ Avvia';
       play.setAttribute('aria-pressed', String(engine.running));
@@ -16276,9 +16312,13 @@ function exportCurrentPatchSyx() {
       edit.title = 'Modifica arpeggio P' + (engine.partIndex + 1);
       edit.onclick = () => selectArpPart(engine.partIndex);
       const status = document.createElement('small'); status.dataset.arpState = '';
+      const channel = document.createElement('select'); channel.dataset.arpChannel = '';
+      channel.setAttribute('aria-label', `Canale MIDI P${engine.partIndex + 1}`);
+      for (let ch=0; ch<16; ch++) { const option=document.createElement('option'); option.value=String(ch); option.textContent=`CH ${ch+1}`; channel.append(option); }
+      channel.onchange = () => { setArpPartChannel(engine.partIndex, Number(channel.value)); arpEngine.updateUI(); };
       const play = document.createElement('button'); play.type = 'button'; play.dataset.arpPlay = '';
       play.className = 'arp-hw-preset-btn'; play.onclick = () => { getAudioContext(); engine.toggle(); };
-      row.append(edit, status, play); lanes.appendChild(row);
+      row.append(edit, channel, status, play); lanes.appendChild(row);
     }
     innerLayout.appendChild(lanes);
     const note = document.createElement('div');
@@ -16296,7 +16336,10 @@ function exportCurrentPatchSyx() {
     };
     const stop = document.createElement('button'); stop.type = 'button'; stop.className = 'arp-hw-preset-btn';
     stop.textContent = 'Ferma tutti'; stop.onclick = () => window.stopAllArps();
-    note.append(help, multi, all, stop); innerLayout.appendChild(note);
+    const channels = document.createElement('button'); channels.type = 'button'; channels.className = 'arp-hw-preset-btn';
+    channels.textContent = 'Canali 1–4'; channels.title = 'Assegna P1→CH1, P2→CH2, P3→CH3, P4→CH4 sul Virus';
+    channels.onclick = assignArpChannels;
+    note.append(help, multi, channels, all, stop); innerLayout.appendChild(note);
     innerLayout.appendChild(topBar);
 
     // =========================================================================
